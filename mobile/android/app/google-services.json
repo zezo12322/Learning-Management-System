@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "153711492797",
+    "project_id": "learning-management-syst-3cc3a",
+    "storage_bucket": "learning-management-syst-3cc3a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153711492797:android:3d646fe6a9af50c8cc41d4",
+        "android_client_info": {
+          "package_name": "com.optimatech.lms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153711492797-55d04ohpbccm4cjmjsq3kokebskcpn8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHloBAkTxce3h1HBhmmzcDVVcMsLDszFk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153711492797-55d04ohpbccm4cjmjsq3kokebskcpn8l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "153711492797-uqgij6562h0q94a72nf2omk53ofpnnmq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.optimatech.lms"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153711492797:android:13f64656b59054a0cc41d4",
+        "android_client_info": {
+          "package_name": "com.optimatech.optimatech_lms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153711492797-55d04ohpbccm4cjmjsq3kokebskcpn8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHloBAkTxce3h1HBhmmzcDVVcMsLDszFk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153711492797-55d04ohpbccm4cjmjsq3kokebskcpn8l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "153711492797-uqgij6562h0q94a72nf2omk53ofpnnmq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.optimatech.lms"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
