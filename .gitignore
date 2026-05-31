@@ -1,0 +1,9 @@
+firebase-debug.log
+dataconnect-debug.log
+pglite-debug.log
+/.agents
+/.firebase
+/.gemini
+/.github
+/dataconnect/.dataconnect
+/mobile/.dart_tool

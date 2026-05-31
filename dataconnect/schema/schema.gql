@@ -1,0 +1,275 @@
+# ==========================================
+# ENUMS
+# ==========================================
+enum RoleAction { CREATE, READ, UPDATE, DELETE }
+enum CourseStatus { DRAFT, PUBLISHED, ARCHIVED }
+enum LectureType { VIDEO, READING, INTERACTIVE, QUIZ }
+enum EnrollmentStatus { ACTIVE, COMPLETED, DROPPED, SUSPENDED }
+enum SessionType { ONLINE, OFFLINE }
+enum AttendanceStatus { PRESENT, LATE, EXCUSED, UNEXCUSED }
+enum AttendanceMethod { QR, MANUAL }
+enum PaymentGateway { FAWRY, PAYMOB, INSTAPAY }
+enum PaymentStatus { PENDING, COMPLETED, FAILED, REFUNDED }
+enum SubscriptionStatus { ACTIVE, CANCELLED, SUSPENDED }
+
+# ==========================================
+# IDENTITY & ACCESS
+# ==========================================
+type User @table(name: "users") {
+  # Maps directly to Firebase Auth UID
+  id: String! @col(name: "uid") 
+  email: String!
+  name: String!
+  avatar: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  lastLogin: Timestamp
+}
+
+type Profile @table(name: "profiles") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User! @unique
+  bio: String
+  company: String
+  phone: String
+  # Swapped JSON to Any for complex preference objects
+  syncedPreferences: Any 
+}
+
+type Role @table(name: "roles") {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String! @unique
+  description: String
+}
+
+type Permission @table(name: "permissions") {
+  id: UUID! @default(expr: "uuidV4()")
+  action: RoleAction!
+  resource: String!
+}
+
+type UserRole @table(name: "user_roles") {
+  user: User!
+  role: Role!
+}
+
+type RolePermission @table(name: "role_permissions") {
+  role: Role!
+  permission: Permission!
+}
+
+# ==========================================
+# COURSE CONTENT & CURRICULUM
+# ==========================================
+type Course @table(name: "courses") {
+  id: UUID! @default(expr: "uuidV4()")
+  title: String!
+  description: String
+  price: Float!
+  status: CourseStatus!
+  language: String!
+  level: String!
+  thumbnail: String
+  categoryId: UUID
+  # Swapped JSON to String Array for quick indexing/searching
+  tags: [String] 
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type CourseInstructor @table(name: "course_instructors") {
+  course: Course!
+  user: User!
+}
+
+type CourseSection @table(name: "course_sections") {
+  id: UUID! @default(expr: "uuidV4()")
+  course: Course!
+  title: String!
+  order: Int!
+}
+
+type CourseLecture @table(name: "course_lectures") {
+  id: UUID! @default(expr: "uuidV4()")
+  section: CourseSection!
+  title: String!
+  type: LectureType!
+  videoUrl: String
+  duration: Int
+  transcriptUrl: String
+  isFreePreview: Boolean!
+  order: Int!
+}
+
+type CourseQuiz @table(name: "course_quizzes") {
+  id: UUID! @default(expr: "uuidV4()")
+  lecture: CourseLecture! @unique
+  passingScore: Float!
+  maxAttempts: Int!
+}
+
+type QuizQuestion @table(name: "quiz_questions") {
+  id: UUID! @default(expr: "uuidV4()")
+  quiz: CourseQuiz!
+  questionText: String!
+  # Swapped JSON to Any to support nested option structures
+  options: Any! 
+  correctAnswerIndex: Int!
+}
+
+# ==========================================
+# OPTIMA MISSIONS (PROJECTS)
+# ==========================================
+type Mission @table(name: "missions") {
+  id: UUID! @default(expr: "uuidV4()")
+  course: Course # Nullable for standalone
+  title: String!
+  scenarioDescription: String!
+  durationMinutes: Int!
+  category: String!
+  difficulty: String!
+  # Swapped JSON to String Array
+  skillsTested: [String] 
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type MissionMicroLesson @table(name: "mission_micro_lessons") {
+  id: UUID! @default(expr: "uuidV4()")
+  mission: Mission!
+  title: String!
+  type: LectureType!
+  videoUrl: String
+  durationSeconds: Int!
+  order: Int!
+}
+
+type MissionTemplate @table(name: "mission_templates") {
+  id: UUID! @default(expr: "uuidV4()")
+  mission: Mission!
+  title: String!
+  fileUrl: String!
+  fileType: String!
+}
+
+type RubricCriterion @table(name: "rubric_criteria") {
+  id: UUID! @default(expr: "uuidV4()")
+  mission: Mission!
+  criterionName: String!
+  description: String
+  maxPoints: Float!
+}
+
+type MissionSubmission @table(name: "mission_submissions") {
+  id: UUID! @default(expr: "uuidV4()")
+  mission: Mission!
+  student: User!
+  grader: User
+  fileUrl: String!
+  # Swapped JSON to Any for dynamic key-value scoring
+  criteriaScores: Any 
+  feedback: String
+  submittedAt: Timestamp
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+# ==========================================
+# TRACKING, ENGAGEMENT & SESSIONS
+# ==========================================
+type Enrollment @table(name: "enrollments") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  course: Course 
+  mission: Mission 
+  status: EnrollmentStatus!
+  enrolledAt: Timestamp! @default(expr: "request.time")
+  completedAt: Timestamp
+}
+
+type LectureProgress @table(name: "lecture_progress") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  lecture: CourseLecture!
+  lastWatchedSecond: Int!
+  completedAt: Timestamp
+}
+
+type QuizAttempt @table(name: "quiz_attempts") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  quiz: CourseQuiz!
+  startedAt: Timestamp! @default(expr: "request.time")
+  completedAt: Timestamp
+}
+
+type QuizAttemptAnswer @table(name: "quiz_attempt_answers") {
+  id: UUID! @default(expr: "uuidV4()")
+  attempt: QuizAttempt!
+  question: QuizQuestion!
+  selectedOptionIndex: Int!
+}
+
+type Session @table(name: "sessions") {
+  id: UUID! @default(expr: "uuidV4()")
+  course: Course!
+  title: String!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  type: SessionType!
+  locationOrUrl: String!
+  qrCodeHash: String
+}
+
+type Attendance @table(name: "attendance") {
+  id: UUID! @default(expr: "uuidV4()")
+  student: User!
+  session: Session!
+  status: AttendanceStatus!
+  method: AttendanceMethod!
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+# ==========================================
+# CERTIFICATES
+# ==========================================
+type Certificate @table(name: "certificates") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  course: Course
+  mission: Mission
+  issuedAt: Timestamp! @default(expr: "request.time")
+  verificationHash: String! @unique
+  assetUrl: String!
+}
+
+# ==========================================
+# FINANCIALS
+# ==========================================
+type Payment @table(name: "payments") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  gateway: PaymentGateway!
+  status: PaymentStatus!
+  referenceId: String! @unique
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type PaymentItem @table(name: "payment_items") {
+  id: UUID! @default(expr: "uuidV4()")
+  payment: Payment!
+  course: Course
+  mission: Mission
+  subscriptionPlan: SubscriptionPlan
+  priceAtPurchase: Float!
+}
+
+# Renamed to SubscriptionPlan to avoid conflicts with standard GraphQL Root 'Subscription' type
+type SubscriptionPlan @table(name: "subscriptions") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  plan: String!
+  status: SubscriptionStatus!
+  startDate: Timestamp!
+  endDate: Timestamp!
+  autoRenew: Boolean!
+}
