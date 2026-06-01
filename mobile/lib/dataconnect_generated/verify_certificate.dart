@@ -20,6 +20,8 @@ class VerifyCertificateVariablesBuilder {
 @immutable
 class VerifyCertificateCertificates {
   final Timestamp issuedAt;
+  final Timestamp? expiresAt;
+  final EnumValue<CertificateTarget> targetType;
   final String assetUrl;
   final VerifyCertificateCertificatesUser user;
   final VerifyCertificateCertificatesCourse? course;
@@ -27,6 +29,8 @@ class VerifyCertificateCertificates {
   VerifyCertificateCertificates.fromJson(dynamic json):
   
   issuedAt = Timestamp.fromJson(json['issuedAt']),
+  expiresAt = json['expiresAt'] == null ? null : Timestamp.fromJson(json['expiresAt']),
+  targetType = certificateTargetDeserializer(json['targetType']),
   assetUrl = nativeFromJson<String>(json['assetUrl']),
   user = VerifyCertificateCertificatesUser.fromJson(json['user']),
   course = json['course'] == null ? null : VerifyCertificateCertificatesCourse.fromJson(json['course']),
@@ -42,6 +46,8 @@ class VerifyCertificateCertificates {
 
     final VerifyCertificateCertificates otherTyped = other as VerifyCertificateCertificates;
     return issuedAt == otherTyped.issuedAt && 
+    expiresAt == otherTyped.expiresAt && 
+    targetType == otherTyped.targetType && 
     assetUrl == otherTyped.assetUrl && 
     user == otherTyped.user && 
     course == otherTyped.course && 
@@ -49,12 +55,18 @@ class VerifyCertificateCertificates {
     
   }
   @override
-  int get hashCode => Object.hashAll([issuedAt.hashCode, assetUrl.hashCode, user.hashCode, course.hashCode, mission.hashCode]);
+  int get hashCode => Object.hashAll([issuedAt.hashCode, expiresAt.hashCode, targetType.hashCode, assetUrl.hashCode, user.hashCode, course.hashCode, mission.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['issuedAt'] = issuedAt.toJson();
+    if (expiresAt != null) {
+      json['expiresAt'] = expiresAt!.toJson();
+    }
+    json['targetType'] = 
+    certificateTargetSerializer(targetType)
+    ;
     json['assetUrl'] = nativeToJson<String>(assetUrl);
     json['user'] = user.toJson();
     if (course != null) {
@@ -68,6 +80,8 @@ class VerifyCertificateCertificates {
 
   VerifyCertificateCertificates({
     required this.issuedAt,
+    this.expiresAt,
+    required this.targetType,
     required this.assetUrl,
     required this.user,
     this.course,

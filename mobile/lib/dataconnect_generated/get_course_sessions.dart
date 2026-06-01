@@ -24,7 +24,9 @@ class GetCourseSessionsSessions {
   final Timestamp startTime;
   final Timestamp endTime;
   final EnumValue<SessionType> type;
+  final int? capacity;
   final String locationOrUrl;
+  final GetCourseSessionsSessionsHostUser? hostUser;
   GetCourseSessionsSessions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -32,7 +34,9 @@ class GetCourseSessionsSessions {
   startTime = Timestamp.fromJson(json['startTime']),
   endTime = Timestamp.fromJson(json['endTime']),
   type = sessionTypeDeserializer(json['type']),
-  locationOrUrl = nativeFromJson<String>(json['locationOrUrl']);
+  capacity = json['capacity'] == null ? null : nativeFromJson<int>(json['capacity']),
+  locationOrUrl = nativeFromJson<String>(json['locationOrUrl']),
+  hostUser = json['hostUser'] == null ? null : GetCourseSessionsSessionsHostUser.fromJson(json['hostUser']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -48,11 +52,13 @@ class GetCourseSessionsSessions {
     startTime == otherTyped.startTime && 
     endTime == otherTyped.endTime && 
     type == otherTyped.type && 
-    locationOrUrl == otherTyped.locationOrUrl;
+    capacity == otherTyped.capacity && 
+    locationOrUrl == otherTyped.locationOrUrl && 
+    hostUser == otherTyped.hostUser;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, startTime.hashCode, endTime.hashCode, type.hashCode, locationOrUrl.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, startTime.hashCode, endTime.hashCode, type.hashCode, capacity.hashCode, locationOrUrl.hashCode, hostUser.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -64,7 +70,13 @@ class GetCourseSessionsSessions {
     json['type'] = 
     sessionTypeSerializer(type)
     ;
+    if (capacity != null) {
+      json['capacity'] = nativeToJson<int?>(capacity);
+    }
     json['locationOrUrl'] = nativeToJson<String>(locationOrUrl);
+    if (hostUser != null) {
+      json['hostUser'] = hostUser!.toJson();
+    }
     return json;
   }
 
@@ -74,7 +86,50 @@ class GetCourseSessionsSessions {
     required this.startTime,
     required this.endTime,
     required this.type,
+    this.capacity,
     required this.locationOrUrl,
+    this.hostUser,
+  });
+}
+
+@immutable
+class GetCourseSessionsSessionsHostUser {
+  final String name;
+  final String? avatar;
+  GetCourseSessionsSessionsHostUser.fromJson(dynamic json):
+  
+  name = nativeFromJson<String>(json['name']),
+  avatar = json['avatar'] == null ? null : nativeFromJson<String>(json['avatar']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetCourseSessionsSessionsHostUser otherTyped = other as GetCourseSessionsSessionsHostUser;
+    return name == otherTyped.name && 
+    avatar == otherTyped.avatar;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([name.hashCode, avatar.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['name'] = nativeToJson<String>(name);
+    if (avatar != null) {
+      json['avatar'] = nativeToJson<String?>(avatar);
+    }
+    return json;
+  }
+
+  GetCourseSessionsSessionsHostUser({
+    required this.name,
+    this.avatar,
   });
 }
 

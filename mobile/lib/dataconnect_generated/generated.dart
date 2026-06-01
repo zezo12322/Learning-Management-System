@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-part 'list_published_courses.dart';
-
-part 'get_course_curriculum.dart';
+part 'get_pending_submissions.dart';
 
 part 'enroll_in_course.dart';
 
@@ -14,11 +12,9 @@ part 'enroll_in_mission.dart';
 
 part 'update_lecture_progress.dart';
 
-part 'submit_mission.dart';
+part 'get_course_sessions.dart';
 
-part 'my_submissions.dart';
-
-part 'grade_submission.dart';
+part 'check_in_to_session.dart';
 
 part 'sync_user.dart';
 
@@ -36,7 +32,13 @@ part 'add_payment_item.dart';
 
 part 'my_payment_history.dart';
 
-part 'get_pending_submissions.dart';
+part 'submit_mission.dart';
+
+part 'grade_submission.dart';
+
+part 'add_criterion_score.dart';
+
+part 'my_submissions.dart';
 
 part 'get_quiz_questions.dart';
 
@@ -46,9 +48,25 @@ part 'submit_quiz_answer.dart';
 
 part 'finish_quiz_attempt.dart';
 
-part 'get_course_sessions.dart';
+part 'admin_create_course.dart';
 
-part 'check_in_to_session.dart';
+part 'admin_delete_course.dart';
+
+part 'admin_create_lecture.dart';
+
+part 'admin_create_session.dart';
+
+part 'admin_cancel_session.dart';
+
+part 'admin_create_subscription_tier.dart';
+
+part 'admin_deprecate_subscription_tier.dart';
+
+part 'admin_create_category.dart';
+
+part 'list_published_courses.dart';
+
+part 'get_course_curriculum.dart';
 
 
 
@@ -114,6 +132,94 @@ part 'check_in_to_session.dart';
   }
   
 
+  enum BillingCycle {
+    
+      MONTHLY,
+    
+      QUARTERLY,
+    
+      YEARLY,
+    
+  }
+  
+  String billingCycleSerializer(EnumValue<BillingCycle> e) {
+    return e.stringValue;
+  }
+  EnumValue<BillingCycle> billingCycleDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'MONTHLY':
+        return const Known(BillingCycle.MONTHLY);
+      
+      case 'QUARTERLY':
+        return const Known(BillingCycle.QUARTERLY);
+      
+      case 'YEARLY':
+        return const Known(BillingCycle.YEARLY);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum CertificateTarget {
+    
+      COURSE,
+    
+      MISSION,
+    
+  }
+  
+  String certificateTargetSerializer(EnumValue<CertificateTarget> e) {
+    return e.stringValue;
+  }
+  EnumValue<CertificateTarget> certificateTargetDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'COURSE':
+        return const Known(CertificateTarget.COURSE);
+      
+      case 'MISSION':
+        return const Known(CertificateTarget.MISSION);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum CourseLevel {
+    
+      BEGINNER,
+    
+      INTERMEDIATE,
+    
+      ADVANCED,
+    
+  }
+  
+  String courseLevelSerializer(EnumValue<CourseLevel> e) {
+    return e.stringValue;
+  }
+  EnumValue<CourseLevel> courseLevelDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'BEGINNER':
+        return const Known(CourseLevel.BEGINNER);
+      
+      case 'INTERMEDIATE':
+        return const Known(CourseLevel.INTERMEDIATE);
+      
+      case 'ADVANCED':
+        return const Known(CourseLevel.ADVANCED);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
   enum LectureType {
     
       VIDEO,
@@ -150,6 +256,42 @@ part 'check_in_to_session.dart';
   }
   
 
+  enum MissionDifficulty {
+    
+      BEGINNER,
+    
+      INTERMEDIATE,
+    
+      ADVANCED,
+    
+      EXPERT,
+    
+  }
+  
+  String missionDifficultySerializer(EnumValue<MissionDifficulty> e) {
+    return e.stringValue;
+  }
+  EnumValue<MissionDifficulty> missionDifficultyDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'BEGINNER':
+        return const Known(MissionDifficulty.BEGINNER);
+      
+      case 'INTERMEDIATE':
+        return const Known(MissionDifficulty.INTERMEDIATE);
+      
+      case 'ADVANCED':
+        return const Known(MissionDifficulty.ADVANCED);
+      
+      case 'EXPERT':
+        return const Known(MissionDifficulty.EXPERT);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
   enum PaymentGateway {
     
       FAWRY,
@@ -174,6 +316,37 @@ part 'check_in_to_session.dart';
       
       case 'INSTAPAY':
         return const Known(PaymentGateway.INSTAPAY);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum PaymentItemTarget {
+    
+      COURSE,
+    
+      MISSION,
+    
+      SUBSCRIPTION,
+    
+  }
+  
+  String paymentItemTargetSerializer(EnumValue<PaymentItemTarget> e) {
+    return e.stringValue;
+  }
+  EnumValue<PaymentItemTarget> paymentItemTargetDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'COURSE':
+        return const Known(PaymentItemTarget.COURSE);
+      
+      case 'MISSION':
+        return const Known(PaymentItemTarget.MISSION);
+      
+      case 'SUBSCRIPTION':
+        return const Known(PaymentItemTarget.SUBSCRIPTION);
       
       default:
         return Unknown(data);
@@ -243,6 +416,42 @@ part 'check_in_to_session.dart';
   }
   
 
+  enum SubmissionStatus {
+    
+      PENDING,
+    
+      GRADED,
+    
+      RETURNED,
+    
+      REJECTED,
+    
+  }
+  
+  String submissionStatusSerializer(EnumValue<SubmissionStatus> e) {
+    return e.stringValue;
+  }
+  EnumValue<SubmissionStatus> submissionStatusDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'PENDING':
+        return const Known(SubmissionStatus.PENDING);
+      
+      case 'GRADED':
+        return const Known(SubmissionStatus.GRADED);
+      
+      case 'RETURNED':
+        return const Known(SubmissionStatus.RETURNED);
+      
+      case 'REJECTED':
+        return const Known(SubmissionStatus.REJECTED);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
 
 
 String enumSerializer(Enum e) {
@@ -297,13 +506,8 @@ class Unknown extends EnumValue<Never> {
 class DefaultConnector {
   
   
-  ListPublishedCoursesVariablesBuilder listPublishedCourses () {
-    return ListPublishedCoursesVariablesBuilder(dataConnect, );
-  }
-  
-  
-  GetCourseCurriculumVariablesBuilder getCourseCurriculum ({required String courseId, }) {
-    return GetCourseCurriculumVariablesBuilder(dataConnect, courseId: courseId,);
+  GetPendingSubmissionsVariablesBuilder getPendingSubmissions () {
+    return GetPendingSubmissionsVariablesBuilder(dataConnect, );
   }
   
   
@@ -322,23 +526,18 @@ class DefaultConnector {
   }
   
   
-  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
-    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
+  GetCourseSessionsVariablesBuilder getCourseSessions ({required String courseId, }) {
+    return GetCourseSessionsVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
   
-  MySubmissionsVariablesBuilder mySubmissions () {
-    return MySubmissionsVariablesBuilder(dataConnect, );
+  CheckInToSessionVariablesBuilder checkInToSession ({required String sessionId, required AttendanceStatus status, required AttendanceMethod method, }) {
+    return CheckInToSessionVariablesBuilder(dataConnect, sessionId: sessionId,status: status,method: method,);
   }
   
   
-  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, required dynamic criteriaScores, }) {
-    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,criteriaScores: criteriaScores,);
-  }
-  
-  
-  SyncUserVariablesBuilder syncUser ({required String uid, required String email, required String name, }) {
-    return SyncUserVariablesBuilder(dataConnect, uid: uid,email: email,name: name,);
+  SyncUserVariablesBuilder syncUser ({required String email, required String name, }) {
+    return SyncUserVariablesBuilder(dataConnect, email: email,name: name,);
   }
   
   
@@ -362,13 +561,13 @@ class DefaultConnector {
   }
   
   
-  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, }) {
-    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,);
+  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, required int amount, }) {
+    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,amount: amount,);
   }
   
   
-  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required double price, }) {
-    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,price: price,);
+  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required PaymentItemTarget targetType, required int price, }) {
+    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,targetType: targetType,price: price,);
   }
   
   
@@ -377,8 +576,23 @@ class DefaultConnector {
   }
   
   
-  GetPendingSubmissionsVariablesBuilder getPendingSubmissions () {
-    return GetPendingSubmissionsVariablesBuilder(dataConnect, );
+  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
+    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
+  }
+  
+  
+  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, }) {
+    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,);
+  }
+  
+  
+  AddCriterionScoreVariablesBuilder addCriterionScore ({required String submissionId, required String criterionId, required double score, }) {
+    return AddCriterionScoreVariablesBuilder(dataConnect, submissionId: submissionId,criterionId: criterionId,score: score,);
+  }
+  
+  
+  MySubmissionsVariablesBuilder mySubmissions () {
+    return MySubmissionsVariablesBuilder(dataConnect, );
   }
   
   
@@ -392,23 +606,63 @@ class DefaultConnector {
   }
   
   
-  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required int selectedIndex, }) {
-    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,selectedIndex: selectedIndex,);
+  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required String optionId, }) {
+    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,optionId: optionId,);
   }
   
   
-  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, }) {
-    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,);
+  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, required double score, required bool passed, }) {
+    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,score: score,passed: passed,);
   }
   
   
-  GetCourseSessionsVariablesBuilder getCourseSessions ({required String courseId, }) {
-    return GetCourseSessionsVariablesBuilder(dataConnect, courseId: courseId,);
+  AdminCreateCourseVariablesBuilder adminCreateCourse ({required String title, required int price, required String language, required CourseLevel level, required String categoryId, required List<String> tags, }) {
+    return AdminCreateCourseVariablesBuilder(dataConnect, title: title,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
   }
   
   
-  CheckInToSessionVariablesBuilder checkInToSession ({required String sessionId, required AttendanceStatus status, required AttendanceMethod method, }) {
-    return CheckInToSessionVariablesBuilder(dataConnect, sessionId: sessionId,status: status,method: method,);
+  AdminDeleteCourseVariablesBuilder adminDeleteCourse ({required String courseId, }) {
+    return AdminDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminCreateLectureVariablesBuilder adminCreateLecture ({required String sectionId, required String title, required LectureType type, required int order, }) {
+    return AdminCreateLectureVariablesBuilder(dataConnect, sectionId: sectionId,title: title,type: type,order: order,);
+  }
+  
+  
+  AdminCreateSessionVariablesBuilder adminCreateSession ({required String courseId, required String title, required Timestamp startTime, required Timestamp endTime, required SessionType type, required String locationOrUrl, }) {
+    return AdminCreateSessionVariablesBuilder(dataConnect, courseId: courseId,title: title,startTime: startTime,endTime: endTime,type: type,locationOrUrl: locationOrUrl,);
+  }
+  
+  
+  AdminCancelSessionVariablesBuilder adminCancelSession ({required String sessionId, }) {
+    return AdminCancelSessionVariablesBuilder(dataConnect, sessionId: sessionId,);
+  }
+  
+  
+  AdminCreateSubscriptionTierVariablesBuilder adminCreateSubscriptionTier ({required String name, required int price, required BillingCycle billingCycle, required List<String> features, }) {
+    return AdminCreateSubscriptionTierVariablesBuilder(dataConnect, name: name,price: price,billingCycle: billingCycle,features: features,);
+  }
+  
+  
+  AdminDeprecateSubscriptionTierVariablesBuilder adminDeprecateSubscriptionTier ({required String tierId, }) {
+    return AdminDeprecateSubscriptionTierVariablesBuilder(dataConnect, tierId: tierId,);
+  }
+  
+  
+  AdminCreateCategoryVariablesBuilder adminCreateCategory ({required String name, }) {
+    return AdminCreateCategoryVariablesBuilder(dataConnect, name: name,);
+  }
+  
+  
+  ListPublishedCoursesVariablesBuilder listPublishedCourses () {
+    return ListPublishedCoursesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetCourseCurriculumVariablesBuilder getCourseCurriculum ({required String courseId, }) {
+    return GetCourseCurriculumVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
 

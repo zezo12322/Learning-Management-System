@@ -21,6 +21,8 @@ class MyPaymentHistoryPayments {
   final String id;
   final EnumValue<PaymentGateway> gateway;
   final EnumValue<PaymentStatus> status;
+  final int amount;
+  final String currency;
   final String referenceId;
   final Timestamp createdAt;
   final List<MyPaymentHistoryPaymentsPaymentItemsOnPayment> paymentItems_on_payment;
@@ -29,6 +31,8 @@ class MyPaymentHistoryPayments {
   id = nativeFromJson<String>(json['id']),
   gateway = paymentGatewayDeserializer(json['gateway']),
   status = paymentStatusDeserializer(json['status']),
+  amount = nativeFromJson<int>(json['amount']),
+  currency = nativeFromJson<String>(json['currency']),
   referenceId = nativeFromJson<String>(json['referenceId']),
   createdAt = Timestamp.fromJson(json['createdAt']),
   paymentItems_on_payment = (json['paymentItems_on_payment'] as List<dynamic>)
@@ -47,13 +51,15 @@ class MyPaymentHistoryPayments {
     return id == otherTyped.id && 
     gateway == otherTyped.gateway && 
     status == otherTyped.status && 
+    amount == otherTyped.amount && 
+    currency == otherTyped.currency && 
     referenceId == otherTyped.referenceId && 
     createdAt == otherTyped.createdAt && 
     paymentItems_on_payment == otherTyped.paymentItems_on_payment;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, gateway.hashCode, status.hashCode, referenceId.hashCode, createdAt.hashCode, paymentItems_on_payment.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, gateway.hashCode, status.hashCode, amount.hashCode, currency.hashCode, referenceId.hashCode, createdAt.hashCode, paymentItems_on_payment.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -65,6 +71,8 @@ class MyPaymentHistoryPayments {
     json['status'] = 
     paymentStatusSerializer(status)
     ;
+    json['amount'] = nativeToJson<int>(amount);
+    json['currency'] = nativeToJson<String>(currency);
     json['referenceId'] = nativeToJson<String>(referenceId);
     json['createdAt'] = createdAt.toJson();
     json['paymentItems_on_payment'] = paymentItems_on_payment.map((e) => e.toJson()).toList();
@@ -75,6 +83,8 @@ class MyPaymentHistoryPayments {
     required this.id,
     required this.gateway,
     required this.status,
+    required this.amount,
+    required this.currency,
     required this.referenceId,
     required this.createdAt,
     required this.paymentItems_on_payment,
@@ -83,16 +93,18 @@ class MyPaymentHistoryPayments {
 
 @immutable
 class MyPaymentHistoryPaymentsPaymentItemsOnPayment {
-  final double priceAtPurchase;
+  final EnumValue<PaymentItemTarget> targetType;
+  final int priceAtPurchase;
   final MyPaymentHistoryPaymentsPaymentItemsOnPaymentCourse? course;
   final MyPaymentHistoryPaymentsPaymentItemsOnPaymentMission? mission;
-  final MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan? subscriptionPlan;
+  final MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier? subscriptionTier;
   MyPaymentHistoryPaymentsPaymentItemsOnPayment.fromJson(dynamic json):
   
-  priceAtPurchase = nativeFromJson<double>(json['priceAtPurchase']),
+  targetType = paymentItemTargetDeserializer(json['targetType']),
+  priceAtPurchase = nativeFromJson<int>(json['priceAtPurchase']),
   course = json['course'] == null ? null : MyPaymentHistoryPaymentsPaymentItemsOnPaymentCourse.fromJson(json['course']),
   mission = json['mission'] == null ? null : MyPaymentHistoryPaymentsPaymentItemsOnPaymentMission.fromJson(json['mission']),
-  subscriptionPlan = json['subscriptionPlan'] == null ? null : MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan.fromJson(json['subscriptionPlan']);
+  subscriptionTier = json['subscriptionTier'] == null ? null : MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier.fromJson(json['subscriptionTier']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -103,36 +115,41 @@ class MyPaymentHistoryPaymentsPaymentItemsOnPayment {
     }
 
     final MyPaymentHistoryPaymentsPaymentItemsOnPayment otherTyped = other as MyPaymentHistoryPaymentsPaymentItemsOnPayment;
-    return priceAtPurchase == otherTyped.priceAtPurchase && 
+    return targetType == otherTyped.targetType && 
+    priceAtPurchase == otherTyped.priceAtPurchase && 
     course == otherTyped.course && 
     mission == otherTyped.mission && 
-    subscriptionPlan == otherTyped.subscriptionPlan;
+    subscriptionTier == otherTyped.subscriptionTier;
     
   }
   @override
-  int get hashCode => Object.hashAll([priceAtPurchase.hashCode, course.hashCode, mission.hashCode, subscriptionPlan.hashCode]);
+  int get hashCode => Object.hashAll([targetType.hashCode, priceAtPurchase.hashCode, course.hashCode, mission.hashCode, subscriptionTier.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['priceAtPurchase'] = nativeToJson<double>(priceAtPurchase);
+    json['targetType'] = 
+    paymentItemTargetSerializer(targetType)
+    ;
+    json['priceAtPurchase'] = nativeToJson<int>(priceAtPurchase);
     if (course != null) {
       json['course'] = course!.toJson();
     }
     if (mission != null) {
       json['mission'] = mission!.toJson();
     }
-    if (subscriptionPlan != null) {
-      json['subscriptionPlan'] = subscriptionPlan!.toJson();
+    if (subscriptionTier != null) {
+      json['subscriptionTier'] = subscriptionTier!.toJson();
     }
     return json;
   }
 
   MyPaymentHistoryPaymentsPaymentItemsOnPayment({
+    required this.targetType,
     required this.priceAtPurchase,
     this.course,
     this.mission,
-    this.subscriptionPlan,
+    this.subscriptionTier,
   });
 }
 
@@ -205,11 +222,11 @@ class MyPaymentHistoryPaymentsPaymentItemsOnPaymentMission {
 }
 
 @immutable
-class MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan {
-  final String plan;
-  MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan.fromJson(dynamic json):
+class MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier {
+  final String name;
+  MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier.fromJson(dynamic json):
   
-  plan = nativeFromJson<String>(json['plan']);
+  name = nativeFromJson<String>(json['name']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -219,22 +236,22 @@ class MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan {
       return false;
     }
 
-    final MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan otherTyped = other as MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan;
-    return plan == otherTyped.plan;
+    final MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier otherTyped = other as MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier;
+    return name == otherTyped.name;
     
   }
   @override
-  int get hashCode => plan.hashCode;
+  int get hashCode => name.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['plan'] = nativeToJson<String>(plan);
+    json['name'] = nativeToJson<String>(name);
     return json;
   }
 
-  MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionPlan({
-    required this.plan,
+  MyPaymentHistoryPaymentsPaymentItemsOnPaymentSubscriptionTier({
+    required this.name,
   });
 }
 

@@ -199,7 +199,7 @@ type MissionSubmission @table(name: "mission_submissions") {
   grader: User
   fileUrl: String!
   feedback: String
-  status: SubmissionStatus! @default(expr: "PENDING") # FIXED: State tracking
+  status: SubmissionStatus! @default(expr: "'PENDING'") # FIXED: State tracking
   attemptNumber: Int! @default(expr: "1") # FIXED: Version tracking
   submittedAt: Timestamp! @default(expr: "request.time") # FIXED: Required
   updatedAt: Timestamp! @default(expr: "request.time")

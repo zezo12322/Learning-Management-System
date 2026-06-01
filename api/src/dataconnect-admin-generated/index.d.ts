@@ -17,10 +17,35 @@ export enum AttendanceStatus {
   EXCUSED = "EXCUSED",
   UNEXCUSED = "UNEXCUSED",
 }
+export enum BillingCycle {
+  MONTHLY = "MONTHLY",
+  QUARTERLY = "QUARTERLY",
+  YEARLY = "YEARLY",
+}
+export enum CertificateTarget {
+  COURSE = "COURSE",
+  MISSION = "MISSION",
+}
+export enum CourseLevel {
+  BEGINNER = "BEGINNER",
+  INTERMEDIATE = "INTERMEDIATE",
+  ADVANCED = "ADVANCED",
+}
+export enum LectureType {
+  VIDEO = "VIDEO",
+  READING = "READING",
+  INTERACTIVE = "INTERACTIVE",
+  QUIZ = "QUIZ",
+}
 export enum PaymentGateway {
   FAWRY = "FAWRY",
   PAYMOB = "PAYMOB",
   INSTAPAY = "INSTAPAY",
+}
+export enum PaymentItemTarget {
+  COURSE = "COURSE",
+  MISSION = "MISSION",
+  SUBSCRIPTION = "SUBSCRIPTION",
 }
 export enum PaymentStatus {
   PENDING = "PENDING",
@@ -32,6 +57,22 @@ export enum SessionType {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
 }
+export enum SubmissionStatus {
+  PENDING = "PENDING",
+  GRADED = "GRADED",
+  RETURNED = "RETURNED",
+  REJECTED = "REJECTED",
+}
+
+export interface AddCriterionScoreData {
+  missionSubmissionScore_insert: MissionSubmissionScore_Key;
+}
+
+export interface AddCriterionScoreVariables {
+  submissionId: UUIDString;
+  criterionId: UUIDString;
+  score: number;
+}
 
 export interface AddPaymentItemData {
   paymentItem_insert: PaymentItem_Key;
@@ -39,15 +80,106 @@ export interface AddPaymentItemData {
 
 export interface AddPaymentItemVariables {
   paymentId: UUIDString;
+  targetType: PaymentItemTarget;
   courseId?: UUIDString | null;
   missionId?: UUIDString | null;
-  subscriptionPlanId?: UUIDString | null;
+  subscriptionTierId?: UUIDString | null;
   price: number;
+}
+
+export interface AdminCancelSessionData {
+  session_update?: Session_Key | null;
+}
+
+export interface AdminCancelSessionVariables {
+  sessionId: UUIDString;
+}
+
+export interface AdminCreateCategoryData {
+  category_insert: Category_Key;
+}
+
+export interface AdminCreateCategoryVariables {
+  name: string;
+  description?: string | null;
+}
+
+export interface AdminCreateCourseData {
+  course_insert: Course_Key;
+}
+
+export interface AdminCreateCourseVariables {
+  title: string;
+  description?: string | null;
+  price: number;
+  language: string;
+  level: CourseLevel;
+  categoryId: UUIDString;
+  tags: string[];
+}
+
+export interface AdminCreateLectureData {
+  courseLecture_insert: CourseLecture_Key;
+}
+
+export interface AdminCreateLectureVariables {
+  sectionId: UUIDString;
+  title: string;
+  type: LectureType;
+  videoUrl?: string | null;
+  content?: string | null;
+  order: number;
+}
+
+export interface AdminCreateSessionData {
+  session_insert: Session_Key;
+}
+
+export interface AdminCreateSessionVariables {
+  courseId: UUIDString;
+  title: string;
+  capacity?: number | null;
+  startTime: TimestampString;
+  endTime: TimestampString;
+  type: SessionType;
+  locationOrUrl: string;
+}
+
+export interface AdminCreateSubscriptionTierData {
+  subscriptionTier_insert: SubscriptionTier_Key;
+}
+
+export interface AdminCreateSubscriptionTierVariables {
+  name: string;
+  price: number;
+  billingCycle: BillingCycle;
+  features: string[];
+}
+
+export interface AdminDeleteCourseData {
+  course_update?: Course_Key | null;
+}
+
+export interface AdminDeleteCourseVariables {
+  courseId: UUIDString;
+}
+
+export interface AdminDeprecateSubscriptionTierData {
+  subscriptionTier_update?: SubscriptionTier_Key | null;
+}
+
+export interface AdminDeprecateSubscriptionTierVariables {
+  tierId: UUIDString;
 }
 
 export interface Attendance_Key {
   id: UUIDString;
   __typename?: 'Attendance_Key';
+}
+
+export interface Category_Key {
+  id: UUIDString;
+  __typename?: 'Category_Key';
 }
 
 export interface Certificate_Key {
@@ -118,6 +250,8 @@ export interface FinishQuizAttemptData {
 
 export interface FinishQuizAttemptVariables {
   attemptId: UUIDString;
+  score: number;
+  passed: boolean;
 }
 
 export interface GetCourseCurriculumData {
@@ -133,6 +267,7 @@ export interface GetCourseCurriculumData {
         id: UUIDString;
         title: string;
         type: LectureType;
+        content?: string | null;
         duration?: number | null;
         isFreePreview: boolean;
       } & CourseLecture_Key)[];
@@ -151,7 +286,12 @@ export interface GetCourseSessionsData {
     startTime: TimestampString;
     endTime: TimestampString;
     type: SessionType;
+    capacity?: number | null;
     locationOrUrl: string;
+    hostUser?: {
+      name: string;
+      avatar?: string | null;
+    };
   } & Session_Key)[];
 }
 
@@ -166,6 +306,7 @@ export interface GetMeData {
     name: string;
     avatar?: string | null;
     createdAt: TimestampString;
+    lastLogin?: TimestampString | null;
     profile_on_user?: {
       bio?: string | null;
       company?: string | null;
@@ -184,14 +325,15 @@ export interface GetPendingSubmissionsData {
   missionSubmissions: ({
     id: UUIDString;
     fileUrl: string;
-    submittedAt?: TimestampString | null;
+    submittedAt: TimestampString;
+    attemptNumber: number;
     student: {
       name: string;
       email: string;
     };
       mission: {
         title: string;
-        difficulty: string;
+        difficulty: MissionDifficulty;
         course?: {
           title: string;
         };
@@ -207,7 +349,11 @@ export interface GetQuizQuestionsData {
     quizQuestions_on_quiz: ({
       id: UUIDString;
       questionText: string;
-      options: unknown;
+      points: number;
+      quizOptions_on_question: ({
+        id: UUIDString;
+        text: string;
+      } & QuizOption_Key)[];
     } & QuizQuestion_Key)[];
   } & CourseQuiz_Key)[];
 }
@@ -222,7 +368,6 @@ export interface GradeSubmissionData {
 
 export interface GradeSubmissionVariables {
   submissionId: UUIDString;
-  criteriaScores: unknown;
   feedback?: string | null;
 }
 
@@ -237,15 +382,18 @@ export interface ListPublishedCoursesData {
     id: UUIDString;
     title: string;
     price: number;
-    level: string;
+    level: CourseLevel;
     thumbnail?: string | null;
-    tags?: string[] | null;
-    courseInstructors_on_course: ({
-      user: {
-        name: string;
-        avatar?: string | null;
-      };
-    })[];
+    tags: string[];
+    category: {
+      name: string;
+    };
+      courseInstructors_on_course: ({
+        user: {
+          name: string;
+          avatar?: string | null;
+        };
+      })[];
   } & Course_Key)[];
 }
 
@@ -256,11 +404,19 @@ export interface LogPaymentData {
 export interface LogPaymentVariables {
   gateway: PaymentGateway;
   referenceId: string;
+  amount: number;
+  currency?: string | null;
 }
 
 export interface MissionMicroLesson_Key {
   id: UUIDString;
   __typename?: 'MissionMicroLesson_Key';
+}
+
+export interface MissionSubmissionScore_Key {
+  submissionId: UUIDString;
+  criterionId: UUIDString;
+  __typename?: 'MissionSubmissionScore_Key';
 }
 
 export interface MissionSubmission_Key {
@@ -282,6 +438,8 @@ export interface MyCertificatesData {
   certificates: ({
     id: UUIDString;
     issuedAt: TimestampString;
+    expiresAt?: TimestampString | null;
+    targetType: CertificateTarget;
     verificationHash: string;
     assetUrl: string;
     course?: {
@@ -298,9 +456,12 @@ export interface MyPaymentHistoryData {
     id: UUIDString;
     gateway: PaymentGateway;
     status: PaymentStatus;
+    amount: number;
+    currency: string;
     referenceId: string;
     createdAt: TimestampString;
     paymentItems_on_payment: ({
+      targetType: PaymentItemTarget;
       priceAtPurchase: number;
       course?: {
         title: string;
@@ -308,8 +469,8 @@ export interface MyPaymentHistoryData {
         mission?: {
           title: string;
         };
-          subscriptionPlan?: {
-            plan: string;
+          subscriptionTier?: {
+            name: string;
           };
     })[];
   } & Payment_Key)[];
@@ -319,13 +480,20 @@ export interface MySubmissionsData {
   missionSubmissions: ({
     id: UUIDString;
     fileUrl: string;
+    status: SubmissionStatus;
     feedback?: string | null;
-    criteriaScores?: unknown | null;
-    submittedAt?: TimestampString | null;
-    mission: {
-      title: string;
-      difficulty: string;
-    };
+    submittedAt: TimestampString;
+    missionSubmissionScores_on_submission: ({
+      score: number;
+      criterion: {
+        criterionName: string;
+        maxPoints: number;
+      };
+    })[];
+      mission: {
+        title: string;
+        difficulty: MissionDifficulty;
+      };
   } & MissionSubmission_Key)[];
 }
 
@@ -358,6 +526,11 @@ export interface QuizAttemptAnswer_Key {
 export interface QuizAttempt_Key {
   id: UUIDString;
   __typename?: 'QuizAttempt_Key';
+}
+
+export interface QuizOption_Key {
+  id: UUIDString;
+  __typename?: 'QuizOption_Key';
 }
 
 export interface QuizQuestion_Key {
@@ -410,12 +583,12 @@ export interface SubmitQuizAnswerData {
 export interface SubmitQuizAnswerVariables {
   attemptId: UUIDString;
   questionId: UUIDString;
-  selectedIndex: number;
+  optionId: UUIDString;
 }
 
-export interface SubscriptionPlan_Key {
+export interface SubscriptionTier_Key {
   id: UUIDString;
-  __typename?: 'SubscriptionPlan_Key';
+  __typename?: 'SubscriptionTier_Key';
 }
 
 export interface SyncUserData {
@@ -423,7 +596,6 @@ export interface SyncUserData {
 }
 
 export interface SyncUserVariables {
-  uid: string;
   email: string;
   name: string;
   avatar?: string | null;
@@ -456,6 +628,11 @@ export interface UserRole_Key {
   __typename?: 'UserRole_Key';
 }
 
+export interface UserSubscription_Key {
+  id: UUIDString;
+  __typename?: 'UserSubscription_Key';
+}
+
 export interface User_Key {
   id: string;
   __typename?: 'User_Key';
@@ -464,6 +641,8 @@ export interface User_Key {
 export interface VerifyCertificateData {
   certificates: ({
     issuedAt: TimestampString;
+    expiresAt?: TimestampString | null;
+    targetType: CertificateTarget;
     assetUrl: string;
     user: {
       name: string;
@@ -506,10 +685,25 @@ export function myPaymentHistory(dc: DataConnect, options?: OperationOptions): P
 /** Generated Node Admin SDK operation action function for the 'MyPaymentHistory' Query. Allow users to pass in custom DataConnect instances. */
 export function myPaymentHistory(options?: OperationOptions): Promise<ExecuteOperationResponse<MyPaymentHistoryData>>;
 
-/** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to execute without passing in DataConnect. */
-export function getPendingSubmissions(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
-/** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to pass in custom DataConnect instances. */
-export function getPendingSubmissions(options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
+/** Generated Node Admin SDK operation action function for the 'SubmitMission' Mutation. Allow users to execute without passing in DataConnect. */
+export function submitMission(dc: DataConnect, vars: SubmitMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitMissionData>>;
+/** Generated Node Admin SDK operation action function for the 'SubmitMission' Mutation. Allow users to pass in custom DataConnect instances. */
+export function submitMission(vars: SubmitMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitMissionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'GradeSubmission' Mutation. Allow users to execute without passing in DataConnect. */
+export function gradeSubmission(dc: DataConnect, vars: GradeSubmissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GradeSubmissionData>>;
+/** Generated Node Admin SDK operation action function for the 'GradeSubmission' Mutation. Allow users to pass in custom DataConnect instances. */
+export function gradeSubmission(vars: GradeSubmissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GradeSubmissionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AddCriterionScore' Mutation. Allow users to execute without passing in DataConnect. */
+export function addCriterionScore(dc: DataConnect, vars: AddCriterionScoreVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddCriterionScoreData>>;
+/** Generated Node Admin SDK operation action function for the 'AddCriterionScore' Mutation. Allow users to pass in custom DataConnect instances. */
+export function addCriterionScore(vars: AddCriterionScoreVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddCriterionScoreData>>;
+
+/** Generated Node Admin SDK operation action function for the 'MySubmissions' Query. Allow users to execute without passing in DataConnect. */
+export function mySubmissions(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<MySubmissionsData>>;
+/** Generated Node Admin SDK operation action function for the 'MySubmissions' Query. Allow users to pass in custom DataConnect instances. */
+export function mySubmissions(options?: OperationOptions): Promise<ExecuteOperationResponse<MySubmissionsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'GetQuizQuestions' Query. Allow users to execute without passing in DataConnect. */
 export function getQuizQuestions(dc: DataConnect, vars: GetQuizQuestionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetQuizQuestionsData>>;
@@ -531,15 +725,45 @@ export function finishQuizAttempt(dc: DataConnect, vars: FinishQuizAttemptVariab
 /** Generated Node Admin SDK operation action function for the 'FinishQuizAttempt' Mutation. Allow users to pass in custom DataConnect instances. */
 export function finishQuizAttempt(vars: FinishQuizAttemptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<FinishQuizAttemptData>>;
 
-/** Generated Node Admin SDK operation action function for the 'GetCourseSessions' Query. Allow users to execute without passing in DataConnect. */
-export function getCourseSessions(dc: DataConnect, vars: GetCourseSessionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseSessionsData>>;
-/** Generated Node Admin SDK operation action function for the 'GetCourseSessions' Query. Allow users to pass in custom DataConnect instances. */
-export function getCourseSessions(vars: GetCourseSessionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseSessionsData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateCourse' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCreateCourse(dc: DataConnect, vars: AdminCreateCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateCourseData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateCourse' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCreateCourse(vars: AdminCreateCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateCourseData>>;
 
-/** Generated Node Admin SDK operation action function for the 'CheckInToSession' Mutation. Allow users to execute without passing in DataConnect. */
-export function checkInToSession(dc: DataConnect, vars: CheckInToSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CheckInToSessionData>>;
-/** Generated Node Admin SDK operation action function for the 'CheckInToSession' Mutation. Allow users to pass in custom DataConnect instances. */
-export function checkInToSession(vars: CheckInToSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CheckInToSessionData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminDeleteCourse' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminDeleteCourse(dc: DataConnect, vars: AdminDeleteCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminDeleteCourseData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminDeleteCourse' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminDeleteCourse(vars: AdminDeleteCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminDeleteCourseData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminCreateLecture' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCreateLecture(dc: DataConnect, vars: AdminCreateLectureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateLectureData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateLecture' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCreateLecture(vars: AdminCreateLectureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateLectureData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminCreateSession' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCreateSession(dc: DataConnect, vars: AdminCreateSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateSessionData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateSession' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCreateSession(vars: AdminCreateSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateSessionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminCancelSession' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCancelSession(dc: DataConnect, vars: AdminCancelSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCancelSessionData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCancelSession' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCancelSession(vars: AdminCancelSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCancelSessionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminCreateSubscriptionTier' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCreateSubscriptionTier(dc: DataConnect, vars: AdminCreateSubscriptionTierVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateSubscriptionTierData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateSubscriptionTier' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCreateSubscriptionTier(vars: AdminCreateSubscriptionTierVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateSubscriptionTierData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminDeprecateSubscriptionTier' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminDeprecateSubscriptionTier(dc: DataConnect, vars: AdminDeprecateSubscriptionTierVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminDeprecateSubscriptionTierData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminDeprecateSubscriptionTier' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminDeprecateSubscriptionTier(vars: AdminDeprecateSubscriptionTierVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminDeprecateSubscriptionTierData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AdminCreateCategory' Mutation. Allow users to execute without passing in DataConnect. */
+export function adminCreateCategory(dc: DataConnect, vars: AdminCreateCategoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateCategoryData>>;
+/** Generated Node Admin SDK operation action function for the 'AdminCreateCategory' Mutation. Allow users to pass in custom DataConnect instances. */
+export function adminCreateCategory(vars: AdminCreateCategoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AdminCreateCategoryData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ListPublishedCourses' Query. Allow users to execute without passing in DataConnect. */
 export function listPublishedCourses(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<ListPublishedCoursesData>>;
@@ -550,6 +774,11 @@ export function listPublishedCourses(options?: OperationOptions): Promise<Execut
 export function getCourseCurriculum(dc: DataConnect, vars: GetCourseCurriculumVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseCurriculumData>>;
 /** Generated Node Admin SDK operation action function for the 'GetCourseCurriculum' Query. Allow users to pass in custom DataConnect instances. */
 export function getCourseCurriculum(vars: GetCourseCurriculumVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseCurriculumData>>;
+
+/** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to execute without passing in DataConnect. */
+export function getPendingSubmissions(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
+/** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to pass in custom DataConnect instances. */
+export function getPendingSubmissions(options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'EnrollInCourse' Mutation. Allow users to execute without passing in DataConnect. */
 export function enrollInCourse(dc: DataConnect, vars: EnrollInCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInCourseData>>;
@@ -566,20 +795,15 @@ export function updateLectureProgress(dc: DataConnect, vars: UpdateLectureProgre
 /** Generated Node Admin SDK operation action function for the 'UpdateLectureProgress' Mutation. Allow users to pass in custom DataConnect instances. */
 export function updateLectureProgress(vars: UpdateLectureProgressVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateLectureProgressData>>;
 
-/** Generated Node Admin SDK operation action function for the 'SubmitMission' Mutation. Allow users to execute without passing in DataConnect. */
-export function submitMission(dc: DataConnect, vars: SubmitMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitMissionData>>;
-/** Generated Node Admin SDK operation action function for the 'SubmitMission' Mutation. Allow users to pass in custom DataConnect instances. */
-export function submitMission(vars: SubmitMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitMissionData>>;
+/** Generated Node Admin SDK operation action function for the 'GetCourseSessions' Query. Allow users to execute without passing in DataConnect. */
+export function getCourseSessions(dc: DataConnect, vars: GetCourseSessionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseSessionsData>>;
+/** Generated Node Admin SDK operation action function for the 'GetCourseSessions' Query. Allow users to pass in custom DataConnect instances. */
+export function getCourseSessions(vars: GetCourseSessionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseSessionsData>>;
 
-/** Generated Node Admin SDK operation action function for the 'MySubmissions' Query. Allow users to execute without passing in DataConnect. */
-export function mySubmissions(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<MySubmissionsData>>;
-/** Generated Node Admin SDK operation action function for the 'MySubmissions' Query. Allow users to pass in custom DataConnect instances. */
-export function mySubmissions(options?: OperationOptions): Promise<ExecuteOperationResponse<MySubmissionsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'GradeSubmission' Mutation. Allow users to execute without passing in DataConnect. */
-export function gradeSubmission(dc: DataConnect, vars: GradeSubmissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GradeSubmissionData>>;
-/** Generated Node Admin SDK operation action function for the 'GradeSubmission' Mutation. Allow users to pass in custom DataConnect instances. */
-export function gradeSubmission(vars: GradeSubmissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GradeSubmissionData>>;
+/** Generated Node Admin SDK operation action function for the 'CheckInToSession' Mutation. Allow users to execute without passing in DataConnect. */
+export function checkInToSession(dc: DataConnect, vars: CheckInToSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CheckInToSessionData>>;
+/** Generated Node Admin SDK operation action function for the 'CheckInToSession' Mutation. Allow users to pass in custom DataConnect instances. */
+export function checkInToSession(vars: CheckInToSessionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CheckInToSessionData>>;
 
 /** Generated Node Admin SDK operation action function for the 'SyncUser' Mutation. Allow users to execute without passing in DataConnect. */
 export function syncUser(dc: DataConnect, vars: SyncUserVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SyncUserData>>;

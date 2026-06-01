@@ -2,7 +2,6 @@ part of 'generated.dart';
 
 class GradeSubmissionVariablesBuilder {
   String submissionId;
-  AnyValue criteriaScores;
   Optional<String> _feedback = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  GradeSubmissionVariablesBuilder feedback(String? t) {
@@ -10,7 +9,7 @@ class GradeSubmissionVariablesBuilder {
    return this;
   }
 
-  GradeSubmissionVariablesBuilder(this._dataConnect, {required  this.submissionId,required  this.criteriaScores,});
+  GradeSubmissionVariablesBuilder(this._dataConnect, {required  this.submissionId,});
   Deserializer<GradeSubmissionData> dataDeserializer = (dynamic json)  => GradeSubmissionData.fromJson(jsonDecode(json));
   Serializer<GradeSubmissionVariables> varsSerializer = (GradeSubmissionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<GradeSubmissionData, GradeSubmissionVariables>> execute() {
@@ -18,7 +17,7 @@ class GradeSubmissionVariablesBuilder {
   }
 
   MutationRef<GradeSubmissionData, GradeSubmissionVariables> ref() {
-    GradeSubmissionVariables vars= GradeSubmissionVariables(submissionId: submissionId,criteriaScores: criteriaScores,feedback: _feedback,);
+    GradeSubmissionVariables vars= GradeSubmissionVariables(submissionId: submissionId,feedback: _feedback,);
     return _dataConnect.mutation("GradeSubmission", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -96,14 +95,11 @@ class GradeSubmissionData {
 @immutable
 class GradeSubmissionVariables {
   final String submissionId;
-  final AnyValue criteriaScores;
   late final Optional<String>feedback;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   GradeSubmissionVariables.fromJson(Map<String, dynamic> json):
   
-  submissionId = nativeFromJson<String>(json['submissionId']),
-  criteriaScores = AnyValue.fromJson(json['criteriaScores']) {
-  
+  submissionId = nativeFromJson<String>(json['submissionId']) {
   
   
   
@@ -122,18 +118,16 @@ class GradeSubmissionVariables {
 
     final GradeSubmissionVariables otherTyped = other as GradeSubmissionVariables;
     return submissionId == otherTyped.submissionId && 
-    criteriaScores == otherTyped.criteriaScores && 
     feedback == otherTyped.feedback;
     
   }
   @override
-  int get hashCode => Object.hashAll([submissionId.hashCode, criteriaScores.hashCode, feedback.hashCode]);
+  int get hashCode => Object.hashAll([submissionId.hashCode, feedback.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['submissionId'] = nativeToJson<String>(submissionId);
-    json['criteriaScores'] = criteriaScores.toJson();
     if(feedback.state == OptionalState.set) {
       json['feedback'] = feedback.toJson();
     }
@@ -142,7 +136,6 @@ class GradeSubmissionVariables {
 
   GradeSubmissionVariables({
     required this.submissionId,
-    required this.criteriaScores,
     required this.feedback,
   });
 }

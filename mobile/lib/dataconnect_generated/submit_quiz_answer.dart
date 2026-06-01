@@ -3,10 +3,10 @@ part of 'generated.dart';
 class SubmitQuizAnswerVariablesBuilder {
   String attemptId;
   String questionId;
-  int selectedIndex;
+  String optionId;
 
   final FirebaseDataConnect _dataConnect;
-  SubmitQuizAnswerVariablesBuilder(this._dataConnect, {required  this.attemptId,required  this.questionId,required  this.selectedIndex,});
+  SubmitQuizAnswerVariablesBuilder(this._dataConnect, {required  this.attemptId,required  this.questionId,required  this.optionId,});
   Deserializer<SubmitQuizAnswerData> dataDeserializer = (dynamic json)  => SubmitQuizAnswerData.fromJson(jsonDecode(json));
   Serializer<SubmitQuizAnswerVariables> varsSerializer = (SubmitQuizAnswerVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<SubmitQuizAnswerData, SubmitQuizAnswerVariables>> execute() {
@@ -14,7 +14,7 @@ class SubmitQuizAnswerVariablesBuilder {
   }
 
   MutationRef<SubmitQuizAnswerData, SubmitQuizAnswerVariables> ref() {
-    SubmitQuizAnswerVariables vars= SubmitQuizAnswerVariables(attemptId: attemptId,questionId: questionId,selectedIndex: selectedIndex,);
+    SubmitQuizAnswerVariables vars= SubmitQuizAnswerVariables(attemptId: attemptId,questionId: questionId,optionId: optionId,);
     return _dataConnect.mutation("SubmitQuizAnswer", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -96,13 +96,13 @@ class SubmitQuizAnswerData {
 class SubmitQuizAnswerVariables {
   final String attemptId;
   final String questionId;
-  final int selectedIndex;
+  final String optionId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   SubmitQuizAnswerVariables.fromJson(Map<String, dynamic> json):
   
   attemptId = nativeFromJson<String>(json['attemptId']),
   questionId = nativeFromJson<String>(json['questionId']),
-  selectedIndex = nativeFromJson<int>(json['selectedIndex']);
+  optionId = nativeFromJson<String>(json['optionId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -115,25 +115,25 @@ class SubmitQuizAnswerVariables {
     final SubmitQuizAnswerVariables otherTyped = other as SubmitQuizAnswerVariables;
     return attemptId == otherTyped.attemptId && 
     questionId == otherTyped.questionId && 
-    selectedIndex == otherTyped.selectedIndex;
+    optionId == otherTyped.optionId;
     
   }
   @override
-  int get hashCode => Object.hashAll([attemptId.hashCode, questionId.hashCode, selectedIndex.hashCode]);
+  int get hashCode => Object.hashAll([attemptId.hashCode, questionId.hashCode, optionId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['attemptId'] = nativeToJson<String>(attemptId);
     json['questionId'] = nativeToJson<String>(questionId);
-    json['selectedIndex'] = nativeToJson<int>(selectedIndex);
+    json['optionId'] = nativeToJson<String>(optionId);
     return json;
   }
 
   SubmitQuizAnswerVariables({
     required this.attemptId,
     required this.questionId,
-    required this.selectedIndex,
+    required this.optionId,
   });
 }
 

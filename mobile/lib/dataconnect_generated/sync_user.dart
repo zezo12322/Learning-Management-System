@@ -1,7 +1,6 @@
 part of 'generated.dart';
 
 class SyncUserVariablesBuilder {
-  String uid;
   String email;
   String name;
   Optional<String> _avatar = Optional.optional(nativeFromJson, nativeToJson);
@@ -11,7 +10,7 @@ class SyncUserVariablesBuilder {
    return this;
   }
 
-  SyncUserVariablesBuilder(this._dataConnect, {required  this.uid,required  this.email,required  this.name,});
+  SyncUserVariablesBuilder(this._dataConnect, {required  this.email,required  this.name,});
   Deserializer<SyncUserData> dataDeserializer = (dynamic json)  => SyncUserData.fromJson(jsonDecode(json));
   Serializer<SyncUserVariables> varsSerializer = (SyncUserVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<SyncUserData, SyncUserVariables>> execute() {
@@ -19,7 +18,7 @@ class SyncUserVariablesBuilder {
   }
 
   MutationRef<SyncUserData, SyncUserVariables> ref() {
-    SyncUserVariables vars= SyncUserVariables(uid: uid,email: email,name: name,avatar: _avatar,);
+    SyncUserVariables vars= SyncUserVariables(email: email,name: name,avatar: _avatar,);
     return _dataConnect.mutation("SyncUser", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -94,17 +93,14 @@ class SyncUserData {
 
 @immutable
 class SyncUserVariables {
-  final String uid;
   final String email;
   final String name;
   late final Optional<String>avatar;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   SyncUserVariables.fromJson(Map<String, dynamic> json):
   
-  uid = nativeFromJson<String>(json['uid']),
   email = nativeFromJson<String>(json['email']),
   name = nativeFromJson<String>(json['name']) {
-  
   
   
   
@@ -123,19 +119,17 @@ class SyncUserVariables {
     }
 
     final SyncUserVariables otherTyped = other as SyncUserVariables;
-    return uid == otherTyped.uid && 
-    email == otherTyped.email && 
+    return email == otherTyped.email && 
     name == otherTyped.name && 
     avatar == otherTyped.avatar;
     
   }
   @override
-  int get hashCode => Object.hashAll([uid.hashCode, email.hashCode, name.hashCode, avatar.hashCode]);
+  int get hashCode => Object.hashAll([email.hashCode, name.hashCode, avatar.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['uid'] = nativeToJson<String>(uid);
     json['email'] = nativeToJson<String>(email);
     json['name'] = nativeToJson<String>(name);
     if(avatar.state == OptionalState.set) {
@@ -145,7 +139,6 @@ class SyncUserVariables {
   }
 
   SyncUserVariables({
-    required this.uid,
     required this.email,
     required this.name,
     required this.avatar,
