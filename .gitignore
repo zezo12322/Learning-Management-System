@@ -13,12 +13,18 @@ pglite-debug.log
 
 # Node.js (Web & API)
 node_modules/
-npm-debug.log
-yarn-error.log
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 api/dist/
 web/.next/
 web/out/
+web/.turbo/
 coverage/
+.eslintcache
+*.tsbuildinfo
 
 # Flutter / Mobile
 mobile/.dart_tool/
@@ -26,6 +32,12 @@ mobile/.flutter-plugins
 mobile/.flutter-plugins-dependencies
 mobile/.pub-cache/
 mobile/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/Flutter.podspec
+mobile/**/ephemeral/
 
 # Secrets & Configs
 .env
@@ -36,5 +48,15 @@ mobile/ios/Runner/GoogleService-Info.plist
 
 # OS & Editor
 .DS_Store
+.AppleDouble
+.LSOverride
 Thumbs.db
+ehthumbs.db
 .idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
