@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.MyCertificates().execute();
-DefaultConnector.instance.VerifyCertificate(verifyCertificateVariables).execute();
-DefaultConnector.instance.GetPendingSubmissions().execute();
+DefaultConnector.instance.ListPublishedCourses().execute();
+DefaultConnector.instance.GetCourseCurriculum(getCourseCurriculumVariables).execute();
 DefaultConnector.instance.EnrollInCourse(enrollInCourseVariables).execute();
 DefaultConnector.instance.EnrollInMission(enrollInMissionVariables).execute();
 DefaultConnector.instance.UpdateLectureProgress(updateLectureProgressVariables).execute();
-DefaultConnector.instance.GetQuizQuestions(getQuizQuestionsVariables).execute();
-DefaultConnector.instance.StartQuizAttempt(startQuizAttemptVariables).execute();
-DefaultConnector.instance.SubmitQuizAnswer(submitQuizAnswerVariables).execute();
-DefaultConnector.instance.FinishQuizAttempt(finishQuizAttemptVariables).execute();
+DefaultConnector.instance.SubmitMission(submitMissionVariables).execute();
+DefaultConnector.instance.MySubmissions().execute();
+DefaultConnector.instance.GradeSubmission(gradeSubmissionVariables).execute();
+DefaultConnector.instance.SyncUser(syncUserVariables).execute();
+DefaultConnector.instance.GetMe().execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.UpdateMyProfile({ ... })
-.bio(...)
+await DefaultConnector.instance.AddPaymentItem({ ... })
+.courseId(...)
 .execute();
 ```
 

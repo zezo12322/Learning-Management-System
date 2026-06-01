@@ -1,53 +1,59 @@
+# Logs a pending payment transaction
 mutation LogPayment(
   $gateway: PaymentGateway!, 
-  $referenceId: String!
+  $referenceId: String!,
+  $amount: Int!,
+  $currency: String = "EGP"
 ) @auth(level: USER) { 
   payment_insert(
     data: {
       userId_expr: "auth.uid",
       gateway: $gateway,
       status: PENDING,
-      referenceId: $referenceId
+      referenceId: $referenceId,
+      amount: $amount,
+      currency: $currency
     }
   )
 }
 
+# Associates purchased items with a specific payment record
 mutation AddPaymentItem(
   $paymentId: UUID!,
+  $targetType: PaymentItemTarget!,
   $courseId: UUID,
   $missionId: UUID,
-  $subscriptionPlanId: UUID,
-  $price: Float!
+  $subscriptionTierId: UUID,
+  $price: Int! 
 ) @auth(level: USER) {
   paymentItem_insert(
     data: {
       paymentId: $paymentId,
+      targetType: $targetType,
       courseId: $courseId,
       missionId: $missionId,
-      subscriptionPlanId: $subscriptionPlanId,
+      subscriptionTierId: $subscriptionTierId,
       priceAtPurchase: $price
     }
   )
 }
 
+# Retrieves the authenticated user's payment history
 query MyPaymentHistory @auth(level: USER) {
   payments(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ createdAt: DESC }]) {
     id
     gateway
     status
+    amount
+    currency
     referenceId
     createdAt
     paymentItems_on_payment { 
+      targetType
       priceAtPurchase
-      course {
-        title
-      }
-      mission {
-        title
-      }
-      subscriptionPlan {
-        plan
-      }
+      course { title }
+      mission { title }
+      subscriptionTier { name }
     }
   }
 }

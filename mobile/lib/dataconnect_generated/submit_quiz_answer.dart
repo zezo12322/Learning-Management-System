@@ -21,10 +21,12 @@ class SubmitQuizAnswerVariablesBuilder {
 
 @immutable
 class SubmitQuizAnswerQuizAttemptAnswerInsert {
-  final String id;
+  final String attemptId;
+  final String questionId;
   SubmitQuizAnswerQuizAttemptAnswerInsert.fromJson(dynamic json):
   
-  id = nativeFromJson<String>(json['id']);
+  attemptId = nativeFromJson<String>(json['attemptId']),
+  questionId = nativeFromJson<String>(json['questionId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -35,21 +37,24 @@ class SubmitQuizAnswerQuizAttemptAnswerInsert {
     }
 
     final SubmitQuizAnswerQuizAttemptAnswerInsert otherTyped = other as SubmitQuizAnswerQuizAttemptAnswerInsert;
-    return id == otherTyped.id;
+    return attemptId == otherTyped.attemptId && 
+    questionId == otherTyped.questionId;
     
   }
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => Object.hashAll([attemptId.hashCode, questionId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['id'] = nativeToJson<String>(id);
+    json['attemptId'] = nativeToJson<String>(attemptId);
+    json['questionId'] = nativeToJson<String>(questionId);
     return json;
   }
 
   SubmitQuizAnswerQuizAttemptAnswerInsert({
-    required this.id,
+    required this.attemptId,
+    required this.questionId,
   });
 }
 

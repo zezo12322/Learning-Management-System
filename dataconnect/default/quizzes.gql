@@ -1,47 +1,50 @@
-# 1. Fetch questions using a where clause on the lectureId
+# Fetches all questions and their options for a particular quiz lecture
 query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
-  courseQuizs(where: { lectureId: { eq: $lectureId } }) {  # FIXED: courseQuizs
+  courseQuizs(where: { lectureId: { eq: $lectureId } }) {
     id
     passingScore
     maxAttempts
-    quizQuestions_on_quiz {
+    quizQuestions_on_quiz(orderBy: [{ order: ASC }]) {
       id
       questionText
-      options 
+      points
+      quizOptions_on_question(orderBy: [{ order: ASC }]) {
+        id
+        text
+      }
     }
   }
 }
 
-# 2. Mark exactly when a student starts the quiz
+# Initializes a new attempt for taking a quiz
 mutation StartQuizAttempt($quizId: UUID!) @auth(level: USER) {
   quizAttempt_insert(
-    data: {
-      userId_expr: "auth.uid",
-      quizId: $quizId
-    }
+    data: { userId_expr: "auth.uid", quizId: $quizId }
   )
 }
 
-# 3. Save a single answer selection
+# Logs an answer to a specific quiz question during an active attempt
 mutation SubmitQuizAnswer(
   $attemptId: UUID!, 
   $questionId: UUID!, 
-  $selectedIndex: Int!
+  $optionId: UUID! 
 ) @auth(level: USER) {
   quizAttemptAnswer_insert(
     data: {
       attemptId: $attemptId,
       questionId: $questionId,
-      selectedOptionIndex: $selectedIndex
+      selectedOptionId: $optionId
     }
   )
 }
 
-# 4. Lock the attempt when they submit the test
-mutation FinishQuizAttempt($attemptId: UUID!) @auth(level: USER) {
+# Marks a quiz attempt as finished with final score and passed status
+mutation FinishQuizAttempt($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: USER) {
   quizAttempt_update(
     id: $attemptId,
     data: {
+      score: $score,
+      passed: $passed,
       completedAt_expr: "request.time"
     }
   )

@@ -350,7 +350,8 @@ export interface Profile_Key {
 }
 
 export interface QuizAttemptAnswer_Key {
-  id: UUIDString;
+  attemptId: UUIDString;
+  questionId: UUIDString;
   __typename?: 'QuizAttemptAnswer_Key';
 }
 
@@ -490,25 +491,25 @@ export function verifyCertificate(dc: DataConnect, vars: VerifyCertificateVariab
 /** Generated Node Admin SDK operation action function for the 'VerifyCertificate' Query. Allow users to pass in custom DataConnect instances. */
 export function verifyCertificate(vars: VerifyCertificateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<VerifyCertificateData>>;
 
+/** Generated Node Admin SDK operation action function for the 'LogPayment' Mutation. Allow users to execute without passing in DataConnect. */
+export function logPayment(dc: DataConnect, vars: LogPaymentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<LogPaymentData>>;
+/** Generated Node Admin SDK operation action function for the 'LogPayment' Mutation. Allow users to pass in custom DataConnect instances. */
+export function logPayment(vars: LogPaymentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<LogPaymentData>>;
+
+/** Generated Node Admin SDK operation action function for the 'AddPaymentItem' Mutation. Allow users to execute without passing in DataConnect. */
+export function addPaymentItem(dc: DataConnect, vars: AddPaymentItemVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddPaymentItemData>>;
+/** Generated Node Admin SDK operation action function for the 'AddPaymentItem' Mutation. Allow users to pass in custom DataConnect instances. */
+export function addPaymentItem(vars: AddPaymentItemVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddPaymentItemData>>;
+
+/** Generated Node Admin SDK operation action function for the 'MyPaymentHistory' Query. Allow users to execute without passing in DataConnect. */
+export function myPaymentHistory(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<MyPaymentHistoryData>>;
+/** Generated Node Admin SDK operation action function for the 'MyPaymentHistory' Query. Allow users to pass in custom DataConnect instances. */
+export function myPaymentHistory(options?: OperationOptions): Promise<ExecuteOperationResponse<MyPaymentHistoryData>>;
+
 /** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to execute without passing in DataConnect. */
 export function getPendingSubmissions(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
 /** Generated Node Admin SDK operation action function for the 'GetPendingSubmissions' Query. Allow users to pass in custom DataConnect instances. */
 export function getPendingSubmissions(options?: OperationOptions): Promise<ExecuteOperationResponse<GetPendingSubmissionsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'EnrollInCourse' Mutation. Allow users to execute without passing in DataConnect. */
-export function enrollInCourse(dc: DataConnect, vars: EnrollInCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInCourseData>>;
-/** Generated Node Admin SDK operation action function for the 'EnrollInCourse' Mutation. Allow users to pass in custom DataConnect instances. */
-export function enrollInCourse(vars: EnrollInCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInCourseData>>;
-
-/** Generated Node Admin SDK operation action function for the 'EnrollInMission' Mutation. Allow users to execute without passing in DataConnect. */
-export function enrollInMission(dc: DataConnect, vars: EnrollInMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInMissionData>>;
-/** Generated Node Admin SDK operation action function for the 'EnrollInMission' Mutation. Allow users to pass in custom DataConnect instances. */
-export function enrollInMission(vars: EnrollInMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInMissionData>>;
-
-/** Generated Node Admin SDK operation action function for the 'UpdateLectureProgress' Mutation. Allow users to execute without passing in DataConnect. */
-export function updateLectureProgress(dc: DataConnect, vars: UpdateLectureProgressVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateLectureProgressData>>;
-/** Generated Node Admin SDK operation action function for the 'UpdateLectureProgress' Mutation. Allow users to pass in custom DataConnect instances. */
-export function updateLectureProgress(vars: UpdateLectureProgressVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateLectureProgressData>>;
 
 /** Generated Node Admin SDK operation action function for the 'GetQuizQuestions' Query. Allow users to execute without passing in DataConnect. */
 export function getQuizQuestions(dc: DataConnect, vars: GetQuizQuestionsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetQuizQuestionsData>>;
@@ -550,20 +551,20 @@ export function getCourseCurriculum(dc: DataConnect, vars: GetCourseCurriculumVa
 /** Generated Node Admin SDK operation action function for the 'GetCourseCurriculum' Query. Allow users to pass in custom DataConnect instances. */
 export function getCourseCurriculum(vars: GetCourseCurriculumVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetCourseCurriculumData>>;
 
-/** Generated Node Admin SDK operation action function for the 'LogPayment' Mutation. Allow users to execute without passing in DataConnect. */
-export function logPayment(dc: DataConnect, vars: LogPaymentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<LogPaymentData>>;
-/** Generated Node Admin SDK operation action function for the 'LogPayment' Mutation. Allow users to pass in custom DataConnect instances. */
-export function logPayment(vars: LogPaymentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<LogPaymentData>>;
+/** Generated Node Admin SDK operation action function for the 'EnrollInCourse' Mutation. Allow users to execute without passing in DataConnect. */
+export function enrollInCourse(dc: DataConnect, vars: EnrollInCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInCourseData>>;
+/** Generated Node Admin SDK operation action function for the 'EnrollInCourse' Mutation. Allow users to pass in custom DataConnect instances. */
+export function enrollInCourse(vars: EnrollInCourseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInCourseData>>;
 
-/** Generated Node Admin SDK operation action function for the 'AddPaymentItem' Mutation. Allow users to execute without passing in DataConnect. */
-export function addPaymentItem(dc: DataConnect, vars: AddPaymentItemVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddPaymentItemData>>;
-/** Generated Node Admin SDK operation action function for the 'AddPaymentItem' Mutation. Allow users to pass in custom DataConnect instances. */
-export function addPaymentItem(vars: AddPaymentItemVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AddPaymentItemData>>;
+/** Generated Node Admin SDK operation action function for the 'EnrollInMission' Mutation. Allow users to execute without passing in DataConnect. */
+export function enrollInMission(dc: DataConnect, vars: EnrollInMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInMissionData>>;
+/** Generated Node Admin SDK operation action function for the 'EnrollInMission' Mutation. Allow users to pass in custom DataConnect instances. */
+export function enrollInMission(vars: EnrollInMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<EnrollInMissionData>>;
 
-/** Generated Node Admin SDK operation action function for the 'MyPaymentHistory' Query. Allow users to execute without passing in DataConnect. */
-export function myPaymentHistory(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<MyPaymentHistoryData>>;
-/** Generated Node Admin SDK operation action function for the 'MyPaymentHistory' Query. Allow users to pass in custom DataConnect instances. */
-export function myPaymentHistory(options?: OperationOptions): Promise<ExecuteOperationResponse<MyPaymentHistoryData>>;
+/** Generated Node Admin SDK operation action function for the 'UpdateLectureProgress' Mutation. Allow users to execute without passing in DataConnect. */
+export function updateLectureProgress(dc: DataConnect, vars: UpdateLectureProgressVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateLectureProgressData>>;
+/** Generated Node Admin SDK operation action function for the 'UpdateLectureProgress' Mutation. Allow users to pass in custom DataConnect instances. */
+export function updateLectureProgress(vars: UpdateLectureProgressVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateLectureProgressData>>;
 
 /** Generated Node Admin SDK operation action function for the 'SubmitMission' Mutation. Allow users to execute without passing in DataConnect. */
 export function submitMission(dc: DataConnect, vars: SubmitMissionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitMissionData>>;

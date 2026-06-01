@@ -56,33 +56,33 @@ function verifyCertificate(dcOrVarsOrOptions, varsOrOptions, options) {
 }
 exports.verifyCertificate = verifyCertificate;
 
+function logPayment(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('LogPayment', inputVars, inputOpts);
+}
+exports.logPayment = logPayment;
+
+function addPaymentItem(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('AddPaymentItem', inputVars, inputOpts);
+}
+exports.addPaymentItem = addPaymentItem;
+
+function myPaymentHistory(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('MyPaymentHistory', undefined, inputOpts);
+}
+exports.myPaymentHistory = myPaymentHistory;
+
 function getPendingSubmissions(dcOrOptions, options) {
   const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
   dcInstance.useGen(true);
   return dcInstance.executeQuery('GetPendingSubmissions', undefined, inputOpts);
 }
 exports.getPendingSubmissions = getPendingSubmissions;
-
-function enrollInCourse(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('EnrollInCourse', inputVars, inputOpts);
-}
-exports.enrollInCourse = enrollInCourse;
-
-function enrollInMission(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('EnrollInMission', inputVars, inputOpts);
-}
-exports.enrollInMission = enrollInMission;
-
-function updateLectureProgress(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('UpdateLectureProgress', inputVars, inputOpts);
-}
-exports.updateLectureProgress = updateLectureProgress;
 
 function getQuizQuestions(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
@@ -140,26 +140,26 @@ function getCourseCurriculum(dcOrVarsOrOptions, varsOrOptions, options) {
 }
 exports.getCourseCurriculum = getCourseCurriculum;
 
-function logPayment(dcOrVarsOrOptions, varsOrOptions, options) {
+function enrollInCourse(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('LogPayment', inputVars, inputOpts);
+  return dcInstance.executeMutation('EnrollInCourse', inputVars, inputOpts);
 }
-exports.logPayment = logPayment;
+exports.enrollInCourse = enrollInCourse;
 
-function addPaymentItem(dcOrVarsOrOptions, varsOrOptions, options) {
+function enrollInMission(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('AddPaymentItem', inputVars, inputOpts);
+  return dcInstance.executeMutation('EnrollInMission', inputVars, inputOpts);
 }
-exports.addPaymentItem = addPaymentItem;
+exports.enrollInMission = enrollInMission;
 
-function myPaymentHistory(dcOrOptions, options) {
-  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+function updateLectureProgress(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeQuery('MyPaymentHistory', undefined, inputOpts);
+  return dcInstance.executeMutation('UpdateLectureProgress', inputVars, inputOpts);
 }
-exports.myPaymentHistory = myPaymentHistory;
+exports.updateLectureProgress = updateLectureProgress;
 
 function submitMission(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);

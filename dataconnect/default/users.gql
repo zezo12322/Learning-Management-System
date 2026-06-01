@@ -1,19 +1,21 @@
+# Upserts the authenticated user's core details
 mutation SyncUser(
-  $uid: String!, 
   $email: String!, 
   $name: String!, 
   $avatar: String
 ) @auth(level: USER) {
   user_upsert(
     data: {
-      id: $uid, 
+      id_expr: "auth.uid",
       email: $email, 
       name: $name, 
-      avatar: $avatar
+      avatar: $avatar,
+      lastLogin_expr: "request.time"
     }
   )
 }
 
+# Retrieves all associated data for the currently authenticated user
 query GetMe @auth(level: USER) {
   user(id_expr: "auth.uid") {
     id
@@ -21,26 +23,14 @@ query GetMe @auth(level: USER) {
     name
     avatar
     createdAt
-    profile_on_user { 
-      bio
-      company
-      phone
-      syncedPreferences
-    }
-    userRoles_on_user {
-      role {
-        name
-      }
-    }
+    lastLogin
+    profile_on_user { bio company phone syncedPreferences }
+    userRoles_on_user { role { name } }
   }
 }
 
-mutation UpdateMyProfile(
-  $bio: String, 
-  $company: String, 
-  $phone: String, 
-  $preferences: Any
-) @auth(level: USER) {
+# Updates the extended profile information of the authenticated user
+mutation UpdateMyProfile($bio: String, $company: String, $phone: String, $preferences: Any) @auth(level: USER) {
   profile_upsert(
     data: {
       userId_expr: "auth.uid",

@@ -1,0 +1,145 @@
+# ==========================================
+# 1. COURSE CREATION & MANAGEMENT
+# ==========================================
+
+# Create a new course in DRAFT mode
+mutation AdminCreateCourse(
+  $title: String!, 
+  $description: String, 
+  $price: Int!,
+  $language: String!, 
+  $level: CourseLevel!, 
+  $categoryId: UUID!,
+  $tags: [String!]!
+) @auth(level: USER) {
+  course_insert(
+    data: {
+      title: $title, 
+      description: $description, 
+      price: $price,
+      language: $language, 
+      level: $level, 
+      categoryId: $categoryId,
+      tags: $tags, 
+      createdById_expr: "auth.uid",
+      status: DRAFT
+    }
+  )
+}
+
+# Soft-delete a course
+mutation AdminDeleteCourse($courseId: UUID!) @auth(level: USER) {
+  course_update(
+    id: $courseId,
+    data: {
+      deletedAt_expr: "request.time",
+      status: ARCHIVED
+    }
+  )
+}
+
+# Add a lecture to a course section
+mutation AdminCreateLecture(
+  $sectionId: UUID!,
+  $title: String!,
+  $type: LectureType!,
+  $videoUrl: String,
+  $content: String,
+  $order: Int!
+) @auth(level: USER) {
+  courseLecture_insert(
+    data: {
+      sectionId: $sectionId,
+      title: $title,
+      type: $type,
+      videoUrl: $videoUrl,
+      content: $content,
+      isFreePreview: false,
+      order: $order
+    }
+  )
+}
+
+# ==========================================
+# 2. SESSION & LIVE CLASS SCHEDULING
+# ==========================================
+
+# Schedule a new Live Session or Physical Class
+mutation AdminCreateSession(
+  $courseId: UUID!,
+  $title: String!,
+  $capacity: Int,
+  $startTime: Timestamp!,
+  $endTime: Timestamp!,
+  $type: SessionType!,
+  $locationOrUrl: String!
+) @auth(level: USER) {
+  session_insert(
+    data: {
+      courseId: $courseId,
+      title: $title,
+      capacity: $capacity,
+      startTime: $startTime,
+      endTime: $endTime,
+      type: $type,
+      locationOrUrl: $locationOrUrl,
+      hostUserId_expr: "auth.uid"
+    }
+  )
+}
+
+# Cancel a session
+mutation AdminCancelSession($sessionId: UUID!) @auth(level: USER) {
+  session_update(
+    id: $sessionId,
+    data: {
+      deletedAt_expr: "request.time"
+    }
+  )
+}
+
+# ==========================================
+# 3. FINANCIAL & SUBSCRIPTION MANAGEMENT
+# ==========================================
+
+# Create a new Subscription Tier
+mutation AdminCreateSubscriptionTier(
+  $name: String!,
+  $price: Int!,
+  $billingCycle: BillingCycle!,
+  $features: [String!]!
+) @auth(level: USER) {
+  subscriptionTier_insert(
+    data: {
+      name: $name,
+      price: $price,
+      billingCycle: $billingCycle,
+      features: $features,
+      isActive: true
+    }
+  )
+}
+
+# Deprecate an old subscription tier
+mutation AdminDeprecateSubscriptionTier($tierId: UUID!) @auth(level: USER) {
+  subscriptionTier_update(
+    id: $tierId,
+    data: {
+      isActive: false
+    }
+  )
+}
+
+# ==========================================
+# 4. PLATFORM TAXONOMY
+# ==========================================
+
+# Create a new course category
+mutation AdminCreateCategory($name: String!, $description: String) @auth(level: USER) {
+  category_insert(
+    data: {
+      name: $name,
+      description: $description
+    }
+  )
+}

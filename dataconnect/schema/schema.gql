@@ -12,6 +12,15 @@ enum PaymentGateway { FAWRY, PAYMOB, INSTAPAY }
 enum PaymentStatus { PENDING, COMPLETED, FAILED, REFUNDED }
 enum SubscriptionStatus { ACTIVE, CANCELLED, SUSPENDED }
 
+# NEW: Strict Enums for classification and polymorphic logic
+enum CourseLevel { BEGINNER, INTERMEDIATE, ADVANCED }
+enum MissionDifficulty { BEGINNER, INTERMEDIATE, ADVANCED, EXPERT }
+enum BillingCycle { MONTHLY, QUARTERLY, YEARLY }
+enum EnrollmentTarget { COURSE, MISSION }
+enum CertificateTarget { COURSE, MISSION }
+enum PaymentItemTarget { COURSE, MISSION, SUBSCRIPTION }
+enum SubmissionStatus { PENDING, GRADED, RETURNED, REJECTED }
+
 # ==========================================
 # IDENTITY & ACCESS
 # ==========================================
@@ -24,13 +33,12 @@ type User @table(name: "users") {
   lastLogin: Timestamp
 }
 
-# FIXED: Natural Primary Key (One-to-One with User)
 type Profile @table(name: "profiles", key: ["user"]) {
   user: User!
   bio: String
   company: String
   phone: String
-  syncedPreferences: Any 
+  syncedPreferences: Any # Acceptable use of Any for truly dynamic frontend UI toggles
 }
 
 type Role @table(name: "roles") {
@@ -56,26 +64,38 @@ type RolePermission @table(name: "role_permissions", key: ["role", "permission"]
 }
 
 # ==========================================
+# TAXONOMY (NEW)
+# ==========================================
+type Category @table(name: "categories") {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String! @unique
+  description: String
+}
+
+# ==========================================
 # COURSE CONTENT & CURRICULUM
 # ==========================================
 type Course @table(name: "courses") {
   id: UUID! @default(expr: "uuidV4()")
   title: String!
   description: String
-  price: Float!
+  price: Int! 
   status: CourseStatus!
   language: String!
-  level: String!
+  level: CourseLevel! # FIXED: Enum
   thumbnail: String
-  categoryId: UUID
-  tags: [String] 
+  category: Category! # FIXED: Foreign Key mapping
+  tags: [String!]!    # FIXED: Non-null array items
+  createdBy: User!    # FIXED: Audit trail
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp # FIXED: Soft deletes
 }
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
   course: Course!
   user: User!
+  isPrimary: Boolean! @default(expr: "false") # FIXED: Distinguish lead
 }
 
 type CourseSection @table(name: "course_sections") {
@@ -91,12 +111,17 @@ type CourseLecture @table(name: "course_lectures") {
   title: String!
   type: LectureType!
   videoUrl: String
+  content: String     # FIXED: Field for READING type lectures
   duration: Int
   transcriptUrl: String
   isFreePreview: Boolean!
   order: Int!
+  deletedAt: Timestamp
 }
 
+# ==========================================
+# QUIZZES (REFACTORED)
+# ==========================================
 type CourseQuiz @table(name: "course_quizzes") {
   id: UUID! @default(expr: "uuidV4()")
   lecture: CourseLecture! @unique
@@ -108,8 +133,18 @@ type QuizQuestion @table(name: "quiz_questions") {
   id: UUID! @default(expr: "uuidV4()")
   quiz: CourseQuiz!
   questionText: String!
-  options: Any! 
-  correctAnswerIndex: Int!
+  order: Int!         # FIXED: Added order
+  points: Float! @default(expr: "1.0") # FIXED: Added points
+  explanation: String # FIXED: Added post-answer explanation
+  correctOptionId: UUID! # Stores ID to break circular FK dependency
+  deletedAt: Timestamp
+}
+
+type QuizOption @table(name: "quiz_options") { # FIXED: Replaced 'Any' JSON options
+  id: UUID! @default(expr: "uuidV4()")
+  question: QuizQuestion!
+  text: String!
+  order: Int!
 }
 
 # ==========================================
@@ -121,11 +156,12 @@ type Mission @table(name: "missions") {
   title: String!
   scenarioDescription: String!
   durationMinutes: Int!
-  category: String!
-  difficulty: String!
-  skillsTested: [String] 
+  category: Category! # FIXED: Foreign key mapping
+  difficulty: MissionDifficulty! # FIXED: Enum
+  skillsTested: [String!]! # FIXED: Strict array
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
 }
 
 type MissionMicroLesson @table(name: "mission_micro_lessons") {
@@ -133,8 +169,9 @@ type MissionMicroLesson @table(name: "mission_micro_lessons") {
   mission: Mission!
   title: String!
   type: LectureType!
-  videoUrl: String
-  durationSeconds: Int!
+  assetUrl: String 
+  content: String
+  durationSeconds: Int 
   order: Int!
 }
 
@@ -152,6 +189,7 @@ type RubricCriterion @table(name: "rubric_criteria") {
   criterionName: String!
   description: String
   maxPoints: Float!
+  order: Int! # FIXED: Ordering
 }
 
 type MissionSubmission @table(name: "mission_submissions") {
@@ -160,10 +198,17 @@ type MissionSubmission @table(name: "mission_submissions") {
   student: User!
   grader: User
   fileUrl: String!
-  criteriaScores: Any 
   feedback: String
-  submittedAt: Timestamp
+  status: SubmissionStatus! @default(expr: "PENDING") # FIXED: State tracking
+  attemptNumber: Int! @default(expr: "1") # FIXED: Version tracking
+  submittedAt: Timestamp! @default(expr: "request.time") # FIXED: Required
   updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["submission", "criterion"]) {
+  submission: MissionSubmission!
+  criterion: RubricCriterion!
+  score: Float! # FIXED: Relational scoring replacing the `Any` JSON block
 }
 
 # ==========================================
@@ -172,6 +217,7 @@ type MissionSubmission @table(name: "mission_submissions") {
 type Enrollment @table(name: "enrollments") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
+  targetType: EnrollmentTarget! # FIXED: Polymorphic discriminator
   course: Course 
   mission: Mission 
   status: EnrollmentStatus!
@@ -179,7 +225,6 @@ type Enrollment @table(name: "enrollments") {
   completedAt: Timestamp
 }
 
-# FIXED: Composite Primary Key (User + Lecture) for Upserts
 type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) {
   user: User!
   lecture: CourseLecture!
@@ -191,26 +236,30 @@ type QuizAttempt @table(name: "quiz_attempts") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
   quiz: CourseQuiz!
+  score: Float      # FIXED: Track outcome
+  passed: Boolean   # FIXED: Track outcome
   startedAt: Timestamp! @default(expr: "request.time")
   completedAt: Timestamp
 }
 
-type QuizAttemptAnswer @table(name: "quiz_attempt_answers") {
-  id: UUID! @default(expr: "uuidV4()")
+type QuizAttemptAnswer @table(name: "quiz_attempt_answers", key: ["attempt", "question"]) {
   attempt: QuizAttempt!
   question: QuizQuestion!
-  selectedOptionIndex: Int!
+  selectedOption: QuizOption! # FIXED: Stable relational mapping
 }
 
 type Session @table(name: "sessions") {
   id: UUID! @default(expr: "uuidV4()")
   course: Course!
   title: String!
+  hostUser: User      # FIXED: Instructor leading the session
+  capacity: Int       # FIXED: Max seats
   startTime: Timestamp!
   endTime: Timestamp!
   type: SessionType!
   locationOrUrl: String!
   qrCodeHash: String
+  deletedAt: Timestamp
 }
 
 type Attendance @table(name: "attendance") {
@@ -228,41 +277,58 @@ type Attendance @table(name: "attendance") {
 type Certificate @table(name: "certificates") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
+  targetType: CertificateTarget! # FIXED: Polymorphic discriminator
   course: Course
   mission: Mission
   issuedAt: Timestamp! @default(expr: "request.time")
+  expiresAt: Timestamp           # FIXED: Compliance/Renewal tracing
   verificationHash: String! @unique
   assetUrl: String!
 }
 
 # ==========================================
-# FINANCIALS
+# FINANCIALS & SUBSCRIPTIONS
 # ==========================================
+type SubscriptionTier @table(name: "subscription_tiers") {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String! @unique
+  price: Int! 
+  billingCycle: BillingCycle! # FIXED: Enum
+  features: [String!]!        # FIXED: Non-null items
+  isActive: Boolean! @default(expr: "true") # FIXED: Safe deprecation
+}
+
 type Payment @table(name: "payments") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
   gateway: PaymentGateway!
   status: PaymentStatus!
+  amount: Int!               # FIXED: Missing total amount
+  currency: String! @default(expr: "'EGP'") # FIXED: Currency code
   referenceId: String! @unique
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }
 
-type PaymentItem @table(name: "payment_items") {
-  id: UUID! @default(expr: "uuidV4()")
-  payment: Payment!
-  course: Course
-  mission: Mission
-  subscriptionPlan: SubscriptionPlan
-  priceAtPurchase: Float!
-}
-
-type SubscriptionPlan @table(name: "subscriptions") {
+type UserSubscription @table(name: "user_subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
-  plan: String!
+  tier: SubscriptionTier!
+  payment: Payment           # FIXED: Audit trace to payment
   status: SubscriptionStatus!
   startDate: Timestamp!
   endDate: Timestamp!
   autoRenew: Boolean!
+  cancelledAt: Timestamp     # FIXED: Churn metrics
+  cancelReason: String       # FIXED: Churn metrics
+}
+
+type PaymentItem @table(name: "payment_items") {
+  id: UUID! @default(expr: "uuidV4()")
+  payment: Payment!
+  targetType: PaymentItemTarget! # FIXED: Polymorphic discriminator
+  course: Course
+  mission: Mission
+  subscriptionTier: SubscriptionTier 
+  priceAtPurchase: Int! 
 }

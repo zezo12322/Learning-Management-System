@@ -1,20 +1,26 @@
-query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery and SEO.") {
-  courses(where: { status: { eq: PUBLISHED } }, orderBy: [{ createdAt: DESC }]) {
+# Lists all published courses available for public discovery
+query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
+  courses(
+    where: { 
+      status: { eq: PUBLISHED },
+      deletedAt: { eq: null }
+    }, 
+    orderBy: [{ createdAt: DESC }]
+  ) {
     id
     title
     price
     level
     thumbnail
     tags
-    courseInstructors_on_course { 
-      user {
-        name
-        avatar
-      }
+    category { name }
+    courseInstructors_on_course(where: { isPrimary: { eq: true } }) { 
+      user { name avatar }
     }
   }
 }
 
+# Retrieves full curriculum details for a specific course
 query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
   course(id: $courseId) {
     id
@@ -24,10 +30,14 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
     courseSections_on_course(orderBy: [{ order: ASC }]) {
       id
       title
-      courseLectures_on_section(orderBy: [{ order: ASC }]) {
+      courseLectures_on_section(
+        where: { deletedAt: { eq: null } },
+        orderBy: [{ order: ASC }]
+      ) {
         id
         title
         type
+        content
         duration
         isFreePreview
       }

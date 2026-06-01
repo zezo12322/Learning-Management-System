@@ -1,17 +1,24 @@
-# Fetch the schedule for a specific course
+# Fetches upcoming live sessions or physical classes for a course
 query GetCourseSessions($courseId: UUID!) @auth(level: USER) {
-  sessions(where: { courseId: { eq: $courseId } }, orderBy: [{ startTime: ASC }]) {
+  sessions(
+    where: { 
+      courseId: { eq: $courseId },
+      deletedAt: { eq: null }
+    }, 
+    orderBy: [{ startTime: ASC }]
+  ) {
     id
     title
     startTime
     endTime
     type
+    capacity
     locationOrUrl
-    # qrCodeHash is intentionally omitted so students can't spoof attendance from home
+    hostUser { name avatar }
   }
 }
 
-# Check a student into a class (Triggered by scanning a QR code or manual instructor entry)
+# Records attendance check-in for a live session
 mutation CheckInToSession(
   $sessionId: UUID!,
   $status: AttendanceStatus!,
