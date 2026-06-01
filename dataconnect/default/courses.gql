@@ -1,0 +1,36 @@
+query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery and SEO.") {
+  courses(where: { status: { eq: PUBLISHED } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    title
+    price
+    level
+    thumbnail
+    tags
+    courseInstructors_on_course { 
+      user {
+        name
+        avatar
+      }
+    }
+  }
+}
+
+query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
+  course(id: $courseId) {
+    id
+    title
+    description
+    language
+    courseSections_on_course(orderBy: [{ order: ASC }]) {
+      id
+      title
+      courseLectures_on_section(orderBy: [{ order: ASC }]) {
+        id
+        title
+        type
+        duration
+        isFreePreview
+      }
+    }
+  }
+}

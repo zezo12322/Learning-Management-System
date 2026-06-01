@@ -1,0 +1,19 @@
+# Fetch all student mission submissions that have not been graded yet
+query GetPendingSubmissions @auth(level: USER) {
+  missionSubmissions(where: { graderId: { eq: null } }, orderBy: [{ submittedAt: ASC }]) {
+    id
+    fileUrl
+    submittedAt
+    student {
+      name
+      email
+    }
+    mission {
+      title
+      difficulty
+      course { 
+        title 
+      }
+    }
+  }
+}

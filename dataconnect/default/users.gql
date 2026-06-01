@@ -1,0 +1,53 @@
+mutation SyncUser(
+  $uid: String!, 
+  $email: String!, 
+  $name: String!, 
+  $avatar: String
+) @auth(level: USER) {
+  user_upsert(
+    data: {
+      id: $uid, 
+      email: $email, 
+      name: $name, 
+      avatar: $avatar
+    }
+  )
+}
+
+query GetMe @auth(level: USER) {
+  user(id_expr: "auth.uid") {
+    id
+    email
+    name
+    avatar
+    createdAt
+    profile_on_user { 
+      bio
+      company
+      phone
+      syncedPreferences
+    }
+    userRoles_on_user {
+      role {
+        name
+      }
+    }
+  }
+}
+
+mutation UpdateMyProfile(
+  $bio: String, 
+  $company: String, 
+  $phone: String, 
+  $preferences: Any
+) @auth(level: USER) {
+  profile_upsert(
+    data: {
+      userId_expr: "auth.uid",
+      bio: $bio,
+      company: $company,
+      phone: $phone,
+      syncedPreferences: $preferences
+    }
+  )
+}

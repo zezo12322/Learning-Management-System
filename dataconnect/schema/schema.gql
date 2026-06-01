@@ -16,7 +16,6 @@ enum SubscriptionStatus { ACTIVE, CANCELLED, SUSPENDED }
 # IDENTITY & ACCESS
 # ==========================================
 type User @table(name: "users") {
-  # Maps directly to Firebase Auth UID
   id: String! @col(name: "uid") 
   email: String!
   name: String!
@@ -25,13 +24,12 @@ type User @table(name: "users") {
   lastLogin: Timestamp
 }
 
-type Profile @table(name: "profiles") {
-  id: UUID! @default(expr: "uuidV4()")
-  user: User! @unique
+# FIXED: Natural Primary Key (One-to-One with User)
+type Profile @table(name: "profiles", key: ["user"]) {
+  user: User!
   bio: String
   company: String
   phone: String
-  # Swapped JSON to Any for complex preference objects
   syncedPreferences: Any 
 }
 
@@ -47,12 +45,12 @@ type Permission @table(name: "permissions") {
   resource: String!
 }
 
-type UserRole @table(name: "user_roles") {
+type UserRole @table(name: "user_roles", key: ["user", "role"]) {
   user: User!
   role: Role!
 }
 
-type RolePermission @table(name: "role_permissions") {
+type RolePermission @table(name: "role_permissions", key: ["role", "permission"]) {
   role: Role!
   permission: Permission!
 }
@@ -70,13 +68,12 @@ type Course @table(name: "courses") {
   level: String!
   thumbnail: String
   categoryId: UUID
-  # Swapped JSON to String Array for quick indexing/searching
   tags: [String] 
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }
 
-type CourseInstructor @table(name: "course_instructors") {
+type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
   course: Course!
   user: User!
 }
@@ -111,23 +108,21 @@ type QuizQuestion @table(name: "quiz_questions") {
   id: UUID! @default(expr: "uuidV4()")
   quiz: CourseQuiz!
   questionText: String!
-  # Swapped JSON to Any to support nested option structures
   options: Any! 
   correctAnswerIndex: Int!
 }
 
 # ==========================================
-# OPTIMA MISSIONS (PROJECTS)
+# MISSIONS (PROJECTS)
 # ==========================================
 type Mission @table(name: "missions") {
   id: UUID! @default(expr: "uuidV4()")
-  course: Course # Nullable for standalone
+  course: Course 
   title: String!
   scenarioDescription: String!
   durationMinutes: Int!
   category: String!
   difficulty: String!
-  # Swapped JSON to String Array
   skillsTested: [String] 
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
@@ -165,7 +160,6 @@ type MissionSubmission @table(name: "mission_submissions") {
   student: User!
   grader: User
   fileUrl: String!
-  # Swapped JSON to Any for dynamic key-value scoring
   criteriaScores: Any 
   feedback: String
   submittedAt: Timestamp
@@ -185,8 +179,8 @@ type Enrollment @table(name: "enrollments") {
   completedAt: Timestamp
 }
 
-type LectureProgress @table(name: "lecture_progress") {
-  id: UUID! @default(expr: "uuidV4()")
+# FIXED: Composite Primary Key (User + Lecture) for Upserts
+type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) {
   user: User!
   lecture: CourseLecture!
   lastWatchedSecond: Int!
@@ -263,7 +257,6 @@ type PaymentItem @table(name: "payment_items") {
   priceAtPurchase: Float!
 }
 
-# Renamed to SubscriptionPlan to avoid conflicts with standard GraphQL Root 'Subscription' type
 type SubscriptionPlan @table(name: "subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!

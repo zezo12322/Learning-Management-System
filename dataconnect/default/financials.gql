@@ -1,0 +1,53 @@
+mutation LogPayment(
+  $gateway: PaymentGateway!, 
+  $referenceId: String!
+) @auth(level: USER) { 
+  payment_insert(
+    data: {
+      userId_expr: "auth.uid",
+      gateway: $gateway,
+      status: PENDING,
+      referenceId: $referenceId
+    }
+  )
+}
+
+mutation AddPaymentItem(
+  $paymentId: UUID!,
+  $courseId: UUID,
+  $missionId: UUID,
+  $subscriptionPlanId: UUID,
+  $price: Float!
+) @auth(level: USER) {
+  paymentItem_insert(
+    data: {
+      paymentId: $paymentId,
+      courseId: $courseId,
+      missionId: $missionId,
+      subscriptionPlanId: $subscriptionPlanId,
+      priceAtPurchase: $price
+    }
+  )
+}
+
+query MyPaymentHistory @auth(level: USER) {
+  payments(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    gateway
+    status
+    referenceId
+    createdAt
+    paymentItems_on_payment { 
+      priceAtPurchase
+      course {
+        title
+      }
+      mission {
+        title
+      }
+      subscriptionPlan {
+        plan
+      }
+    }
+  }
+}

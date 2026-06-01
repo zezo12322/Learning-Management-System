@@ -1,0 +1,28 @@
+# Fetch the schedule for a specific course
+query GetCourseSessions($courseId: UUID!) @auth(level: USER) {
+  sessions(where: { courseId: { eq: $courseId } }, orderBy: [{ startTime: ASC }]) {
+    id
+    title
+    startTime
+    endTime
+    type
+    locationOrUrl
+    # qrCodeHash is intentionally omitted so students can't spoof attendance from home
+  }
+}
+
+# Check a student into a class (Triggered by scanning a QR code or manual instructor entry)
+mutation CheckInToSession(
+  $sessionId: UUID!,
+  $status: AttendanceStatus!,
+  $method: AttendanceMethod!
+) @auth(level: USER) {
+  attendance_insert(
+    data: {
+      studentId_expr: "auth.uid",
+      sessionId: $sessionId,
+      status: $status,
+      method: $method
+    }
+  )
+}

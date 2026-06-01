@@ -1,4 +1,4 @@
-connectorId: example
+connectorId: default
 generate:
   dartSdk:
     - outputDir: ..\..\mobile\lib\dataconnect_generated
