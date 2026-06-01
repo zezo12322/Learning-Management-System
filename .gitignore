@@ -1,8 +1,39 @@
+# Firebase & DataConnect
+firebase.exe
 firebase-debug.log
 dataconnect-debug.log
 pglite-debug.log
-/.agents
 /.firebase
-/.gemini
 /dataconnect/.dataconnect
-/mobile/.dart_tool
+
+# AI / Agents
+/.agents
+/.gemini
+
+# Node.js (Web & API)
+node_modules/
+npm-debug.log
+yarn-error.log
+api/dist/
+web/.next/
+web/out/
+coverage/
+
+# Flutter / Mobile
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.pub-cache/
+mobile/build/
+
+# Secrets & Configs
+.env
+.env.*
+*.local
+mobile/android/app/google-services.json
+mobile/ios/Runner/GoogleService-Info.plist
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/

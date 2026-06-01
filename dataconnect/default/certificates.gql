@@ -1,0 +1,32 @@
+# For the student's personal dashboard
+query MyCertificates @auth(level: USER) {
+  certificates(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ issuedAt: DESC }]) {
+    id
+    issuedAt
+    verificationHash
+    assetUrl
+    course { 
+      title 
+    }
+    mission { 
+      title 
+    }
+  }
+}
+
+# PUBLIC ROUTE: Allows employers to scan a QR code and verify authenticity using a where clause
+query VerifyCertificate($hash: String!) @auth(level: PUBLIC, insecureReason: "Verification hashes are meant to be scanned publicly.") {
+  certificates(where: { verificationHash: { eq: $hash } }) {
+    issuedAt
+    assetUrl
+    user { 
+      name 
+    }
+    course { 
+      title 
+    }
+    mission { 
+      title 
+    }
+  }
+}

@@ -1,0 +1,34 @@
+mutation EnrollInCourse($courseId: UUID!) @auth(level: USER) {
+  enrollment_insert(
+    data: {
+      userId_expr: "auth.uid",
+      courseId: $courseId,
+      status: ACTIVE
+    }
+  )
+}
+
+mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
+  enrollment_insert(
+    data: {
+      userId_expr: "auth.uid",
+      missionId: $missionId,
+      status: ACTIVE
+    }
+  )
+}
+
+mutation UpdateLectureProgress(
+  $lectureId: UUID!, 
+  $lastWatchedSecond: Int!,
+  $completedAt: Timestamp
+) @auth(level: USER) {
+  lectureProgress_upsert(
+    data: {
+      userId_expr: "auth.uid",
+      lectureId: $lectureId,
+      lastWatchedSecond: $lastWatchedSecond,
+      completedAt: $completedAt
+    }
+  )
+}

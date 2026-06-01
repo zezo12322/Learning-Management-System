@@ -1,0 +1,41 @@
+mutation SubmitMission(
+  $missionId: UUID!, 
+  $fileUrl: String!
+) @auth(level: USER) {
+  missionSubmission_insert(
+    data: {
+      missionId: $missionId,
+      studentId_expr: "auth.uid",
+      fileUrl: $fileUrl
+    }
+  )
+}
+
+query MySubmissions @auth(level: USER) {
+  missionSubmissions(where: { studentId: { eq_expr: "auth.uid" } }, orderBy: [{ updatedAt: DESC }]) {
+    id
+    fileUrl
+    feedback
+    criteriaScores
+    submittedAt
+    mission {
+      title
+      difficulty
+    }
+  }
+}
+
+mutation GradeSubmission(
+  $submissionId: UUID!, 
+  $criteriaScores: Any!, 
+  $feedback: String
+) @auth(level: USER) {
+  missionSubmission_update(
+    id: $submissionId,
+    data: {
+      graderId_expr: "auth.uid",
+      criteriaScores: $criteriaScores,
+      feedback: $feedback
+    }
+  )
+}

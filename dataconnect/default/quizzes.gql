@@ -1,0 +1,48 @@
+# 1. Fetch questions using a where clause on the lectureId
+query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
+  courseQuizs(where: { lectureId: { eq: $lectureId } }) {  # FIXED: courseQuizs
+    id
+    passingScore
+    maxAttempts
+    quizQuestions_on_quiz {
+      id
+      questionText
+      options 
+    }
+  }
+}
+
+# 2. Mark exactly when a student starts the quiz
+mutation StartQuizAttempt($quizId: UUID!) @auth(level: USER) {
+  quizAttempt_insert(
+    data: {
+      userId_expr: "auth.uid",
+      quizId: $quizId
+    }
+  )
+}
+
+# 3. Save a single answer selection
+mutation SubmitQuizAnswer(
+  $attemptId: UUID!, 
+  $questionId: UUID!, 
+  $selectedIndex: Int!
+) @auth(level: USER) {
+  quizAttemptAnswer_insert(
+    data: {
+      attemptId: $attemptId,
+      questionId: $questionId,
+      selectedOptionIndex: $selectedIndex
+    }
+  )
+}
+
+# 4. Lock the attempt when they submit the test
+mutation FinishQuizAttempt($attemptId: UUID!) @auth(level: USER) {
+  quizAttempt_update(
+    id: $attemptId,
+    data: {
+      completedAt_expr: "request.time"
+    }
+  )
+}
