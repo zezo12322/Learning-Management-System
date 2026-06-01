@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.ListPublishedCourses().execute();
-DefaultConnector.instance.GetCourseCurriculum(getCourseCurriculumVariables).execute();
-DefaultConnector.instance.GetPendingSubmissions().execute();
-DefaultConnector.instance.SubmitMission(submitMissionVariables).execute();
-DefaultConnector.instance.GradeSubmission(gradeSubmissionVariables).execute();
-DefaultConnector.instance.AddCriterionScore(addCriterionScoreVariables).execute();
-DefaultConnector.instance.MySubmissions().execute();
-DefaultConnector.instance.GetQuizQuestions(getQuizQuestionsVariables).execute();
-DefaultConnector.instance.StartQuizAttempt(startQuizAttemptVariables).execute();
-DefaultConnector.instance.SubmitQuizAnswer(submitQuizAnswerVariables).execute();
+DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
+DefaultConnector.instance.AdminDeleteCourse(adminDeleteCourseVariables).execute();
+DefaultConnector.instance.AdminCreateCourseSection(adminCreateCourseSectionVariables).execute();
+DefaultConnector.instance.AdminCreateLecture(adminCreateLectureVariables).execute();
+DefaultConnector.instance.InstructorCourses().execute();
+DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
+DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execute();
+DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
+DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
+DefaultConnector.instance.ListSubscriptionTiers().execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.UpdateMyProfile({ ... })
-.bio(...)
+await DefaultConnector.instance.UpdateLectureProgress({ ... })
+.completedAt(...)
 .execute();
 ```
 

@@ -6,7 +6,7 @@ mutation SyncUser(
 ) @auth(level: USER) {
   user_upsert(
     data: {
-      id_expr: "auth.uid",
+      id_expr: "auth.uid", 
       email: $email, 
       name: $name, 
       avatar: $avatar,

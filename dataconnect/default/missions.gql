@@ -34,7 +34,7 @@ mutation AddCriterionScore(
   $criterionId: UUID!,
   $score: Float!
 ) @auth(level: USER) {
-  missionSubmissionScore_upsert(
+  missionSubmissionScore_insert(
     data: {
       submissionId: $submissionId,
       criterionId: $criterionId,

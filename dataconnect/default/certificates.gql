@@ -3,8 +3,8 @@ query MyCertificates @auth(level: USER) {
   certificates(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ issuedAt: DESC }]) {
     id
     issuedAt
-    expiresAt
-    targetType
+    expiresAt 
+    targetType 
     verificationHash
     assetUrl
     course { title }

@@ -3,7 +3,7 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
   courses(
     where: { 
       status: { eq: PUBLISHED },
-      deletedAt: { eq: null }
+      deletedAt: { eq: null } 
     }, 
     orderBy: [{ createdAt: DESC }]
   ) {
@@ -13,10 +13,8 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
     level
     thumbnail
     tags
-    category { name }
-    courseInstructors_on_course(where: { isPrimary: { eq: true } }) { 
-      user { name avatar }
-    }
+    category { name } 
+    author { name avatar }
   }
 }
 
@@ -31,13 +29,13 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
       id
       title
       courseLectures_on_section(
-        where: { deletedAt: { eq: null } },
+        where: { deletedAt: { eq: null } }, 
         orderBy: [{ order: ASC }]
       ) {
         id
         title
         type
-        content
+        content 
         duration
         isFreePreview
       }
