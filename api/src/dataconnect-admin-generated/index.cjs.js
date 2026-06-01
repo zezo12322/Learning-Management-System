@@ -85,69 +85,6 @@ const connectorConfig = {
 };
 exports.connectorConfig = connectorConfig;
 
-function myCertificates(dcOrOptions, options) {
-  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('MyCertificates', undefined, inputOpts);
-}
-exports.myCertificates = myCertificates;
-
-function verifyCertificate(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('VerifyCertificate', inputVars, inputOpts);
-}
-exports.verifyCertificate = verifyCertificate;
-
-function logPayment(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('LogPayment', inputVars, inputOpts);
-}
-exports.logPayment = logPayment;
-
-function addPaymentItem(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('AddPaymentItem', inputVars, inputOpts);
-}
-exports.addPaymentItem = addPaymentItem;
-
-function myPaymentHistory(dcOrOptions, options) {
-  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('MyPaymentHistory', undefined, inputOpts);
-}
-exports.myPaymentHistory = myPaymentHistory;
-
-function submitMission(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('SubmitMission', inputVars, inputOpts);
-}
-exports.submitMission = submitMission;
-
-function gradeSubmission(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('GradeSubmission', inputVars, inputOpts);
-}
-exports.gradeSubmission = gradeSubmission;
-
-function addCriterionScore(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('AddCriterionScore', inputVars, inputOpts);
-}
-exports.addCriterionScore = addCriterionScore;
-
-function mySubmissions(dcOrOptions, options) {
-  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('MySubmissions', undefined, inputOpts);
-}
-exports.mySubmissions = mySubmissions;
-
 function getQuizQuestions(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
@@ -232,26 +169,40 @@ function adminCreateCategory(dcOrVarsOrOptions, varsOrOptions, options) {
 }
 exports.adminCreateCategory = adminCreateCategory;
 
-function listPublishedCourses(dcOrOptions, options) {
+function myCertificates(dcOrOptions, options) {
   const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
   dcInstance.useGen(true);
-  return dcInstance.executeQuery('ListPublishedCourses', undefined, inputOpts);
+  return dcInstance.executeQuery('MyCertificates', undefined, inputOpts);
 }
-exports.listPublishedCourses = listPublishedCourses;
+exports.myCertificates = myCertificates;
 
-function getCourseCurriculum(dcOrVarsOrOptions, varsOrOptions, options) {
+function verifyCertificate(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeQuery('GetCourseCurriculum', inputVars, inputOpts);
+  return dcInstance.executeQuery('VerifyCertificate', inputVars, inputOpts);
 }
-exports.getCourseCurriculum = getCourseCurriculum;
+exports.verifyCertificate = verifyCertificate;
 
-function getPendingSubmissions(dcOrOptions, options) {
+function logPayment(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('LogPayment', inputVars, inputOpts);
+}
+exports.logPayment = logPayment;
+
+function addPaymentItem(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('AddPaymentItem', inputVars, inputOpts);
+}
+exports.addPaymentItem = addPaymentItem;
+
+function myPaymentHistory(dcOrOptions, options) {
   const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
   dcInstance.useGen(true);
-  return dcInstance.executeQuery('GetPendingSubmissions', undefined, inputOpts);
+  return dcInstance.executeQuery('MyPaymentHistory', undefined, inputOpts);
 }
-exports.getPendingSubmissions = getPendingSubmissions;
+exports.myPaymentHistory = myPaymentHistory;
 
 function enrollInCourse(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
@@ -308,4 +259,53 @@ function updateMyProfile(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeMutation('UpdateMyProfile', inputVars, inputOpts);
 }
 exports.updateMyProfile = updateMyProfile;
+
+function listPublishedCourses(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ListPublishedCourses', undefined, inputOpts);
+}
+exports.listPublishedCourses = listPublishedCourses;
+
+function getCourseCurriculum(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('GetCourseCurriculum', inputVars, inputOpts);
+}
+exports.getCourseCurriculum = getCourseCurriculum;
+
+function getPendingSubmissions(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('GetPendingSubmissions', undefined, inputOpts);
+}
+exports.getPendingSubmissions = getPendingSubmissions;
+
+function submitMission(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('SubmitMission', inputVars, inputOpts);
+}
+exports.submitMission = submitMission;
+
+function gradeSubmission(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('GradeSubmission', inputVars, inputOpts);
+}
+exports.gradeSubmission = gradeSubmission;
+
+function addCriterionScore(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('AddCriterionScore', inputVars, inputOpts);
+}
+exports.addCriterionScore = addCriterionScore;
+
+function mySubmissions(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('MySubmissions', undefined, inputOpts);
+}
+exports.mySubmissions = mySubmissions;
 
