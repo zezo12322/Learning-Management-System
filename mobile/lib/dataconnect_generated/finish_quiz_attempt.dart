@@ -2,9 +2,11 @@ part of 'generated.dart';
 
 class FinishQuizAttemptVariablesBuilder {
   String attemptId;
+  double score;
+  bool passed;
 
   final FirebaseDataConnect _dataConnect;
-  FinishQuizAttemptVariablesBuilder(this._dataConnect, {required  this.attemptId,});
+  FinishQuizAttemptVariablesBuilder(this._dataConnect, {required  this.attemptId,required  this.score,required  this.passed,});
   Deserializer<FinishQuizAttemptData> dataDeserializer = (dynamic json)  => FinishQuizAttemptData.fromJson(jsonDecode(json));
   Serializer<FinishQuizAttemptVariables> varsSerializer = (FinishQuizAttemptVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<FinishQuizAttemptData, FinishQuizAttemptVariables>> execute() {
@@ -12,7 +14,7 @@ class FinishQuizAttemptVariablesBuilder {
   }
 
   MutationRef<FinishQuizAttemptData, FinishQuizAttemptVariables> ref() {
-    FinishQuizAttemptVariables vars= FinishQuizAttemptVariables(attemptId: attemptId,);
+    FinishQuizAttemptVariables vars= FinishQuizAttemptVariables(attemptId: attemptId,score: score,passed: passed,);
     return _dataConnect.mutation("FinishQuizAttempt", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -90,10 +92,14 @@ class FinishQuizAttemptData {
 @immutable
 class FinishQuizAttemptVariables {
   final String attemptId;
+  final double score;
+  final bool passed;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   FinishQuizAttemptVariables.fromJson(Map<String, dynamic> json):
   
-  attemptId = nativeFromJson<String>(json['attemptId']);
+  attemptId = nativeFromJson<String>(json['attemptId']),
+  score = nativeFromJson<double>(json['score']),
+  passed = nativeFromJson<bool>(json['passed']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -104,21 +110,27 @@ class FinishQuizAttemptVariables {
     }
 
     final FinishQuizAttemptVariables otherTyped = other as FinishQuizAttemptVariables;
-    return attemptId == otherTyped.attemptId;
+    return attemptId == otherTyped.attemptId && 
+    score == otherTyped.score && 
+    passed == otherTyped.passed;
     
   }
   @override
-  int get hashCode => attemptId.hashCode;
+  int get hashCode => Object.hashAll([attemptId.hashCode, score.hashCode, passed.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['attemptId'] = nativeToJson<String>(attemptId);
+    json['score'] = nativeToJson<double>(score);
+    json['passed'] = nativeToJson<bool>(passed);
     return json;
   }
 
   FinishQuizAttemptVariables({
     required this.attemptId,
+    required this.score,
+    required this.passed,
   });
 }
 

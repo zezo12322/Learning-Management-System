@@ -23,6 +23,7 @@ class GetMeUser {
   final String name;
   final String? avatar;
   final Timestamp createdAt;
+  final Timestamp? lastLogin;
   final GetMeUserProfileOnUser? profile_on_user;
   final List<GetMeUserUserRolesOnUser> userRoles_on_user;
   GetMeUser.fromJson(dynamic json):
@@ -32,6 +33,7 @@ class GetMeUser {
   name = nativeFromJson<String>(json['name']),
   avatar = json['avatar'] == null ? null : nativeFromJson<String>(json['avatar']),
   createdAt = Timestamp.fromJson(json['createdAt']),
+  lastLogin = json['lastLogin'] == null ? null : Timestamp.fromJson(json['lastLogin']),
   profile_on_user = json['profile_on_user'] == null ? null : GetMeUserProfileOnUser.fromJson(json['profile_on_user']),
   userRoles_on_user = (json['userRoles_on_user'] as List<dynamic>)
         .map((e) => GetMeUserUserRolesOnUser.fromJson(e))
@@ -51,12 +53,13 @@ class GetMeUser {
     name == otherTyped.name && 
     avatar == otherTyped.avatar && 
     createdAt == otherTyped.createdAt && 
+    lastLogin == otherTyped.lastLogin && 
     profile_on_user == otherTyped.profile_on_user && 
     userRoles_on_user == otherTyped.userRoles_on_user;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, avatar.hashCode, createdAt.hashCode, profile_on_user.hashCode, userRoles_on_user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, avatar.hashCode, createdAt.hashCode, lastLogin.hashCode, profile_on_user.hashCode, userRoles_on_user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -68,6 +71,9 @@ class GetMeUser {
       json['avatar'] = nativeToJson<String?>(avatar);
     }
     json['createdAt'] = createdAt.toJson();
+    if (lastLogin != null) {
+      json['lastLogin'] = lastLogin!.toJson();
+    }
     if (profile_on_user != null) {
       json['profile_on_user'] = profile_on_user!.toJson();
     }
@@ -81,6 +87,7 @@ class GetMeUser {
     required this.name,
     this.avatar,
     required this.createdAt,
+    this.lastLogin,
     this.profile_on_user,
     required this.userRoles_on_user,
   });

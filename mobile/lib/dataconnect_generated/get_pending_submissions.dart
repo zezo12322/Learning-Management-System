@@ -20,14 +20,16 @@ class GetPendingSubmissionsVariablesBuilder {
 class GetPendingSubmissionsMissionSubmissions {
   final String id;
   final String fileUrl;
-  final Timestamp? submittedAt;
+  final Timestamp submittedAt;
+  final int attemptNumber;
   final GetPendingSubmissionsMissionSubmissionsStudent student;
   final GetPendingSubmissionsMissionSubmissionsMission mission;
   GetPendingSubmissionsMissionSubmissions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   fileUrl = nativeFromJson<String>(json['fileUrl']),
-  submittedAt = json['submittedAt'] == null ? null : Timestamp.fromJson(json['submittedAt']),
+  submittedAt = Timestamp.fromJson(json['submittedAt']),
+  attemptNumber = nativeFromJson<int>(json['attemptNumber']),
   student = GetPendingSubmissionsMissionSubmissionsStudent.fromJson(json['student']),
   mission = GetPendingSubmissionsMissionSubmissionsMission.fromJson(json['mission']);
   @override
@@ -43,21 +45,21 @@ class GetPendingSubmissionsMissionSubmissions {
     return id == otherTyped.id && 
     fileUrl == otherTyped.fileUrl && 
     submittedAt == otherTyped.submittedAt && 
+    attemptNumber == otherTyped.attemptNumber && 
     student == otherTyped.student && 
     mission == otherTyped.mission;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, fileUrl.hashCode, submittedAt.hashCode, student.hashCode, mission.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, fileUrl.hashCode, submittedAt.hashCode, attemptNumber.hashCode, student.hashCode, mission.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['fileUrl'] = nativeToJson<String>(fileUrl);
-    if (submittedAt != null) {
-      json['submittedAt'] = submittedAt!.toJson();
-    }
+    json['submittedAt'] = submittedAt.toJson();
+    json['attemptNumber'] = nativeToJson<int>(attemptNumber);
     json['student'] = student.toJson();
     json['mission'] = mission.toJson();
     return json;
@@ -66,7 +68,8 @@ class GetPendingSubmissionsMissionSubmissions {
   GetPendingSubmissionsMissionSubmissions({
     required this.id,
     required this.fileUrl,
-    this.submittedAt,
+    required this.submittedAt,
+    required this.attemptNumber,
     required this.student,
     required this.mission,
   });
@@ -114,12 +117,12 @@ class GetPendingSubmissionsMissionSubmissionsStudent {
 @immutable
 class GetPendingSubmissionsMissionSubmissionsMission {
   final String title;
-  final String difficulty;
+  final EnumValue<MissionDifficulty> difficulty;
   final GetPendingSubmissionsMissionSubmissionsMissionCourse? course;
   GetPendingSubmissionsMissionSubmissionsMission.fromJson(dynamic json):
   
   title = nativeFromJson<String>(json['title']),
-  difficulty = nativeFromJson<String>(json['difficulty']),
+  difficulty = missionDifficultyDeserializer(json['difficulty']),
   course = json['course'] == null ? null : GetPendingSubmissionsMissionSubmissionsMissionCourse.fromJson(json['course']);
   @override
   bool operator ==(Object other) {
@@ -143,7 +146,9 @@ class GetPendingSubmissionsMissionSubmissionsMission {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['title'] = nativeToJson<String>(title);
-    json['difficulty'] = nativeToJson<String>(difficulty);
+    json['difficulty'] = 
+    missionDifficultySerializer(difficulty)
+    ;
     if (course != null) {
       json['course'] = course!.toJson();
     }

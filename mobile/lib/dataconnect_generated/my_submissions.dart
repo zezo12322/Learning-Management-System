@@ -20,17 +20,21 @@ class MySubmissionsVariablesBuilder {
 class MySubmissionsMissionSubmissions {
   final String id;
   final String fileUrl;
+  final EnumValue<SubmissionStatus> status;
   final String? feedback;
-  final AnyValue? criteriaScores;
-  final Timestamp? submittedAt;
+  final Timestamp submittedAt;
+  final List<MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission> missionSubmissionScores_on_submission;
   final MySubmissionsMissionSubmissionsMission mission;
   MySubmissionsMissionSubmissions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   fileUrl = nativeFromJson<String>(json['fileUrl']),
+  status = submissionStatusDeserializer(json['status']),
   feedback = json['feedback'] == null ? null : nativeFromJson<String>(json['feedback']),
-  criteriaScores = json['criteriaScores'] == null ? null : AnyValue.fromJson(json['criteriaScores']),
-  submittedAt = json['submittedAt'] == null ? null : Timestamp.fromJson(json['submittedAt']),
+  submittedAt = Timestamp.fromJson(json['submittedAt']),
+  missionSubmissionScores_on_submission = (json['missionSubmissionScores_on_submission'] as List<dynamic>)
+        .map((e) => MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission.fromJson(e))
+        .toList(),
   mission = MySubmissionsMissionSubmissionsMission.fromJson(json['mission']);
   @override
   bool operator ==(Object other) {
@@ -44,29 +48,29 @@ class MySubmissionsMissionSubmissions {
     final MySubmissionsMissionSubmissions otherTyped = other as MySubmissionsMissionSubmissions;
     return id == otherTyped.id && 
     fileUrl == otherTyped.fileUrl && 
+    status == otherTyped.status && 
     feedback == otherTyped.feedback && 
-    criteriaScores == otherTyped.criteriaScores && 
     submittedAt == otherTyped.submittedAt && 
+    missionSubmissionScores_on_submission == otherTyped.missionSubmissionScores_on_submission && 
     mission == otherTyped.mission;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, fileUrl.hashCode, feedback.hashCode, criteriaScores.hashCode, submittedAt.hashCode, mission.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, fileUrl.hashCode, status.hashCode, feedback.hashCode, submittedAt.hashCode, missionSubmissionScores_on_submission.hashCode, mission.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['fileUrl'] = nativeToJson<String>(fileUrl);
+    json['status'] = 
+    submissionStatusSerializer(status)
+    ;
     if (feedback != null) {
       json['feedback'] = nativeToJson<String?>(feedback);
     }
-    if (criteriaScores != null) {
-      json['criteriaScores'] = criteriaScores!.toJson();
-    }
-    if (submittedAt != null) {
-      json['submittedAt'] = submittedAt!.toJson();
-    }
+    json['submittedAt'] = submittedAt.toJson();
+    json['missionSubmissionScores_on_submission'] = missionSubmissionScores_on_submission.map((e) => e.toJson()).toList();
     json['mission'] = mission.toJson();
     return json;
   }
@@ -74,21 +78,100 @@ class MySubmissionsMissionSubmissions {
   MySubmissionsMissionSubmissions({
     required this.id,
     required this.fileUrl,
+    required this.status,
     this.feedback,
-    this.criteriaScores,
-    this.submittedAt,
+    required this.submittedAt,
+    required this.missionSubmissionScores_on_submission,
     required this.mission,
+  });
+}
+
+@immutable
+class MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission {
+  final double score;
+  final MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion criterion;
+  MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission.fromJson(dynamic json):
+  
+  score = nativeFromJson<double>(json['score']),
+  criterion = MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion.fromJson(json['criterion']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission otherTyped = other as MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission;
+    return score == otherTyped.score && 
+    criterion == otherTyped.criterion;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([score.hashCode, criterion.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['score'] = nativeToJson<double>(score);
+    json['criterion'] = criterion.toJson();
+    return json;
+  }
+
+  MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmission({
+    required this.score,
+    required this.criterion,
+  });
+}
+
+@immutable
+class MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion {
+  final String criterionName;
+  final double maxPoints;
+  MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion.fromJson(dynamic json):
+  
+  criterionName = nativeFromJson<String>(json['criterionName']),
+  maxPoints = nativeFromJson<double>(json['maxPoints']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion otherTyped = other as MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion;
+    return criterionName == otherTyped.criterionName && 
+    maxPoints == otherTyped.maxPoints;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([criterionName.hashCode, maxPoints.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['criterionName'] = nativeToJson<String>(criterionName);
+    json['maxPoints'] = nativeToJson<double>(maxPoints);
+    return json;
+  }
+
+  MySubmissionsMissionSubmissionsMissionSubmissionScoresOnSubmissionCriterion({
+    required this.criterionName,
+    required this.maxPoints,
   });
 }
 
 @immutable
 class MySubmissionsMissionSubmissionsMission {
   final String title;
-  final String difficulty;
+  final EnumValue<MissionDifficulty> difficulty;
   MySubmissionsMissionSubmissionsMission.fromJson(dynamic json):
   
   title = nativeFromJson<String>(json['title']),
-  difficulty = nativeFromJson<String>(json['difficulty']);
+  difficulty = missionDifficultyDeserializer(json['difficulty']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -110,7 +193,9 @@ class MySubmissionsMissionSubmissionsMission {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['title'] = nativeToJson<String>(title);
-    json['difficulty'] = nativeToJson<String>(difficulty);
+    json['difficulty'] = 
+    missionDifficultySerializer(difficulty)
+    ;
     return json;
   }
 

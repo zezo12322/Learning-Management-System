@@ -20,21 +20,23 @@ class ListPublishedCoursesVariablesBuilder {
 class ListPublishedCoursesCourses {
   final String id;
   final String title;
-  final double price;
-  final String level;
+  final int price;
+  final EnumValue<CourseLevel> level;
   final String? thumbnail;
-  final List<String>? tags;
+  final List<String> tags;
+  final ListPublishedCoursesCoursesCategory category;
   final List<ListPublishedCoursesCoursesCourseInstructorsOnCourse> courseInstructors_on_course;
   ListPublishedCoursesCourses.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   title = nativeFromJson<String>(json['title']),
-  price = nativeFromJson<double>(json['price']),
-  level = nativeFromJson<String>(json['level']),
+  price = nativeFromJson<int>(json['price']),
+  level = courseLevelDeserializer(json['level']),
   thumbnail = json['thumbnail'] == null ? null : nativeFromJson<String>(json['thumbnail']),
-  tags = json['tags'] == null ? null : (json['tags'] as List<dynamic>)
+  tags = (json['tags'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
         .toList(),
+  category = ListPublishedCoursesCoursesCategory.fromJson(json['category']),
   courseInstructors_on_course = (json['courseInstructors_on_course'] as List<dynamic>)
         .map((e) => ListPublishedCoursesCoursesCourseInstructorsOnCourse.fromJson(e))
         .toList();
@@ -54,25 +56,27 @@ class ListPublishedCoursesCourses {
     level == otherTyped.level && 
     thumbnail == otherTyped.thumbnail && 
     tags == otherTyped.tags && 
+    category == otherTyped.category && 
     courseInstructors_on_course == otherTyped.courseInstructors_on_course;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, courseInstructors_on_course.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, category.hashCode, courseInstructors_on_course.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['title'] = nativeToJson<String>(title);
-    json['price'] = nativeToJson<double>(price);
-    json['level'] = nativeToJson<String>(level);
+    json['price'] = nativeToJson<int>(price);
+    json['level'] = 
+    courseLevelSerializer(level)
+    ;
     if (thumbnail != null) {
       json['thumbnail'] = nativeToJson<String?>(thumbnail);
     }
-    if (tags != null) {
-      json['tags'] = tags?.map((e) => nativeToJson<String>(e)).toList();
-    }
+    json['tags'] = tags.map((e) => nativeToJson<String>(e)).toList();
+    json['category'] = category.toJson();
     json['courseInstructors_on_course'] = courseInstructors_on_course.map((e) => e.toJson()).toList();
     return json;
   }
@@ -83,8 +87,43 @@ class ListPublishedCoursesCourses {
     required this.price,
     required this.level,
     this.thumbnail,
-    this.tags,
+    required this.tags,
+    required this.category,
     required this.courseInstructors_on_course,
+  });
+}
+
+@immutable
+class ListPublishedCoursesCoursesCategory {
+  final String name;
+  ListPublishedCoursesCoursesCategory.fromJson(dynamic json):
+  
+  name = nativeFromJson<String>(json['name']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListPublishedCoursesCoursesCategory otherTyped = other as ListPublishedCoursesCoursesCategory;
+    return name == otherTyped.name;
+    
+  }
+  @override
+  int get hashCode => name.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['name'] = nativeToJson<String>(name);
+    return json;
+  }
+
+  ListPublishedCoursesCoursesCategory({
+    required this.name,
   });
 }
 

@@ -20,6 +20,8 @@ class MyCertificatesVariablesBuilder {
 class MyCertificatesCertificates {
   final String id;
   final Timestamp issuedAt;
+  final Timestamp? expiresAt;
+  final EnumValue<CertificateTarget> targetType;
   final String verificationHash;
   final String assetUrl;
   final MyCertificatesCertificatesCourse? course;
@@ -28,6 +30,8 @@ class MyCertificatesCertificates {
   
   id = nativeFromJson<String>(json['id']),
   issuedAt = Timestamp.fromJson(json['issuedAt']),
+  expiresAt = json['expiresAt'] == null ? null : Timestamp.fromJson(json['expiresAt']),
+  targetType = certificateTargetDeserializer(json['targetType']),
   verificationHash = nativeFromJson<String>(json['verificationHash']),
   assetUrl = nativeFromJson<String>(json['assetUrl']),
   course = json['course'] == null ? null : MyCertificatesCertificatesCourse.fromJson(json['course']),
@@ -44,6 +48,8 @@ class MyCertificatesCertificates {
     final MyCertificatesCertificates otherTyped = other as MyCertificatesCertificates;
     return id == otherTyped.id && 
     issuedAt == otherTyped.issuedAt && 
+    expiresAt == otherTyped.expiresAt && 
+    targetType == otherTyped.targetType && 
     verificationHash == otherTyped.verificationHash && 
     assetUrl == otherTyped.assetUrl && 
     course == otherTyped.course && 
@@ -51,13 +57,19 @@ class MyCertificatesCertificates {
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, issuedAt.hashCode, verificationHash.hashCode, assetUrl.hashCode, course.hashCode, mission.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, issuedAt.hashCode, expiresAt.hashCode, targetType.hashCode, verificationHash.hashCode, assetUrl.hashCode, course.hashCode, mission.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['issuedAt'] = issuedAt.toJson();
+    if (expiresAt != null) {
+      json['expiresAt'] = expiresAt!.toJson();
+    }
+    json['targetType'] = 
+    certificateTargetSerializer(targetType)
+    ;
     json['verificationHash'] = nativeToJson<String>(verificationHash);
     json['assetUrl'] = nativeToJson<String>(assetUrl);
     if (course != null) {
@@ -72,6 +84,8 @@ class MyCertificatesCertificates {
   MyCertificatesCertificates({
     required this.id,
     required this.issuedAt,
+    this.expiresAt,
+    required this.targetType,
     required this.verificationHash,
     required this.assetUrl,
     this.course,

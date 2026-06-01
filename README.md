@@ -10,6 +10,7 @@ lms/
 ├── web/             # Next.js (Web Platform)
 ├── api/             # NestJS (Backend API)
 ├── ai/              # Python FastAPI (AI Services) - قادم
+├── dataconnect/     # Firebase Data Connect (GraphQL Schema)
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
@@ -62,7 +63,7 @@ docker compose --profile tools up -d
 
 1. اذهب إلى [Firebase Console](https://console.firebase.google.com/)
 2. أنشئ مشروع جديد باسم `optimatech-lms`
-3. فعّل: **Authentication** (Email/Password + Google) + **Firestore** + **Storage** + **Cloud Messaging**
+3. فعّل: **Authentication** (Email/Password + Google) + **Firestore** + **Storage** + **Cloud Messaging** + **Data Connect** (PostgreSQL)
 4. للـ Flutter:
    ```bash
    cd mobile
@@ -70,6 +71,10 @@ docker compose --profile tools up -d
    flutterfire configure --project=YOUR_FIREBASE_PROJECT_ID
    ```
 5. للـ Web: أضف credentials في `.env`
+6. لنشر أو تحديث Schema الخاصة بـ Data Connect:
+   ```bash
+   firebase deploy --only dataconnect
+   ```
 
 ## 🌐 URLs المحلية
 
@@ -87,7 +92,8 @@ docker compose --profile tools up -d
 |--------|---------|
 | Mobile | Flutter + Firebase |
 | Web | Next.js 14 + TypeScript + Tailwind |
-| API | NestJS + PostgreSQL + Redis |
+| API | NestJS |
+| Database | PostgreSQL + Redis + Firebase Data Connect (GraphQL) |
 | Auth | JWT + Firebase Auth + Google OAuth |
 | AI (V2) | Python + FastAPI |
 

@@ -126,6 +126,7 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
   final String id;
   final String title;
   final EnumValue<LectureType> type;
+  final String? content;
   final int? duration;
   final bool isFreePreview;
   GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection.fromJson(dynamic json):
@@ -133,6 +134,7 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
   id = nativeFromJson<String>(json['id']),
   title = nativeFromJson<String>(json['title']),
   type = lectureTypeDeserializer(json['type']),
+  content = json['content'] == null ? null : nativeFromJson<String>(json['content']),
   duration = json['duration'] == null ? null : nativeFromJson<int>(json['duration']),
   isFreePreview = nativeFromJson<bool>(json['isFreePreview']);
   @override
@@ -148,12 +150,13 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
     return id == otherTyped.id && 
     title == otherTyped.title && 
     type == otherTyped.type && 
+    content == otherTyped.content && 
     duration == otherTyped.duration && 
     isFreePreview == otherTyped.isFreePreview;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, type.hashCode, duration.hashCode, isFreePreview.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, type.hashCode, content.hashCode, duration.hashCode, isFreePreview.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -163,6 +166,9 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
     json['type'] = 
     lectureTypeSerializer(type)
     ;
+    if (content != null) {
+      json['content'] = nativeToJson<String?>(content);
+    }
     if (duration != null) {
       json['duration'] = nativeToJson<int?>(duration);
     }
@@ -174,6 +180,7 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
     required this.id,
     required this.title,
     required this.type,
+    this.content,
     this.duration,
     required this.isFreePreview,
   });
