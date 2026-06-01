@@ -29,7 +29,7 @@ mutation SubmitQuizAnswer(
   $questionId: UUID!, 
   $optionId: UUID! 
 ) @auth(level: USER) {
-  quizAttemptAnswer_insert(
+  quizAttemptAnswer_upsert(
     data: {
       attemptId: $attemptId,
       questionId: $questionId,

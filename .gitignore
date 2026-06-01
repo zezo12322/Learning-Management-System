@@ -5,6 +5,7 @@ dataconnect-debug.log
 pglite-debug.log
 /.firebase
 /dataconnect/.dataconnect
+**/dataconnect-admin-generated/
 
 # AI / Agents
 /.agents

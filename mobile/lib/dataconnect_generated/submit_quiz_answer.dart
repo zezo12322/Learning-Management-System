@@ -20,10 +20,10 @@ class SubmitQuizAnswerVariablesBuilder {
 }
 
 @immutable
-class SubmitQuizAnswerQuizAttemptAnswerInsert {
+class SubmitQuizAnswerQuizAttemptAnswerUpsert {
   final String attemptId;
   final String questionId;
-  SubmitQuizAnswerQuizAttemptAnswerInsert.fromJson(dynamic json):
+  SubmitQuizAnswerQuizAttemptAnswerUpsert.fromJson(dynamic json):
   
   attemptId = nativeFromJson<String>(json['attemptId']),
   questionId = nativeFromJson<String>(json['questionId']);
@@ -36,7 +36,7 @@ class SubmitQuizAnswerQuizAttemptAnswerInsert {
       return false;
     }
 
-    final SubmitQuizAnswerQuizAttemptAnswerInsert otherTyped = other as SubmitQuizAnswerQuizAttemptAnswerInsert;
+    final SubmitQuizAnswerQuizAttemptAnswerUpsert otherTyped = other as SubmitQuizAnswerQuizAttemptAnswerUpsert;
     return attemptId == otherTyped.attemptId && 
     questionId == otherTyped.questionId;
     
@@ -52,7 +52,7 @@ class SubmitQuizAnswerQuizAttemptAnswerInsert {
     return json;
   }
 
-  SubmitQuizAnswerQuizAttemptAnswerInsert({
+  SubmitQuizAnswerQuizAttemptAnswerUpsert({
     required this.attemptId,
     required this.questionId,
   });
@@ -60,10 +60,10 @@ class SubmitQuizAnswerQuizAttemptAnswerInsert {
 
 @immutable
 class SubmitQuizAnswerData {
-  final SubmitQuizAnswerQuizAttemptAnswerInsert quizAttemptAnswer_insert;
+  final SubmitQuizAnswerQuizAttemptAnswerUpsert quizAttemptAnswer_upsert;
   SubmitQuizAnswerData.fromJson(dynamic json):
   
-  quizAttemptAnswer_insert = SubmitQuizAnswerQuizAttemptAnswerInsert.fromJson(json['quizAttemptAnswer_insert']);
+  quizAttemptAnswer_upsert = SubmitQuizAnswerQuizAttemptAnswerUpsert.fromJson(json['quizAttemptAnswer_upsert']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -74,21 +74,21 @@ class SubmitQuizAnswerData {
     }
 
     final SubmitQuizAnswerData otherTyped = other as SubmitQuizAnswerData;
-    return quizAttemptAnswer_insert == otherTyped.quizAttemptAnswer_insert;
+    return quizAttemptAnswer_upsert == otherTyped.quizAttemptAnswer_upsert;
     
   }
   @override
-  int get hashCode => quizAttemptAnswer_insert.hashCode;
+  int get hashCode => quizAttemptAnswer_upsert.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['quizAttemptAnswer_insert'] = quizAttemptAnswer_insert.toJson();
+    json['quizAttemptAnswer_upsert'] = quizAttemptAnswer_upsert.toJson();
     return json;
   }
 
   SubmitQuizAnswerData({
-    required this.quizAttemptAnswer_insert,
+    required this.quizAttemptAnswer_upsert,
   });
 }
 

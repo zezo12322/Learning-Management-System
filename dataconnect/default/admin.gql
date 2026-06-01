@@ -38,6 +38,21 @@ mutation AdminDeleteCourse($courseId: UUID!) @auth(level: USER) {
   )
 }
 
+# Create a new course section
+mutation AdminCreateCourseSection(
+  $courseId: UUID!,
+  $title: String!,
+  $order: Int!
+) @auth(level: USER) {
+  courseSection_insert(
+    data: {
+      courseId: $courseId,
+      title: $title,
+      order: $order
+    }
+  )
+}
+
 # Add a lecture to a course section
 mutation AdminCreateLecture(
   $sectionId: UUID!,
@@ -58,6 +73,22 @@ mutation AdminCreateLecture(
       order: $order
     }
   )
+}
+
+# Get instructor's courses
+query InstructorCourses @auth(level: USER) {
+  courses(
+    where: { createdById: { eq_expr: "auth.uid" } },
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    title
+    status
+    createdAt
+    price
+    language
+    level
+  }
 }
 
 # ==========================================
@@ -130,6 +161,17 @@ mutation AdminDeprecateSubscriptionTier($tierId: UUID!) @auth(level: USER) {
   )
 }
 
+# List active subscription tiers
+query ListSubscriptionTiers @auth(level: PUBLIC) {
+  subscriptionTiers(where: { isActive: { eq: true } }) {
+    id
+    name
+    price
+    billingCycle
+    features
+  }
+}
+
 # ==========================================
 # 4. PLATFORM TAXONOMY
 # ==========================================
@@ -140,6 +182,141 @@ mutation AdminCreateCategory($name: String!, $description: String) @auth(level: 
     data: {
       name: $name,
       description: $description
+    }
+  )
+}
+
+# List all categories
+query ListCategories @auth(level: PUBLIC) {
+  categories {
+    id
+    name
+    description
+  }
+}
+
+# ==========================================
+# 5. QUIZZES
+# ==========================================
+
+# Create a Quiz
+mutation AdminCreateQuiz(
+  $lectureId: UUID!,
+  $passingScore: Float!,
+  $maxAttempts: Int!
+) @auth(level: USER) {
+  courseQuiz_insert(
+    data: {
+      lectureId: $lectureId,
+      passingScore: $passingScore,
+      maxAttempts: $maxAttempts
+    }
+  )
+}
+
+# Create a Quiz Question
+mutation AdminCreateQuizQuestion(
+  $quizId: UUID!,
+  $questionText: String!,
+  $order: Int!,
+  $points: Float = 1.0,
+  $correctOptionId: UUID!
+) @auth(level: USER) {
+  quizQuestion_insert(
+    data: {
+      quizId: $quizId,
+      questionText: $questionText,
+      order: $order,
+      points: $points,
+      correctOptionId: $correctOptionId
+    }
+  )
+}
+
+# Create a Quiz Option
+mutation AdminCreateQuizOption(
+  $questionId: UUID!,
+  $text: String!,
+  $order: Int!
+) @auth(level: USER) {
+  quizOption_insert(
+    data: {
+      questionId: $questionId,
+      text: $text,
+      order: $order
+    }
+  )
+}
+
+# ==========================================
+# 6. MISSIONS
+# ==========================================
+
+# Create a Mission
+mutation AdminCreateMission(
+  $courseId: UUID,
+  $title: String!,
+  $scenarioDescription: String!,
+  $durationMinutes: Int!,
+  $categoryId: UUID!,
+  $difficulty: MissionDifficulty!,
+  $skillsTested: [String!]!
+) @auth(level: USER) {
+  mission_insert(
+    data: {
+      courseId: $courseId,
+      title: $title,
+      scenarioDescription: $scenarioDescription,
+      durationMinutes: $durationMinutes,
+      categoryId: $categoryId,
+      difficulty: $difficulty,
+      skillsTested: $skillsTested
+    }
+  )
+}
+
+# Create a Rubric Criterion
+mutation AdminCreateRubricCriterion(
+  $missionId: UUID!,
+  $criterionName: String!,
+  $description: String,
+  $maxPoints: Float!,
+  $order: Int!
+) @auth(level: USER) {
+  rubricCriterion_insert(
+    data: {
+      missionId: $missionId,
+      criterionName: $criterionName,
+      description: $description,
+      maxPoints: $maxPoints,
+      order: $order
+    }
+  )
+}
+
+# ==========================================
+# 7. CERTIFICATES
+# ==========================================
+
+# Issue a certificate
+mutation AdminIssueCertificate(
+  $userId: String!,
+  $targetType: CertificateTarget!,
+  $courseId: UUID,
+  $missionId: UUID,
+  $expiresAt: Timestamp,
+  $verificationHash: String!,
+  $assetUrl: String!
+) @auth(level: USER) {
+  certificate_insert(
+    data: {
+      userId: $userId,
+      targetType: $targetType,
+      courseId: $courseId,
+      missionId: $missionId,
+      expiresAt: $expiresAt,
+      verificationHash: $verificationHash,
+      assetUrl: $assetUrl
     }
   )
 }
