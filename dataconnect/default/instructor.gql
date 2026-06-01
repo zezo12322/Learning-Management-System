@@ -1,13 +1,13 @@
 # Gets all student submissions pending review and grading
 query GetPendingSubmissions @auth(level: USER) {
   missionSubmissions(
-    where: { status: { eq: PENDING } },
+    where: { status: { eq: PENDING } }, 
     orderBy: [{ submittedAt: ASC }]
   ) {
     id
     fileUrl
     submittedAt
-    attemptNumber
+    attemptNumber 
     student { name email }
     mission {
       title

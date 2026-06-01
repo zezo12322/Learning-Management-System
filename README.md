@@ -76,6 +76,50 @@ docker compose --profile tools up -d
    firebase deploy --only dataconnect
    ```
 
+## 💾 قاعدة البيانات (Firebase Data Connect)
+
+تعتمد المنصة على **Firebase Data Connect** للتعامل مع قاعدة بيانات **PostgreSQL** عن طريق **GraphQL**. 
+تُوفر هذه التقنية طرقًا مرنة وآمنة للوصول إلى البيانات من الواجهات الأمامية والخلفية عن طريق توليد حزم وتوابع جاهزة (Generated SDKs).
+
+### 1. أين تكتب الجداول والعمليات؟
+- **هيكل الجداول (Schema):** يتم تعريف كل جداول التطبيق في `dataconnect/schema/schema.gql`.
+- **العمليات (Queries & Mutations):** تُكتب في ملفات `dataconnect/default/*.gql` (مثل `users.gql`, `courses.gql`).
+
+### 2. أين تتولد الأكواد (Generated SDKs)؟
+كلما أضفت استعلاماً (Query) أو تعديلاً (Mutation)، يُصدر Firebase Data Connect أكواداً جاهزة في مسارات مشروعك:
+- **للويب (Next.js):** `web/src/dataconnect-generated/`
+- **للموبايل (Flutter):** `mobile/lib/dataconnect_generated/`
+- **للباك إند (NestJS):** `api/src/dataconnect-admin-generated/`
+
+### 3. كيف تستخدم قاعدة البيانات في الكود؟
+
+#### 👉 من الواجهة الأمامية (Web & Mobile)
+لجلب البيانات أو تعديلها (وفقاً لصلاحيات المستخدم)، استخدم الدوال التي تم توليدها تلقائياً مباشرةً.
+**مثال في Web (Next.js):**
+```typescript
+import { executeCoursesQuery } from '@/dataconnect-generated';
+
+const courses = await executeCoursesQuery();
+```
+
+#### 👉 من الباك إند (NestJS API)
+لإجراء العمليات التي تتطلب صلاحيات مشرف (Admin)، أو لإخفاء منطق أعمال معقد، يتم استخدام دوال الـ Admin المولدة في NestJS Backend.
+**مثال في NestJS:**
+- قم بكتابة المسارات `controllers` والمنطق `services` كالمعتاد.
+- استدعِ دوال Data Connect من داخل הـ Service:
+```typescript
+import { Injectable } from '@nestjs/common';
+import { createAdminUser } from '../dataconnect-admin-generated';
+
+@Injectable()
+export class UsersService {
+  async createUser(data: any) {
+    // يمكنك إضافة أي منطق خاص بالخادم هنا
+    return await createAdminUser(data);
+  }
+}
+```
+
 ## 🌐 URLs المحلية
 
 | Service | URL |

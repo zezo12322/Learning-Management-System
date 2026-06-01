@@ -4,7 +4,10 @@ query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
     id
     passingScore
     maxAttempts
-    quizQuestions_on_quiz(orderBy: [{ order: ASC }]) {
+    quizQuestions_on_quiz(
+        where: { deletedAt: { eq: null } },
+        orderBy: [{ order: ASC }]
+    ) {
       id
       questionText
       points
@@ -29,7 +32,7 @@ mutation SubmitQuizAnswer(
   $questionId: UUID!, 
   $optionId: UUID! 
 ) @auth(level: USER) {
-  quizAttemptAnswer_upsert(
+  quizAttemptAnswer_insert(
     data: {
       attemptId: $attemptId,
       questionId: $questionId,
