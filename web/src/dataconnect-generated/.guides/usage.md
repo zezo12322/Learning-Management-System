@@ -12,20 +12,16 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useMyCertificates, useVerifyCertificate, useGetPendingSubmissions, useEnrollInCourse, useEnrollInMission, useUpdateLectureProgress, useGetQuizQuestions, useStartQuizAttempt, useSubmitQuizAnswer, useFinishQuizAttempt } from '@dataconnect/generated/react';
+import { useLogPayment, useAddPaymentItem, useMyPaymentHistory, useGetPendingSubmissions, useGetQuizQuestions, useStartQuizAttempt, useSubmitQuizAnswer, useFinishQuizAttempt, useGetCourseSessions, useCheckInToSession } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
-const { data, isPending, isSuccess, isError, error } = useMyCertificates();
+const { data, isPending, isSuccess, isError, error } = useLogPayment(logPaymentVars);
 
-const { data, isPending, isSuccess, isError, error } = useVerifyCertificate(verifyCertificateVars);
+const { data, isPending, isSuccess, isError, error } = useAddPaymentItem(addPaymentItemVars);
+
+const { data, isPending, isSuccess, isError, error } = useMyPaymentHistory();
 
 const { data, isPending, isSuccess, isError, error } = useGetPendingSubmissions();
-
-const { data, isPending, isSuccess, isError, error } = useEnrollInCourse(enrollInCourseVars);
-
-const { data, isPending, isSuccess, isError, error } = useEnrollInMission(enrollInMissionVars);
-
-const { data, isPending, isSuccess, isError, error } = useUpdateLectureProgress(updateLectureProgressVars);
 
 const { data, isPending, isSuccess, isError, error } = useGetQuizQuestions(getQuizQuestionsVars);
 
@@ -34,6 +30,10 @@ const { data, isPending, isSuccess, isError, error } = useStartQuizAttempt(start
 const { data, isPending, isSuccess, isError, error } = useSubmitQuizAnswer(submitQuizAnswerVars);
 
 const { data, isPending, isSuccess, isError, error } = useFinishQuizAttempt(finishQuizAttemptVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetCourseSessions(getCourseSessionsVars);
+
+const { data, isPending, isSuccess, isError, error } = useCheckInToSession(checkInToSessionVars);
 
 ```
 
@@ -72,26 +72,20 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { myCertificates, verifyCertificate, getPendingSubmissions, enrollInCourse, enrollInMission, updateLectureProgress, getQuizQuestions, startQuizAttempt, submitQuizAnswer, finishQuizAttempt } from '@dataconnect/generated';
+import { logPayment, addPaymentItem, myPaymentHistory, getPendingSubmissions, getQuizQuestions, startQuizAttempt, submitQuizAnswer, finishQuizAttempt, getCourseSessions, checkInToSession } from '@dataconnect/generated';
 
 
-// Operation MyCertificates: 
-const { data } = await MyCertificates(dataConnect);
+// Operation LogPayment:  For variables, look at type LogPaymentVars in ../index.d.ts
+const { data } = await LogPayment(dataConnect, logPaymentVars);
 
-// Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
-const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
+// Operation AddPaymentItem:  For variables, look at type AddPaymentItemVars in ../index.d.ts
+const { data } = await AddPaymentItem(dataConnect, addPaymentItemVars);
+
+// Operation MyPaymentHistory: 
+const { data } = await MyPaymentHistory(dataConnect);
 
 // Operation GetPendingSubmissions: 
 const { data } = await GetPendingSubmissions(dataConnect);
-
-// Operation EnrollInCourse:  For variables, look at type EnrollInCourseVars in ../index.d.ts
-const { data } = await EnrollInCourse(dataConnect, enrollInCourseVars);
-
-// Operation EnrollInMission:  For variables, look at type EnrollInMissionVars in ../index.d.ts
-const { data } = await EnrollInMission(dataConnect, enrollInMissionVars);
-
-// Operation UpdateLectureProgress:  For variables, look at type UpdateLectureProgressVars in ../index.d.ts
-const { data } = await UpdateLectureProgress(dataConnect, updateLectureProgressVars);
 
 // Operation GetQuizQuestions:  For variables, look at type GetQuizQuestionsVars in ../index.d.ts
 const { data } = await GetQuizQuestions(dataConnect, getQuizQuestionsVars);
@@ -104,6 +98,12 @@ const { data } = await SubmitQuizAnswer(dataConnect, submitQuizAnswerVars);
 
 // Operation FinishQuizAttempt:  For variables, look at type FinishQuizAttemptVars in ../index.d.ts
 const { data } = await FinishQuizAttempt(dataConnect, finishQuizAttemptVars);
+
+// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
+const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
+
+// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
+const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
 
 
 ```

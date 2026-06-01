@@ -1,23 +1,28 @@
+# Enrolls the authenticated user into a specific course
 mutation EnrollInCourse($courseId: UUID!) @auth(level: USER) {
   enrollment_insert(
     data: {
       userId_expr: "auth.uid",
+      targetType: COURSE,
       courseId: $courseId,
       status: ACTIVE
     }
   )
 }
 
+# Enrolls the authenticated user into a specific mission
 mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
   enrollment_insert(
     data: {
       userId_expr: "auth.uid",
+      targetType: MISSION,
       missionId: $missionId,
       status: ACTIVE
     }
   )
 }
 
+# Updates the authenticated user's progress for a watched lecture
 mutation UpdateLectureProgress(
   $lectureId: UUID!, 
   $lastWatchedSecond: Int!,

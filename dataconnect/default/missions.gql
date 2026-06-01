@@ -1,3 +1,4 @@
+# Submits a file link for mission evaluation
 mutation SubmitMission(
   $missionId: UUID!, 
   $fileUrl: String!
@@ -6,36 +7,54 @@ mutation SubmitMission(
     data: {
       missionId: $missionId,
       studentId_expr: "auth.uid",
-      fileUrl: $fileUrl
+      fileUrl: $fileUrl,
+      status: PENDING
     }
   )
 }
 
-query MySubmissions @auth(level: USER) {
-  missionSubmissions(where: { studentId: { eq_expr: "auth.uid" } }, orderBy: [{ updatedAt: DESC }]) {
-    id
-    fileUrl
-    feedback
-    criteriaScores
-    submittedAt
-    mission {
-      title
-      difficulty
-    }
-  }
-}
-
+# Grades a student mission submission and adds overall feedback
 mutation GradeSubmission(
   $submissionId: UUID!, 
-  $criteriaScores: Any!, 
   $feedback: String
 ) @auth(level: USER) {
   missionSubmission_update(
     id: $submissionId,
     data: {
       graderId_expr: "auth.uid",
-      criteriaScores: $criteriaScores,
+      status: GRADED,
       feedback: $feedback
     }
   )
+}
+
+# Logs individual scores for a specific mission criterion
+mutation AddCriterionScore(
+  $submissionId: UUID!,
+  $criterionId: UUID!,
+  $score: Float!
+) @auth(level: USER) {
+  missionSubmissionScore_insert(
+    data: {
+      submissionId: $submissionId,
+      criterionId: $criterionId,
+      score: $score
+    }
+  )
+}
+
+# Retrieves all mission submissions made by the authenticated user
+query MySubmissions @auth(level: USER) {
+  missionSubmissions(where: { studentId: { eq_expr: "auth.uid" } }, orderBy: [{ updatedAt: DESC }]) {
+    id
+    fileUrl
+    status
+    feedback
+    submittedAt
+    missionSubmissionScores_on_submission {
+      score
+      criterion { criterionName maxPoints }
+    }
+    mission { title difficulty }
+  }
 }

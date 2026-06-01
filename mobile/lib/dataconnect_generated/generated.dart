@@ -4,39 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-part 'my_certificates.dart';
+part 'list_published_courses.dart';
 
-part 'verify_certificate.dart';
-
-part 'get_pending_submissions.dart';
+part 'get_course_curriculum.dart';
 
 part 'enroll_in_course.dart';
 
 part 'enroll_in_mission.dart';
 
 part 'update_lecture_progress.dart';
-
-part 'get_quiz_questions.dart';
-
-part 'start_quiz_attempt.dart';
-
-part 'submit_quiz_answer.dart';
-
-part 'finish_quiz_attempt.dart';
-
-part 'get_course_sessions.dart';
-
-part 'check_in_to_session.dart';
-
-part 'list_published_courses.dart';
-
-part 'get_course_curriculum.dart';
-
-part 'log_payment.dart';
-
-part 'add_payment_item.dart';
-
-part 'my_payment_history.dart';
 
 part 'submit_mission.dart';
 
@@ -49,6 +25,30 @@ part 'sync_user.dart';
 part 'get_me.dart';
 
 part 'update_my_profile.dart';
+
+part 'my_certificates.dart';
+
+part 'verify_certificate.dart';
+
+part 'log_payment.dart';
+
+part 'add_payment_item.dart';
+
+part 'my_payment_history.dart';
+
+part 'get_pending_submissions.dart';
+
+part 'get_quiz_questions.dart';
+
+part 'start_quiz_attempt.dart';
+
+part 'submit_quiz_answer.dart';
+
+part 'finish_quiz_attempt.dart';
+
+part 'get_course_sessions.dart';
+
+part 'check_in_to_session.dart';
 
 
 
@@ -297,18 +297,13 @@ class Unknown extends EnumValue<Never> {
 class DefaultConnector {
   
   
-  MyCertificatesVariablesBuilder myCertificates () {
-    return MyCertificatesVariablesBuilder(dataConnect, );
+  ListPublishedCoursesVariablesBuilder listPublishedCourses () {
+    return ListPublishedCoursesVariablesBuilder(dataConnect, );
   }
   
   
-  VerifyCertificateVariablesBuilder verifyCertificate ({required String hash, }) {
-    return VerifyCertificateVariablesBuilder(dataConnect, hash: hash,);
-  }
-  
-  
-  GetPendingSubmissionsVariablesBuilder getPendingSubmissions () {
-    return GetPendingSubmissionsVariablesBuilder(dataConnect, );
+  GetCourseCurriculumVariablesBuilder getCourseCurriculum ({required String courseId, }) {
+    return GetCourseCurriculumVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
   
@@ -324,61 +319,6 @@ class DefaultConnector {
   
   UpdateLectureProgressVariablesBuilder updateLectureProgress ({required String lectureId, required int lastWatchedSecond, }) {
     return UpdateLectureProgressVariablesBuilder(dataConnect, lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,);
-  }
-  
-  
-  GetQuizQuestionsVariablesBuilder getQuizQuestions ({required String lectureId, }) {
-    return GetQuizQuestionsVariablesBuilder(dataConnect, lectureId: lectureId,);
-  }
-  
-  
-  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, }) {
-    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,);
-  }
-  
-  
-  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required int selectedIndex, }) {
-    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,selectedIndex: selectedIndex,);
-  }
-  
-  
-  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, }) {
-    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,);
-  }
-  
-  
-  GetCourseSessionsVariablesBuilder getCourseSessions ({required String courseId, }) {
-    return GetCourseSessionsVariablesBuilder(dataConnect, courseId: courseId,);
-  }
-  
-  
-  CheckInToSessionVariablesBuilder checkInToSession ({required String sessionId, required AttendanceStatus status, required AttendanceMethod method, }) {
-    return CheckInToSessionVariablesBuilder(dataConnect, sessionId: sessionId,status: status,method: method,);
-  }
-  
-  
-  ListPublishedCoursesVariablesBuilder listPublishedCourses () {
-    return ListPublishedCoursesVariablesBuilder(dataConnect, );
-  }
-  
-  
-  GetCourseCurriculumVariablesBuilder getCourseCurriculum ({required String courseId, }) {
-    return GetCourseCurriculumVariablesBuilder(dataConnect, courseId: courseId,);
-  }
-  
-  
-  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, }) {
-    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,);
-  }
-  
-  
-  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required double price, }) {
-    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,price: price,);
-  }
-  
-  
-  MyPaymentHistoryVariablesBuilder myPaymentHistory () {
-    return MyPaymentHistoryVariablesBuilder(dataConnect, );
   }
   
   
@@ -409,6 +349,66 @@ class DefaultConnector {
   
   UpdateMyProfileVariablesBuilder updateMyProfile () {
     return UpdateMyProfileVariablesBuilder(dataConnect, );
+  }
+  
+  
+  MyCertificatesVariablesBuilder myCertificates () {
+    return MyCertificatesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  VerifyCertificateVariablesBuilder verifyCertificate ({required String hash, }) {
+    return VerifyCertificateVariablesBuilder(dataConnect, hash: hash,);
+  }
+  
+  
+  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, }) {
+    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,);
+  }
+  
+  
+  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required double price, }) {
+    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,price: price,);
+  }
+  
+  
+  MyPaymentHistoryVariablesBuilder myPaymentHistory () {
+    return MyPaymentHistoryVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetPendingSubmissionsVariablesBuilder getPendingSubmissions () {
+    return GetPendingSubmissionsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetQuizQuestionsVariablesBuilder getQuizQuestions ({required String lectureId, }) {
+    return GetQuizQuestionsVariablesBuilder(dataConnect, lectureId: lectureId,);
+  }
+  
+  
+  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, }) {
+    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,);
+  }
+  
+  
+  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required int selectedIndex, }) {
+    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,selectedIndex: selectedIndex,);
+  }
+  
+  
+  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, }) {
+    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,);
+  }
+  
+  
+  GetCourseSessionsVariablesBuilder getCourseSessions ({required String courseId, }) {
+    return GetCourseSessionsVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  CheckInToSessionVariablesBuilder checkInToSession ({required String sessionId, required AttendanceStatus status, required AttendanceMethod method, }) {
+    return CheckInToSessionVariablesBuilder(dataConnect, sessionId: sessionId,status: status,method: method,);
   }
   
 
