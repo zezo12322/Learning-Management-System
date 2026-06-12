@@ -1,0 +1,43 @@
+{
+  "app_name": "QR Smart Ordering",
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "search": "Search",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "network": "No internet connection. Please check your network.",
+    "server": "Server error. Please try again.",
+    "unauthorized": "Session expired. Please log in again.",
+    "unauthorized_403": "You are not authorized.",
+    "not_found": "Resource not found.",
+    "validation": "Please check your input.",
+    "unknown": "Unknown error occurred."
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "login_button": "Sign In",
+    "login_failed": "Invalid credentials. Please try again."
+  },
+  "home": {
+    "welcome": "Welcome back"
+  },
+  "navigation": {
+    "not_found": "Page Not Found",
+    "not_found_msg": "The route you requested does not exist.",
+    "go_home": "Go to Home"
+  }
+}

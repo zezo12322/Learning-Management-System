@@ -1,15 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'core/config/firebase_options.dart';
-import 'core/config/app_config.dart';
-import 'core/di/injection.dart';
-import 'core/theme/app_theme.dart';
-import 'core/config/router.dart';
+import 'package:optimatech_lms/core/config/firebase_options.dart';
+import 'package:optimatech_lms/core/helper_function/on_generate_route.dart';
+import 'package:optimatech_lms/core/services/get_it_service.dart';
+import 'package:optimatech_lms/core/utils/app_theme.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
+import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -19,36 +21,50 @@ void main() async {
   // Initialize Hive (Offline Storage)
   await Hive.initFlutter();
 
-  // Setup Dependency Injection
+  // Localization
+  await EasyLocalization.ensureInitialized();
+
   await setupDependencies();
 
   runApp(
-    const ProviderScope(
-      child: OptimaTechApp(),
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ar'),
+      ],
+      path: AppConstants.translationsPath,
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('en'),
+      child: const OptimaTechLMS(),
     ),
   );
 }
 
-class OptimaTechApp extends ConsumerWidget {
-  const OptimaTechApp({super.key});
+class OptimaTechLMS extends StatelessWidget {
+  const OptimaTechLMS({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(routerProvider);
-
-    return MaterialApp.router(
-      title: 'OptimaTech LMS',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: router,
-      // RTL Support for Arabic
-      locale: const Locale('ar', 'EG'),
-      supportedLocales: const [
-        Locale('ar', 'EG'),
-        Locale('en', 'US'),
-      ],
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(393, 852),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child){
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          // Localization
+          locale: context.locale,
+          supportedLocales: context.supportedLocales,
+          localizationsDelegates: context.localizationDelegates,
+          // Theme
+          themeMode: ThemeMode.system,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          // Routing
+          onGenerateRoute: generateRoute,
+          initialRoute: HomeView.routeName,
+        );
+      },
     );
   }
 }
