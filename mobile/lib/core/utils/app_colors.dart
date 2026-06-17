@@ -11,6 +11,7 @@ abstract class AppColors {
   static const Color error = Color(0xffEF4444);
   static const Color background = Color(0xffF8FAFC);
   static const Color surface = Color(0xffFFFFFF);
+  static const Color disableBackground = Color(0xffF3F4F6);
   static const Color textPrimary = Color(0xff0F172A);
   static const Color textSecondary = Color(0xff64748B);
   static const Color border = Color(0xffE2E8F0);
@@ -24,7 +25,14 @@ abstract class AppColors {
   static const Color darkError = Color(0xffF87171);
   static const Color darkBackground = Color(0xff0F172A);
   static const Color darkSurface = Color(0xff1E293B);
+  static const Color darkDisableBackground = Color(0xff121212);
   static const Color darkTextPrimary = Color(0xffF8FAFC);
   static const Color darkTextSecondary = Color(0xff94A3B8);
   static const Color darkBorder = Color(0xff334155);
+  // =========================
+  // Common
+  // =========================
+  static const Color placeholder = Color(0xff6B7280);
+  static const Color disablePlaceholder = Color(0xff9CA3AF);
+
 }

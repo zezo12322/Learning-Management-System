@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/core/utils/extentions.dart';
+import 'package:optimatech_lms/core/utils/extension.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
