@@ -30,7 +30,16 @@
     "username": "اسم المستخدم",
     "password": "كلمة المرور",
     "login_button": "دخول",
-    "login_failed": "بيانات غير صحيحة. حاول مجددًا."
+    "login_failed": "بيانات غير صحيحة. حاول مجددًا.",
+    "validation": {
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_not_match": "من فضلك أدخل بريد إلكتروني صحيح",
+      "password_required": "الرقم السري مطلوب",
+      "password_length": "الرقم السري يجب أن يكون 6 أحرف على الأقل"
+    },
+    "password_hint": "أدخل كلمة المرور",
+    "show_password": "اظهر كلمه المرور",
+    "hide_password": "اخفاء كلمه المرور"
   },
   "home": {
     "welcome": "أهلاً بك"

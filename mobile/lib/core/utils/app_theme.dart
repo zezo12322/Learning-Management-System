@@ -17,6 +17,8 @@ class AppTheme {
       onError: Colors.white,
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
+      surfaceDim: AppColors.disableBackground,
+      outline: AppColors.border,
     ),
 
     scaffoldBackgroundColor: AppColors.background,
@@ -97,6 +99,12 @@ class AppTheme {
           color: AppColors.error,
         ),
       ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(
+          color: AppColors.border,
+        ),
+      ),
     ),
 
     dividerColor: AppColors.border,
@@ -152,6 +160,8 @@ class AppTheme {
       onError: Colors.white,
       surface: AppColors.darkSurface,
       onSurface: AppColors.darkTextPrimary,
+      surfaceDim: AppColors.darkDisableBackground,
+      outline: AppColors.darkBorder,
     ),
 
     scaffoldBackgroundColor: AppColors.darkBackground,
@@ -204,7 +214,7 @@ class AppTheme {
       filled: true,
       fillColor: AppColors.darkSurface,
 
-      contentPadding: EdgeInsets.symmetric(
+      contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 16,
       ),
@@ -235,6 +245,13 @@ class AppTheme {
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(
           color: AppColors.darkError,
+        ),
+      ),
+
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(
+          color: AppColors.darkBorder,
         ),
       ),
     ),

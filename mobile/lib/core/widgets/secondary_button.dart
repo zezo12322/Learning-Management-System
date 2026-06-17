@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/core/utils/extentions.dart';
+import 'package:optimatech_lms/core/utils/extension.dart';
 
 class SecondaryButton extends StatelessWidget {
   const SecondaryButton({

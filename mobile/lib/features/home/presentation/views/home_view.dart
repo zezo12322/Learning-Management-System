@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/core/widgets/secondary_button.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -10,11 +9,9 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: Center(
-        child: SecondaryButton(
-          text: 'Home Feature',
-          onPressed: (){},
-        ),
+      body: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(child: Text('Home'),),
       ),
     );
   }

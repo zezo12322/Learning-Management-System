@@ -30,7 +30,17 @@
     "username": "Username",
     "password": "Password",
     "login_button": "Sign In",
-    "login_failed": "Invalid credentials. Please try again."
+    "login_failed": "Invalid credentials. Please try again.",
+    "validation": {
+      "email_required": "Email is required",
+      "email_not_match": "Please enter a valid email address",
+      "password_required": "Password is required",
+      "password_length": "Password must be at least 6 characters long"
+    },
+    "password_hint": "Enter The Password",
+    "show_password": "show password",
+    "hide_password": "show_password"
+
   },
   "home": {
     "welcome": "Welcome back"
