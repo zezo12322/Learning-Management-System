@@ -24,11 +24,11 @@ class SecondaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
             color: context.theme.colorScheme.primary,
-            width: 1.5
-          )
+            width: 1.5,
+          ),
         ),
       ),
-      onPressed:onPressed,
+      onPressed: isDisabled ? null : onPressed,
       child: Text(text),
     );
   }

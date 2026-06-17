@@ -24,7 +24,7 @@ class PrimaryButton extends StatelessWidget {
           ? context.theme.colorScheme.primary.withAlpha(110)
           : null,
       ),
-      onPressed: !isLoading ? onPressed : (){},
+      onPressed: (isLoading || isDisabled) ? null : onPressed,
       child: isLoading? Row(
         mainAxisSize: MainAxisSize.min,
         children: [
