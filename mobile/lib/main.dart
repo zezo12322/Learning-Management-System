@@ -8,7 +8,7 @@ import 'package:optimatech_lms/core/helper_function/on_generate_route.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
-import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
+import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
@@ -62,7 +62,7 @@ class OptimaTechLMS extends StatelessWidget {
           darkTheme: AppTheme.dark,
           // Routing
           onGenerateRoute: generateRoute,
-          initialRoute: HomeView.routeName,
+          initialRoute: SplashView.routeName,
         );
       },
     );
