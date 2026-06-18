@@ -18,6 +18,7 @@ class AppTheme {
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       surfaceDim: AppColors.disableBackground,
+      onSurfaceVariant: AppColors.textSecondary,
       outline: AppColors.border,
     ),
 
@@ -161,6 +162,7 @@ class AppTheme {
       surface: AppColors.darkSurface,
       onSurface: AppColors.darkTextPrimary,
       surfaceDim: AppColors.darkDisableBackground,
+      onSurfaceVariant: AppColors.darkTextSecondary,
       outline: AppColors.darkBorder,
     ),
 
