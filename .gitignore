@@ -25,6 +25,10 @@ web/.turbo/
 coverage/
 .eslintcache
 *.tsbuildinfo
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.* 
 
 # Flutter / Mobile
 mobile/.dart_tool/
