@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onClear;
   final TextInputType keyboardType;
   final bool enabled;
+  final bool showClear;
 
   const CustomTextField({
     super.key,
@@ -24,12 +25,11 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     required this.onChanged,
     this.onClear,
+    required this.showClear,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasError = errorText != null;
-    final bool showClear = controller.text.isNotEmpty && enabled;
 
     final Color? fillColor = enabled
         ? context.theme.inputDecorationTheme.fillColor
@@ -43,6 +43,8 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       keyboardType: keyboardType,
+      autofillHints: [AutofillHints.email],
+      textInputAction: TextInputAction.done,
       validator: validator,
       onChanged: onChanged,
 
@@ -69,7 +71,7 @@ class CustomTextField extends StatelessWidget {
           child: Icon(
             prefixIcon,
             size: 20,
-            color: hasError? context.theme.colorScheme.error : iconColor,
+            color: errorText != null ? context.theme.colorScheme.error : iconColor,
           ),
         )
             : null,
@@ -79,7 +81,7 @@ class CustomTextField extends StatelessWidget {
         ),
 
         // clear icon
-        suffixIcon: showClear
+        suffixIcon: showClear && enabled
             ? Padding(
           padding: const EdgeInsets.only(right: 16, left: 12),
           child: IconButton(
@@ -88,9 +90,12 @@ class CustomTextField extends StatelessWidget {
             icon: Icon(
               Icons.cancel, // أو Icons.highlight_remove
               size: 20,
-              color: hasError? context.theme.colorScheme.error : iconColor,
+              color: errorText != null ? context.theme.colorScheme.error : iconColor,
             ),
-            onPressed: onClear,
+            onPressed: (){
+              onClear?.call();
+              onChanged('');
+            },
           ),
         )
             : null,
