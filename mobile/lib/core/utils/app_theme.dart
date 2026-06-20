@@ -40,7 +40,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 0,
+        elevation: 4,
+        shadowColor: Colors.black45,
       ),
     ),
 
@@ -108,7 +109,10 @@ class AppTheme {
       ),
     ),
 
-    dividerColor: AppColors.border,
+    dividerTheme: const DividerThemeData(
+      color: AppColors.border,
+      thickness: 1,
+    ),
 
     textTheme: TextTheme(
       displayLarge: TextStyles.displayLarge.copyWith(

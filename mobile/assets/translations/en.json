@@ -39,8 +39,22 @@
     },
     "password_hint": "Enter The Password",
     "show_password": "show password",
-    "hide_password": "show_password"
-
+    "hide_password": "show_password",
+    "login_screen": {
+      "welcome": "Welcome\nback!",
+      "subtitle": "Sign in to continue your\nlearning journey.",
+      "email_label": "Email Address",
+      "email_hint": "alex@example.com",
+      "password_label": "Password",
+      "password_hint": "Enter your password",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot Password?",
+      "login_btn": "Login",
+      "or_continue": "or continue with",
+      "google_btn": "Continue with Google",
+      "no_account": "Don't have an account?",
+      "register": "Register"
+    }
   },
   "home": {
     "welcome": "Welcome back"

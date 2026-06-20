@@ -39,7 +39,22 @@
     },
     "password_hint": "أدخل كلمة المرور",
     "show_password": "اظهر كلمه المرور",
-    "hide_password": "اخفاء كلمه المرور"
+    "hide_password": "اخفاء كلمه المرور",
+    "login_screen": {
+      "welcome": "أهلاً\nبعودتك!",
+      "subtitle": "سجّل دخولك لمواصلة\nرحلتك التعليمية.",
+      "email_label": "البريد الإلكتروني",
+      "email_hint": "alex@example.com",
+      "password_label": "كلمة المرور",
+      "password_hint": "أدخل كلمة المرور",
+      "remember_me": "تذكّرني",
+      "forgot_password": "نسيت كلمة المرور؟",
+      "login_btn": "تسجيل الدخول",
+      "or_continue": "أو تابع بـ",
+      "google_btn": "المتابعة بـ Google",
+      "no_account": "ليس لديك حساب؟",
+      "register": "إنشاء حساب"
+    }
   },
   "home": {
     "welcome": "أهلاً بك"
