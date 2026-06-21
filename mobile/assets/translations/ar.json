@@ -39,7 +39,30 @@
     },
     "password_hint": "أدخل كلمة المرور",
     "show_password": "اظهر كلمه المرور",
-    "hide_password": "اخفاء كلمه المرور"
+    "hide_password": "اخفاء كلمه المرور",
+    "login_screen": {
+      "welcome": "أهلاً\nبعودتك!",
+      "subtitle": "سجّل دخولك لمواصلة\nرحلتك التعليمية.",
+      "email_label": "البريد الإلكتروني",
+      "email_hint": "alex@example.com",
+      "password_label": "كلمة المرور",
+      "password_hint": "أدخل كلمة المرور",
+      "remember_me": "تذكّرني",
+      "forgot_password": "نسيت كلمة المرور؟",
+      "login_btn": "تسجيل الدخول",
+      "or_continue": "أو تابع بـ",
+      "google_btn": "المتابعة بـ Google",
+      "no_account": "ليس لديك حساب؟",
+      "register": "إنشاء حساب"
+    },
+    "error":{
+      "weakPassword": "كلمة المرور ضعيفة جدًا.",
+      "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
+      "networkError": "تأكد من اتصالك بالإنترنت.",
+      "genericError": "هناك خطأ ما، حاول مرة أخري.",
+      "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
+      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى."
+    }
   },
   "home": {
     "welcome": "أهلاً بك"
