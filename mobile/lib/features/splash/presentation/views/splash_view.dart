@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/widgets/splash_content_section.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/widgets/splash_header_section.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/widgets/splash_trailing_section.dart';
@@ -9,15 +11,15 @@ class SplashView extends StatelessWidget {
   static const String routeName = '/';
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          SizedBox(height: 40,),
-          SplashHeaderSection(),
-          SplashContentSection(),
-          SplashTrailingSection(),
-          SizedBox(height: 40,),
+          Gap(40.h,),
+          const SplashHeaderSection(),
+          const SplashContentSection(),
+          const SplashTrailingSection(),
+          Gap(40.h,),
         ],
       ),
     );
