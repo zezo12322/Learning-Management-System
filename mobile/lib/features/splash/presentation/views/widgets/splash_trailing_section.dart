@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
 
 class SplashTrailingSection extends StatefulWidget {
   const SplashTrailingSection({super.key});
@@ -21,7 +23,11 @@ class _SplashTrailingSectionState extends State<SplashTrailingSection>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2200),
-    )..forward();
+    );
+
+    _controller.forward().then((_) {
+      if (mounted) Navigator.pushNamedAndRemoveUntil(context, LogInView.routeName, (r)=> false);
+    });
 
     _progressAnim = CurvedAnimation(
       parent: _controller,
@@ -57,7 +63,7 @@ class _SplashTrailingSectionState extends State<SplashTrailingSection>
               );
             },
           ),
-          SizedBox(height: 12.h),
+          Gap(12.h),
           Text(
             'Loading...',
             style: TextStyles.labelSmall.copyWith(
