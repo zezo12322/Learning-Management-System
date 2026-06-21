@@ -54,6 +54,14 @@
       "google_btn": "المتابعة بـ Google",
       "no_account": "ليس لديك حساب؟",
       "register": "إنشاء حساب"
+    },
+    "error":{
+      "weakPassword": "كلمة المرور ضعيفة جدًا.",
+      "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
+      "networkError": "تأكد من اتصالك بالإنترنت.",
+      "genericError": "هناك خطأ ما، حاول مرة أخري.",
+      "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
+      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى."
     }
   },
   "home": {

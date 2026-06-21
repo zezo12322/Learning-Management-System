@@ -6,6 +6,14 @@ class ServerException implements Exception {
   String toString() => message;
 }
 
+class CustomExceptions implements Exception {
+  final String message;
+  const CustomExceptions({required this.message});
+
+  @override
+  String toString() => message;
+}
+
 class NetworkException implements Exception {
   final String message;
   const NetworkException({required this.message});
