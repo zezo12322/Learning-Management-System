@@ -15,6 +15,7 @@ dependencies:
   equatable: ^2.0.8
   get_it: ^9.2.1
   dartz:  ^0.10.1
+  logger: ^2.6.0
   # Networking
   dio: ^5.9.2
   pretty_dio_logger: ^1.4.0
@@ -26,6 +27,7 @@ dependencies:
   firebase_storage: ^11.6.0
   firebase_messaging: ^14.7.10
   firebase_analytics: ^10.8.0
+  google_sign_in: ^6.2.1
   # Local Storage & Cache
   shared_preferences: ^2.5.5
   hive: ^2.2.3

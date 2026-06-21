@@ -1,13 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:optimatech_lms/core/config/firebase_options.dart';
 import 'package:optimatech_lms/core/helper_function/on_generate_route.dart';
+import 'package:optimatech_lms/core/services/bloc_observer_service.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
+import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 
 Future<void> main() async {
@@ -18,6 +21,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  Bloc.observer = BlocObserverService();
   // Initialize Hive (Offline Storage)
   await Hive.initFlutter();
 
@@ -62,7 +66,7 @@ class OptimaTechLMS extends StatelessWidget {
           darkTheme: AppTheme.dark,
           // Routing
           onGenerateRoute: generateRoute,
-          initialRoute: SplashView.routeName,
+          initialRoute: LogInView.routeName,
         );
       },
     );
