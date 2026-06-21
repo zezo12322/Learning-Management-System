@@ -26,6 +26,7 @@ dependencies:
   firebase_storage: ^11.6.0
   firebase_messaging: ^14.7.10
   firebase_analytics: ^10.8.0
+  google_sign_in: ^6.2.1
   # Local Storage & Cache
   shared_preferences: ^2.5.5
   hive: ^2.2.3
