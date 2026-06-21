@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:optimatech_lms/core/helper_function/build_snack_bar.dart';
 import 'package:optimatech_lms/core/utils/app_validators.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:gap/gap.dart';
@@ -17,6 +18,7 @@ import 'package:optimatech_lms/features/auth/presentation/views/widgets/or_divid
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/register_link.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/remember_me_checkbox.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/section_label.dart';
+import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
 
 class LogInForm extends StatefulWidget {
   const LogInForm({super.key});
@@ -78,11 +80,11 @@ class _LogInFormState extends State<LogInForm> {
         padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 0),
         child: BlocListener<LogInCubit, LogInState>(
           listener: (context, state) {
-            if(state.status == LogInStatus.success){
-              print('success');
+            if (state.status == LogInStatus.success) {
+              Navigator.pushReplacementNamed(context, HomeView.routeName);
             }
-            if(state.status == LogInStatus.failure){
-              print(state.errorMessage);
+            if (state.status == LogInStatus.failure && state.errorMessage != null) {
+              buildErrorSnackBar(context: context, text: state.errorMessage!);
             }
           },
           child: Form(
@@ -106,12 +108,6 @@ class _LogInFormState extends State<LogInForm> {
                       onChanged: (value) {
                         cubit.emailChanged();
                         setState(() => _showClear = _emailController.text.isNotEmpty);
-                        // _showClear = _emailController.text.isNotEmpty;
-                        // if (_emailController.text.isNotEmpty) {
-                        //   setState(() => _showClear = true);
-                        // } else if (_emailController.text.isEmpty) {
-                        //   setState(() => _showClear = false);
-                        // }
                       },
                       onClear: () {
                         _emailController.clear();
