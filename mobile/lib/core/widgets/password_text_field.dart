@@ -12,6 +12,7 @@ class PasswordTextField extends StatelessWidget {
   final bool enabled;
   final VoidCallback onToggled;
   final ValueChanged<String?>? onChanged;
+  final FormFieldValidator<String?> validator;
 
   const PasswordTextField({
     super.key,
@@ -22,6 +23,7 @@ class PasswordTextField extends StatelessWidget {
     required this.onChanged,
     required this.errorText,
     required this.hintText,
+    this.validator = AppValidators.validatePassword,
   });
 
   @override
@@ -41,7 +43,7 @@ class PasswordTextField extends StatelessWidget {
       keyboardType: TextInputType.text,
       autofillHints: [AutofillHints.password],
       textInputAction: TextInputAction.done,
-      validator: AppValidators.validatePassword,
+      validator: validator,
       onChanged: onChanged,
 
       style: context.theme.textTheme.bodyMedium?.copyWith(
