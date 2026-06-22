@@ -37,4 +37,17 @@ class AuthRepositoryImpl implements AuthRepository {
       return left(ServerFailure('auth.error.genericError'.tr()));
     }
   }
+
+  @override
+  Future<Either<Failure, UserEntity>> signupWithEmail({required String email, required String password}) async{
+    try{
+      User user = await firebaseAuthService.createUserWithEmailPassword(email: email, password: password);
+      UserEntity userEntity = UserModel.fromFirebaseUser(user).toEntity();
+      return right(userEntity);
+    }on CustomExceptions catch (e) {
+      return left(ServerFailure(e.message));
+    }catch (e){
+      return left(ServerFailure('auth.error.genericError'.tr()));
+    }
+  }
 }

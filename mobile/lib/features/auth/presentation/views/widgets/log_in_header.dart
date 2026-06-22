@@ -43,7 +43,7 @@ class LogInHeader extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'OptimaTech',
+                            'app_name'.tr(),
                             style: context.textTheme.labelLarge?.copyWith(
                               fontWeight: FontWeights.bold,
                             ),

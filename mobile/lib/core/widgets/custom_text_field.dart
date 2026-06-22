@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool enabled;
   final bool showClear;
+  final int? maxLength;
 
   const CustomTextField({
     super.key,
@@ -25,7 +26,8 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     required this.onChanged,
     this.onClear,
-    required this.showClear,
+    this.showClear = false,
+    this.maxLength,
   });
 
   @override
@@ -45,6 +47,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       autofillHints: [AutofillHints.email],
       textInputAction: TextInputAction.done,
+      maxLength: maxLength,
       validator: validator,
       onChanged: onChanged,
 

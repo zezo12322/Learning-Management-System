@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
@@ -27,9 +28,13 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       centerTitle: true,
       elevation: 0,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Colors.transparent,
       foregroundColor: AppColors.textPrimary,
       surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+      ),
     ),
 
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -175,9 +180,13 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       centerTitle: true,
       elevation: 0,
-      backgroundColor: AppColors.darkSurface,
+      backgroundColor: Colors.transparent,
       foregroundColor: AppColors.darkTextPrimary,
       surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+      ),
     ),
 
     elevatedButtonTheme: ElevatedButtonThemeData(

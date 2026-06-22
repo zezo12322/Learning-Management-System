@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:gap/gap.dart';
+import 'package:optimatech_lms/features/auth/presentation/views/widgets/custom_checkbox.dart';
 
 
 class RememberMeCheckbox  extends StatelessWidget {
@@ -13,43 +14,21 @@ class RememberMeCheckbox  extends StatelessWidget {
   final ValueChanged<bool> onChanged;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            width: 20.r,
-            height: 20.r,
-            decoration: BoxDecoration(
-              color: value ? context.theme.colorScheme.primary : Colors.transparent,
-              border:  Border.all(
-                color: value
-                    ? context.theme.colorScheme.primary
-                    : context.theme.colorScheme.outline,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: value
-                ? Icon(
-              Icons.check_rounded,
-              color: Colors.white,
-              size: 16.r,
-            )
-                : null,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CustomCheckbox(
+          value: value,
+          onChanged: onChanged,
+        ),
+        Gap(8.w),
+        Text(
+          'auth.login_screen.remember_me'.tr(),
+          style: context.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeights.bold
           ),
-          Gap(8.w),
-          Text(
-            'auth.login_screen.remember_me'.tr(),
-            style: context.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeights.bold
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

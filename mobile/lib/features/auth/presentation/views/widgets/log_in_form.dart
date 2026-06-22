@@ -84,7 +84,7 @@ class _LogInFormState extends State<LogInForm> {
               Navigator.pushReplacementNamed(context, HomeView.routeName);
             }
             if (state.status == LogInStatus.failure && state.errorMessage != null) {
-              buildErrorSnackBar(context: context, text: state.errorMessage!);
+              buildSnackBar(context: context, text: state.errorMessage!);
             }
           },
           child: Form(
