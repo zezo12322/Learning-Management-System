@@ -82,13 +82,15 @@
       "already_have_account": "Already have an account?",
       "login": "Login"
     },
+    "success": "The Account is created successfully.",
     "error":{
       "weakPassword": "The password provided is too weak.",
       "emailAlreadyInUse": "An account already exists for that email.",
       "networkError": "Please check your internet connection.",
       "genericError": "Something went wrong, please try again.",
       "invalidEmailOrPassword": "Invalid email or password.",
-      "invalidCredential": "Incorrect email or password. Please try again."
+      "invalidCredential": "Incorrect email or password. Please try again.",
+      "accept_terms_required": "accept terms is required"
     }
   },
   "home": {

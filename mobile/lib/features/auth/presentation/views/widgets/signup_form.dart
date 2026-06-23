@@ -9,7 +9,7 @@ import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/custom_text_field.dart';
 import 'package:optimatech_lms/core/widgets/password_text_field.dart';
 import 'package:optimatech_lms/core/widgets/primary_button.dart';
-import 'package:optimatech_lms/features/auth/presentation/manager/signup%20cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/already_have_account.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/custom_checkbox.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/section_label.dart';
@@ -33,7 +33,6 @@ class _SignupFormState extends State<SignupForm> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isAgreeTerms = false;
 
   @override
   void initState() {
@@ -43,6 +42,14 @@ class _SignupFormState extends State<SignupForm> {
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     super.initState();
+  }
+
+  void clearFields(){
+    _fullNameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _passwordController.clear();
+    _confirmPasswordController.clear();
   }
 
   @override
@@ -55,13 +62,14 @@ class _SignupFormState extends State<SignupForm> {
     super.dispose();
   }
 
-  void _onSignup(String email, String password) {
-    if(!_isAgreeTerms){
-      buildSnackBar(context: context, isError: true, text: 'accept terms is required');
-      return;
-    }
+  void _onSignup() {
     if (_formKey.currentState!.validate()) {
-      context.read<SignupCubit>().signup(email: email, password: password);
+      context.read<SignupCubit>().signup(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        password: _passwordController.text,
+      );
     } else {
       setState(() => _autovalidateMode = AutovalidateMode.always);
     }
@@ -87,7 +95,7 @@ class _SignupFormState extends State<SignupForm> {
         child: BlocListener<SignupCubit, SignupState>(
           listener: (context, state) {
             if (state.status == SignupStatus.success) {
-              buildSnackBar(context: context, text: 'Success');
+              buildSnackBar(context: context, text: 'auth.signup_screen.success'.tr());
             }
             if (state.status == SignupStatus.failure && state.errorMessage != null) {
               buildSnackBar(context: context, isError: true, text: state.errorMessage!);
@@ -212,7 +220,6 @@ class _SignupFormState extends State<SignupForm> {
                         return CustomCheckbox(
                           value: isAgree,
                           onChanged: (v) {
-                            _isAgreeTerms = v;
                             context.read<SignupCubit>().toggleTerms(v);
                           },
                         );
@@ -233,7 +240,7 @@ class _SignupFormState extends State<SignupForm> {
                   builder: (context, isLoading) {
                     return PrimaryButton(
                       text: 'auth.signup_screen.create_account_button'.tr(),
-                      onPressed: () => _onSignup(_emailController.text, _passwordController.text),
+                      onPressed: () => _onSignup(),
                       isLoading: isLoading,
                     );
                   },

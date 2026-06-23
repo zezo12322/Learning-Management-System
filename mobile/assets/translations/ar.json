@@ -82,13 +82,15 @@
       "already_have_account": "لديك حساب بالفعل؟",
       "login": "تسجيل الدخول"
     },
+    "success": "تم انشاء الحساب بنجاح.",
     "error":{
       "weakPassword": "كلمة المرور ضعيفة جدًا.",
       "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
       "networkError": "تأكد من اتصالك بالإنترنت.",
       "genericError": "هناك خطأ ما، حاول مرة أخري.",
       "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
-      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى."
+      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى.",
+      "accept_terms_required": "accept terms is required"
     }
   },
   "home": {

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
-import 'package:optimatech_lms/features/auth/presentation/manager/signup%20cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/signup_form.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/signup_header.dart';
 
