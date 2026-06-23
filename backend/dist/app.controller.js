@@ -11,25 +11,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
-const app_service_1 = require("./app.service");
+const firebase_service_1 = require("./firebase/firebase.service");
 let AppController = class AppController {
-    appService;
-    constructor(appService) {
-        this.appService = appService;
+    firebaseService;
+    constructor(firebaseService) {
+        this.firebaseService = firebaseService;
     }
-    getHello() {
-        return this.appService.getHello();
+    async getUserCount() {
+        const listUsersResult = await this.firebaseService.getAuth().listUsers(1);
+        return { status: 'Connected', sampleUserCount: listUsersResult.users.length };
     }
 };
 exports.AppController = AppController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('users-count'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
-], AppController.prototype, "getHello", null);
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "getUserCount", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [app_service_1.AppService])
+    __metadata("design:paramtypes", [firebase_service_1.FirebaseService])
 ], AppController);
 //# sourceMappingURL=app.controller.js.map

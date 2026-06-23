@@ -16,7 +16,7 @@ class AdminCreateSubscriptionTierVariablesBuilder {
 
   MutationRef<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables> ref() {
     AdminCreateSubscriptionTierVariables vars= AdminCreateSubscriptionTierVariables(name: name,price: price,billingCycle: billingCycle,features: features,);
-    return _dataConnect.mutation("AdminCreateSubscriptionTier", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('AdminCreateSubscriptionTier', dataDeserializer, varsSerializer, vars);
   }
 }
 

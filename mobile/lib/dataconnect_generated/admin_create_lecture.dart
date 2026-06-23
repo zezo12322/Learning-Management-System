@@ -4,8 +4,8 @@ class AdminCreateLectureVariablesBuilder {
   String sectionId;
   String title;
   LectureType type;
-  Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
-  Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
   int order;
 
   final FirebaseDataConnect _dataConnect;  AdminCreateLectureVariablesBuilder videoUrl(String? t) {
@@ -26,7 +26,7 @@ class AdminCreateLectureVariablesBuilder {
 
   MutationRef<AdminCreateLectureData, AdminCreateLectureVariables> ref() {
     AdminCreateLectureVariables vars= AdminCreateLectureVariables(sectionId: sectionId,title: title,type: type,videoUrl: _videoUrl,content: _content,order: order,);
-    return _dataConnect.mutation("AdminCreateLecture", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('AdminCreateLecture', dataDeserializer, varsSerializer, vars);
   }
 }
 

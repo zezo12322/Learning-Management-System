@@ -3,7 +3,7 @@ part of 'generated.dart';
 class UpdateLectureProgressVariablesBuilder {
   String lectureId;
   int lastWatchedSecond;
-  Optional<Timestamp> _completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
+  final Optional<Timestamp> _completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
 
   final FirebaseDataConnect _dataConnect;  UpdateLectureProgressVariablesBuilder completedAt(Timestamp? t) {
    _completedAt.value = t;
@@ -19,7 +19,7 @@ class UpdateLectureProgressVariablesBuilder {
 
   MutationRef<UpdateLectureProgressData, UpdateLectureProgressVariables> ref() {
     UpdateLectureProgressVariables vars= UpdateLectureProgressVariables(lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,completedAt: _completedAt,);
-    return _dataConnect.mutation("UpdateLectureProgress", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('UpdateLectureProgress', dataDeserializer, varsSerializer, vars);
   }
 }
 

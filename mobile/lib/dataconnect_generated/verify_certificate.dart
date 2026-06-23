@@ -13,7 +13,7 @@ class VerifyCertificateVariablesBuilder {
 
   QueryRef<VerifyCertificateData, VerifyCertificateVariables> ref() {
     VerifyCertificateVariables vars= VerifyCertificateVariables(hash: hash,);
-    return _dataConnect.query("VerifyCertificate", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query('VerifyCertificate', dataDeserializer, varsSerializer, vars);
   }
 }
 

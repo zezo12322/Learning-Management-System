@@ -1,3 +1,7 @@
+# ==========================================
+# INSTRUCTOR MANAGEMENT
+# ==========================================
+
 # Gets all student submissions pending review and grading
 query GetPendingSubmissions @auth(level: USER) {
   missionSubmissions(
@@ -13,6 +17,44 @@ query GetPendingSubmissions @auth(level: USER) {
       title
       difficulty
       course { title }
+    }
+  }
+}
+
+# Adds a co-instructor to a course
+mutation AdminAddCourseInstructor(
+  $courseId: UUID!,
+  $userId: String!
+) @auth(level: USER) {
+  courseInstructor_insert(
+    data: {
+      courseId: $courseId,
+      userId: $userId
+    }
+  )
+}
+
+# Removes a co-instructor from a course
+mutation AdminRemoveCourseInstructor(
+  $courseId: UUID!,
+  $userId: String!
+) @auth(level: USER) {
+  courseInstructor_delete(
+    key: {
+      courseId: $courseId,
+      userId: $userId
+    }
+  )
+}
+
+# Lists all instructors for a specific course
+query GetCourseInstructors($courseId: UUID!) @auth(level: USER) {
+  courseInstructors(where: { courseId: { eq: $courseId } }) {
+    user {
+      id
+      name
+      email
+      avatar
     }
   }
 }

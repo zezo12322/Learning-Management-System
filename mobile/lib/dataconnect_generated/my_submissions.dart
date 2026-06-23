@@ -12,7 +12,7 @@ class MySubmissionsVariablesBuilder {
 
   QueryRef<MySubmissionsData, void> ref() {
     
-    return _dataConnect.query("MySubmissions", dataDeserializer, emptySerializer, null);
+    return _dataConnect.query('MySubmissions', dataDeserializer, emptySerializer, null);
   }
 }
 

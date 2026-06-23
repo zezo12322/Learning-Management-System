@@ -1,10 +1,10 @@
 part of 'generated.dart';
 
 class UpdateMyProfileVariablesBuilder {
-  Optional<String> _bio = Optional.optional(nativeFromJson, nativeToJson);
-  Optional<String> _company = Optional.optional(nativeFromJson, nativeToJson);
-  Optional<String> _phone = Optional.optional(nativeFromJson, nativeToJson);
-  Optional<AnyValue> _preferences = Optional.optional(AnyValue.fromJson, defaultSerializer);
+  final Optional<String> _bio = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _company = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _phone = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<AnyValue> _preferences = Optional.optional(AnyValue.fromJson, defaultSerializer);
 
   final FirebaseDataConnect _dataConnect;
   UpdateMyProfileVariablesBuilder bio(String? t) {
@@ -33,7 +33,7 @@ class UpdateMyProfileVariablesBuilder {
 
   MutationRef<UpdateMyProfileData, UpdateMyProfileVariables> ref() {
     UpdateMyProfileVariables vars= UpdateMyProfileVariables(bio: _bio,company: _company,phone: _phone,preferences: _preferences,);
-    return _dataConnect.mutation("UpdateMyProfile", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('UpdateMyProfile', dataDeserializer, varsSerializer, vars);
   }
 }
 

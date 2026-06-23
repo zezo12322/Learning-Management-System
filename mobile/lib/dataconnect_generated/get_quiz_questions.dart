@@ -13,7 +13,7 @@ class GetQuizQuestionsVariablesBuilder {
 
   QueryRef<GetQuizQuestionsData, GetQuizQuestionsVariables> ref() {
     GetQuizQuestionsVariables vars= GetQuizQuestionsVariables(lectureId: lectureId,);
-    return _dataConnect.query("GetQuizQuestions", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query('GetQuizQuestions', dataDeserializer, varsSerializer, vars);
   }
 }
 
@@ -22,14 +22,16 @@ class GetQuizQuestionsCourseQuizs {
   final String id;
   final double passingScore;
   final int maxAttempts;
-  final List<GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz> quizQuestions_on_quiz;
+  final int? timeLimitMinutes;
+  final List<GetQuizQuestionsCourseQuizsTakeQuestions> takeQuestions;
   GetQuizQuestionsCourseQuizs.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   passingScore = nativeFromJson<double>(json['passingScore']),
   maxAttempts = nativeFromJson<int>(json['maxAttempts']),
-  quizQuestions_on_quiz = (json['quizQuestions_on_quiz'] as List<dynamic>)
-        .map((e) => GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz.fromJson(e))
+  timeLimitMinutes = json['timeLimitMinutes'] == null ? null : nativeFromJson<int>(json['timeLimitMinutes']),
+  takeQuestions = (json['takeQuestions'] as List<dynamic>)
+        .map((e) => GetQuizQuestionsCourseQuizsTakeQuestions.fromJson(e))
         .toList();
   @override
   bool operator ==(Object other) {
@@ -44,11 +46,12 @@ class GetQuizQuestionsCourseQuizs {
     return id == otherTyped.id && 
     passingScore == otherTyped.passingScore && 
     maxAttempts == otherTyped.maxAttempts && 
-    quizQuestions_on_quiz == otherTyped.quizQuestions_on_quiz;
+    timeLimitMinutes == otherTyped.timeLimitMinutes && 
+    takeQuestions == otherTyped.takeQuestions;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, passingScore.hashCode, maxAttempts.hashCode, quizQuestions_on_quiz.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, passingScore.hashCode, maxAttempts.hashCode, timeLimitMinutes.hashCode, takeQuestions.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -56,7 +59,10 @@ class GetQuizQuestionsCourseQuizs {
     json['id'] = nativeToJson<String>(id);
     json['passingScore'] = nativeToJson<double>(passingScore);
     json['maxAttempts'] = nativeToJson<int>(maxAttempts);
-    json['quizQuestions_on_quiz'] = quizQuestions_on_quiz.map((e) => e.toJson()).toList();
+    if (timeLimitMinutes != null) {
+      json['timeLimitMinutes'] = nativeToJson<int?>(timeLimitMinutes);
+    }
+    json['takeQuestions'] = takeQuestions.map((e) => e.toJson()).toList();
     return json;
   }
 
@@ -64,23 +70,24 @@ class GetQuizQuestionsCourseQuizs {
     required this.id,
     required this.passingScore,
     required this.maxAttempts,
-    required this.quizQuestions_on_quiz,
+    this.timeLimitMinutes,
+    required this.takeQuestions,
   });
 }
 
 @immutable
-class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz {
+class GetQuizQuestionsCourseQuizsTakeQuestions {
   final String id;
   final String questionText;
   final double points;
-  final List<GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion> quizOptions_on_question;
-  GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz.fromJson(dynamic json):
+  final List<GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions> takeOptions;
+  GetQuizQuestionsCourseQuizsTakeQuestions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   questionText = nativeFromJson<String>(json['questionText']),
   points = nativeFromJson<double>(json['points']),
-  quizOptions_on_question = (json['quizOptions_on_question'] as List<dynamic>)
-        .map((e) => GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion.fromJson(e))
+  takeOptions = (json['takeOptions'] as List<dynamic>)
+        .map((e) => GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions.fromJson(e))
         .toList();
   @override
   bool operator ==(Object other) {
@@ -91,15 +98,15 @@ class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz {
       return false;
     }
 
-    final GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz otherTyped = other as GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz;
+    final GetQuizQuestionsCourseQuizsTakeQuestions otherTyped = other as GetQuizQuestionsCourseQuizsTakeQuestions;
     return id == otherTyped.id && 
     questionText == otherTyped.questionText && 
     points == otherTyped.points && 
-    quizOptions_on_question == otherTyped.quizOptions_on_question;
+    takeOptions == otherTyped.takeOptions;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, questionText.hashCode, points.hashCode, quizOptions_on_question.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, questionText.hashCode, points.hashCode, takeOptions.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -107,23 +114,23 @@ class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz {
     json['id'] = nativeToJson<String>(id);
     json['questionText'] = nativeToJson<String>(questionText);
     json['points'] = nativeToJson<double>(points);
-    json['quizOptions_on_question'] = quizOptions_on_question.map((e) => e.toJson()).toList();
+    json['takeOptions'] = takeOptions.map((e) => e.toJson()).toList();
     return json;
   }
 
-  GetQuizQuestionsCourseQuizsQuizQuestionsOnQuiz({
+  GetQuizQuestionsCourseQuizsTakeQuestions({
     required this.id,
     required this.questionText,
     required this.points,
-    required this.quizOptions_on_question,
+    required this.takeOptions,
   });
 }
 
 @immutable
-class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion {
+class GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions {
   final String id;
   final String text;
-  GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion.fromJson(dynamic json):
+  GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   text = nativeFromJson<String>(json['text']);
@@ -136,7 +143,7 @@ class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion {
       return false;
     }
 
-    final GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion otherTyped = other as GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion;
+    final GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions otherTyped = other as GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions;
     return id == otherTyped.id && 
     text == otherTyped.text;
     
@@ -152,7 +159,7 @@ class GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion {
     return json;
   }
 
-  GetQuizQuestionsCourseQuizsQuizQuestionsOnQuizQuizOptionsOnQuestion({
+  GetQuizQuestionsCourseQuizsTakeQuestionsTakeOptions({
     required this.id,
     required this.text,
   });

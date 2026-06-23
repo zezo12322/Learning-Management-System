@@ -15,15 +15,15 @@ class AddCriterionScoreVariablesBuilder {
 
   MutationRef<AddCriterionScoreData, AddCriterionScoreVariables> ref() {
     AddCriterionScoreVariables vars= AddCriterionScoreVariables(submissionId: submissionId,criterionId: criterionId,score: score,);
-    return _dataConnect.mutation("AddCriterionScore", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('AddCriterionScore', dataDeserializer, varsSerializer, vars);
   }
 }
 
 @immutable
-class AddCriterionScoreMissionSubmissionScoreUpsert {
+class AddCriterionScoreMissionSubmissionScoreInsert {
   final String submissionId;
   final String criterionId;
-  AddCriterionScoreMissionSubmissionScoreUpsert.fromJson(dynamic json):
+  AddCriterionScoreMissionSubmissionScoreInsert.fromJson(dynamic json):
   
   submissionId = nativeFromJson<String>(json['submissionId']),
   criterionId = nativeFromJson<String>(json['criterionId']);
@@ -36,7 +36,7 @@ class AddCriterionScoreMissionSubmissionScoreUpsert {
       return false;
     }
 
-    final AddCriterionScoreMissionSubmissionScoreUpsert otherTyped = other as AddCriterionScoreMissionSubmissionScoreUpsert;
+    final AddCriterionScoreMissionSubmissionScoreInsert otherTyped = other as AddCriterionScoreMissionSubmissionScoreInsert;
     return submissionId == otherTyped.submissionId && 
     criterionId == otherTyped.criterionId;
     
@@ -52,7 +52,7 @@ class AddCriterionScoreMissionSubmissionScoreUpsert {
     return json;
   }
 
-  AddCriterionScoreMissionSubmissionScoreUpsert({
+  AddCriterionScoreMissionSubmissionScoreInsert({
     required this.submissionId,
     required this.criterionId,
   });
@@ -60,10 +60,10 @@ class AddCriterionScoreMissionSubmissionScoreUpsert {
 
 @immutable
 class AddCriterionScoreData {
-  final AddCriterionScoreMissionSubmissionScoreUpsert missionSubmissionScore_upsert;
+  final AddCriterionScoreMissionSubmissionScoreInsert missionSubmissionScore_insert;
   AddCriterionScoreData.fromJson(dynamic json):
   
-  missionSubmissionScore_upsert = AddCriterionScoreMissionSubmissionScoreUpsert.fromJson(json['missionSubmissionScore_upsert']);
+  missionSubmissionScore_insert = AddCriterionScoreMissionSubmissionScoreInsert.fromJson(json['missionSubmissionScore_insert']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -74,21 +74,21 @@ class AddCriterionScoreData {
     }
 
     final AddCriterionScoreData otherTyped = other as AddCriterionScoreData;
-    return missionSubmissionScore_upsert == otherTyped.missionSubmissionScore_upsert;
+    return missionSubmissionScore_insert == otherTyped.missionSubmissionScore_insert;
     
   }
   @override
-  int get hashCode => missionSubmissionScore_upsert.hashCode;
+  int get hashCode => missionSubmissionScore_insert.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['missionSubmissionScore_upsert'] = missionSubmissionScore_upsert.toJson();
+    json['missionSubmissionScore_insert'] = missionSubmissionScore_insert.toJson();
     return json;
   }
 
   AddCriterionScoreData({
-    required this.missionSubmissionScore_upsert,
+    required this.missionSubmissionScore_insert,
   });
 }
 

@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { FirebaseService } from './firebase.service';
+import { DataConnectService } from './dataconnect.service';
 
+@Global()
 @Module({
-  providers: [FirebaseService],
-  exports: [FirebaseService], // Makes it available to import elsewhere
+  providers: [FirebaseService, DataConnectService],
+  exports: [FirebaseService, DataConnectService],
 })
 export class FirebaseModule { }
