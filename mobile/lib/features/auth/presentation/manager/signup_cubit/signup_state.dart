@@ -56,7 +56,7 @@ class SignupState extends Equatable{
     status,
     fullNameError,
     emailError,
-    passwordError,
+    phoneError,
     passwordError,
     confirmPasswordError,
     errorMessage,

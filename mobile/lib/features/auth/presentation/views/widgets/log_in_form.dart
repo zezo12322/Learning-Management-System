@@ -9,7 +9,7 @@ import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/widgets/custom_text_field.dart';
 import 'package:optimatech_lms/core/widgets/password_text_field.dart';
 import 'package:optimatech_lms/core/widgets/primary_button.dart';
-import 'package:optimatech_lms/features/auth/presentation/manager/login%20cubit/log_in_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/sign_up_view.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/bottom_decor_strip.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/forget_password_bt.dart';
@@ -44,9 +44,12 @@ class _LogInFormState extends State<LogInForm> {
     super.initState();
   }
 
-  void _onLogIn(String email, String password) {
+  void _onLogIn() {
     if (_formKey.currentState!.validate()) {
-      context.read<LogInCubit>().login(email: email, password: password);
+      context.read<LogInCubit>().login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
     } else {
       setState(() => _autovalidateMode = AutovalidateMode.always);
     }
@@ -81,7 +84,7 @@ class _LogInFormState extends State<LogInForm> {
         child: BlocListener<LogInCubit, LogInState>(
           listener: (context, state) {
             if (state.status == LogInStatus.success) {
-              Navigator.pushReplacementNamed(context, HomeView.routeName);
+              Navigator.pushNamedAndRemoveUntil(context, HomeView.routeName, (route) => false,);
             }
             if (state.status == LogInStatus.failure && state.errorMessage != null) {
               buildSnackBar(context: context, text: state.errorMessage!);
@@ -161,7 +164,7 @@ class _LogInFormState extends State<LogInForm> {
                   builder: (context, isLoading) {
                     return PrimaryButton(
                       text: 'auth.login_screen.login_btn'.tr(),
-                      onPressed: () => _onLogIn(_emailController.text, _passwordController.text),
+                      onPressed: () => _onLogIn(),
                       isLoading: isLoading,
                     );
                   },

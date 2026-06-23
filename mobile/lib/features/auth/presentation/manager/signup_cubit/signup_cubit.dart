@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
@@ -13,7 +14,7 @@ class SignupCubit extends Cubit<SignupState> {
   }
 
   void fullNameChanged(){
-    if(state.emailError != null){
+    if(state.fullNameError != null){
       emit(state.copyWith(fullNameError: null));
     }
   }
@@ -23,7 +24,7 @@ class SignupCubit extends Cubit<SignupState> {
     }
   }
   void phoneChanged(){
-    if(state.emailError != null){
+    if(state.phoneError != null){
       emit(state.copyWith(passwordError: null));
     }
   }
@@ -33,37 +34,40 @@ class SignupCubit extends Cubit<SignupState> {
     }
   }
   void confirmPasswordChanged(){
-    if(state.passwordError != null){
+    if(state.confirmPasswordError != null){
       emit(state.copyWith(confirmPasswordError: null));
     }
   }
 
-  Future<void> signup({required String email, required String password}) async{
-    // final emailError= AppValidators.validateEmail(email);
-    // final passwordError = AppValidators.validatePassword(password);
-    //
-    // if(emailError != null || passwordError != null){
-    //   emit(
-    //     state.copyWith(
-    //       emailError: emailError,
-    //       passwordError: passwordError,
-    //     ),
-    //   );
-    //   return;
-    // }
+  Future<void> signup({
+    required String fullName,
+    required String email,
+    required String phone,
+    required String password,
+  }) async{
+
+    if (!state.isAgree) {
+      emit(
+        state.copyWith(
+          status: SignupStatus.failure,
+          errorMessage: 'auth.error.accept_terms_required'.tr(),
+        ),
+      );
+      return;
+    }
 
     emit(state.copyWith(status: SignupStatus.loading, errorMessage: null));
 
     final response = await _authRepository.signupWithEmail(email: email, password: password);
 
     response.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           errorMessage: failure.message,
           status: SignupStatus.failure,
         ),
       ),
-          (success) => emit(
+      (success) => emit(
         state.copyWith(
           status: SignupStatus.success,
         ),
