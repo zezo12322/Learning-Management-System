@@ -1,5 +1,5 @@
 {
-  "app_name": "QR Smart Ordering",
+  "app_name": "OptimaTech",
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -35,7 +35,13 @@
       "email_required": "Email is required",
       "email_not_match": "Please enter a valid email address",
       "password_required": "Password is required",
-      "password_length": "Password must be at least 6 characters long"
+      "password_length": "Password must be at least 6 characters long",
+      "full_name_required": "Full name is required",
+      "full_name_length": "Full name must be at least 3 characters",
+      "phone_required": "Phone number is required",
+      "phone_not_match": "Please enter a valid phone number",
+      "confirm_password_required": "Please confirm your password",
+      "passwords_not_match": "Passwords do not match"
     },
     "password_hint": "Enter The Password",
     "show_password": "show password",
@@ -55,13 +61,36 @@
       "no_account": "Don't have an account?",
       "register": "Register"
     },
+    "signup_screen": {
+      "create_account": "Create\nAccount",
+      "subtitle": "Join Optima and start your\nlearning journey today",
+      "full_name": "Full Name",
+      "enter_full_name": "Enter your full name",
+      "email": "Email",
+      "enter_email": "Enter your email",
+      "phone_number": "Phone Number",
+      "enter_phone_number": "Enter your phone number",
+      "password": "Password",
+      "create_password": "Create a password",
+      "confirm_password": "Confirm Password",
+      "confirm_your_password": "Confirm your password",
+      "agree_terms": "I agree to the ",
+      "terms_of_service": "Terms of Service",
+      "and": " and ",
+      "privacy_policy": "Privacy Policy.",
+      "create_account_button": "Create Account",
+      "already_have_account": "Already have an account?",
+      "login": "Login"
+    },
+    "success": "The Account is created successfully.",
     "error":{
       "weakPassword": "The password provided is too weak.",
       "emailAlreadyInUse": "An account already exists for that email.",
       "networkError": "Please check your internet connection.",
       "genericError": "Something went wrong, please try again.",
       "invalidEmailOrPassword": "Invalid email or password.",
-      "invalidCredential": "Incorrect email or password. Please try again."
+      "invalidCredential": "Incorrect email or password. Please try again.",
+      "accept_terms_required": "accept terms is required"
     }
   },
   "home": {

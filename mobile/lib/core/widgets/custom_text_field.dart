@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool enabled;
   final bool showClear;
+  final int? maxLength;
 
   const CustomTextField({
     super.key,
@@ -25,7 +26,8 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     required this.onChanged,
     this.onClear,
-    required this.showClear,
+    this.showClear = false,
+    this.maxLength,
   });
 
   @override
@@ -45,6 +47,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       autofillHints: [AutofillHints.email],
       textInputAction: TextInputAction.done,
+      maxLength: maxLength,
       validator: validator,
       onChanged: onChanged,
 
@@ -55,6 +58,7 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         fillColor: fillColor,
+        counter: const SizedBox.shrink(),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         hintStyle: context.theme.textTheme.bodyMedium?.copyWith(
           color: enabled ? AppColors.placeholder : AppColors.disablePlaceholder,

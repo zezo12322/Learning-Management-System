@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 
-void buildErrorSnackBar({required BuildContext context, required String text}){
+void buildSnackBar({required BuildContext context, required String text, bool isError = false}){
    ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -11,7 +12,7 @@ void buildErrorSnackBar({required BuildContext context, required String text}){
           color: context.theme.colorScheme.onError,
         ),
       ),
-      backgroundColor: context.theme.colorScheme.error,
+      backgroundColor: isError ? context.theme.colorScheme.error : AppColors.success,
       duration: const Duration(seconds: 3),
     ),
   );
