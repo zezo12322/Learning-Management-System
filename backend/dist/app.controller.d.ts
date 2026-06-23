@@ -1,6 +1,9 @@
-import { AppService } from './app.service';
+import { FirebaseService } from './firebase/firebase.service';
 export declare class AppController {
-    private readonly appService;
-    constructor(appService: AppService);
-    getHello(): string;
+    private firebaseService;
+    constructor(firebaseService: FirebaseService);
+    getUserCount(): Promise<{
+        status: string;
+        sampleUserCount: number;
+    }>;
 }

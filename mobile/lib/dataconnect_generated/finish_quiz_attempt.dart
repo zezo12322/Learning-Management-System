@@ -15,7 +15,7 @@ class FinishQuizAttemptVariablesBuilder {
 
   MutationRef<FinishQuizAttemptData, FinishQuizAttemptVariables> ref() {
     FinishQuizAttemptVariables vars= FinishQuizAttemptVariables(attemptId: attemptId,score: score,passed: passed,);
-    return _dataConnect.mutation("FinishQuizAttempt", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('FinishQuizAttempt', dataDeserializer, varsSerializer, vars);
   }
 }
 

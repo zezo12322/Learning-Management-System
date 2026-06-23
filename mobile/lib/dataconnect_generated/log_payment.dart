@@ -4,7 +4,7 @@ class LogPaymentVariablesBuilder {
   PaymentGateway gateway;
   String referenceId;
   int amount;
-  Optional<String> _currency = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _currency = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  LogPaymentVariablesBuilder currency(String? t) {
    _currency.value = t;
@@ -20,7 +20,7 @@ class LogPaymentVariablesBuilder {
 
   MutationRef<LogPaymentData, LogPaymentVariables> ref() {
     LogPaymentVariables vars= LogPaymentVariables(gateway: gateway,referenceId: referenceId,amount: amount,currency: _currency,);
-    return _dataConnect.mutation("LogPayment", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('LogPayment', dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -129,6 +129,7 @@ type CourseQuiz @table(name: "course_quizzes") {
   lecture: CourseLecture! @unique
   passingScore: Float!
   maxAttempts: Int!
+  timeLimitMinutes: Int
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }

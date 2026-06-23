@@ -4,15 +4,15 @@ class AdminCreateQuizQuestionVariablesBuilder {
   String quizId;
   String questionText;
   int order;
-  Optional<double> _points = Optional.optional(nativeFromJson, nativeToJson);
-  String correctOptionId;
+  double points;
+  final Optional<String> _explanation = Optional.optional(nativeFromJson, nativeToJson);
 
-  final FirebaseDataConnect _dataConnect;  AdminCreateQuizQuestionVariablesBuilder points(double? t) {
-   _points.value = t;
+  final FirebaseDataConnect _dataConnect;  AdminCreateQuizQuestionVariablesBuilder explanation(String? t) {
+   _explanation.value = t;
    return this;
   }
 
-  AdminCreateQuizQuestionVariablesBuilder(this._dataConnect, {required  this.quizId,required  this.questionText,required  this.order,required  this.correctOptionId,});
+  AdminCreateQuizQuestionVariablesBuilder(this._dataConnect, {required  this.quizId,required  this.questionText,required  this.order,required  this.points,});
   Deserializer<AdminCreateQuizQuestionData> dataDeserializer = (dynamic json)  => AdminCreateQuizQuestionData.fromJson(jsonDecode(json));
   Serializer<AdminCreateQuizQuestionVariables> varsSerializer = (AdminCreateQuizQuestionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<AdminCreateQuizQuestionData, AdminCreateQuizQuestionVariables>> execute() {
@@ -20,8 +20,8 @@ class AdminCreateQuizQuestionVariablesBuilder {
   }
 
   MutationRef<AdminCreateQuizQuestionData, AdminCreateQuizQuestionVariables> ref() {
-    AdminCreateQuizQuestionVariables vars= AdminCreateQuizQuestionVariables(quizId: quizId,questionText: questionText,order: order,points: _points,correctOptionId: correctOptionId,);
-    return _dataConnect.mutation("AdminCreateQuizQuestion", dataDeserializer, varsSerializer, vars);
+    AdminCreateQuizQuestionVariables vars= AdminCreateQuizQuestionVariables(quizId: quizId,questionText: questionText,order: order,points: points,explanation: _explanation,);
+    return _dataConnect.mutation('AdminCreateQuizQuestion', dataDeserializer, varsSerializer, vars);
   }
 }
 
@@ -98,23 +98,23 @@ class AdminCreateQuizQuestionVariables {
   final String quizId;
   final String questionText;
   final int order;
-  late final Optional<double>points;
-  final String correctOptionId;
+  final double points;
+  late final Optional<String>explanation;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateQuizQuestionVariables.fromJson(Map<String, dynamic> json):
   
   quizId = nativeFromJson<String>(json['quizId']),
   questionText = nativeFromJson<String>(json['questionText']),
   order = nativeFromJson<int>(json['order']),
-  correctOptionId = nativeFromJson<String>(json['correctOptionId']) {
+  points = nativeFromJson<double>(json['points']) {
   
   
   
   
   
-    points = Optional.optional(nativeFromJson, nativeToJson);
-    points.value = json['points'] == null ? null : nativeFromJson<double>(json['points']);
   
+    explanation = Optional.optional(nativeFromJson, nativeToJson);
+    explanation.value = json['explanation'] == null ? null : nativeFromJson<String>(json['explanation']);
   
   }
   @override
@@ -131,11 +131,11 @@ class AdminCreateQuizQuestionVariables {
     questionText == otherTyped.questionText && 
     order == otherTyped.order && 
     points == otherTyped.points && 
-    correctOptionId == otherTyped.correctOptionId;
+    explanation == otherTyped.explanation;
     
   }
   @override
-  int get hashCode => Object.hashAll([quizId.hashCode, questionText.hashCode, order.hashCode, points.hashCode, correctOptionId.hashCode]);
+  int get hashCode => Object.hashAll([quizId.hashCode, questionText.hashCode, order.hashCode, points.hashCode, explanation.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -143,10 +143,10 @@ class AdminCreateQuizQuestionVariables {
     json['quizId'] = nativeToJson<String>(quizId);
     json['questionText'] = nativeToJson<String>(questionText);
     json['order'] = nativeToJson<int>(order);
-    if(points.state == OptionalState.set) {
-      json['points'] = points.toJson();
+    json['points'] = nativeToJson<double>(points);
+    if(explanation.state == OptionalState.set) {
+      json['explanation'] = explanation.toJson();
     }
-    json['correctOptionId'] = nativeToJson<String>(correctOptionId);
     return json;
   }
 
@@ -155,7 +155,7 @@ class AdminCreateQuizQuestionVariables {
     required this.questionText,
     required this.order,
     required this.points,
-    required this.correctOptionId,
+    required this.explanation,
   });
 }
 

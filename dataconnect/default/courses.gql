@@ -1,3 +1,7 @@
+# ==========================================
+# PUBLIC / STUDENT QUERIES
+# ==========================================
+
 # Lists all published courses available for public discovery
 query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
   courses(
@@ -25,10 +29,10 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
     title
     description
     language
-    courseSections_on_course(orderBy: [{ order: ASC }]) {
+    publishedSections: courseSections_on_course(orderBy: [{ order: ASC }]) {
       id
       title
-      courseLectures_on_section(
+      publishedLectures: courseLectures_on_section(
         where: { deletedAt: { eq: null } }, 
         orderBy: [{ order: ASC }]
       ) {
@@ -41,4 +45,332 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
       }
     }
   }
+}
+
+# Retrieves a specific lecture's content for playback
+query GetLectureContent($lectureId: UUID!) @auth(level: USER) {
+  courseLecture(id: $lectureId) {
+    id
+    title
+    type
+    videoUrl
+    content
+    duration
+    transcriptUrl
+    isFreePreview
+    section {
+      course {
+        id
+      }
+    }
+  }
+}
+
+# Retrieves the authenticated user's progress for a specific lecture
+query GetUserLectureProgress($lectureId: UUID!) @auth(level: USER) {
+  lectureProgresses(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      lectureId: { eq: $lectureId }
+    }
+  ) {
+    lastWatchedSecond
+    completedAt
+  }
+}
+
+# Retrieves all lecture progress for a user within a specific course
+query GetMyCourseProgress($courseId: UUID!) @auth(level: USER) {
+  sections: courseSections(
+    where: { courseId: { eq: $courseId } },
+    orderBy: [{ order: ASC }]
+  ) {
+    id
+    title
+    progressLectures: courseLectures_on_section(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
+      id
+      title
+      userProgress: lectureProgresses_on_lecture(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) {
+        completedAt
+      }
+    }
+  }
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — COURSE MANAGEMENT
+# ==========================================
+
+# Retrieves full course details for authoring purposes (includes drafts)
+query AdminGetCourse($courseId: UUID!) @auth(level: USER) {
+  course(id: $courseId) {
+    id
+    title
+    description
+    price
+    status
+    language
+    level
+    thumbnail
+    tags
+    deletedAt
+    createdAt
+    updatedAt
+    category { id name }
+    author { id name email avatar }
+    createdBy { id name }
+    instructors: courseInstructors_on_course {
+      user { id name email avatar }
+    }
+    adminSections: courseSections_on_course(orderBy: [{ order: ASC }]) {
+      id
+      title
+      order
+      adminLectures: courseLectures_on_section(
+        where: { deletedAt: { eq: null } },
+        orderBy: [{ order: ASC }]
+      ) {
+        id
+        title
+        type
+        videoUrl
+        content
+        duration
+        transcriptUrl
+        isFreePreview
+        order
+      }
+    }
+  }
+}
+
+# Lists all courses authored by the authenticated user
+query AdminListMyCourses @auth(level: USER) {
+  courses(
+    where: {
+      authorId: { eq_expr: "auth.uid" },
+      deletedAt: { eq: null }
+    },
+    orderBy: [{ updatedAt: DESC }]
+  ) {
+    id
+    title
+    status
+    level
+    thumbnail
+    price
+    updatedAt
+    category { name }
+  }
+}
+
+# Updates course metadata
+mutation AdminUpdateCourse(
+  $courseId: UUID!,
+  $title: String,
+  $description: String,
+  $price: Int,
+  $language: String,
+  $level: CourseLevel,
+  $categoryId: UUID,
+  $tags: [String!],
+  $thumbnail: String
+) @auth(level: USER) {
+  course_update(
+    id: $courseId,
+    data: {
+      title: $title,
+      description: $description,
+      price: $price,
+      language: $language,
+      level: $level,
+      categoryId: $categoryId,
+      tags: $tags,
+      thumbnail: $thumbnail,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Transitions course status (DRAFT -> PUBLISHED -> ARCHIVED)
+mutation AdminUpdateCourseStatus(
+  $courseId: UUID!,
+  $status: CourseStatus!
+) @auth(level: USER) {
+  course_update(
+    id: $courseId,
+    data: {
+      status: $status,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — SECTION MANAGEMENT
+# ==========================================
+
+# Creates a new section/module within a course
+mutation AdminCreateSection(
+  $courseId: UUID!,
+  $title: String!,
+  $order: Int!
+) @auth(level: USER) {
+  courseSection_insert(
+    data: {
+      courseId: $courseId,
+      title: $title,
+      order: $order
+    }
+  )
+}
+
+# Updates a section's title
+mutation AdminUpdateSection(
+  $sectionId: UUID!,
+  $title: String!
+) @auth(level: USER) {
+  courseSection_update(
+    id: $sectionId,
+    data: {
+      title: $title,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Deletes a section
+mutation AdminDeleteSection($sectionId: UUID!) @auth(level: USER) {
+  courseSection_delete(id: $sectionId)
+}
+
+# Updates a section's order position (used in batch for reorder)
+mutation AdminUpdateSectionOrder(
+  $sectionId: UUID!,
+  $order: Int!
+) @auth(level: USER) {
+  courseSection_update(
+    id: $sectionId,
+    data: {
+      order: $order,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — LECTURE MANAGEMENT
+# ==========================================
+
+# Creates a new lecture with all fields
+mutation AdminCreateLectureFull(
+  $sectionId: UUID!,
+  $title: String!,
+  $type: LectureType!,
+  $videoUrl: String,
+  $content: String,
+  $duration: Int,
+  $transcriptUrl: String,
+  $isFreePreview: Boolean!,
+  $order: Int!
+) @auth(level: USER) {
+  courseLecture_insert(
+    data: {
+      sectionId: $sectionId,
+      title: $title,
+      type: $type,
+      videoUrl: $videoUrl,
+      content: $content,
+      duration: $duration,
+      transcriptUrl: $transcriptUrl,
+      isFreePreview: $isFreePreview,
+      order: $order
+    }
+  )
+}
+
+# Updates an existing lecture
+mutation AdminUpdateLecture(
+  $lectureId: UUID!,
+  $title: String,
+  $type: LectureType,
+  $videoUrl: String,
+  $content: String,
+  $duration: Int,
+  $transcriptUrl: String,
+  $isFreePreview: Boolean
+) @auth(level: USER) {
+  courseLecture_update(
+    id: $lectureId,
+    data: {
+      title: $title,
+      type: $type,
+      videoUrl: $videoUrl,
+      content: $content,
+      duration: $duration,
+      transcriptUrl: $transcriptUrl,
+      isFreePreview: $isFreePreview,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Soft-deletes a lecture
+mutation AdminSoftDeleteLecture($lectureId: UUID!) @auth(level: USER) {
+  courseLecture_update(
+    id: $lectureId,
+    data: {
+      deletedAt_expr: "request.time",
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Updates a lecture's order position (used in batch for reorder)
+mutation AdminUpdateLectureOrder(
+  $lectureId: UUID!,
+  $order: Int!
+) @auth(level: USER) {
+  courseLecture_update(
+    id: $lectureId,
+    data: {
+      order: $order,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Moves a lecture to a different section with a new order position
+mutation AdminMoveLectureToSection(
+  $lectureId: UUID!,
+  $newSectionId: UUID!,
+  $order: Int!
+) @auth(level: USER) {
+  courseLecture_update(
+    id: $lectureId,
+    data: {
+      sectionId: $newSectionId,
+      order: $order,
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Bulk soft-deletes all non-deleted lectures within a section (section delete cascade)
+mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) @auth(level: USER) {
+  courseLecture_updateMany(
+    where: {
+      sectionId: { eq: $sectionId },
+      deletedAt: { eq: null }
+    },
+    data: {
+      deletedAt_expr: "request.time",
+      updatedAt_expr: "request.time"
+    }
+  )
 }

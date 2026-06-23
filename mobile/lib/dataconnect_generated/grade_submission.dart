@@ -2,7 +2,7 @@ part of 'generated.dart';
 
 class GradeSubmissionVariablesBuilder {
   String submissionId;
-  Optional<String> _feedback = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<String> _feedback = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  GradeSubmissionVariablesBuilder feedback(String? t) {
    _feedback.value = t;
@@ -18,7 +18,7 @@ class GradeSubmissionVariablesBuilder {
 
   MutationRef<GradeSubmissionData, GradeSubmissionVariables> ref() {
     GradeSubmissionVariables vars= GradeSubmissionVariables(submissionId: submissionId,feedback: _feedback,);
-    return _dataConnect.mutation("GradeSubmission", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('GradeSubmission', dataDeserializer, varsSerializer, vars);
   }
 }
 

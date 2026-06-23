@@ -3,7 +3,7 @@ part of 'generated.dart';
 class AdminCreateSessionVariablesBuilder {
   String courseId;
   String title;
-  Optional<int> _capacity = Optional.optional(nativeFromJson, nativeToJson);
+  final Optional<int> _capacity = Optional.optional(nativeFromJson, nativeToJson);
   Timestamp startTime;
   Timestamp endTime;
   SessionType type;
@@ -23,7 +23,7 @@ class AdminCreateSessionVariablesBuilder {
 
   MutationRef<AdminCreateSessionData, AdminCreateSessionVariables> ref() {
     AdminCreateSessionVariables vars= AdminCreateSessionVariables(courseId: courseId,title: title,capacity: _capacity,startTime: startTime,endTime: endTime,type: type,locationOrUrl: locationOrUrl,);
-    return _dataConnect.mutation("AdminCreateSession", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('AdminCreateSession', dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -12,7 +12,7 @@ class GetPendingSubmissionsVariablesBuilder {
 
   QueryRef<GetPendingSubmissionsData, void> ref() {
     
-    return _dataConnect.query("GetPendingSubmissions", dataDeserializer, emptySerializer, null);
+    return _dataConnect.query('GetPendingSubmissions', dataDeserializer, emptySerializer, null);
   }
 }
 

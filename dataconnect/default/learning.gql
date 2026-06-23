@@ -1,3 +1,7 @@
+# ==========================================
+# STUDENT — ENROLLMENT
+# ==========================================
+
 # Enrolls the authenticated user into a specific course
 mutation EnrollInCourse($courseId: UUID!) @auth(level: USER) {
   enrollment_insert(
@@ -22,6 +26,10 @@ mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
   )
 }
 
+# ==========================================
+# STUDENT — PROGRESS TRACKING
+# ==========================================
+
 # Updates the authenticated user's progress for a watched lecture
 mutation UpdateLectureProgress(
   $lectureId: UUID!, 
@@ -36,4 +44,67 @@ mutation UpdateLectureProgress(
       completedAt: $completedAt
     }
   )
+}
+
+# ==========================================
+# COMPLETION TRACKING (KAN-116)
+# ==========================================
+
+# Counts total lectures vs completed lectures for a course
+query GetCourseCompletionStatus($courseId: UUID!) @auth(level: USER) {
+  sections: courseSections(where: { courseId: { eq: $courseId } }) {
+    completionLectures: courseLectures_on_section(where: { deletedAt: { eq: null } }) {
+      id
+      completionProgress: lectureProgresses_on_lecture(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) {
+        completedAt
+      }
+    }
+  }
+}
+
+# Updates an enrollment's status and completion timestamp
+mutation UpdateEnrollmentStatus(
+  $enrollmentId: UUID!,
+  $status: EnrollmentStatus!,
+  $completedAt: Timestamp
+) @auth(level: USER) {
+  enrollment_update(
+    id: $enrollmentId,
+    data: {
+      status: $status,
+      completedAt: $completedAt
+    }
+  )
+}
+
+# Finds the authenticated user's enrollment record for a specific course
+query GetUserEnrollmentForCourse($courseId: UUID!) @auth(level: USER) {
+  enrollments(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      courseId: { eq: $courseId },
+      targetType: { eq: COURSE }
+    }
+  ) {
+    id
+    status
+    completedAt
+  }
+}
+
+# Finds the authenticated user's enrollment record for a specific mission
+query GetUserEnrollmentForMission($missionId: UUID!) @auth(level: USER) {
+  enrollments(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      missionId: { eq: $missionId },
+      targetType: { eq: MISSION }
+    }
+  ) {
+    id
+    status
+    completedAt
+  }
 }

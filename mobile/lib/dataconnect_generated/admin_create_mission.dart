@@ -1,16 +1,15 @@
 part of 'generated.dart';
 
 class AdminCreateMissionVariablesBuilder {
-  Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
   String title;
   String scenarioDescription;
   int durationMinutes;
   String categoryId;
   MissionDifficulty difficulty;
   List<String> skillsTested;
+  final Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
 
-  final FirebaseDataConnect _dataConnect;
-  AdminCreateMissionVariablesBuilder courseId(String? t) {
+  final FirebaseDataConnect _dataConnect;  AdminCreateMissionVariablesBuilder courseId(String? t) {
    _courseId.value = t;
    return this;
   }
@@ -23,8 +22,8 @@ class AdminCreateMissionVariablesBuilder {
   }
 
   MutationRef<AdminCreateMissionData, AdminCreateMissionVariables> ref() {
-    AdminCreateMissionVariables vars= AdminCreateMissionVariables(courseId: _courseId,title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,);
-    return _dataConnect.mutation("AdminCreateMission", dataDeserializer, varsSerializer, vars);
+    AdminCreateMissionVariables vars= AdminCreateMissionVariables(title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,courseId: _courseId,);
+    return _dataConnect.mutation('AdminCreateMission', dataDeserializer, varsSerializer, vars);
   }
 }
 
@@ -98,13 +97,13 @@ class AdminCreateMissionData {
 
 @immutable
 class AdminCreateMissionVariables {
-  late final Optional<String>courseId;
   final String title;
   final String scenarioDescription;
   final int durationMinutes;
   final String categoryId;
   final MissionDifficulty difficulty;
   final List<String> skillsTested;
+  late final Optional<String>courseId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateMissionVariables.fromJson(Map<String, dynamic> json):
   
@@ -118,14 +117,14 @@ class AdminCreateMissionVariables {
         .toList() {
   
   
+  
+  
+  
+  
+  
+  
     courseId = Optional.optional(nativeFromJson, nativeToJson);
     courseId.value = json['courseId'] == null ? null : nativeFromJson<String>(json['courseId']);
-  
-  
-  
-  
-  
-  
   
   }
   @override
@@ -138,24 +137,21 @@ class AdminCreateMissionVariables {
     }
 
     final AdminCreateMissionVariables otherTyped = other as AdminCreateMissionVariables;
-    return courseId == otherTyped.courseId && 
-    title == otherTyped.title && 
+    return title == otherTyped.title && 
     scenarioDescription == otherTyped.scenarioDescription && 
     durationMinutes == otherTyped.durationMinutes && 
     categoryId == otherTyped.categoryId && 
     difficulty == otherTyped.difficulty && 
-    skillsTested == otherTyped.skillsTested;
+    skillsTested == otherTyped.skillsTested && 
+    courseId == otherTyped.courseId;
     
   }
   @override
-  int get hashCode => Object.hashAll([courseId.hashCode, title.hashCode, scenarioDescription.hashCode, durationMinutes.hashCode, categoryId.hashCode, difficulty.hashCode, skillsTested.hashCode]);
+  int get hashCode => Object.hashAll([title.hashCode, scenarioDescription.hashCode, durationMinutes.hashCode, categoryId.hashCode, difficulty.hashCode, skillsTested.hashCode, courseId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    if(courseId.state == OptionalState.set) {
-      json['courseId'] = courseId.toJson();
-    }
     json['title'] = nativeToJson<String>(title);
     json['scenarioDescription'] = nativeToJson<String>(scenarioDescription);
     json['durationMinutes'] = nativeToJson<int>(durationMinutes);
@@ -164,17 +160,20 @@ class AdminCreateMissionVariables {
     difficulty.name
     ;
     json['skillsTested'] = skillsTested.map((e) => nativeToJson<String>(e)).toList();
+    if(courseId.state == OptionalState.set) {
+      json['courseId'] = courseId.toJson();
+    }
     return json;
   }
 
   AdminCreateMissionVariables({
-    required this.courseId,
     required this.title,
     required this.scenarioDescription,
     required this.durationMinutes,
     required this.categoryId,
     required this.difficulty,
     required this.skillsTested,
+    required this.courseId,
   });
 }
 

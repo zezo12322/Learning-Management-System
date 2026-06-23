@@ -15,7 +15,7 @@ class CheckInToSessionVariablesBuilder {
 
   MutationRef<CheckInToSessionData, CheckInToSessionVariables> ref() {
     CheckInToSessionVariables vars= CheckInToSessionVariables(sessionId: sessionId,status: status,method: method,);
-    return _dataConnect.mutation("CheckInToSession", dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation('CheckInToSession', dataDeserializer, varsSerializer, vars);
   }
 }
 

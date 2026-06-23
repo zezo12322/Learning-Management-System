@@ -12,7 +12,7 @@ class GetMeVariablesBuilder {
 
   QueryRef<GetMeData, void> ref() {
     
-    return _dataConnect.query("GetMe", dataDeserializer, emptySerializer, null);
+    return _dataConnect.query('GetMe', dataDeserializer, emptySerializer, null);
   }
 }
 

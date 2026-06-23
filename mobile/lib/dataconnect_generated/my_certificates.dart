@@ -12,7 +12,7 @@ class MyCertificatesVariablesBuilder {
 
   QueryRef<MyCertificatesData, void> ref() {
     
-    return _dataConnect.query("MyCertificates", dataDeserializer, emptySerializer, null);
+    return _dataConnect.query('MyCertificates', dataDeserializer, emptySerializer, null);
   }
 }
 
