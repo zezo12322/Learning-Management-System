@@ -1,5 +1,5 @@
 {
-  "app_name": "الطلب الذكي بالـ QR",
+  "app_name": "OptimaTech",
   "common": {
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -35,7 +35,13 @@
       "email_required": "البريد الإلكتروني مطلوب",
       "email_not_match": "من فضلك أدخل بريد إلكتروني صحيح",
       "password_required": "الرقم السري مطلوب",
-      "password_length": "الرقم السري يجب أن يكون 6 أحرف على الأقل"
+      "password_length": "الرقم السري يجب أن يكون 6 أحرف على الأقل",
+      "full_name_required": "الاسم الكامل مطلوب",
+      "full_name_length": "يجب أن يتكون الاسم من 3 أحرف على الأقل",
+      "phone_required": "رقم الهاتف مطلوب",
+      "phone_not_match": "يرجى إدخال رقم هاتف صحيح",
+      "confirm_password_required": "يرجى تأكيد كلمة المرور",
+      "passwords_not_match": "كلمتا المرور غير متطابقتين"
     },
     "password_hint": "أدخل كلمة المرور",
     "show_password": "اظهر كلمه المرور",
@@ -55,13 +61,36 @@
       "no_account": "ليس لديك حساب؟",
       "register": "إنشاء حساب"
     },
+    "signup_screen": {
+      "create_account": "إنشاء\nحساب",
+      "subtitle": "انضم إلى Optima وابدأ\nرحلتك التعليمية اليوم",
+      "full_name": "الاسم الكامل",
+      "enter_full_name": "أدخل اسمك الكامل",
+      "email": "البريد الإلكتروني",
+      "enter_email": "أدخل بريدك الإلكتروني",
+      "phone_number": "رقم الهاتف",
+      "enter_phone_number": "أدخل رقم هاتفك",
+      "password": "كلمة المرور",
+      "create_password": "أنشئ كلمة مرور",
+      "confirm_password": "تأكيد كلمة المرور",
+      "confirm_your_password": "أعد إدخال كلمة المرور",
+      "agree_terms": "أوافق على ",
+      "terms_of_service": "شروط الاستخدام",
+      "and": " و ",
+      "privacy_policy": "سياسة الخصوصية.",
+      "create_account_button": "إنشاء حساب",
+      "already_have_account": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول"
+    },
+    "success": "تم انشاء الحساب بنجاح.",
     "error":{
       "weakPassword": "كلمة المرور ضعيفة جدًا.",
       "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
       "networkError": "تأكد من اتصالك بالإنترنت.",
       "genericError": "هناك خطأ ما، حاول مرة أخري.",
       "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
-      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى."
+      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى.",
+      "accept_terms_required": "accept terms is required"
     }
   },
   "home": {
