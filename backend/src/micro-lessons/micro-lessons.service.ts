@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
+import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class MicroLessonsService {
@@ -82,6 +83,11 @@ export class MicroLessonsService {
   }
 
   async reorder(missionId: string, orderedIds: string[], authToken: string) {
+    // Validate every id belongs to this mission before reordering.
+    const mission = await this.dc.executeQuery('AdminGetMission', { missionId }, authToken);
+    const validIds = (mission?.mission?.microLessons ?? []).map((m: any) => m.id);
+    assertReorderMembership(orderedIds, validIds, 'micro-lesson');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateMicroLessonOrder',

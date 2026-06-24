@@ -1,6 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto, LectureType } from './dto/lecture.dto';
+import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class LecturesService {
@@ -31,7 +32,15 @@ export class LecturesService {
     const section = (course?.course?.adminSections ?? []).find(
       (s: any) => s.id === sectionId,
     );
-    const lectures = section?.adminLectures ?? [];
+    // Reject if the section isn't part of the authorized course (the route's
+    // :courseId is what CourseAccessGuard checked) — otherwise a lecture could
+    // be attached to another course's section.
+    if (!section) {
+      throw new BadRequestException(
+        `Section ${sectionId} does not belong to course ${courseId}`,
+      );
+    }
+    const lectures = section.adminLectures ?? [];
     const maxOrder = lectures.reduce(
       (max: number, l: any) => Math.max(max, l.order ?? 0),
       0,
@@ -99,7 +108,20 @@ export class LecturesService {
     return { success: true };
   }
 
-  async reorder(sectionId: string, orderedIds: string[], authToken: string) {
+  async reorder(
+    courseId: string,
+    sectionId: string,
+    orderedIds: string[],
+    authToken: string,
+  ) {
+    // Validate every id belongs to this section before reordering.
+    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
+    const section = (course?.course?.adminSections ?? []).find(
+      (s: any) => s.id === sectionId,
+    );
+    const validIds = (section?.adminLectures ?? []).map((l: any) => l.id);
+    assertReorderMembership(orderedIds, validIds, 'lecture');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateLectureOrder',
@@ -112,6 +134,30 @@ export class LecturesService {
   }
 
   async move(lectureId: string, dto: MoveLectureDto, authToken: string) {
+    // The caller's ownership of the lecture is verified by the guard; here we
+    // ensure the target section is in the SAME course, so a lecture can't be
+    // moved into another course's section.
+    const lec = await this.dc.executeQuery('GetLectureContent', { lectureId }, authToken);
+    const sourceCourseId = lec?.courseLecture?.section?.course?.id;
+    if (!sourceCourseId) {
+      throw new NotFoundException(`Lecture ${lectureId} not found`);
+    }
+
+    const tgt = await this.dc.executeQuery(
+      'GetSectionCourse',
+      { sectionId: dto.targetSectionId },
+      authToken,
+    );
+    const targetCourseId = tgt?.courseSection?.course?.id;
+    if (!targetCourseId) {
+      throw new NotFoundException(`Section ${dto.targetSectionId} not found`);
+    }
+    if (sourceCourseId !== targetCourseId) {
+      throw new BadRequestException(
+        'Cannot move a lecture to a section in a different course',
+      );
+    }
+
     return this.dc.executeMutation(
       'AdminMoveLectureToSection',
       {

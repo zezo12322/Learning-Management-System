@@ -46,16 +46,32 @@ mutation SubmitQuizAnswer(
   )
 }
 
-# Marks a quiz attempt as finished with final score and passed status
-mutation FinishQuizAttempt($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: USER) {
-  quizAttempt_update(
-    id: $attemptId,
+# Atomically finalize an attempt only if it is still open (completedAt == null).
+# Returns the number of rows updated: 1 = this call finalized it, 0 = it was
+# already finalized by a concurrent finish/timeout (idempotency guard, H2).
+mutation FinishQuizAttemptIfOpen($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: USER) {
+  quizAttempt_updateMany(
+    where: { id: { eq: $attemptId }, completedAt: { eq: null } },
     data: {
       score: $score,
       passed: $passed,
       completedAt_expr: "request.time"
     }
   )
+}
+
+# Sweep query for the server-side timer (KAN-115): every in-progress,
+# time-limited attempt. Called by the QuizExpiryTask cron with admin
+# credentials, so it is NOT scoped to a single auth.uid.
+query GetExpiredAttempts @auth(level: USER) {
+  quizAttempts(where: { completedAt: { eq: null } }) {
+    id
+    startedAt
+    quiz {
+      id
+      timeLimitMinutes
+    }
+  }
 }
 
 # Counts user's attempts for a specific quiz (max-attempt validation)
@@ -166,6 +182,9 @@ query GetActiveQuizSession($attemptId: UUID!) @auth(level: USER) {
     id
     startedAt
     completedAt
+    user {
+      id
+    }
     quiz {
       timeLimitMinutes
       passingScore
@@ -357,20 +376,6 @@ mutation AdminUpdateQuizOptionOrder(
     id: $optionId,
     data: {
       order: $order
-    }
-  )
-}
-
-# Sets the time limit on a quiz (anti-cheating)
-mutation AdminSetQuizTimeLimit(
-  $quizId: UUID!,
-  $timeLimitMinutes: Int
-) @auth(level: USER) {
-  courseQuiz_update(
-    id: $quizId,
-    data: {
-      timeLimitMinutes: $timeLimitMinutes,
-      updatedAt_expr: "request.time"
     }
   )
 }

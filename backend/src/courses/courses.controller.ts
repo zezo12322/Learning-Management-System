@@ -12,10 +12,14 @@ import {
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto } from './dto/course.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { CourseAccessGuard } from '../common/guards/course-access.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
 @Controller('courses')
-@UseGuards(FirebaseAuthGuard)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
+@Roles('admin', 'instructor')
 export class CoursesController {
   constructor(
     private readonly coursesService: CoursesService,
@@ -33,11 +37,13 @@ export class CoursesController {
   }
 
   @Get(':courseId')
+  @UseGuards(CourseAccessGuard)
   findOne(@Param('courseId') courseId: string, @Req() req: any) {
     return this.coursesService.findOne(courseId, this.dc.extractToken(req));
   }
 
   @Patch(':courseId')
+  @UseGuards(CourseAccessGuard)
   update(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseDto,
@@ -47,6 +53,7 @@ export class CoursesController {
   }
 
   @Patch(':courseId/status')
+  @UseGuards(CourseAccessGuard)
   updateStatus(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseStatusDto,
@@ -56,6 +63,7 @@ export class CoursesController {
   }
 
   @Delete(':courseId')
+  @UseGuards(CourseAccessGuard)
   softDelete(@Param('courseId') courseId: string, @Req() req: any) {
     return this.coursesService.softDelete(courseId, this.dc.extractToken(req));
   }
@@ -65,6 +73,7 @@ export class CoursesController {
   // ==========================================
 
   @Post(':courseId/instructors')
+  @UseGuards(CourseAccessGuard)
   addInstructor(
     @Param('courseId') courseId: string,
     @Body('userId') userId: string,
@@ -74,6 +83,7 @@ export class CoursesController {
   }
 
   @Delete(':courseId/instructors/:userId')
+  @UseGuards(CourseAccessGuard)
   removeInstructor(
     @Param('courseId') courseId: string,
     @Param('userId') userId: string,
@@ -83,6 +93,7 @@ export class CoursesController {
   }
 
   @Get(':courseId/instructors')
+  @UseGuards(CourseAccessGuard)
   getInstructors(@Param('courseId') courseId: string, @Req() req: any) {
     return this.coursesService.getInstructors(courseId, this.dc.extractToken(req));
   }

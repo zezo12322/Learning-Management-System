@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { initializeApp, cert, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';
-import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 
 @Injectable()
@@ -28,9 +27,30 @@ export class FirebaseService implements OnModuleInit {
         return getAuth(this.firebaseApp);
     }
 
-    // Firestore service
-    getFirestore(): Firestore {
-        return getFirestore(this.firebaseApp);
+    /**
+     * Assign a global role to a user via Firebase custom claims. Sets both the
+     * `role` string and an `admin` boolean convenience flag. The change takes
+     * effect on the user's next token refresh.
+     */
+    async setUserRole(uid: string, role: 'admin' | 'instructor' | 'student'): Promise<void> {
+        await this.getAuth().setCustomUserClaims(uid, {
+            role,
+            admin: role === 'admin',
+        });
+    }
+
+    /**
+     * Mint a Google OAuth2 access token for the service-account credential.
+     * Used for privileged, server-only Data Connect calls (e.g. the quiz
+     * expiry cron) that have no end-user Firebase token / auth.uid.
+     */
+    async getAdminAccessToken(): Promise<string> {
+        const credential = this.firebaseApp.options.credential;
+        if (!credential?.getAccessToken) {
+            throw new Error('Service-account credential cannot mint access tokens');
+        }
+        const { access_token } = await credential.getAccessToken();
+        return access_token;
     }
 
     // Get the default storage bucket
@@ -62,19 +82,6 @@ export class FirebaseService implements OnModuleInit {
         await file.makePublic();
 
         return `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-    }
-
-    /**
-     * Delete a file from Firebase Storage.
-     */
-    async deleteFile(filePath: string): Promise<void> {
-        const bucket = this.getBucket();
-        const file = bucket.file(filePath);
-
-        const [exists] = await file.exists();
-        if (exists) {
-            await file.delete();
-        }
     }
 
     /**

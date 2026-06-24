@@ -13,10 +13,16 @@ import { MicroLessonsService } from './micro-lessons.service';
 import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { CourseAccessGuard } from '../common/guards/course-access.guard';
+import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
 @Controller('missions/:missionId/micro-lessons')
-@UseGuards(FirebaseAuthGuard)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
+@Roles('admin', 'instructor')
 export class MicroLessonsController {
   constructor(
     private readonly microLessonsService: MicroLessonsService,
@@ -24,6 +30,7 @@ export class MicroLessonsController {
   ) {}
 
   @Post()
+  @UseGuards(CourseAccessGuard)
   create(
     @Param('missionId') missionId: string,
     @Body() dto: CreateMicroLessonDto,
@@ -33,6 +40,8 @@ export class MicroLessonsController {
   }
 
   @Patch(':microLessonId')
+  @OwnsResource('microLesson')
+  @UseGuards(ResourceOwnershipGuard)
   update(
     @Param('microLessonId') microLessonId: string,
     @Body() dto: UpdateMicroLessonDto,
@@ -42,6 +51,8 @@ export class MicroLessonsController {
   }
 
   @Delete(':microLessonId')
+  @OwnsResource('microLesson')
+  @UseGuards(ResourceOwnershipGuard)
   delete(
     @Param('missionId') missionId: string,
     @Param('microLessonId') microLessonId: string,
@@ -55,6 +66,7 @@ export class MicroLessonsController {
   }
 
   @Put('reorder')
+  @UseGuards(CourseAccessGuard)
   reorder(
     @Param('missionId') missionId: string,
     @Body() dto: ReorderDto,
