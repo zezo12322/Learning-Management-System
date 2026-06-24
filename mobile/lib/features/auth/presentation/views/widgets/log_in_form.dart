@@ -87,7 +87,7 @@ class _LogInFormState extends State<LogInForm> {
               Navigator.pushNamedAndRemoveUntil(context, HomeView.routeName, (route) => false,);
             }
             if (state.status == LogInStatus.failure && state.errorMessage != null) {
-              buildSnackBar(context: context, text: state.errorMessage!);
+              buildSnackBar(context: context, text: state.errorMessage!, isError: true);
             }
           },
           child: Form(

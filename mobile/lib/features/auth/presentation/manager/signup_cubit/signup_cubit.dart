@@ -25,7 +25,7 @@ class SignupCubit extends Cubit<SignupState> {
   }
   void phoneChanged(){
     if(state.phoneError != null){
-      emit(state.copyWith(passwordError: null));
+      emit(state.copyWith(phoneError: null));
     }
   }
   void passwordChanged(){
@@ -58,7 +58,7 @@ class SignupCubit extends Cubit<SignupState> {
 
     emit(state.copyWith(status: SignupStatus.loading, errorMessage: null));
 
-    final response = await _authRepository.signupWithEmail(email: email, password: password);
+    final response = await _authRepository.signupWithEmail(email: email, password: password, fullName: fullName, phone: phone);
 
     response.fold(
       (failure) => emit(
