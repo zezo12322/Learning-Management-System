@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:optimatech_lms/core/services/fire_store_service.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
 import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
@@ -8,7 +9,9 @@ import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/s
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
   getIt.registerLazySingleton<FirebaseAuthService>(() => FirebaseAuthService(),);
-  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(firebaseAuthService: getIt<FirebaseAuthService>()),);
+  getIt.registerLazySingleton<FireStoreService>(() => FireStoreService(),);
+  getIt.registerLazySingleton<AuthRepository>(() =>
+      AuthRepositoryImpl(firebaseAuthService: getIt<FirebaseAuthService>(), fireStoreService: getIt<FireStoreService>()),);
   getIt.registerFactory<LogInCubit>(() => LogInCubit(authRepository: getIt<AuthRepository>()));
   getIt.registerFactory<SignupCubit>(() => SignupCubit(authRepository: getIt<AuthRepository>()));
 }
