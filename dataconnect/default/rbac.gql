@@ -48,7 +48,7 @@ query GetMyMissionAccess($missionId: UUID!) @auth(level: USER) {
       createdBy {
         id
       }
-      myInstructorLink: courseInstructors_on_course(
+      myMissionCourseInstructorLink: courseInstructors_on_course(
         where: { userId: { eq_expr: "auth.uid" } }
       ) {
         user {
