@@ -39,28 +39,6 @@ mutation AdminDeleteCourse($courseId: UUID!) @auth(level: USER) {
   )
 }
 
-# Add a lecture to an existing course section
-mutation AdminCreateLecture(
-  $sectionId: UUID!,
-  $title: String!,
-  $type: LectureType!,
-  $videoUrl: String,
-  $content: String,
-  $order: Int!
-) @auth(level: USER) {
-  courseLecture_insert(
-    data: {
-      sectionId: $sectionId,
-      title: $title,
-      type: $type,
-      videoUrl: $videoUrl,
-      content: $content,
-      isFreePreview: false,
-      order: $order
-    }
-  )
-}
-
 # ==========================================
 # 2. SESSION & LIVE CLASS SCHEDULING
 # ==========================================

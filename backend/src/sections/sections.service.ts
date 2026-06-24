@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto';
+import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class SectionsService {
@@ -68,6 +69,11 @@ export class SectionsService {
   }
 
   async reorder(courseId: string, orderedIds: string[], authToken: string) {
+    // Validate every id belongs to this course before reordering.
+    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
+    const validIds = (course?.course?.adminSections ?? []).map((s: any) => s.id);
+    assertReorderMembership(orderedIds, validIds, 'section');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateSectionOrder',

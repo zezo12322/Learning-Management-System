@@ -13,11 +13,16 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TemplatesService } from './templates.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { CourseAccessGuard } from '../common/guards/course-access.guard';
+import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
 @Controller('missions/:missionId/templates')
-@UseGuards(FirebaseAuthGuard)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
 export class TemplatesController {
   constructor(
     private readonly templatesService: TemplatesService,
@@ -25,6 +30,8 @@ export class TemplatesController {
   ) {}
 
   @Post()
+  @Roles('admin', 'instructor')
+  @UseGuards(CourseAccessGuard)
   @UseInterceptors(FileInterceptor('file', { storage: undefined }))
   upload(
     @Param('missionId') missionId: string,
@@ -46,6 +53,9 @@ export class TemplatesController {
   }
 
   @Delete(':templateId')
+  @Roles('admin', 'instructor')
+  @OwnsResource('template')
+  @UseGuards(ResourceOwnershipGuard)
   delete(
     @Param('missionId') missionId: string,
     @Param('templateId') templateId: string,

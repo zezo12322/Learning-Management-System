@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CreateCriterionDto, UpdateCriterionDto } from './dto/criterion.dto';
+import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class RubricService {
@@ -70,6 +71,11 @@ export class RubricService {
   }
 
   async reorder(missionId: string, orderedIds: string[], authToken: string) {
+    // Validate every id belongs to this mission before reordering.
+    const mission = await this.dc.executeQuery('AdminGetMission', { missionId }, authToken);
+    const validIds = (mission?.mission?.criteria ?? []).map((c: any) => c.id);
+    assertReorderMembership(orderedIds, validIds, 'criterion');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateRubricCriterionOrder',

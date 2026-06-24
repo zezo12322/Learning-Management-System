@@ -7,6 +7,7 @@ import {
   GatewayTimeoutException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { FirebaseService } from './firebase.service';
 
 /**
  * Service for executing GraphQL operations against Firebase Data Connect.
@@ -20,7 +21,10 @@ export class DataConnectService {
   private readonly apiKey: string;
   private readonly timeoutMs: number;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly firebaseService: FirebaseService,
+  ) {
     const projectId = this.configService.get<string>('FIREBASE_PROJECT_ID', 'learning-management-syst-3cc3a');
     const location = this.configService.get<string>('FDC_LOCATION', 'europe-west8');
     const serviceId = this.configService.get<string>('FDC_SERVICE_ID', 'learning-management-syst-3cc3a-service');
@@ -60,6 +64,27 @@ export class DataConnectService {
   }
 
   /**
+   * Execute a query with the backend's service-account credential instead of an
+   * end-user token. Runs with admin privileges and no auth.uid — use only for
+   * trusted, server-initiated work (e.g. the quiz expiry cron). Never expose an
+   * admin-executed operation to a request whose role hasn't been verified.
+   */
+  async executeQueryAsAdmin<T = any>(
+    operationName: string,
+    variables?: Record<string, any>,
+  ): Promise<T> {
+    return this.execute<T>('executeQuery', operationName, variables, undefined, true);
+  }
+
+  /** Mutation counterpart of {@link executeQueryAsAdmin}. */
+  async executeMutationAsAdmin<T = any>(
+    operationName: string,
+    variables?: Record<string, any>,
+  ): Promise<T> {
+    return this.execute<T>('executeMutation', operationName, variables, undefined, true);
+  }
+
+  /**
    * Internal method to execute FDC operations via REST API.
    */
   private async execute<T>(
@@ -67,6 +92,7 @@ export class DataConnectService {
     operationName: string,
     variables?: Record<string, any>,
     authToken?: string,
+    useAdmin = false,
   ): Promise<T> {
     const url = `${this.baseUrl}:${action}`;
 
@@ -74,8 +100,13 @@ export class DataConnectService {
       'Content-Type': 'application/json',
     };
 
-    // Use Firebase Auth token for user-level operations
-    if (authToken) {
+    if (useAdmin) {
+      // Privileged server-to-server call: authenticate with the service-account
+      // OAuth token. The request runs as admin (no auth.uid).
+      const adminToken = await this.firebaseService.getAdminAccessToken();
+      headers['Authorization'] = `Bearer ${adminToken}`;
+    } else if (authToken) {
+      // Use Firebase Auth token for user-level operations
       headers['x-firebase-auth-token'] = authToken;
     }
 

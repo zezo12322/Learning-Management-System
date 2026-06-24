@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   BadRequestException,
   ForbiddenException,
   GoneException,
@@ -7,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CompletionService } from '../completion/completion.service';
+import { assertReorderMembership } from '../common/utils/ordering';
 import {
   CreateQuizDto,
   UpdateQuizDto,
@@ -18,16 +20,57 @@ import {
 
 @Injectable()
 export class QuizzesService {
+  private readonly logger = new Logger(QuizzesService.name);
+
   constructor(
     private readonly dc: DataConnectService,
     private readonly completionService: CompletionService,
   ) {}
 
+  /**
+   * Guards against IDOR (C3): a caller may only act on their own attempt.
+   * `callerUid` is omitted for trusted internal callers (e.g. the expiry cron,
+   * which runs with admin credentials and no auth.uid).
+   */
+  private assertOwnsAttempt(attempt: any, callerUid?: string) {
+    if (callerUid && attempt?.user?.id && attempt.user.id !== callerUid) {
+      throw new ForbiddenException('This attempt does not belong to you');
+    }
+  }
+
+  /**
+   * Student-safe quiz fetch for taking: questions and options WITHOUT the
+   * `isCorrect` answer key (fixes C2). Resolves the quiz's lecture, then loads
+   * the answer-free question set.
+   */
+  async getQuizForTaking(quizId: string, authToken: string) {
+    const settings = await this.dc.executeQuery(
+      'GetQuizSettings',
+      { quizId },
+      authToken,
+    );
+    const lectureId = settings?.courseQuiz?.lecture?.id;
+    if (!lectureId) {
+      throw new NotFoundException(`Quiz ${quizId} not found`);
+    }
+    const data = await this.dc.executeQuery(
+      'GetQuizQuestions',
+      { lectureId },
+      authToken,
+    );
+    return data?.courseQuizs?.[0] ?? null;
+  }
+
   // ==========================================
   // QUIZ BUILDER
   // ==========================================
 
-  async createQuiz(lectureId: string, dto: CreateQuizDto, authToken: string) {
+  async createQuiz(
+    courseId: string,
+    lectureId: string,
+    dto: CreateQuizDto,
+    authToken: string,
+  ) {
     // Validate the lecture exists and is a QUIZ-type lecture
     const lectureData = await this.dc.executeQuery(
       'GetLectureContent',
@@ -37,6 +80,11 @@ export class QuizzesService {
     const lecture = lectureData?.courseLecture;
     if (!lecture) {
       throw new NotFoundException(`Lecture ${lectureId} not found`);
+    }
+    // Ensure the lecture actually belongs to the course the caller is authorized
+    // for — the route's :courseId is what CourseAccessGuard checked.
+    if (lecture.section?.course?.id !== courseId) {
+      throw new BadRequestException('Lecture does not belong to this course');
     }
     if (lecture.type !== 'QUIZ') {
       throw new BadRequestException(
@@ -241,6 +289,11 @@ export class QuizzesService {
   }
 
   async reorderQuestions(quizId: string, orderedIds: string[], authToken: string) {
+    // Validate every id belongs to this quiz before reordering.
+    const quiz = await this.getQuiz(quizId, authToken);
+    const validIds = (quiz.adminQuestions ?? []).map((q: any) => q.id);
+    assertReorderMembership(orderedIds, validIds, 'question');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateQuizQuestionOrder',
@@ -266,6 +319,15 @@ export class QuizzesService {
   }
 
   async reorderOptions(questionId: string, orderedIds: string[], authToken: string) {
+    // Validate every id belongs to this question before reordering.
+    const existing = await this.dc.executeQuery(
+      'GetQuestionOptions',
+      { questionId },
+      authToken,
+    );
+    const validIds = (existing?.quizOptions ?? []).map((o: any) => o.id);
+    assertReorderMembership(orderedIds, validIds, 'option');
+
     const updates = orderedIds.map((id, index) =>
       this.dc.executeMutation(
         'AdminUpdateQuizOptionOrder',
@@ -335,7 +397,12 @@ export class QuizzesService {
     return this.dc.executeMutation('StartQuizAttempt', { quizId }, authToken);
   }
 
-  async submitAnswer(attemptId: string, dto: SubmitAnswerDto, authToken: string) {
+  async submitAnswer(
+    attemptId: string,
+    dto: SubmitAnswerDto,
+    authToken: string,
+    callerUid?: string,
+  ) {
     // Validate attempt is still active
     const attemptData = await this.dc.executeQuery(
       'GetQuizAttemptById',
@@ -347,6 +414,7 @@ export class QuizzesService {
     if (!attempt) {
       throw new NotFoundException(`Attempt ${attemptId} not found`);
     }
+    this.assertOwnsAttempt(attempt, callerUid);
     if (attempt.completedAt) {
       throw new BadRequestException('This attempt is already completed');
     }
@@ -357,7 +425,7 @@ export class QuizzesService {
       const elapsed = (Date.now() - startTime) / 1000 / 60;
       if (elapsed > attempt.quiz.timeLimitMinutes) {
         // Auto-finish with whatever answers exist
-        const result = await this.autoGrade(attemptId, authToken);
+        const result = await this.autoGrade(attemptId, { token: authToken });
         throw new GoneException({
           message: 'Session timed out. Attempt auto-graded.',
           ...result,
@@ -398,7 +466,7 @@ export class QuizzesService {
     );
   }
 
-  async finishAttempt(attemptId: string, authToken: string) {
+  async finishAttempt(attemptId: string, authToken: string, callerUid?: string) {
     // Validate attempt is still active
     const attemptData = await this.dc.executeQuery(
       'GetQuizAttemptById',
@@ -410,39 +478,47 @@ export class QuizzesService {
     if (!attempt) {
       throw new NotFoundException(`Attempt ${attemptId} not found`);
     }
+    this.assertOwnsAttempt(attempt, callerUid);
     if (attempt.completedAt) {
       throw new BadRequestException('This attempt is already completed');
     }
 
-    return this.autoGrade(attemptId, authToken);
+    return this.autoGrade(attemptId, { token: authToken });
   }
 
   /**
-   * Auto-grade: compare selected answers to correct answers,
-   * compute weighted score, determine pass/fail.
+   * Auto-grade: compare selected answers to correct answers, compute weighted
+   * score, determine pass/fail, and atomically finalize the attempt.
+   *
+   * `ctx` selects the auth used for every Data Connect call:
+   *  - `{ token }`  → the student's request (normal finish/submit/timeout path)
+   *  - `{ admin: true }` → service credentials, for the expiry cron (no auth.uid).
+   * The KAN-116 completion/certificate trigger only runs on the user path,
+   * since those mutations are scoped to the student's auth.uid.
    */
-  async autoGrade(attemptId: string, authToken: string) {
+  async autoGrade(attemptId: string, ctx: { token?: string; admin?: boolean }) {
+    const query = <T = any>(op: string, vars?: Record<string, any>): Promise<T> =>
+      ctx.admin
+        ? this.dc.executeQueryAsAdmin<T>(op, vars)
+        : this.dc.executeQuery<T>(op, vars, ctx.token);
+    const mutate = <T = any>(op: string, vars?: Record<string, any>): Promise<T> =>
+      ctx.admin
+        ? this.dc.executeMutationAsAdmin<T>(op, vars)
+        : this.dc.executeMutation<T>(op, vars, ctx.token);
+
     // Get all answers with correct flags
-    const answersData = await this.dc.executeQuery(
-      'GetAttemptAnswersWithCorrect',
-      { attemptId },
-      authToken,
-    );
+    const answersData = await query('GetAttemptAnswersWithCorrect', { attemptId });
     const answers = answersData?.quizAttemptAnswers ?? [];
 
     // Get attempt details for passing score and the owning quiz id
-    const attemptData = await this.dc.executeQuery(
-      'GetQuizAttemptById',
-      { attemptId },
-      authToken,
-    );
+    const attemptData = await query('GetQuizAttemptById', { attemptId });
     const passingScore = attemptData?.quizAttempt?.quiz?.passingScore ?? 0;
     const quizId = attemptData?.quizAttempt?.quiz?.id;
 
     // Denominator = total points of EVERY non-deleted question in the quiz,
     // so skipped/unanswered questions are graded as zero (not ignored).
     const questionsData = quizId
-      ? await this.dc.executeQuery('GetQuizQuestionPoints', { quizId }, authToken)
+      ? await query('GetQuizQuestionPoints', { quizId })
       : null;
     const allQuestions: any[] = questionsData?.quizQuestions ?? [];
     const totalPoints = allQuestions.reduce(
@@ -464,33 +540,56 @@ export class QuizzesService {
     const score = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0;
     const passed = score >= passingScore;
 
-    // Persist the result
-    await this.dc.executeMutation(
-      'FinishQuizAttempt',
-      { attemptId, score, passed },
-      authToken,
-    );
+    // Persist atomically: only finalize if the attempt is still open. A return
+    // of 0 means a concurrent finish/timeout already graded it — in that case
+    // skip the completion trigger so certificates aren't generated twice (H2).
+    const finishResult = await mutate('FinishQuizAttemptIfOpen', {
+      attemptId,
+      score,
+      passed,
+    });
+    const rowsUpdated = finishResult?.quizAttempt_updateMany ?? 0;
+    if (rowsUpdated === 0) {
+      this.logger.debug(
+        `Attempt ${attemptId} was already finalized; skipping completion trigger`,
+      );
+      return {
+        score: Math.round(score * 100) / 100,
+        passed,
+        totalPoints,
+        earnedPoints,
+        correctCount,
+        answeredCount: answers.length,
+        totalQuestions,
+        alreadyFinalized: true,
+      };
+    }
 
-    // Trigger 1 (KAN-116): on pass, mark the quiz lecture complete and
-    // re-check course completion. Best-effort — never fails the grading.
-    if (passed) {
-      const quizId = attemptData?.quizAttempt?.quiz?.id;
+    // Trigger 1 (KAN-116): on pass, mark the quiz lecture complete and re-check
+    // course completion. Only on the user path — completion mutations are scoped
+    // to the student's auth.uid, which the admin/cron context does not carry.
+    if (passed && !ctx.admin && ctx.token) {
       if (quizId) {
         try {
-          const settings = await this.dc.executeQuery(
-            'GetQuizSettings',
-            { quizId },
-            authToken,
-          );
+          const settings = await query('GetQuizSettings', { quizId });
           const lectureId = settings?.courseQuiz?.lecture?.id;
           const courseId = settings?.courseQuiz?.lecture?.section?.course?.id;
           if (lectureId && courseId) {
-            await this.completionService.onQuizPassed(lectureId, courseId, authToken);
+            await this.completionService.onQuizPassed(
+              lectureId,
+              courseId,
+              ctx.token,
+            );
           }
         } catch {
           // swallow — completion tracking is non-critical
         }
       }
+    } else if (passed && ctx.admin) {
+      this.logger.warn(
+        `Attempt ${attemptId} auto-finalized as PASSED by the expiry cron; ` +
+          `completion/certificate trigger deferred (no user auth context)`,
+      );
     }
 
     return {
@@ -508,7 +607,7 @@ export class QuizzesService {
   // SESSION MANAGEMENT (KAN-115)
   // ==========================================
 
-  async heartbeat(attemptId: string, authToken: string) {
+  async heartbeat(attemptId: string, authToken: string, callerUid?: string) {
     const sessionData = await this.dc.executeQuery(
       'GetActiveQuizSession',
       { attemptId },
@@ -519,6 +618,7 @@ export class QuizzesService {
     if (!attempt) {
       throw new NotFoundException(`Attempt ${attemptId} not found`);
     }
+    this.assertOwnsAttempt(attempt, callerUid);
     if (attempt.completedAt) {
       return { active: false, message: 'Attempt already completed' };
     }
@@ -535,7 +635,7 @@ export class QuizzesService {
 
     if (remaining <= 0) {
       // Auto-finish
-      const result = await this.autoGrade(attemptId, authToken);
+      const result = await this.autoGrade(attemptId, { token: authToken });
       return { active: false, message: 'Session timed out', ...result };
     }
 

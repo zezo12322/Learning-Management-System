@@ -1,12 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { AccessService } from '../common/services/access.service';
 import { CreateMissionDto, UpdateMissionDto } from './dto/mission.dto';
 
 @Injectable()
 export class MissionsService {
-  constructor(private readonly dc: DataConnectService) {}
+  constructor(
+    private readonly dc: DataConnectService,
+    private readonly access: AccessService,
+  ) {}
 
-  async create(dto: CreateMissionDto, authToken: string) {
+  async create(
+    dto: CreateMissionDto,
+    authToken: string,
+    uid: string,
+    isAdmin: boolean,
+  ) {
+    // If the mission is attached to a course, the caller must own that course
+    // (route-based guards can't check a body field).
+    if (dto.courseId) {
+      await this.access.assertCourseAccess(dto.courseId, uid, authToken, isAdmin);
+    }
     return this.dc.executeMutation(
       'AdminCreateMission',
       {

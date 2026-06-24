@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
+import { CommonModule } from './common/common.module';
+import { AdminModule } from './admin/admin.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { CoursesModule } from './courses/courses.module';
 import { SectionsModule } from './sections/sections.module';
@@ -20,6 +23,9 @@ import { CompletionModule } from './completion/completion.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
+    CommonModule,
+    AdminModule,
     FirebaseModule,
     CoursesModule,
     SectionsModule,

@@ -8,8 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const schedule_1 = require("@nestjs/schedule");
 const app_controller_1 = require("./app.controller");
 const config_module_1 = require("@nestjs/config/dist/config.module");
+const common_module_1 = require("./common/common.module");
+const admin_module_1 = require("./admin/admin.module");
 const firebase_module_1 = require("./firebase/firebase.module");
 const courses_module_1 = require("./courses/courses.module");
 const sections_module_1 = require("./sections/sections.module");
@@ -32,6 +35,9 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
                 envFilePath: '.env',
             }),
+            schedule_1.ScheduleModule.forRoot(),
+            common_module_1.CommonModule,
+            admin_module_1.AdminModule,
             firebase_module_1.FirebaseModule,
             courses_module_1.CoursesModule,
             sections_module_1.SectionsModule,

@@ -3,8 +3,6 @@
  * Centralizes all storage path conventions for the LMS platform.
  */
 
-export const STORAGE_BUCKET_SUFFIX = '.appspot.com';
-
 // ==========================================
 // COURSE STORAGE PATHS
 // ==========================================
@@ -25,9 +23,6 @@ export const CourseStoragePaths = {
 // ==========================================
 
 export const MissionStoragePaths = {
-  microLessonAsset: (missionId: string, microLessonId: string, filename: string) =>
-    `missions/${missionId}/micro-lessons/${microLessonId}/${filename}`,
-
   template: (missionId: string, templateId: string, filename: string) =>
     `missions/${missionId}/templates/${templateId}/${filename}`,
 } as const;

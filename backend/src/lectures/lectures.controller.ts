@@ -14,10 +14,14 @@ import { LecturesService } from './lectures.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
 @Controller()
-@UseGuards(FirebaseAuthGuard)
+@UseGuards(FirebaseAuthGuard, RolesGuard)
 export class LecturesController {
   constructor(
     private readonly lecturesService: LecturesService,
@@ -25,6 +29,9 @@ export class LecturesController {
   ) {}
 
   @Post('courses/:courseId/sections/:sectionId/lectures')
+  @Roles('admin', 'instructor')
+  @OwnsResource('section')
+  @UseGuards(ResourceOwnershipGuard)
   create(
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
@@ -35,6 +42,9 @@ export class LecturesController {
   }
 
   @Patch('courses/:courseId/sections/:sectionId/lectures/:lectureId')
+  @Roles('admin', 'instructor')
+  @OwnsResource('lecture')
+  @UseGuards(ResourceOwnershipGuard)
   update(
     @Param('lectureId') lectureId: string,
     @Body() dto: UpdateLectureDto,
@@ -44,6 +54,9 @@ export class LecturesController {
   }
 
   @Delete('courses/:courseId/sections/:sectionId/lectures/:lectureId')
+  @Roles('admin', 'instructor')
+  @OwnsResource('lecture')
+  @UseGuards(ResourceOwnershipGuard)
   softDelete(
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
@@ -59,15 +72,22 @@ export class LecturesController {
   }
 
   @Put('courses/:courseId/sections/:sectionId/lectures/reorder')
+  @Roles('admin', 'instructor')
+  @OwnsResource('section')
+  @UseGuards(ResourceOwnershipGuard)
   reorder(
+    @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Body() dto: ReorderDto,
     @Req() req: any,
   ) {
-    return this.lecturesService.reorder(sectionId, dto.orderedIds, this.dc.extractToken(req));
+    return this.lecturesService.reorder(courseId, sectionId, dto.orderedIds, this.dc.extractToken(req));
   }
 
   @Patch('courses/:courseId/lectures/:lectureId/move')
+  @Roles('admin', 'instructor')
+  @OwnsResource('lecture')
+  @UseGuards(ResourceOwnershipGuard)
   move(
     @Param('lectureId') lectureId: string,
     @Body() dto: MoveLectureDto,
