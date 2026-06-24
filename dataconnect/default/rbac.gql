@@ -19,7 +19,9 @@ query GetMyCourseAccess($courseId: UUID!) @auth(level: USER) {
     createdBy {
       id
     }
-    courseInstructors_on_course(where: { userId: { eq_expr: "auth.uid" } }) {
+    myInstructorLink: courseInstructors_on_course(
+      where: { userId: { eq_expr: "auth.uid" } }
+    ) {
       user {
         id
       }
@@ -46,7 +48,9 @@ query GetMyMissionAccess($missionId: UUID!) @auth(level: USER) {
       createdBy {
         id
       }
-      courseInstructors_on_course(where: { userId: { eq_expr: "auth.uid" } }) {
+      myInstructorLink: courseInstructors_on_course(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) {
         user {
           id
         }
