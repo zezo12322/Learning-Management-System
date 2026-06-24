@@ -13,7 +13,7 @@ class AdminDeleteMissionTemplateVariablesBuilder {
 
   MutationRef<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables> ref() {
     AdminDeleteMissionTemplateVariables vars= AdminDeleteMissionTemplateVariables(templateId: templateId,);
-    return _dataConnect.mutation('AdminDeleteMissionTemplate', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteMissionTemplate", dataDeserializer, varsSerializer, vars);
   }
 }
 

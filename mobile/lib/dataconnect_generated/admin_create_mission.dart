@@ -7,7 +7,7 @@ class AdminCreateMissionVariablesBuilder {
   String categoryId;
   MissionDifficulty difficulty;
   List<String> skillsTested;
-  final Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminCreateMissionVariablesBuilder courseId(String? t) {
    _courseId.value = t;
@@ -23,7 +23,7 @@ class AdminCreateMissionVariablesBuilder {
 
   MutationRef<AdminCreateMissionData, AdminCreateMissionVariables> ref() {
     AdminCreateMissionVariables vars= AdminCreateMissionVariables(title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,courseId: _courseId,);
-    return _dataConnect.mutation('AdminCreateMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -13,7 +13,7 @@ class GetAttemptAnswersWithCorrectVariablesBuilder {
 
   QueryRef<GetAttemptAnswersWithCorrectData, GetAttemptAnswersWithCorrectVariables> ref() {
     GetAttemptAnswersWithCorrectVariables vars= GetAttemptAnswersWithCorrectVariables(attemptId: attemptId,);
-    return _dataConnect.query('GetAttemptAnswersWithCorrect', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetAttemptAnswersWithCorrect", dataDeserializer, varsSerializer, vars);
   }
 }
 

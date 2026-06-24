@@ -13,7 +13,7 @@ class AdminDeleteRubricCriterionVariablesBuilder {
 
   MutationRef<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables> ref() {
     AdminDeleteRubricCriterionVariables vars= AdminDeleteRubricCriterionVariables(criterionId: criterionId,);
-    return _dataConnect.mutation('AdminDeleteRubricCriterion', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteRubricCriterion", dataDeserializer, varsSerializer, vars);
   }
 }
 

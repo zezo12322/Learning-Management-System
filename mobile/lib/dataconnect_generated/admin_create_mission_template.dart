@@ -16,7 +16,7 @@ class AdminCreateMissionTemplateVariablesBuilder {
 
   MutationRef<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables> ref() {
     AdminCreateMissionTemplateVariables vars= AdminCreateMissionTemplateVariables(missionId: missionId,title: title,fileUrl: fileUrl,fileType: fileType,);
-    return _dataConnect.mutation('AdminCreateMissionTemplate', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateMissionTemplate", dataDeserializer, varsSerializer, vars);
   }
 }
 

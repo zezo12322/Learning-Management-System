@@ -13,7 +13,7 @@ class AdminSoftDeleteLectureVariablesBuilder {
 
   MutationRef<AdminSoftDeleteLectureData, AdminSoftDeleteLectureVariables> ref() {
     AdminSoftDeleteLectureVariables vars= AdminSoftDeleteLectureVariables(lectureId: lectureId,);
-    return _dataConnect.mutation('AdminSoftDeleteLecture', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminSoftDeleteLecture", dataDeserializer, varsSerializer, vars);
   }
 }
 

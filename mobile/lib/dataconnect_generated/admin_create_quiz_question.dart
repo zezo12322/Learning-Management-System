@@ -5,7 +5,7 @@ class AdminCreateQuizQuestionVariablesBuilder {
   String questionText;
   int order;
   double points;
-  final Optional<String> _explanation = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _explanation = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminCreateQuizQuestionVariablesBuilder explanation(String? t) {
    _explanation.value = t;
@@ -21,7 +21,7 @@ class AdminCreateQuizQuestionVariablesBuilder {
 
   MutationRef<AdminCreateQuizQuestionData, AdminCreateQuizQuestionVariables> ref() {
     AdminCreateQuizQuestionVariables vars= AdminCreateQuizQuestionVariables(quizId: quizId,questionText: questionText,order: order,points: points,explanation: _explanation,);
-    return _dataConnect.mutation('AdminCreateQuizQuestion', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateQuizQuestion", dataDeserializer, varsSerializer, vars);
   }
 }
 

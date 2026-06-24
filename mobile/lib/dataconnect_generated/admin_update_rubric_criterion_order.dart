@@ -14,7 +14,7 @@ class AdminUpdateRubricCriterionOrderVariablesBuilder {
 
   MutationRef<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables> ref() {
     AdminUpdateRubricCriterionOrderVariables vars= AdminUpdateRubricCriterionOrderVariables(criterionId: criterionId,order: order,);
-    return _dataConnect.mutation('AdminUpdateRubricCriterionOrder', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateRubricCriterionOrder", dataDeserializer, varsSerializer, vars);
   }
 }
 

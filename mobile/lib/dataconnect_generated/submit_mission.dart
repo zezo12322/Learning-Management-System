@@ -14,7 +14,7 @@ class SubmitMissionVariablesBuilder {
 
   MutationRef<SubmitMissionData, SubmitMissionVariables> ref() {
     SubmitMissionVariables vars= SubmitMissionVariables(missionId: missionId,fileUrl: fileUrl,);
-    return _dataConnect.mutation('SubmitMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("SubmitMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

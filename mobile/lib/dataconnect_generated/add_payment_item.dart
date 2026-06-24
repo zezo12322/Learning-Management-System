@@ -3,9 +3,9 @@ part of 'generated.dart';
 class AddPaymentItemVariablesBuilder {
   String paymentId;
   PaymentItemTarget targetType;
-  final Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _missionId = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _subscriptionTierId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _missionId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _subscriptionTierId = Optional.optional(nativeFromJson, nativeToJson);
   int price;
 
   final FirebaseDataConnect _dataConnect;  AddPaymentItemVariablesBuilder courseId(String? t) {
@@ -30,7 +30,7 @@ class AddPaymentItemVariablesBuilder {
 
   MutationRef<AddPaymentItemData, AddPaymentItemVariables> ref() {
     AddPaymentItemVariables vars= AddPaymentItemVariables(paymentId: paymentId,targetType: targetType,courseId: _courseId,missionId: _missionId,subscriptionTierId: _subscriptionTierId,price: price,);
-    return _dataConnect.mutation('AddPaymentItem', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AddPaymentItem", dataDeserializer, varsSerializer, vars);
   }
 }
 

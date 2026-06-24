@@ -13,7 +13,7 @@ class GetUserLectureProgressVariablesBuilder {
 
   QueryRef<GetUserLectureProgressData, GetUserLectureProgressVariables> ref() {
     GetUserLectureProgressVariables vars= GetUserLectureProgressVariables(lectureId: lectureId,);
-    return _dataConnect.query('GetUserLectureProgress', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetUserLectureProgress", dataDeserializer, varsSerializer, vars);
   }
 }
 

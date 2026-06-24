@@ -13,7 +13,7 @@ class AdminDeleteQuizOptionVariablesBuilder {
 
   MutationRef<AdminDeleteQuizOptionData, AdminDeleteQuizOptionVariables> ref() {
     AdminDeleteQuizOptionVariables vars= AdminDeleteQuizOptionVariables(optionId: optionId,);
-    return _dataConnect.mutation('AdminDeleteQuizOption', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteQuizOption", dataDeserializer, varsSerializer, vars);
   }
 }
 

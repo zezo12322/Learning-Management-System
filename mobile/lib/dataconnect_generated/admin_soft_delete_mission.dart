@@ -13,7 +13,7 @@ class AdminSoftDeleteMissionVariablesBuilder {
 
   MutationRef<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables> ref() {
     AdminSoftDeleteMissionVariables vars= AdminSoftDeleteMissionVariables(missionId: missionId,);
-    return _dataConnect.mutation('AdminSoftDeleteMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminSoftDeleteMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

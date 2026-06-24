@@ -13,7 +13,7 @@ class GetMissionTemplatesVariablesBuilder {
 
   QueryRef<GetMissionTemplatesData, GetMissionTemplatesVariables> ref() {
     GetMissionTemplatesVariables vars= GetMissionTemplatesVariables(missionId: missionId,);
-    return _dataConnect.query('GetMissionTemplates', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetMissionTemplates", dataDeserializer, varsSerializer, vars);
   }
 }
 

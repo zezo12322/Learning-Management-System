@@ -13,7 +13,7 @@ class GetLectureContentVariablesBuilder {
 
   QueryRef<GetLectureContentData, GetLectureContentVariables> ref() {
     GetLectureContentVariables vars= GetLectureContentVariables(lectureId: lectureId,);
-    return _dataConnect.query('GetLectureContent', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetLectureContent", dataDeserializer, varsSerializer, vars);
   }
 }
 

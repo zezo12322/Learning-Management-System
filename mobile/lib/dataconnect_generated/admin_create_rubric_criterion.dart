@@ -3,7 +3,7 @@ part of 'generated.dart';
 class AdminCreateRubricCriterionVariablesBuilder {
   String missionId;
   String criterionName;
-  final Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
   double maxPoints;
   int order;
 
@@ -21,7 +21,7 @@ class AdminCreateRubricCriterionVariablesBuilder {
 
   MutationRef<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables> ref() {
     AdminCreateRubricCriterionVariables vars= AdminCreateRubricCriterionVariables(missionId: missionId,criterionName: criterionName,description: _description,maxPoints: maxPoints,order: order,);
-    return _dataConnect.mutation('AdminCreateRubricCriterion', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateRubricCriterion", dataDeserializer, varsSerializer, vars);
   }
 }
 

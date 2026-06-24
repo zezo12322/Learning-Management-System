@@ -13,7 +13,7 @@ class GetUserEnrollmentForCourseVariablesBuilder {
 
   QueryRef<GetUserEnrollmentForCourseData, GetUserEnrollmentForCourseVariables> ref() {
     GetUserEnrollmentForCourseVariables vars= GetUserEnrollmentForCourseVariables(courseId: courseId,);
-    return _dataConnect.query('GetUserEnrollmentForCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetUserEnrollmentForCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

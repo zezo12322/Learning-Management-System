@@ -12,7 +12,7 @@ class ListPublishedCoursesVariablesBuilder {
 
   QueryRef<ListPublishedCoursesData, void> ref() {
     
-    return _dataConnect.query('ListPublishedCourses', dataDeserializer, emptySerializer, null);
+    return _dataConnect.query("ListPublishedCourses", dataDeserializer, emptySerializer, null);
   }
 }
 

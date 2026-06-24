@@ -12,7 +12,7 @@ class AdminListMyCoursesVariablesBuilder {
 
   QueryRef<AdminListMyCoursesData, void> ref() {
     
-    return _dataConnect.query('AdminListMyCourses', dataDeserializer, emptySerializer, null);
+    return _dataConnect.query("AdminListMyCourses", dataDeserializer, emptySerializer, null);
   }
 }
 

@@ -13,7 +13,7 @@ class GetMyCourseProgressVariablesBuilder {
 
   QueryRef<GetMyCourseProgressData, GetMyCourseProgressVariables> ref() {
     GetMyCourseProgressVariables vars= GetMyCourseProgressVariables(courseId: courseId,);
-    return _dataConnect.query('GetMyCourseProgress', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetMyCourseProgress", dataDeserializer, varsSerializer, vars);
   }
 }
 

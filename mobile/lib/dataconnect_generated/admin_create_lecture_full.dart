@@ -4,10 +4,10 @@ class AdminCreateLectureFullVariablesBuilder {
   String sectionId;
   String title;
   LectureType type;
-  final Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _duration = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _transcriptUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _duration = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _transcriptUrl = Optional.optional(nativeFromJson, nativeToJson);
   bool isFreePreview;
   int order;
 
@@ -37,7 +37,7 @@ class AdminCreateLectureFullVariablesBuilder {
 
   MutationRef<AdminCreateLectureFullData, AdminCreateLectureFullVariables> ref() {
     AdminCreateLectureFullVariables vars= AdminCreateLectureFullVariables(sectionId: sectionId,title: title,type: type,videoUrl: _videoUrl,content: _content,duration: _duration,transcriptUrl: _transcriptUrl,isFreePreview: isFreePreview,order: order,);
-    return _dataConnect.mutation('AdminCreateLectureFull', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateLectureFull", dataDeserializer, varsSerializer, vars);
   }
 }
 

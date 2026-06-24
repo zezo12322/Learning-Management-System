@@ -2,9 +2,9 @@ part of 'generated.dart';
 
 class AdminUpdateQuizVariablesBuilder {
   String quizId;
-  final Optional<double> _passingScore = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _maxAttempts = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<double> _passingScore = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _maxAttempts = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateQuizVariablesBuilder passingScore(double? t) {
    _passingScore.value = t;
@@ -28,7 +28,7 @@ class AdminUpdateQuizVariablesBuilder {
 
   MutationRef<AdminUpdateQuizData, AdminUpdateQuizVariables> ref() {
     AdminUpdateQuizVariables vars= AdminUpdateQuizVariables(quizId: quizId,passingScore: _passingScore,maxAttempts: _maxAttempts,timeLimitMinutes: _timeLimitMinutes,);
-    return _dataConnect.mutation('AdminUpdateQuiz', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateQuiz", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -13,7 +13,7 @@ class GetCourseSessionsVariablesBuilder {
 
   QueryRef<GetCourseSessionsData, GetCourseSessionsVariables> ref() {
     GetCourseSessionsVariables vars= GetCourseSessionsVariables(courseId: courseId,);
-    return _dataConnect.query('GetCourseSessions', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetCourseSessions", dataDeserializer, varsSerializer, vars);
   }
 }
 

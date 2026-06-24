@@ -12,7 +12,7 @@ class AdminListMyMissionsVariablesBuilder {
 
   QueryRef<AdminListMyMissionsData, void> ref() {
     
-    return _dataConnect.query('AdminListMyMissions', dataDeserializer, emptySerializer, null);
+    return _dataConnect.query("AdminListMyMissions", dataDeserializer, emptySerializer, null);
   }
 }
 

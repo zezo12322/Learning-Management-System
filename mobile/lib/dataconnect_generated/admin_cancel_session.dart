@@ -13,7 +13,7 @@ class AdminCancelSessionVariablesBuilder {
 
   MutationRef<AdminCancelSessionData, AdminCancelSessionVariables> ref() {
     AdminCancelSessionVariables vars= AdminCancelSessionVariables(sessionId: sessionId,);
-    return _dataConnect.mutation('AdminCancelSession', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCancelSession", dataDeserializer, varsSerializer, vars);
   }
 }
 

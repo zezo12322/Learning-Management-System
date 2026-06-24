@@ -2,7 +2,7 @@ part of 'generated.dart';
 
 class AdminCreateCourseVariablesBuilder {
   String title;
-  final Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
   int price;
   String language;
   CourseLevel level;
@@ -23,7 +23,7 @@ class AdminCreateCourseVariablesBuilder {
 
   MutationRef<AdminCreateCourseData, AdminCreateCourseVariables> ref() {
     AdminCreateCourseVariables vars= AdminCreateCourseVariables(title: title,description: _description,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
-    return _dataConnect.mutation('AdminCreateCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -13,7 +13,7 @@ class AdminDeleteSectionVariablesBuilder {
 
   MutationRef<AdminDeleteSectionData, AdminDeleteSectionVariables> ref() {
     AdminDeleteSectionVariables vars= AdminDeleteSectionVariables(sectionId: sectionId,);
-    return _dataConnect.mutation('AdminDeleteSection', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteSection", dataDeserializer, varsSerializer, vars);
   }
 }
 

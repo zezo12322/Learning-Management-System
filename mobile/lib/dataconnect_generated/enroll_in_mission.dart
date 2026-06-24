@@ -13,7 +13,7 @@ class EnrollInMissionVariablesBuilder {
 
   MutationRef<EnrollInMissionData, EnrollInMissionVariables> ref() {
     EnrollInMissionVariables vars= EnrollInMissionVariables(missionId: missionId,);
-    return _dataConnect.mutation('EnrollInMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("EnrollInMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

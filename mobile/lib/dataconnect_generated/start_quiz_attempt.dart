@@ -13,7 +13,7 @@ class StartQuizAttemptVariablesBuilder {
 
   MutationRef<StartQuizAttemptData, StartQuizAttemptVariables> ref() {
     StartQuizAttemptVariables vars= StartQuizAttemptVariables(quizId: quizId,);
-    return _dataConnect.mutation('StartQuizAttempt', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("StartQuizAttempt", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -13,7 +13,7 @@ class AdminGetMissionVariablesBuilder {
 
   QueryRef<AdminGetMissionData, AdminGetMissionVariables> ref() {
     AdminGetMissionVariables vars= AdminGetMissionVariables(missionId: missionId,);
-    return _dataConnect.query('AdminGetMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("AdminGetMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

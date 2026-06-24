@@ -2,7 +2,7 @@ part of 'generated.dart';
 
 class AdminCreateCategoryVariablesBuilder {
   String name;
-  final Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminCreateCategoryVariablesBuilder description(String? t) {
    _description.value = t;
@@ -18,7 +18,7 @@ class AdminCreateCategoryVariablesBuilder {
 
   MutationRef<AdminCreateCategoryData, AdminCreateCategoryVariables> ref() {
     AdminCreateCategoryVariables vars= AdminCreateCategoryVariables(name: name,description: _description,);
-    return _dataConnect.mutation('AdminCreateCategory', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateCategory", dataDeserializer, varsSerializer, vars);
   }
 }
 
