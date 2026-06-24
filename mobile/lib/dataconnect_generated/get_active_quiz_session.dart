@@ -13,7 +13,7 @@ class GetActiveQuizSessionVariablesBuilder {
 
   QueryRef<GetActiveQuizSessionData, GetActiveQuizSessionVariables> ref() {
     GetActiveQuizSessionVariables vars= GetActiveQuizSessionVariables(attemptId: attemptId,);
-    return _dataConnect.query('GetActiveQuizSession', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetActiveQuizSession", dataDeserializer, varsSerializer, vars);
   }
 }
 
@@ -22,12 +22,14 @@ class GetActiveQuizSessionQuizAttempt {
   final String id;
   final Timestamp startedAt;
   final Timestamp? completedAt;
+  final GetActiveQuizSessionQuizAttemptUser user;
   final GetActiveQuizSessionQuizAttemptQuiz quiz;
   GetActiveQuizSessionQuizAttempt.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   startedAt = Timestamp.fromJson(json['startedAt']),
   completedAt = json['completedAt'] == null ? null : Timestamp.fromJson(json['completedAt']),
+  user = GetActiveQuizSessionQuizAttemptUser.fromJson(json['user']),
   quiz = GetActiveQuizSessionQuizAttemptQuiz.fromJson(json['quiz']);
   @override
   bool operator ==(Object other) {
@@ -42,11 +44,12 @@ class GetActiveQuizSessionQuizAttempt {
     return id == otherTyped.id && 
     startedAt == otherTyped.startedAt && 
     completedAt == otherTyped.completedAt && 
+    user == otherTyped.user && 
     quiz == otherTyped.quiz;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, startedAt.hashCode, completedAt.hashCode, quiz.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, startedAt.hashCode, completedAt.hashCode, user.hashCode, quiz.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -56,6 +59,7 @@ class GetActiveQuizSessionQuizAttempt {
     if (completedAt != null) {
       json['completedAt'] = completedAt!.toJson();
     }
+    json['user'] = user.toJson();
     json['quiz'] = quiz.toJson();
     return json;
   }
@@ -64,7 +68,42 @@ class GetActiveQuizSessionQuizAttempt {
     required this.id,
     required this.startedAt,
     this.completedAt,
+    required this.user,
     required this.quiz,
+  });
+}
+
+@immutable
+class GetActiveQuizSessionQuizAttemptUser {
+  final String id;
+  GetActiveQuizSessionQuizAttemptUser.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetActiveQuizSessionQuizAttemptUser otherTyped = other as GetActiveQuizSessionQuizAttemptUser;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetActiveQuizSessionQuizAttemptUser({
+    required this.id,
   });
 }
 

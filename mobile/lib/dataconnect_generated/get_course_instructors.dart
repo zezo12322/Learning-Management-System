@@ -13,7 +13,7 @@ class GetCourseInstructorsVariablesBuilder {
 
   QueryRef<GetCourseInstructorsData, GetCourseInstructorsVariables> ref() {
     GetCourseInstructorsVariables vars= GetCourseInstructorsVariables(courseId: courseId,);
-    return _dataConnect.query('GetCourseInstructors', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetCourseInstructors", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -4,7 +4,7 @@ class AdminCreateQuizVariablesBuilder {
   String lectureId;
   double passingScore;
   int maxAttempts;
-  final Optional<int> _timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminCreateQuizVariablesBuilder timeLimitMinutes(int? t) {
    _timeLimitMinutes.value = t;
@@ -20,7 +20,7 @@ class AdminCreateQuizVariablesBuilder {
 
   MutationRef<AdminCreateQuizData, AdminCreateQuizVariables> ref() {
     AdminCreateQuizVariables vars= AdminCreateQuizVariables(lectureId: lectureId,passingScore: passingScore,maxAttempts: maxAttempts,timeLimitMinutes: _timeLimitMinutes,);
-    return _dataConnect.mutation('AdminCreateQuiz', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateQuiz", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -13,7 +13,7 @@ class EnrollInCourseVariablesBuilder {
 
   MutationRef<EnrollInCourseData, EnrollInCourseVariables> ref() {
     EnrollInCourseVariables vars= EnrollInCourseVariables(courseId: courseId,);
-    return _dataConnect.mutation('EnrollInCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("EnrollInCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

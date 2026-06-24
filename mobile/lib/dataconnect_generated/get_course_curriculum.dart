@@ -13,7 +13,7 @@ class GetCourseCurriculumVariablesBuilder {
 
   QueryRef<GetCourseCurriculumData, GetCourseCurriculumVariables> ref() {
     GetCourseCurriculumVariables vars= GetCourseCurriculumVariables(courseId: courseId,);
-    return _dataConnect.query('GetCourseCurriculum', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetCourseCurriculum", dataDeserializer, varsSerializer, vars);
   }
 }
 

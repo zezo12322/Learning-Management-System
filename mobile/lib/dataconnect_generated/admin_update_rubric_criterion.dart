@@ -2,9 +2,9 @@ part of 'generated.dart';
 
 class AdminUpdateRubricCriterionVariablesBuilder {
   String criterionId;
-  final Optional<String> _criterionName = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<double> _maxPoints = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _criterionName = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<double> _maxPoints = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateRubricCriterionVariablesBuilder criterionName(String? t) {
    _criterionName.value = t;
@@ -28,7 +28,7 @@ class AdminUpdateRubricCriterionVariablesBuilder {
 
   MutationRef<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables> ref() {
     AdminUpdateRubricCriterionVariables vars= AdminUpdateRubricCriterionVariables(criterionId: criterionId,criterionName: _criterionName,description: _description,maxPoints: _maxPoints,);
-    return _dataConnect.mutation('AdminUpdateRubricCriterion', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateRubricCriterion", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -2,8 +2,8 @@ part of 'generated.dart';
 
 class AdminUpdateQuizOptionVariablesBuilder {
   String optionId;
-  final Optional<String> _text = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<bool> _isCorrect = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _text = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<bool> _isCorrect = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateQuizOptionVariablesBuilder text(String? t) {
    _text.value = t;
@@ -23,7 +23,7 @@ class AdminUpdateQuizOptionVariablesBuilder {
 
   MutationRef<AdminUpdateQuizOptionData, AdminUpdateQuizOptionVariables> ref() {
     AdminUpdateQuizOptionVariables vars= AdminUpdateQuizOptionVariables(optionId: optionId,text: _text,isCorrect: _isCorrect,);
-    return _dataConnect.mutation('AdminUpdateQuizOption', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateQuizOption", dataDeserializer, varsSerializer, vars);
   }
 }
 

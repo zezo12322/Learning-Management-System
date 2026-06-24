@@ -13,7 +13,7 @@ class GetUserEnrollmentForMissionVariablesBuilder {
 
   QueryRef<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables> ref() {
     GetUserEnrollmentForMissionVariables vars= GetUserEnrollmentForMissionVariables(missionId: missionId,);
-    return _dataConnect.query('GetUserEnrollmentForMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetUserEnrollmentForMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

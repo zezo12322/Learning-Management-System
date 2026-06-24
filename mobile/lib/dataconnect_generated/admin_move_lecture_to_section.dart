@@ -15,7 +15,7 @@ class AdminMoveLectureToSectionVariablesBuilder {
 
   MutationRef<AdminMoveLectureToSectionData, AdminMoveLectureToSectionVariables> ref() {
     AdminMoveLectureToSectionVariables vars= AdminMoveLectureToSectionVariables(lectureId: lectureId,newSectionId: newSectionId,order: order,);
-    return _dataConnect.mutation('AdminMoveLectureToSection', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminMoveLectureToSection", dataDeserializer, varsSerializer, vars);
   }
 }
 

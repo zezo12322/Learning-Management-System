@@ -3,7 +3,7 @@ part of 'generated.dart';
 class SyncUserVariablesBuilder {
   String email;
   String name;
-  final Optional<String> _avatar = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _avatar = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  SyncUserVariablesBuilder avatar(String? t) {
    _avatar.value = t;
@@ -19,7 +19,7 @@ class SyncUserVariablesBuilder {
 
   MutationRef<SyncUserData, SyncUserVariables> ref() {
     SyncUserVariables vars= SyncUserVariables(email: email,name: name,avatar: _avatar,);
-    return _dataConnect.mutation('SyncUser', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("SyncUser", dataDeserializer, varsSerializer, vars);
   }
 }
 

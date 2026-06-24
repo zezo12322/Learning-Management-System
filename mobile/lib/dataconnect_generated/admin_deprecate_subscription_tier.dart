@@ -13,7 +13,7 @@ class AdminDeprecateSubscriptionTierVariablesBuilder {
 
   MutationRef<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables> ref() {
     AdminDeprecateSubscriptionTierVariables vars= AdminDeprecateSubscriptionTierVariables(tierId: tierId,);
-    return _dataConnect.mutation('AdminDeprecateSubscriptionTier', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeprecateSubscriptionTier", dataDeserializer, varsSerializer, vars);
   }
 }
 

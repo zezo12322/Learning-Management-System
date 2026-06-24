@@ -15,7 +15,7 @@ class AddCriterionScoreVariablesBuilder {
 
   MutationRef<AddCriterionScoreData, AddCriterionScoreVariables> ref() {
     AddCriterionScoreVariables vars= AddCriterionScoreVariables(submissionId: submissionId,criterionId: criterionId,score: score,);
-    return _dataConnect.mutation('AddCriterionScore', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AddCriterionScore", dataDeserializer, varsSerializer, vars);
   }
 }
 

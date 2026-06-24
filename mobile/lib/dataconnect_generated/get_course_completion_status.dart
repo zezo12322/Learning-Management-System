@@ -13,7 +13,7 @@ class GetCourseCompletionStatusVariablesBuilder {
 
   QueryRef<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables> ref() {
     GetCourseCompletionStatusVariables vars= GetCourseCompletionStatusVariables(courseId: courseId,);
-    return _dataConnect.query('GetCourseCompletionStatus', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetCourseCompletionStatus", dataDeserializer, varsSerializer, vars);
   }
 }
 

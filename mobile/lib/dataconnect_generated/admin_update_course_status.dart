@@ -14,7 +14,7 @@ class AdminUpdateCourseStatusVariablesBuilder {
 
   MutationRef<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables> ref() {
     AdminUpdateCourseStatusVariables vars= AdminUpdateCourseStatusVariables(courseId: courseId,status: status,);
-    return _dataConnect.mutation('AdminUpdateCourseStatus', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateCourseStatus", dataDeserializer, varsSerializer, vars);
   }
 }
 

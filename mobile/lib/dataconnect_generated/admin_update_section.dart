@@ -14,7 +14,7 @@ class AdminUpdateSectionVariablesBuilder {
 
   MutationRef<AdminUpdateSectionData, AdminUpdateSectionVariables> ref() {
     AdminUpdateSectionVariables vars= AdminUpdateSectionVariables(sectionId: sectionId,title: title,);
-    return _dataConnect.mutation('AdminUpdateSection', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateSection", dataDeserializer, varsSerializer, vars);
   }
 }
 

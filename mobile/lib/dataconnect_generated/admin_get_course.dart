@@ -13,7 +13,7 @@ class AdminGetCourseVariablesBuilder {
 
   QueryRef<AdminGetCourseData, AdminGetCourseVariables> ref() {
     AdminGetCourseVariables vars= AdminGetCourseVariables(courseId: courseId,);
-    return _dataConnect.query('AdminGetCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("AdminGetCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

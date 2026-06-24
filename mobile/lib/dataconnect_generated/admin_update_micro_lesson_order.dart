@@ -14,7 +14,7 @@ class AdminUpdateMicroLessonOrderVariablesBuilder {
 
   MutationRef<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables> ref() {
     AdminUpdateMicroLessonOrderVariables vars= AdminUpdateMicroLessonOrderVariables(microLessonId: microLessonId,order: order,);
-    return _dataConnect.mutation('AdminUpdateMicroLessonOrder', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateMicroLessonOrder", dataDeserializer, varsSerializer, vars);
   }
 }
 

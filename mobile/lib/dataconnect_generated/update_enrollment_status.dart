@@ -3,7 +3,7 @@ part of 'generated.dart';
 class UpdateEnrollmentStatusVariablesBuilder {
   String enrollmentId;
   EnrollmentStatus status;
-  final Optional<Timestamp> _completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
+  Optional<Timestamp> _completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
 
   final FirebaseDataConnect _dataConnect;  UpdateEnrollmentStatusVariablesBuilder completedAt(Timestamp? t) {
    _completedAt.value = t;
@@ -19,7 +19,7 @@ class UpdateEnrollmentStatusVariablesBuilder {
 
   MutationRef<UpdateEnrollmentStatusData, UpdateEnrollmentStatusVariables> ref() {
     UpdateEnrollmentStatusVariables vars= UpdateEnrollmentStatusVariables(enrollmentId: enrollmentId,status: status,completedAt: _completedAt,);
-    return _dataConnect.mutation('UpdateEnrollmentStatus', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("UpdateEnrollmentStatus", dataDeserializer, varsSerializer, vars);
   }
 }
 

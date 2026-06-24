@@ -15,7 +15,7 @@ class AdminCreateSectionVariablesBuilder {
 
   MutationRef<AdminCreateSectionData, AdminCreateSectionVariables> ref() {
     AdminCreateSectionVariables vars= AdminCreateSectionVariables(courseId: courseId,title: title,order: order,);
-    return _dataConnect.mutation('AdminCreateSection', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateSection", dataDeserializer, varsSerializer, vars);
   }
 }
 

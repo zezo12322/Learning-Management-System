@@ -2,13 +2,13 @@ part of 'generated.dart';
 
 class AdminUpdateMissionVariablesBuilder {
   String missionId;
-  final Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _scenarioDescription = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _durationMinutes = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _categoryId = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<MissionDifficulty> _difficulty = Optional.optional((data) => MissionDifficulty.values.byName(data), enumSerializer);
-  final Optional<List<String>> _skillsTested = Optional.optional(listDeserializer(nativeFromJson), listSerializer(nativeToJson));
-  final Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _scenarioDescription = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _durationMinutes = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _categoryId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<MissionDifficulty> _difficulty = Optional.optional((data) => MissionDifficulty.values.byName(data), enumSerializer);
+  Optional<List<String>> _skillsTested = Optional.optional(listDeserializer(nativeFromJson), listSerializer(nativeToJson));
+  Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateMissionVariablesBuilder title(String? t) {
    _title.value = t;
@@ -48,7 +48,7 @@ class AdminUpdateMissionVariablesBuilder {
 
   MutationRef<AdminUpdateMissionData, AdminUpdateMissionVariables> ref() {
     AdminUpdateMissionVariables vars= AdminUpdateMissionVariables(missionId: missionId,title: _title,scenarioDescription: _scenarioDescription,durationMinutes: _durationMinutes,categoryId: _categoryId,difficulty: _difficulty,skillsTested: _skillsTested,courseId: _courseId,);
-    return _dataConnect.mutation('AdminUpdateMission', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateMission", dataDeserializer, varsSerializer, vars);
   }
 }
 

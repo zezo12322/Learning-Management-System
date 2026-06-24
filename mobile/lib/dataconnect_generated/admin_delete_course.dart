@@ -13,7 +13,7 @@ class AdminDeleteCourseVariablesBuilder {
 
   MutationRef<AdminDeleteCourseData, AdminDeleteCourseVariables> ref() {
     AdminDeleteCourseVariables vars= AdminDeleteCourseVariables(courseId: courseId,);
-    return _dataConnect.mutation('AdminDeleteCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -2,11 +2,11 @@ part of 'generated.dart';
 
 class AdminUpdateMicroLessonVariablesBuilder {
   String microLessonId;
-  final Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<LectureType> _type = Optional.optional((data) => LectureType.values.byName(data), enumSerializer);
-  final Optional<String> _assetUrl = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _durationSeconds = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<LectureType> _type = Optional.optional((data) => LectureType.values.byName(data), enumSerializer);
+  Optional<String> _assetUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _durationSeconds = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateMicroLessonVariablesBuilder title(String? t) {
    _title.value = t;
@@ -38,7 +38,7 @@ class AdminUpdateMicroLessonVariablesBuilder {
 
   MutationRef<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables> ref() {
     AdminUpdateMicroLessonVariables vars= AdminUpdateMicroLessonVariables(microLessonId: microLessonId,title: _title,type: _type,assetUrl: _assetUrl,content: _content,durationSeconds: _durationSeconds,);
-    return _dataConnect.mutation('AdminUpdateMicroLesson', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateMicroLesson", dataDeserializer, varsSerializer, vars);
   }
 }
 

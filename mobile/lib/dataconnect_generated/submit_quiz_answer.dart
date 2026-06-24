@@ -15,7 +15,7 @@ class SubmitQuizAnswerVariablesBuilder {
 
   MutationRef<SubmitQuizAnswerData, SubmitQuizAnswerVariables> ref() {
     SubmitQuizAnswerVariables vars= SubmitQuizAnswerVariables(attemptId: attemptId,questionId: questionId,optionId: optionId,);
-    return _dataConnect.mutation('SubmitQuizAnswer', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("SubmitQuizAnswer", dataDeserializer, varsSerializer, vars);
   }
 }
 

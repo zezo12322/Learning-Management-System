@@ -16,7 +16,7 @@ class AdminCreateQuizOptionVariablesBuilder {
 
   MutationRef<AdminCreateQuizOptionData, AdminCreateQuizOptionVariables> ref() {
     AdminCreateQuizOptionVariables vars= AdminCreateQuizOptionVariables(questionId: questionId,text: text,order: order,isCorrect: isCorrect,);
-    return _dataConnect.mutation('AdminCreateQuizOption', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateQuizOption", dataDeserializer, varsSerializer, vars);
   }
 }
 

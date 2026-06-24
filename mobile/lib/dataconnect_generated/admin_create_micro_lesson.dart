@@ -4,9 +4,9 @@ class AdminCreateMicroLessonVariablesBuilder {
   String missionId;
   String title;
   LectureType type;
-  final Optional<String> _assetUrl = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _durationSeconds = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _assetUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _durationSeconds = Optional.optional(nativeFromJson, nativeToJson);
   int order;
 
   final FirebaseDataConnect _dataConnect;  AdminCreateMicroLessonVariablesBuilder assetUrl(String? t) {
@@ -31,7 +31,7 @@ class AdminCreateMicroLessonVariablesBuilder {
 
   MutationRef<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables> ref() {
     AdminCreateMicroLessonVariables vars= AdminCreateMicroLessonVariables(missionId: missionId,title: title,type: type,assetUrl: _assetUrl,content: _content,durationSeconds: _durationSeconds,order: order,);
-    return _dataConnect.mutation('AdminCreateMicroLesson', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminCreateMicroLesson", dataDeserializer, varsSerializer, vars);
   }
 }
 

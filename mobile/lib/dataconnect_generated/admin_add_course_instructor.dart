@@ -14,7 +14,7 @@ class AdminAddCourseInstructorVariablesBuilder {
 
   MutationRef<AdminAddCourseInstructorData, AdminAddCourseInstructorVariables> ref() {
     AdminAddCourseInstructorVariables vars= AdminAddCourseInstructorVariables(courseId: courseId,userId: userId,);
-    return _dataConnect.mutation('AdminAddCourseInstructor', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminAddCourseInstructor", dataDeserializer, varsSerializer, vars);
   }
 }
 

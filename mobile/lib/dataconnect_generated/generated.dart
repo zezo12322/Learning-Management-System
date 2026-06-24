@@ -8,8 +8,6 @@ part 'admin_create_course.dart';
 
 part 'admin_delete_course.dart';
 
-part 'admin_create_lecture.dart';
-
 part 'admin_create_session.dart';
 
 part 'admin_cancel_session.dart';
@@ -59,6 +57,8 @@ part 'admin_soft_delete_lecture.dart';
 part 'admin_update_lecture_order.dart';
 
 part 'admin_move_lecture_to_section.dart';
+
+part 'admin_soft_delete_lectures_by_section.dart';
 
 part 'log_payment.dart';
 
@@ -134,13 +134,23 @@ part 'start_quiz_attempt.dart';
 
 part 'submit_quiz_answer.dart';
 
-part 'finish_quiz_attempt.dart';
+part 'finish_quiz_attempt_if_open.dart';
+
+part 'get_expired_attempts.dart';
 
 part 'get_user_quiz_attempts.dart';
 
 part 'get_quiz_attempt_by_id.dart';
 
+part 'get_quiz_question_points.dart';
+
 part 'get_attempt_answers_with_correct.dart';
+
+part 'get_quiz_settings.dart';
+
+part 'get_question_options.dart';
+
+part 'get_option_with_question.dart';
 
 part 'get_active_quiz_session.dart';
 
@@ -168,7 +178,21 @@ part 'admin_delete_quiz_option.dart';
 
 part 'admin_update_quiz_option_order.dart';
 
-part 'admin_set_quiz_time_limit.dart';
+part 'get_my_course_access.dart';
+
+part 'get_my_mission_access.dart';
+
+part 'get_question_course.dart';
+
+part 'get_option_course.dart';
+
+part 'get_section_course.dart';
+
+part 'get_micro_lesson_mission.dart';
+
+part 'get_criterion_mission.dart';
+
+part 'get_template_mission.dart';
 
 part 'get_course_sessions.dart';
 
@@ -650,7 +674,7 @@ sealed class EnumValue<T extends Enum> {
   String get stringValue;
   @override
   String toString() {
-    return 'EnumValue($stringValue)';
+    return "EnumValue($stringValue)";
   }
 }
 
@@ -666,7 +690,7 @@ class Known<T extends Enum> extends EnumValue<T> {
 
   @override
   String toString() {
-    return 'Known($stringValue)';
+    return "Known($stringValue)";
   }
 }
 /// Represents an unknown or unrecognized enum value.
@@ -678,7 +702,7 @@ class Unknown extends EnumValue<Never> {
   const Unknown(this.stringValue);
   @override
   String toString() {
-    return 'Unknown($stringValue)';
+    return "Unknown($stringValue)";
   }
 }
 
@@ -692,11 +716,6 @@ class DefaultConnector {
   
   AdminDeleteCourseVariablesBuilder adminDeleteCourse ({required String courseId, }) {
     return AdminDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
-  }
-  
-  
-  AdminCreateLectureVariablesBuilder adminCreateLecture ({required String sectionId, required String title, required LectureType type, required int order, }) {
-    return AdminCreateLectureVariablesBuilder(dataConnect, sectionId: sectionId,title: title,type: type,order: order,);
   }
   
   
@@ -822,6 +841,11 @@ class DefaultConnector {
   
   AdminMoveLectureToSectionVariablesBuilder adminMoveLectureToSection ({required String lectureId, required String newSectionId, required int order, }) {
     return AdminMoveLectureToSectionVariablesBuilder(dataConnect, lectureId: lectureId,newSectionId: newSectionId,order: order,);
+  }
+  
+  
+  AdminSoftDeleteLecturesBySectionVariablesBuilder adminSoftDeleteLecturesBySection ({required String sectionId, }) {
+    return AdminSoftDeleteLecturesBySectionVariablesBuilder(dataConnect, sectionId: sectionId,);
   }
   
   
@@ -1010,8 +1034,13 @@ class DefaultConnector {
   }
   
   
-  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, required double score, required bool passed, }) {
-    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,score: score,passed: passed,);
+  FinishQuizAttemptIfOpenVariablesBuilder finishQuizAttemptIfOpen ({required String attemptId, required double score, required bool passed, }) {
+    return FinishQuizAttemptIfOpenVariablesBuilder(dataConnect, attemptId: attemptId,score: score,passed: passed,);
+  }
+  
+  
+  GetExpiredAttemptsVariablesBuilder getExpiredAttempts () {
+    return GetExpiredAttemptsVariablesBuilder(dataConnect, );
   }
   
   
@@ -1025,8 +1054,28 @@ class DefaultConnector {
   }
   
   
+  GetQuizQuestionPointsVariablesBuilder getQuizQuestionPoints ({required String quizId, }) {
+    return GetQuizQuestionPointsVariablesBuilder(dataConnect, quizId: quizId,);
+  }
+  
+  
   GetAttemptAnswersWithCorrectVariablesBuilder getAttemptAnswersWithCorrect ({required String attemptId, }) {
     return GetAttemptAnswersWithCorrectVariablesBuilder(dataConnect, attemptId: attemptId,);
+  }
+  
+  
+  GetQuizSettingsVariablesBuilder getQuizSettings ({required String quizId, }) {
+    return GetQuizSettingsVariablesBuilder(dataConnect, quizId: quizId,);
+  }
+  
+  
+  GetQuestionOptionsVariablesBuilder getQuestionOptions ({required String questionId, }) {
+    return GetQuestionOptionsVariablesBuilder(dataConnect, questionId: questionId,);
+  }
+  
+  
+  GetOptionWithQuestionVariablesBuilder getOptionWithQuestion ({required String optionId, }) {
+    return GetOptionWithQuestionVariablesBuilder(dataConnect, optionId: optionId,);
   }
   
   
@@ -1095,8 +1144,43 @@ class DefaultConnector {
   }
   
   
-  AdminSetQuizTimeLimitVariablesBuilder adminSetQuizTimeLimit ({required String quizId, }) {
-    return AdminSetQuizTimeLimitVariablesBuilder(dataConnect, quizId: quizId,);
+  GetMyCourseAccessVariablesBuilder getMyCourseAccess ({required String courseId, }) {
+    return GetMyCourseAccessVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetMyMissionAccessVariablesBuilder getMyMissionAccess ({required String missionId, }) {
+    return GetMyMissionAccessVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  GetQuestionCourseVariablesBuilder getQuestionCourse ({required String questionId, }) {
+    return GetQuestionCourseVariablesBuilder(dataConnect, questionId: questionId,);
+  }
+  
+  
+  GetOptionCourseVariablesBuilder getOptionCourse ({required String optionId, }) {
+    return GetOptionCourseVariablesBuilder(dataConnect, optionId: optionId,);
+  }
+  
+  
+  GetSectionCourseVariablesBuilder getSectionCourse ({required String sectionId, }) {
+    return GetSectionCourseVariablesBuilder(dataConnect, sectionId: sectionId,);
+  }
+  
+  
+  GetMicroLessonMissionVariablesBuilder getMicroLessonMission ({required String microLessonId, }) {
+    return GetMicroLessonMissionVariablesBuilder(dataConnect, microLessonId: microLessonId,);
+  }
+  
+  
+  GetCriterionMissionVariablesBuilder getCriterionMission ({required String criterionId, }) {
+    return GetCriterionMissionVariablesBuilder(dataConnect, criterionId: criterionId,);
+  }
+  
+  
+  GetTemplateMissionVariablesBuilder getTemplateMission ({required String templateId, }) {
+    return GetTemplateMissionVariablesBuilder(dataConnect, templateId: templateId,);
   }
   
   
@@ -1135,7 +1219,7 @@ class DefaultConnector {
   static DefaultConnector get instance {
     
     CacheSettings cacheSettings = CacheSettings(
-      maxAge: const Duration(),
+      maxAge: Duration(milliseconds:0),
       storage: CacheStorage.persistent,
     );
     

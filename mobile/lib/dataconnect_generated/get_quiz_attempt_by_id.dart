@@ -13,7 +13,7 @@ class GetQuizAttemptByIdVariablesBuilder {
 
   QueryRef<GetQuizAttemptByIdData, GetQuizAttemptByIdVariables> ref() {
     GetQuizAttemptByIdVariables vars= GetQuizAttemptByIdVariables(attemptId: attemptId,);
-    return _dataConnect.query('GetQuizAttemptById', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("GetQuizAttemptById", dataDeserializer, varsSerializer, vars);
   }
 }
 

@@ -3,7 +3,6 @@
 ```dart
 DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
 DefaultConnector.instance.AdminDeleteCourse(adminDeleteCourseVariables).execute();
-DefaultConnector.instance.AdminCreateLecture(adminCreateLectureVariables).execute();
 DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
 DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execute();
 DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
@@ -11,6 +10,7 @@ DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscript
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
 DefaultConnector.instance.MyCertificates().execute();
 DefaultConnector.instance.VerifyCertificate(verifyCertificateVariables).execute();
+DefaultConnector.instance.ListPublishedCourses().execute();
 
 ```
 

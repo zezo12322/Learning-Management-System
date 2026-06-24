@@ -2,13 +2,13 @@ part of 'generated.dart';
 
 class AdminUpdateLectureVariablesBuilder {
   String lectureId;
-  final Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<LectureType> _type = Optional.optional((data) => LectureType.values.byName(data), enumSerializer);
-  final Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _duration = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _transcriptUrl = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<bool> _isFreePreview = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<LectureType> _type = Optional.optional((data) => LectureType.values.byName(data), enumSerializer);
+  Optional<String> _videoUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _content = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _duration = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _transcriptUrl = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<bool> _isFreePreview = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateLectureVariablesBuilder title(String? t) {
    _title.value = t;
@@ -48,7 +48,7 @@ class AdminUpdateLectureVariablesBuilder {
 
   MutationRef<AdminUpdateLectureData, AdminUpdateLectureVariables> ref() {
     AdminUpdateLectureVariables vars= AdminUpdateLectureVariables(lectureId: lectureId,title: _title,type: _type,videoUrl: _videoUrl,content: _content,duration: _duration,transcriptUrl: _transcriptUrl,isFreePreview: _isFreePreview,);
-    return _dataConnect.mutation('AdminUpdateLecture', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateLecture", dataDeserializer, varsSerializer, vars);
   }
 }
 

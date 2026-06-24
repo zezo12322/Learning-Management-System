@@ -2,14 +2,14 @@ part of 'generated.dart';
 
 class AdminUpdateCourseVariablesBuilder {
   String courseId;
-  final Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<int> _price = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _language = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<CourseLevel> _level = Optional.optional((data) => CourseLevel.values.byName(data), enumSerializer);
-  final Optional<String> _categoryId = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<List<String>> _tags = Optional.optional(listDeserializer(nativeFromJson), listSerializer(nativeToJson));
-  final Optional<String> _thumbnail = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _title = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _description = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _price = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _language = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<CourseLevel> _level = Optional.optional((data) => CourseLevel.values.byName(data), enumSerializer);
+  Optional<String> _categoryId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<List<String>> _tags = Optional.optional(listDeserializer(nativeFromJson), listSerializer(nativeToJson));
+  Optional<String> _thumbnail = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateCourseVariablesBuilder title(String? t) {
    _title.value = t;
@@ -53,7 +53,7 @@ class AdminUpdateCourseVariablesBuilder {
 
   MutationRef<AdminUpdateCourseData, AdminUpdateCourseVariables> ref() {
     AdminUpdateCourseVariables vars= AdminUpdateCourseVariables(courseId: courseId,title: _title,description: _description,price: _price,language: _language,level: _level,categoryId: _categoryId,tags: _tags,thumbnail: _thumbnail,);
-    return _dataConnect.mutation('AdminUpdateCourse', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 

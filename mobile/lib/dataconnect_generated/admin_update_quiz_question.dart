@@ -2,9 +2,9 @@ part of 'generated.dart';
 
 class AdminUpdateQuizQuestionVariablesBuilder {
   String questionId;
-  final Optional<String> _questionText = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<double> _points = Optional.optional(nativeFromJson, nativeToJson);
-  final Optional<String> _explanation = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _questionText = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<double> _points = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _explanation = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  AdminUpdateQuizQuestionVariablesBuilder questionText(String? t) {
    _questionText.value = t;
@@ -28,7 +28,7 @@ class AdminUpdateQuizQuestionVariablesBuilder {
 
   MutationRef<AdminUpdateQuizQuestionData, AdminUpdateQuizQuestionVariables> ref() {
     AdminUpdateQuizQuestionVariables vars= AdminUpdateQuizQuestionVariables(questionId: questionId,questionText: _questionText,points: _points,explanation: _explanation,);
-    return _dataConnect.mutation('AdminUpdateQuizQuestion', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateQuizQuestion", dataDeserializer, varsSerializer, vars);
   }
 }
 

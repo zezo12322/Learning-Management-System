@@ -14,7 +14,7 @@ class AdminUpdateQuizQuestionOrderVariablesBuilder {
 
   MutationRef<AdminUpdateQuizQuestionOrderData, AdminUpdateQuizQuestionOrderVariables> ref() {
     AdminUpdateQuizQuestionOrderVariables vars= AdminUpdateQuizQuestionOrderVariables(questionId: questionId,order: order,);
-    return _dataConnect.mutation('AdminUpdateQuizQuestionOrder', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminUpdateQuizQuestionOrder", dataDeserializer, varsSerializer, vars);
   }
 }
 

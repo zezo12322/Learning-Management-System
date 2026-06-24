@@ -13,7 +13,7 @@ class AdminGetQuizVariablesBuilder {
 
   QueryRef<AdminGetQuizData, AdminGetQuizVariables> ref() {
     AdminGetQuizVariables vars= AdminGetQuizVariables(quizId: quizId,);
-    return _dataConnect.query('AdminGetQuiz', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.query("AdminGetQuiz", dataDeserializer, varsSerializer, vars);
   }
 }
 

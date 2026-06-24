@@ -13,7 +13,7 @@ class AdminDeleteMicroLessonVariablesBuilder {
 
   MutationRef<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables> ref() {
     AdminDeleteMicroLessonVariables vars= AdminDeleteMicroLessonVariables(microLessonId: microLessonId,);
-    return _dataConnect.mutation('AdminDeleteMicroLesson', dataDeserializer, varsSerializer, vars);
+    return _dataConnect.mutation("AdminDeleteMicroLesson", dataDeserializer, varsSerializer, vars);
   }
 }
 

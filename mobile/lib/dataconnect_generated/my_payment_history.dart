@@ -12,7 +12,7 @@ class MyPaymentHistoryVariablesBuilder {
 
   QueryRef<MyPaymentHistoryData, void> ref() {
     
-    return _dataConnect.query('MyPaymentHistory', dataDeserializer, emptySerializer, null);
+    return _dataConnect.query("MyPaymentHistory", dataDeserializer, emptySerializer, null);
   }
 }
 
