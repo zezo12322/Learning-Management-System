@@ -55,7 +55,7 @@ export class AccessService {
     return (
       course.author?.id === uid ||
       course.createdBy?.id === uid ||
-      (course.courseInstructors_on_course ?? []).length > 0
+      (course.myInstructorLink ?? []).length > 0
     );
   }
 }
