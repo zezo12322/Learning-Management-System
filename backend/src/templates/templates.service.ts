@@ -22,8 +22,8 @@ export class TemplatesService {
     const filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}${ext}`;
     const storagePath = MissionStoragePaths.template(missionId, templateId, filename);
 
-    // Upload to Firebase Storage
-    const fileUrl = await this.firebase.uploadFile(
+    // Upload privately (H2); persist the storage PATH, not a public URL.
+    const storedPath = await this.firebase.uploadFile(
       storagePath,
       file.buffer,
       file.mimetype,
@@ -36,7 +36,7 @@ export class TemplatesService {
       {
         missionId,
         title,
-        fileUrl,
+        fileUrl: storedPath,
         fileType: ext.replace('.', ''),
       },
       authToken,
@@ -62,6 +62,13 @@ export class TemplatesService {
       { missionId },
       authToken,
     );
-    return data?.missionTemplates ?? [];
+    const templates: any[] = data?.missionTemplates ?? [];
+    // Exchange stored private paths for short-lived signed read URLs (H2).
+    return Promise.all(
+      templates.map(async (t) => ({
+        ...t,
+        fileUrl: await this.firebase.resolveReadUrl(t.fileUrl),
+      })),
+    );
   }
 }

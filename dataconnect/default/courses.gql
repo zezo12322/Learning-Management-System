@@ -29,7 +29,10 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
     title
     description
     language
-    publishedSections: courseSections_on_course(orderBy: [{ order: ASC }]) {
+    publishedSections: courseSections_on_course(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
       id
       title
       publishedLectures: courseLectures_on_section(
@@ -82,7 +85,7 @@ query GetUserLectureProgress($lectureId: UUID!) @auth(level: USER) {
 # Retrieves all lecture progress for a user within a specific course
 query GetMyCourseProgress($courseId: UUID!) @auth(level: USER) {
   sections: courseSections(
-    where: { courseId: { eq: $courseId } },
+    where: { courseId: { eq: $courseId }, deletedAt: { eq: null } },
     orderBy: [{ order: ASC }]
   ) {
     id
@@ -99,6 +102,16 @@ query GetMyCourseProgress($courseId: UUID!) @auth(level: USER) {
         completedAt
       }
     }
+  }
+}
+
+# Minimal course facts for enrollment eligibility checks (status/price/soft-delete).
+query GetCourseForEnrollment($courseId: UUID!) @auth(level: USER) {
+  course(id: $courseId) {
+    id
+    status
+    price
+    deletedAt
   }
 }
 
@@ -127,7 +140,10 @@ query AdminGetCourse($courseId: UUID!) @auth(expr: "auth.token.role == 'admin' |
     instructors: courseInstructors_on_course {
       user { id name email avatar }
     }
-    adminSections: courseSections_on_course(orderBy: [{ order: ASC }]) {
+    adminSections: courseSections_on_course(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
       id
       title
       order
@@ -244,9 +260,17 @@ mutation AdminUpdateSection(
   )
 }
 
-# Deletes a section
-mutation AdminDeleteSection($sectionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseSection_delete(id: $sectionId)
+# Soft-deletes a section. Soft-delete (not a hard delete) keeps referential
+# integrity with its child lectures (which are themselves soft-deleted) and
+# their lecture_progress rows, and matches the lecture lifecycle (H4).
+mutation AdminSoftDeleteSection($sectionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
+  courseSection_update(
+    id: $sectionId,
+    data: {
+      deletedAt_expr: "request.time",
+      updatedAt_expr: "request.time"
+    }
+  )
 }
 
 # Updates a section's order position (used in batch for reorder)

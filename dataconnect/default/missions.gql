@@ -2,6 +2,14 @@
 # STUDENT — MISSION SUBMISSIONS
 # ==========================================
 
+# Minimal mission facts for enrollment eligibility checks (soft-delete).
+query GetMissionForEnrollment($missionId: UUID!) @auth(level: USER) {
+  mission(id: $missionId) {
+    id
+    deletedAt
+  }
+}
+
 # Submits a file link for mission evaluation
 mutation SubmitMission(
   $missionId: UUID!, 
@@ -47,24 +55,55 @@ mutation GradeSubmission(
     data: {
       graderId_expr: "auth.uid",
       status: GRADED,
-      feedback: $feedback
+      feedback: $feedback,
+      updatedAt_expr: "request.time"
     }
   )
 }
 
-# Logs individual scores for a specific mission criterion
+# Logs/updates the score for a specific mission criterion. Upsert so re-grading
+# a criterion overwrites the prior score instead of failing on the (submission,
+# criterion) primary key.
 mutation AddCriterionScore(
   $submissionId: UUID!,
   $criterionId: UUID!,
   $score: Float!
 ) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  missionSubmissionScore_insert(
+  missionSubmissionScore_upsert(
     data: {
       submissionId: $submissionId,
       criterionId: $criterionId,
       score: $score
     }
   )
+}
+
+# Resolves a submission to its owning mission + student, for grading
+# authorization and the post-grade completion trigger.
+query GetSubmissionForGrading($submissionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
+  missionSubmission(id: $submissionId) {
+    id
+    status
+    attemptNumber
+    mission { id }
+    student { id }
+  }
+}
+
+# Finds a specific student's enrollment in a mission (instructor-side completion
+# update, where auth.uid is the grader, not the student).
+query GetEnrollmentForUserMission($userId: String!, $missionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
+  enrollments(
+    where: {
+      userId: { eq: $userId },
+      missionId: { eq: $missionId },
+      targetType: { eq: MISSION }
+    }
+  ) {
+    id
+    status
+    completedAt
+  }
 }
 
 # ==========================================

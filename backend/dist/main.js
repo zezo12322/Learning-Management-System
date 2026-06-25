@@ -13,7 +13,14 @@ async function bootstrap() {
             enableImplicitConversion: true,
         },
     }));
-    app.enableCors();
+    const corsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173')
+        .split(',')
+        .map((o) => o.trim())
+        .filter(Boolean);
+    app.enableCors({
+        origin: corsOrigins,
+        credentials: true,
+    });
     app.setGlobalPrefix('api/v1');
     await app.listen(process.env.PORT ?? 3000);
 }

@@ -150,11 +150,13 @@ export class DataConnectService {
 
     if (!response.ok) {
       const errorBody = await response.text();
+      // Log full upstream detail server-side; never surface schema/SQL internals
+      // to the client (M7 — information disclosure).
       this.logger.error(
         `FDC ${action} failed for ${operationName}: ${response.status} ${errorBody}`,
       );
       throw new HttpException(
-        `Data Connect operation "${operationName}" failed: ${errorBody}`,
+        `Data Connect operation "${operationName}" failed`,
         this.mapStatus(response.status),
       );
     }
@@ -166,7 +168,7 @@ export class DataConnectService {
         `FDC ${action} errors for ${operationName}: ${JSON.stringify(result.errors)}`,
       );
       throw new HttpException(
-        `Data Connect operation "${operationName}" returned errors: ${JSON.stringify(result.errors)}`,
+        `Data Connect operation "${operationName}" returned errors`,
         this.mapGraphqlErrorStatus(result.errors),
       );
     }

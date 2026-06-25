@@ -9,6 +9,7 @@ import {
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CompletionService } from '../completion/completion.service';
 import { OrderingService } from '../common/services/ordering.service';
+import { AccessService } from '../common/services/access.service';
 import { assertReorderMembership } from '../common/utils/ordering';
 import {
   CreateQuizDto,
@@ -27,6 +28,7 @@ export class QuizzesService {
     private readonly dc: DataConnectService,
     private readonly completionService: CompletionService,
     private readonly ordering: OrderingService,
+    private readonly access: AccessService,
   ) {}
 
   /**
@@ -45,7 +47,12 @@ export class QuizzesService {
    * `isCorrect` answer key (fixes C2). Resolves the quiz's lecture, then loads
    * the answer-free question set.
    */
-  async getQuizForTaking(quizId: string, authToken: string) {
+  async getQuizForTaking(
+    quizId: string,
+    authToken: string,
+    uid: string | undefined,
+    isAdmin: boolean,
+  ) {
     const settings = await this.dc.executeQuery(
       'GetQuizSettings',
       { quizId },
@@ -55,12 +62,52 @@ export class QuizzesService {
     if (!lectureId) {
       throw new NotFoundException(`Quiz ${quizId} not found`);
     }
+
+    // Gate access (M4): only the course owner/admin (previewing) or an
+    // actively-enrolled student may load the quiz questions.
+    await this.assertCanTakeOrPreview(
+      settings?.courseQuiz?.lecture?.section?.course?.id,
+      authToken,
+      uid,
+      isAdmin,
+    );
+
     const data = await this.dc.executeQuery(
       'GetQuizQuestions',
       { lectureId },
       authToken,
     );
     return data?.courseQuizs?.[0] ?? null;
+  }
+
+  /**
+   * Allows the request through if the caller owns the course (or is admin) or
+   * has an ACTIVE enrollment in it; otherwise throws 403. Shared by the
+   * student-facing quiz read/taking paths.
+   */
+  private async assertCanTakeOrPreview(
+    courseId: string | undefined,
+    authToken: string,
+    uid: string | undefined,
+    isAdmin: boolean,
+  ): Promise<void> {
+    if (!courseId) return; // quiz not attached to a course — nothing to gate against
+    try {
+      await this.access.assertCourseAccess(courseId, uid, authToken, isAdmin);
+      return; // owner / admin / assigned instructor
+    } catch {
+      // not an owner — fall through to enrollment
+    }
+    const enrollmentData = await this.dc.executeQuery(
+      'GetUserEnrollmentForCourse',
+      { courseId },
+      authToken,
+    );
+    if (enrollmentData?.enrollments?.[0]?.status !== 'ACTIVE') {
+      throw new ForbiddenException(
+        'You must have an active enrollment in this course to access this quiz',
+      );
+    }
   }
 
   // ==========================================
@@ -518,10 +565,19 @@ export class QuizzesService {
     );
     const totalQuestions = allQuestions.length;
 
-    // Numerator = points earned on correctly answered questions
+    // Only questions still part of the quiz (non-deleted) count toward the score.
+    // An answer to a question that was soft-deleted after submission is in the
+    // denominator-less numerator otherwise, which can push the score over 100% (M3).
+    const gradableQuestionIds = new Set(allQuestions.map((q) => q.id));
+
+    // Numerator = points earned on correctly answered, still-gradable questions
     let earnedPoints = 0;
     let correctCount = 0;
     for (const answer of answers) {
+      const questionId = answer.question?.id;
+      if (questionId && !gradableQuestionIds.has(questionId)) {
+        continue; // answer to a soft-deleted question — ignore
+      }
       if (answer.selectedOption?.isCorrect) {
         earnedPoints += answer.question?.points ?? 1;
         correctCount++;

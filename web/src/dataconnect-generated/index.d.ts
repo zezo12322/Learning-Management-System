@@ -99,7 +99,7 @@ export enum SubmissionStatus {
 
 
 export interface AddCriterionScoreData {
-  missionSubmissionScore_insert: MissionSubmissionScore_Key;
+  missionSubmissionScore_upsert: MissionSubmissionScore_Key;
 }
 
 export interface AddCriterionScoreVariables {
@@ -345,14 +345,6 @@ export interface AdminDeleteRubricCriterionVariables {
   criterionId: UUIDString;
 }
 
-export interface AdminDeleteSectionData {
-  courseSection_delete?: CourseSection_Key | null;
-}
-
-export interface AdminDeleteSectionVariables {
-  sectionId: UUIDString;
-}
-
 export interface AdminDeprecateSubscriptionTierData {
   subscriptionTier_update?: SubscriptionTier_Key | null;
 }
@@ -596,6 +588,14 @@ export interface AdminSoftDeleteQuizQuestionData {
 
 export interface AdminSoftDeleteQuizQuestionVariables {
   questionId: UUIDString;
+}
+
+export interface AdminSoftDeleteSectionData {
+  courseSection_update?: CourseSection_Key | null;
+}
+
+export interface AdminSoftDeleteSectionVariables {
+  sectionId: UUIDString;
 }
 
 export interface AdminUpdateCourseData {
@@ -930,6 +930,19 @@ export interface GetCourseCurriculumVariables {
   courseId: UUIDString;
 }
 
+export interface GetCourseForEnrollmentData {
+  course?: {
+    id: UUIDString;
+    status: CourseStatus;
+    price: number;
+    deletedAt?: TimestampString | null;
+  } & Course_Key;
+}
+
+export interface GetCourseForEnrollmentVariables {
+  courseId: UUIDString;
+}
+
 export interface GetCourseInstructorsData {
   courseInstructors: ({
     user: {
@@ -975,6 +988,19 @@ export interface GetCriterionMissionData {
 
 export interface GetCriterionMissionVariables {
   criterionId: UUIDString;
+}
+
+export interface GetEnrollmentForUserMissionData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+
+export interface GetEnrollmentForUserMissionVariables {
+  userId: string;
+  missionId: UUIDString;
 }
 
 export interface GetExpiredAttemptsData {
@@ -1042,6 +1068,17 @@ export interface GetMicroLessonMissionData {
 
 export interface GetMicroLessonMissionVariables {
   microLessonId: UUIDString;
+}
+
+export interface GetMissionForEnrollmentData {
+  mission?: {
+    id: UUIDString;
+    deletedAt?: TimestampString | null;
+  } & Mission_Key;
+}
+
+export interface GetMissionForEnrollmentVariables {
+  missionId: UUIDString;
 }
 
 export interface GetMissionTemplatesData {
@@ -1301,6 +1338,24 @@ export interface GetSectionCourseData {
 
 export interface GetSectionCourseVariables {
   sectionId: UUIDString;
+}
+
+export interface GetSubmissionForGradingData {
+  missionSubmission?: {
+    id: UUIDString;
+    status: SubmissionStatus;
+    attemptNumber: number;
+    mission: {
+      id: UUIDString;
+    } & Mission_Key;
+    student: {
+      id: string;
+    } & User_Key;
+  } & MissionSubmission_Key;
+}
+
+export interface GetSubmissionForGradingVariables {
+  submissionId: UUIDString;
 }
 
 export interface GetTemplateMissionData {
@@ -1838,6 +1893,18 @@ export const getMyCourseProgressRef: GetMyCourseProgressRef;
 export function getMyCourseProgress(vars: GetMyCourseProgressVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseProgressData, GetMyCourseProgressVariables>;
 export function getMyCourseProgress(dc: DataConnect, vars: GetMyCourseProgressVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseProgressData, GetMyCourseProgressVariables>;
 
+interface GetCourseForEnrollmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCourseForEnrollmentVariables): QueryRef<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCourseForEnrollmentVariables): QueryRef<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+  operationName: string;
+}
+export const getCourseForEnrollmentRef: GetCourseForEnrollmentRef;
+
+export function getCourseForEnrollment(vars: GetCourseForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+export function getCourseForEnrollment(dc: DataConnect, vars: GetCourseForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+
 interface AdminGetCourseRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: AdminGetCourseVariables): QueryRef<AdminGetCourseData, AdminGetCourseVariables>;
@@ -1910,17 +1977,17 @@ export const adminUpdateSectionRef: AdminUpdateSectionRef;
 export function adminUpdateSection(vars: AdminUpdateSectionVariables): MutationPromise<AdminUpdateSectionData, AdminUpdateSectionVariables>;
 export function adminUpdateSection(dc: DataConnect, vars: AdminUpdateSectionVariables): MutationPromise<AdminUpdateSectionData, AdminUpdateSectionVariables>;
 
-interface AdminDeleteSectionRef {
+interface AdminSoftDeleteSectionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeleteSectionVariables): MutationRef<AdminDeleteSectionData, AdminDeleteSectionVariables>;
+  (vars: AdminSoftDeleteSectionVariables): MutationRef<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeleteSectionVariables): MutationRef<AdminDeleteSectionData, AdminDeleteSectionVariables>;
+  (dc: DataConnect, vars: AdminSoftDeleteSectionVariables): MutationRef<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
   operationName: string;
 }
-export const adminDeleteSectionRef: AdminDeleteSectionRef;
+export const adminSoftDeleteSectionRef: AdminSoftDeleteSectionRef;
 
-export function adminDeleteSection(vars: AdminDeleteSectionVariables): MutationPromise<AdminDeleteSectionData, AdminDeleteSectionVariables>;
-export function adminDeleteSection(dc: DataConnect, vars: AdminDeleteSectionVariables): MutationPromise<AdminDeleteSectionData, AdminDeleteSectionVariables>;
+export function adminSoftDeleteSection(vars: AdminSoftDeleteSectionVariables): MutationPromise<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
+export function adminSoftDeleteSection(dc: DataConnect, vars: AdminSoftDeleteSectionVariables): MutationPromise<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
 
 interface AdminUpdateSectionOrderRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2174,6 +2241,18 @@ export const getUserEnrollmentForMissionRef: GetUserEnrollmentForMissionRef;
 export function getUserEnrollmentForMission(vars: GetUserEnrollmentForMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
 export function getUserEnrollmentForMission(dc: DataConnect, vars: GetUserEnrollmentForMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
 
+interface GetMissionForEnrollmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  operationName: string;
+}
+export const getMissionForEnrollmentRef: GetMissionForEnrollmentRef;
+
+export function getMissionForEnrollment(vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+export function getMissionForEnrollment(dc: DataConnect, vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+
 interface SubmitMissionRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: SubmitMissionVariables): MutationRef<SubmitMissionData, SubmitMissionVariables>;
@@ -2221,6 +2300,30 @@ export const addCriterionScoreRef: AddCriterionScoreRef;
 
 export function addCriterionScore(vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
 export function addCriterionScore(dc: DataConnect, vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
+
+interface GetSubmissionForGradingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  operationName: string;
+}
+export const getSubmissionForGradingRef: GetSubmissionForGradingRef;
+
+export function getSubmissionForGrading(vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+export function getSubmissionForGrading(dc: DataConnect, vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+
+interface GetEnrollmentForUserMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  operationName: string;
+}
+export const getEnrollmentForUserMissionRef: GetEnrollmentForUserMissionRef;
+
+export function getEnrollmentForUserMission(vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+export function getEnrollmentForUserMission(dc: DataConnect, vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
 
 interface AdminCreateMissionRef {
   /* Allow users to create refs without passing in DataConnect */

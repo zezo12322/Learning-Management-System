@@ -1,0 +1,31 @@
+import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';
+import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
+
+/**
+ * Self-service identity endpoints for the authenticated user. No role required
+ * beyond being signed in — every authenticated principal may manage their own
+ * record/profile (M9).
+ */
+@Controller('me')
+@UseGuards(FirebaseAuthGuard)
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post('sync')
+  sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
+    return this.usersService.sync(dto, token);
+  }
+
+  @Get()
+  getMe(@AuthToken() token: string) {
+    return this.usersService.getMe(token);
+  }
+
+  @Patch('profile')
+  updateProfile(@Body() dto: UpdateProfileDto, @AuthToken() token: string) {
+    return this.usersService.updateProfile(dto, token);
+  }
+}

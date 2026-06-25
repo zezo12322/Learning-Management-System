@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CommonModule } from './common/common.module';
@@ -16,6 +18,10 @@ import { RubricModule } from './rubric/rubric.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { ProgressModule } from './progress/progress.module';
 import { CompletionModule } from './completion/completion.module';
+import { UsersModule } from './users/users.module';
+import { EnrollmentModule } from './enrollment/enrollment.module';
+import { SubmissionsModule } from './submissions/submissions.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -24,6 +30,13 @@ import { CompletionModule } from './completion/completion.module';
       envFilePath: '.env',
     }),
     ScheduleModule.forRoot(),
+    // Global rate limiting (M8): 100 requests / 60s per client by default.
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     CommonModule,
     AdminModule,
     FirebaseModule,
@@ -38,7 +51,18 @@ import { CompletionModule } from './completion/completion.module';
     UploadsModule,
     ProgressModule,
     CompletionModule,
+    UsersModule,
+    EnrollmentModule,
+    SubmissionsModule,
+    CatalogModule,
   ],
   controllers: [AppController],
+  providers: [
+    // Apply the throttler globally.
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule { }

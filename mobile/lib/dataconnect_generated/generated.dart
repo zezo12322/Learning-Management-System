@@ -32,6 +32,8 @@ part 'get_user_lecture_progress.dart';
 
 part 'get_my_course_progress.dart';
 
+part 'get_course_for_enrollment.dart';
+
 part 'admin_get_course.dart';
 
 part 'admin_list_my_courses.dart';
@@ -44,7 +46,7 @@ part 'admin_create_section.dart';
 
 part 'admin_update_section.dart';
 
-part 'admin_delete_section.dart';
+part 'admin_soft_delete_section.dart';
 
 part 'admin_update_section_order.dart';
 
@@ -88,6 +90,8 @@ part 'get_user_enrollment_for_course.dart';
 
 part 'get_user_enrollment_for_mission.dart';
 
+part 'get_mission_for_enrollment.dart';
+
 part 'submit_mission.dart';
 
 part 'my_submissions.dart';
@@ -95,6 +99,10 @@ part 'my_submissions.dart';
 part 'grade_submission.dart';
 
 part 'add_criterion_score.dart';
+
+part 'get_submission_for_grading.dart';
+
+part 'get_enrollment_for_user_mission.dart';
 
 part 'admin_create_mission.dart';
 
@@ -779,6 +787,11 @@ class DefaultConnector {
   }
   
   
+  GetCourseForEnrollmentVariablesBuilder getCourseForEnrollment ({required String courseId, }) {
+    return GetCourseForEnrollmentVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
   AdminGetCourseVariablesBuilder adminGetCourse ({required String courseId, }) {
     return AdminGetCourseVariablesBuilder(dataConnect, courseId: courseId,);
   }
@@ -809,8 +822,8 @@ class DefaultConnector {
   }
   
   
-  AdminDeleteSectionVariablesBuilder adminDeleteSection ({required String sectionId, }) {
-    return AdminDeleteSectionVariablesBuilder(dataConnect, sectionId: sectionId,);
+  AdminSoftDeleteSectionVariablesBuilder adminSoftDeleteSection ({required String sectionId, }) {
+    return AdminSoftDeleteSectionVariablesBuilder(dataConnect, sectionId: sectionId,);
   }
   
   
@@ -919,6 +932,11 @@ class DefaultConnector {
   }
   
   
+  GetMissionForEnrollmentVariablesBuilder getMissionForEnrollment ({required String missionId, }) {
+    return GetMissionForEnrollmentVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
   SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
     return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
   }
@@ -936,6 +954,16 @@ class DefaultConnector {
   
   AddCriterionScoreVariablesBuilder addCriterionScore ({required String submissionId, required String criterionId, required double score, }) {
     return AddCriterionScoreVariablesBuilder(dataConnect, submissionId: submissionId,criterionId: criterionId,score: score,);
+  }
+  
+  
+  GetSubmissionForGradingVariablesBuilder getSubmissionForGrading ({required String submissionId, }) {
+    return GetSubmissionForGradingVariablesBuilder(dataConnect, submissionId: submissionId,);
+  }
+  
+  
+  GetEnrollmentForUserMissionVariablesBuilder getEnrollmentForUserMission ({required String userId, required String missionId, }) {
+    return GetEnrollmentForUserMissionVariablesBuilder(dataConnect, userId: userId,missionId: missionId,);
   }
   
   

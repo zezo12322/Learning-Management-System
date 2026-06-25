@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
 import {
@@ -61,9 +62,16 @@ export class QuizzesController {
   }
 
   // Student-safe view (no isCorrect) — used to render the quiz for taking.
+  // Access is gated in the service (M4): course owner/admin or active enrollee.
   @Get('courses/:courseId/quizzes/:quizId/questions')
-  getQuizForTaking(@Param('quizId') quizId: string, @AuthToken() token: string) {
-    return this.quizzesService.getQuizForTaking(quizId, token);
+  getQuizForTaking(
+    @Param('quizId') quizId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+    @Req() req: any,
+  ) {
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.quizzesService.getQuizForTaking(quizId, token, uid, isAdmin);
   }
 
   @Patch('courses/:courseId/quizzes/:quizId')

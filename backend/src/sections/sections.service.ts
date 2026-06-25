@@ -43,8 +43,9 @@ export class SectionsService {
       authToken,
     );
 
-    // 2. Delete the section itself
-    await this.dc.executeMutation('AdminDeleteSection', { sectionId }, authToken);
+    // 2. Soft-delete the section itself (H4) — preserves FK integrity with the
+    //    now soft-deleted child lectures and their progress rows.
+    await this.dc.executeMutation('AdminSoftDeleteSection', { sectionId }, authToken);
 
     // 3. Re-normalize the order of the remaining sections in the course
     const course = await this.dc.executeQuery(

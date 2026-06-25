@@ -113,13 +113,23 @@ export class CompletionService {
   }
 
   /**
-   * Trigger 3: After a mission is graded, check if it passed and update enrollment.
+   * Trigger 3: After an instructor grades a mission submission, mark the
+   * *student's* mission enrollment COMPLETED.
+   *
+   * The grader (auth.uid) is NOT the student, so we look the enrollment up by
+   * the student's uid via the instructor-scoped GetEnrollmentForUserMission
+   * query (the old version used auth.uid and silently targeted the grader's own
+   * enrollment — corrected for H6).
    */
-  async checkMissionCompletion(missionId: string, authToken: string): Promise<void> {
+  async markMissionEnrollmentCompleted(
+    missionId: string,
+    studentUid: string,
+    authToken: string,
+  ): Promise<void> {
     try {
       const enrollmentData = await this.dc.executeQuery(
-        'GetUserEnrollmentForMission',
-        { missionId },
+        'GetEnrollmentForUserMission',
+        { userId: studentUid, missionId },
         authToken,
       );
 
@@ -136,12 +146,12 @@ export class CompletionService {
         );
 
         this.logger.log(
-          `Mission ${missionId} enrollment ${enrollment.id} marked as COMPLETED`,
+          `Mission ${missionId} enrollment ${enrollment.id} (student ${studentUid}) marked as COMPLETED`,
         );
       }
     } catch (error) {
       this.logger.error(
-        `Failed to check mission completion for ${missionId}: ${error.message}`,
+        `Failed to complete mission ${missionId} for student ${studentUid}: ${error.message}`,
       );
     }
   }

@@ -53,7 +53,19 @@ export class MissionsService {
     return data?.missions ?? [];
   }
 
-  async update(missionId: string, dto: UpdateMissionDto, authToken: string) {
+  async update(
+    missionId: string,
+    dto: UpdateMissionDto,
+    authToken: string,
+    uid: string,
+    isAdmin: boolean,
+  ) {
+    // If the update (re)attaches the mission to a course, the caller must own
+    // that target course too — not just the mission (M5). Route guards only
+    // checked mission ownership.
+    if (dto.courseId) {
+      await this.access.assertCourseAccess(dto.courseId, uid, authToken, isAdmin);
+    }
     return this.dc.executeMutation(
       'AdminUpdateMission',
       { missionId, ...dto },
