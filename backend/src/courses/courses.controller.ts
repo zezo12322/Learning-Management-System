@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto } from './dto/course.dto';
@@ -15,31 +14,28 @@ import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('courses')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 @Roles('admin', 'instructor')
 export class CoursesController {
-  constructor(
-    private readonly coursesService: CoursesService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  create(@Body() dto: CreateCourseDto, @Req() req: any) {
-    return this.coursesService.create(dto, this.dc.extractToken(req));
+  create(@Body() dto: CreateCourseDto, @AuthToken() token: string) {
+    return this.coursesService.create(dto, token);
   }
 
   @Get()
-  findAll(@Req() req: any) {
-    return this.coursesService.findMyList(this.dc.extractToken(req));
+  findAll(@AuthToken() token: string) {
+    return this.coursesService.findMyList(token);
   }
 
   @Get(':courseId')
   @UseGuards(CourseAccessGuard)
-  findOne(@Param('courseId') courseId: string, @Req() req: any) {
-    return this.coursesService.findOne(courseId, this.dc.extractToken(req));
+  findOne(@Param('courseId') courseId: string, @AuthToken() token: string) {
+    return this.coursesService.findOne(courseId, token);
   }
 
   @Patch(':courseId')
@@ -47,9 +43,9 @@ export class CoursesController {
   update(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.coursesService.update(courseId, dto, this.dc.extractToken(req));
+    return this.coursesService.update(courseId, dto, token);
   }
 
   @Patch(':courseId/status')
@@ -57,15 +53,15 @@ export class CoursesController {
   updateStatus(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseStatusDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.coursesService.updateStatus(courseId, dto, this.dc.extractToken(req));
+    return this.coursesService.updateStatus(courseId, dto, token);
   }
 
   @Delete(':courseId')
   @UseGuards(CourseAccessGuard)
-  softDelete(@Param('courseId') courseId: string, @Req() req: any) {
-    return this.coursesService.softDelete(courseId, this.dc.extractToken(req));
+  softDelete(@Param('courseId') courseId: string, @AuthToken() token: string) {
+    return this.coursesService.softDelete(courseId, token);
   }
 
   // ==========================================
@@ -77,9 +73,9 @@ export class CoursesController {
   addInstructor(
     @Param('courseId') courseId: string,
     @Body('userId') userId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.coursesService.addInstructor(courseId, userId, this.dc.extractToken(req));
+    return this.coursesService.addInstructor(courseId, userId, token);
   }
 
   @Delete(':courseId/instructors/:userId')
@@ -87,14 +83,14 @@ export class CoursesController {
   removeInstructor(
     @Param('courseId') courseId: string,
     @Param('userId') userId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.coursesService.removeInstructor(courseId, userId, this.dc.extractToken(req));
+    return this.coursesService.removeInstructor(courseId, userId, token);
   }
 
   @Get(':courseId/instructors')
   @UseGuards(CourseAccessGuard)
-  getInstructors(@Param('courseId') courseId: string, @Req() req: any) {
-    return this.coursesService.getInstructors(courseId, this.dc.extractToken(req));
+  getInstructors(@Param('courseId') courseId: string, @AuthToken() token: string) {
+    return this.coursesService.getInstructors(courseId, token);
   }
 }

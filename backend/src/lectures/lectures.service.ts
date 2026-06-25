@@ -1,11 +1,15 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { OrderingService } from '../common/services/ordering.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto, LectureType } from './dto/lecture.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class LecturesService {
-  constructor(private readonly dc: DataConnectService) {}
+  constructor(
+    private readonly dc: DataConnectService,
+    private readonly ordering: OrderingService,
+  ) {}
 
   /**
    * Validates that the content matches the lecture type:
@@ -41,10 +45,6 @@ export class LecturesService {
       );
     }
     const lectures = section.adminLectures ?? [];
-    const maxOrder = lectures.reduce(
-      (max: number, l: any) => Math.max(max, l.order ?? 0),
-      0,
-    );
 
     return this.dc.executeMutation(
       'AdminCreateLectureFull',
@@ -57,7 +57,7 @@ export class LecturesService {
         duration: dto.duration ?? null,
         transcriptUrl: dto.transcriptUrl ?? null,
         isFreePreview: dto.isFreePreview ?? false,
-        order: maxOrder + 1,
+        order: this.ordering.nextOrder(lectures),
       },
       authToken,
     );
@@ -92,18 +92,10 @@ export class LecturesService {
     const section = (course?.course?.adminSections ?? []).find(
       (s: any) => s.id === sectionId,
     );
-    const remaining = (section?.adminLectures ?? []).filter(
-      (l: any) => l.id !== lectureId,
-    );
-    await Promise.all(
-      remaining.map((l: any, index: number) =>
-        this.dc.executeMutation(
-          'AdminUpdateLectureOrder',
-          { lectureId: l.id, order: index + 1 },
-          authToken,
-        ),
-      ),
-    );
+    const remaining = (section?.adminLectures ?? [])
+      .filter((l: any) => l.id !== lectureId)
+      .map((l: any) => l.id);
+    await this.ordering.applyOrder(remaining, 'AdminUpdateLectureOrder', 'lectureId', authToken);
 
     return { success: true };
   }
@@ -122,14 +114,7 @@ export class LecturesService {
     const validIds = (section?.adminLectures ?? []).map((l: any) => l.id);
     assertReorderMembership(orderedIds, validIds, 'lecture');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateLectureOrder',
-        { lectureId: id, order: index + 1 },
-        authToken,
-      ),
-    );
-    await Promise.all(updates);
+    await this.ordering.applyOrder(orderedIds, 'AdminUpdateLectureOrder', 'lectureId', authToken);
     return { success: true, order: orderedIds };
   }
 

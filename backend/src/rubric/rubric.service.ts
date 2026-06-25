@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { OrderingService } from '../common/services/ordering.service';
 import { CreateCriterionDto, UpdateCriterionDto } from './dto/criterion.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class RubricService {
-  constructor(private readonly dc: DataConnectService) {}
+  constructor(
+    private readonly dc: DataConnectService,
+    private readonly ordering: OrderingService,
+  ) {}
 
   async create(missionId: string, dto: CreateCriterionDto, authToken: string) {
     // Fetch existing criteria to auto-calculate order
@@ -15,10 +19,6 @@ export class RubricService {
       authToken,
     );
     const criteria = mission?.mission?.criteria ?? [];
-    const maxOrder = criteria.reduce(
-      (max: number, c: any) => Math.max(max, c.order ?? 0),
-      0,
-    );
 
     return this.dc.executeMutation(
       'AdminCreateRubricCriterion',
@@ -27,7 +27,7 @@ export class RubricService {
         criterionName: dto.criterionName,
         description: dto.description ?? null,
         maxPoints: dto.maxPoints,
-        order: maxOrder + 1,
+        order: this.ordering.nextOrder(criteria),
       },
       authToken,
     );
@@ -54,17 +54,14 @@ export class RubricService {
       { missionId },
       authToken,
     );
-    const remaining = (mission?.mission?.criteria ?? []).filter(
-      (c: any) => c.id !== criterionId,
-    );
-    await Promise.all(
-      remaining.map((c: any, index: number) =>
-        this.dc.executeMutation(
-          'AdminUpdateRubricCriterionOrder',
-          { criterionId: c.id, order: index + 1 },
-          authToken,
-        ),
-      ),
+    const remaining = (mission?.mission?.criteria ?? [])
+      .filter((c: any) => c.id !== criterionId)
+      .map((c: any) => c.id);
+    await this.ordering.applyOrder(
+      remaining,
+      'AdminUpdateRubricCriterionOrder',
+      'criterionId',
+      authToken,
     );
 
     return { success: true };
@@ -76,14 +73,12 @@ export class RubricService {
     const validIds = (mission?.mission?.criteria ?? []).map((c: any) => c.id);
     assertReorderMembership(orderedIds, validIds, 'criterion');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateRubricCriterionOrder',
-        { criterionId: id, order: index + 1 },
-        authToken,
-      ),
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateRubricCriterionOrder',
+      'criterionId',
+      authToken,
     );
-    await Promise.all(updates);
     return { success: true, order: orderedIds };
   }
 }

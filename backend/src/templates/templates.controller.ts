@@ -8,7 +8,6 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TemplatesService } from './templates.service';
@@ -18,16 +17,13 @@ import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
-import { DataConnectService } from '../firebase/dataconnect.service';
 
 @Controller('missions/:missionId/templates')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class TemplatesController {
-  constructor(
-    private readonly templatesService: TemplatesService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly templatesService: TemplatesService) {}
 
   @Post()
   @Roles('admin', 'instructor')
@@ -37,19 +33,14 @@ export class TemplatesController {
     @Param('missionId') missionId: string,
     @Body('title') title: string,
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.templatesService.upload(
-      missionId,
-      title,
-      file,
-      this.dc.extractToken(req),
-    );
+    return this.templatesService.upload(missionId, title, file, token);
   }
 
   @Get()
-  findAll(@Param('missionId') missionId: string, @Req() req: any) {
-    return this.templatesService.findAll(missionId, this.dc.extractToken(req));
+  findAll(@Param('missionId') missionId: string, @AuthToken() token: string) {
+    return this.templatesService.findAll(missionId, token);
   }
 
   @Delete(':templateId')
@@ -59,12 +50,8 @@ export class TemplatesController {
   delete(
     @Param('missionId') missionId: string,
     @Param('templateId') templateId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.templatesService.delete(
-      missionId,
-      templateId,
-      this.dc.extractToken(req),
-    );
+    return this.templatesService.delete(missionId, templateId, token);
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
+import { OrderingService } from '../common/services/ordering.service';
 import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
@@ -9,6 +10,7 @@ export class MicroLessonsService {
   constructor(
     private readonly dc: DataConnectService,
     private readonly firebase: FirebaseService,
+    private readonly ordering: OrderingService,
   ) {}
 
   async create(missionId: string, dto: CreateMicroLessonDto, authToken: string) {
@@ -19,10 +21,6 @@ export class MicroLessonsService {
       authToken,
     );
     const microLessons = mission?.mission?.microLessons ?? [];
-    const maxOrder = microLessons.reduce(
-      (max: number, m: any) => Math.max(max, m.order ?? 0),
-      0,
-    );
 
     return this.dc.executeMutation(
       'AdminCreateMicroLesson',
@@ -33,7 +31,7 @@ export class MicroLessonsService {
         assetUrl: dto.assetUrl ?? null,
         content: dto.content ?? null,
         durationSeconds: dto.durationSeconds ?? null,
-        order: maxOrder + 1,
+        order: this.ordering.nextOrder(microLessons),
       },
       authToken,
     );
@@ -66,17 +64,14 @@ export class MicroLessonsService {
       { missionId },
       authToken,
     );
-    const remaining = (mission?.mission?.microLessons ?? []).filter(
-      (m: any) => m.id !== microLessonId,
-    );
-    await Promise.all(
-      remaining.map((m: any, index: number) =>
-        this.dc.executeMutation(
-          'AdminUpdateMicroLessonOrder',
-          { microLessonId: m.id, order: index + 1 },
-          authToken,
-        ),
-      ),
+    const remaining = (mission?.mission?.microLessons ?? [])
+      .filter((m: any) => m.id !== microLessonId)
+      .map((m: any) => m.id);
+    await this.ordering.applyOrder(
+      remaining,
+      'AdminUpdateMicroLessonOrder',
+      'microLessonId',
+      authToken,
     );
 
     return { success: true };
@@ -88,14 +83,12 @@ export class MicroLessonsService {
     const validIds = (mission?.mission?.microLessons ?? []).map((m: any) => m.id);
     assertReorderMembership(orderedIds, validIds, 'micro-lesson');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateMicroLessonOrder',
-        { microLessonId: id, order: index + 1 },
-        authToken,
-      ),
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateMicroLessonOrder',
+      'microLessonId',
+      authToken,
     );
-    await Promise.all(updates);
     return { success: true, order: orderedIds };
   }
 }

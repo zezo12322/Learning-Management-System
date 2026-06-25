@@ -41,7 +41,7 @@ query MySubmissions @auth(level: USER) {
 mutation GradeSubmission(
   $submissionId: UUID!, 
   $feedback: String
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionSubmission_update(
     id: $submissionId,
     data: {
@@ -57,7 +57,7 @@ mutation AddCriterionScore(
   $submissionId: UUID!,
   $criterionId: UUID!,
   $score: Float!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionSubmissionScore_insert(
     data: {
       submissionId: $submissionId,
@@ -80,7 +80,7 @@ mutation AdminCreateMission(
   $difficulty: MissionDifficulty!,
   $skillsTested: [String!]!,
   $courseId: UUID
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   mission_insert(
     data: {
       title: $title,
@@ -106,7 +106,7 @@ mutation AdminUpdateMission(
   $difficulty: MissionDifficulty,
   $skillsTested: [String!],
   $courseId: UUID
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   mission_update(
     id: $missionId,
     data: {
@@ -123,7 +123,7 @@ mutation AdminUpdateMission(
 }
 
 # Soft-deletes a mission
-mutation AdminSoftDeleteMission($missionId: UUID!) @auth(level: USER) {
+mutation AdminSoftDeleteMission($missionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   mission_update(
     id: $missionId,
     data: {
@@ -133,7 +133,7 @@ mutation AdminSoftDeleteMission($missionId: UUID!) @auth(level: USER) {
 }
 
 # Retrieves full mission details for authoring (admin view)
-query AdminGetMission($missionId: UUID!) @auth(level: USER) {
+query AdminGetMission($missionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   mission(id: $missionId) {
     id
     title
@@ -174,7 +174,7 @@ query AdminGetMission($missionId: UUID!) @auth(level: USER) {
 }
 
 # Lists all missions authored by the authenticated user
-query AdminListMyMissions @auth(level: USER) {
+query AdminListMyMissions @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missions(
     where: {
       authorId: { eq_expr: "auth.uid" },
@@ -205,7 +205,7 @@ mutation AdminCreateMicroLesson(
   $content: String,
   $durationSeconds: Int,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionMicroLesson_insert(
     data: {
       missionId: $missionId,
@@ -227,7 +227,7 @@ mutation AdminUpdateMicroLesson(
   $assetUrl: String,
   $content: String,
   $durationSeconds: Int
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionMicroLesson_update(
     id: $microLessonId,
     data: {
@@ -241,7 +241,7 @@ mutation AdminUpdateMicroLesson(
 }
 
 # Deletes a micro-lesson
-mutation AdminDeleteMicroLesson($microLessonId: UUID!) @auth(level: USER) {
+mutation AdminDeleteMicroLesson($microLessonId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionMicroLesson_delete(id: $microLessonId)
 }
 
@@ -249,7 +249,7 @@ mutation AdminDeleteMicroLesson($microLessonId: UUID!) @auth(level: USER) {
 mutation AdminUpdateMicroLessonOrder(
   $microLessonId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionMicroLesson_update(
     id: $microLessonId,
     data: {
@@ -268,7 +268,7 @@ mutation AdminCreateMissionTemplate(
   $title: String!,
   $fileUrl: String!,
   $fileType: String!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionTemplate_insert(
     data: {
       missionId: $missionId,
@@ -280,7 +280,7 @@ mutation AdminCreateMissionTemplate(
 }
 
 # Deletes a mission template record
-mutation AdminDeleteMissionTemplate($templateId: UUID!) @auth(level: USER) {
+mutation AdminDeleteMissionTemplate($templateId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionTemplate_delete(id: $templateId)
 }
 
@@ -305,7 +305,7 @@ mutation AdminCreateRubricCriterion(
   $description: String,
   $maxPoints: Float!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   rubricCriterion_insert(
     data: {
       missionId: $missionId,
@@ -323,7 +323,7 @@ mutation AdminUpdateRubricCriterion(
   $criterionName: String,
   $description: String,
   $maxPoints: Float
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   rubricCriterion_update(
     id: $criterionId,
     data: {
@@ -335,7 +335,7 @@ mutation AdminUpdateRubricCriterion(
 }
 
 # Deletes a rubric criterion
-mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(level: USER) {
+mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   rubricCriterion_delete(id: $criterionId)
 }
 
@@ -343,7 +343,7 @@ mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(level: USER) {
 mutation AdminUpdateRubricCriterionOrder(
   $criterionId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   rubricCriterion_update(
     id: $criterionId,
     data: {

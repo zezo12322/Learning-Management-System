@@ -107,7 +107,7 @@ query GetMyCourseProgress($courseId: UUID!) @auth(level: USER) {
 # ==========================================
 
 # Retrieves full course details for authoring purposes (includes drafts)
-query AdminGetCourse($courseId: UUID!) @auth(level: USER) {
+query AdminGetCourse($courseId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   course(id: $courseId) {
     id
     title
@@ -150,7 +150,7 @@ query AdminGetCourse($courseId: UUID!) @auth(level: USER) {
 }
 
 # Lists all courses authored by the authenticated user
-query AdminListMyCourses @auth(level: USER) {
+query AdminListMyCourses @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courses(
     where: {
       authorId: { eq_expr: "auth.uid" },
@@ -180,7 +180,7 @@ mutation AdminUpdateCourse(
   $categoryId: UUID,
   $tags: [String!],
   $thumbnail: String
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   course_update(
     id: $courseId,
     data: {
@@ -201,7 +201,7 @@ mutation AdminUpdateCourse(
 mutation AdminUpdateCourseStatus(
   $courseId: UUID!,
   $status: CourseStatus!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   course_update(
     id: $courseId,
     data: {
@@ -220,7 +220,7 @@ mutation AdminCreateSection(
   $courseId: UUID!,
   $title: String!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseSection_insert(
     data: {
       courseId: $courseId,
@@ -234,7 +234,7 @@ mutation AdminCreateSection(
 mutation AdminUpdateSection(
   $sectionId: UUID!,
   $title: String!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseSection_update(
     id: $sectionId,
     data: {
@@ -245,7 +245,7 @@ mutation AdminUpdateSection(
 }
 
 # Deletes a section
-mutation AdminDeleteSection($sectionId: UUID!) @auth(level: USER) {
+mutation AdminDeleteSection($sectionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseSection_delete(id: $sectionId)
 }
 
@@ -253,7 +253,7 @@ mutation AdminDeleteSection($sectionId: UUID!) @auth(level: USER) {
 mutation AdminUpdateSectionOrder(
   $sectionId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseSection_update(
     id: $sectionId,
     data: {
@@ -278,7 +278,7 @@ mutation AdminCreateLectureFull(
   $transcriptUrl: String,
   $isFreePreview: Boolean!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_insert(
     data: {
       sectionId: $sectionId,
@@ -304,7 +304,7 @@ mutation AdminUpdateLecture(
   $duration: Int,
   $transcriptUrl: String,
   $isFreePreview: Boolean
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_update(
     id: $lectureId,
     data: {
@@ -321,7 +321,7 @@ mutation AdminUpdateLecture(
 }
 
 # Soft-deletes a lecture
-mutation AdminSoftDeleteLecture($lectureId: UUID!) @auth(level: USER) {
+mutation AdminSoftDeleteLecture($lectureId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_update(
     id: $lectureId,
     data: {
@@ -335,7 +335,7 @@ mutation AdminSoftDeleteLecture($lectureId: UUID!) @auth(level: USER) {
 mutation AdminUpdateLectureOrder(
   $lectureId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_update(
     id: $lectureId,
     data: {
@@ -350,7 +350,7 @@ mutation AdminMoveLectureToSection(
   $lectureId: UUID!,
   $newSectionId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_update(
     id: $lectureId,
     data: {
@@ -362,7 +362,7 @@ mutation AdminMoveLectureToSection(
 }
 
 # Bulk soft-deletes all non-deleted lectures within a section (section delete cascade)
-mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) @auth(level: USER) {
+mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseLecture_updateMany(
     where: {
       sectionId: { eq: $sectionId },

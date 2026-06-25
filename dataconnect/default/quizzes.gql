@@ -153,7 +153,7 @@ query GetQuizSettings($quizId: UUID!) @auth(level: USER) {
 }
 
 # Retrieves all options for a specific question (used for option diffing on update)
-query GetQuestionOptions($questionId: UUID!) @auth(level: USER) {
+query GetQuestionOptions($questionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizOptions(
     where: { questionId: { eq: $questionId } },
     orderBy: [{ order: ASC }]
@@ -197,7 +197,7 @@ query GetActiveQuizSession($attemptId: UUID!) @auth(level: USER) {
 # ==========================================
 
 # Retrieves quiz with all questions, options, and correct answers (admin view)
-query AdminGetQuiz($quizId: UUID!) @auth(level: USER) {
+query AdminGetQuiz($quizId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseQuiz(id: $quizId) {
     id
     passingScore
@@ -237,7 +237,7 @@ mutation AdminCreateQuiz(
   $passingScore: Float!,
   $maxAttempts: Int!,
   $timeLimitMinutes: Int
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseQuiz_insert(
     data: {
       lectureId: $lectureId,
@@ -254,7 +254,7 @@ mutation AdminUpdateQuiz(
   $passingScore: Float,
   $maxAttempts: Int,
   $timeLimitMinutes: Int
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseQuiz_update(
     id: $quizId,
     data: {
@@ -267,7 +267,7 @@ mutation AdminUpdateQuiz(
 }
 
 # Deletes a quiz
-mutation AdminDeleteQuiz($quizId: UUID!) @auth(level: USER) {
+mutation AdminDeleteQuiz($quizId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseQuiz_delete(id: $quizId)
 }
 
@@ -278,7 +278,7 @@ mutation AdminCreateQuizQuestion(
   $order: Int!,
   $points: Float!,
   $explanation: String
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizQuestion_insert(
     data: {
       quizId: $quizId,
@@ -296,7 +296,7 @@ mutation AdminUpdateQuizQuestion(
   $questionText: String,
   $points: Float,
   $explanation: String
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizQuestion_update(
     id: $questionId,
     data: {
@@ -308,7 +308,7 @@ mutation AdminUpdateQuizQuestion(
 }
 
 # Soft-deletes a quiz question
-mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(level: USER) {
+mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizQuestion_update(
     id: $questionId,
     data: {
@@ -321,7 +321,7 @@ mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(level: USER) {
 mutation AdminUpdateQuizQuestionOrder(
   $questionId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizQuestion_update(
     id: $questionId,
     data: {
@@ -336,7 +336,7 @@ mutation AdminCreateQuizOption(
   $text: String!,
   $order: Int!,
   $isCorrect: Boolean!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizOption_insert(
     data: {
       questionId: $questionId,
@@ -352,7 +352,7 @@ mutation AdminUpdateQuizOption(
   $optionId: UUID!,
   $text: String,
   $isCorrect: Boolean
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizOption_update(
     id: $optionId,
     data: {
@@ -363,7 +363,7 @@ mutation AdminUpdateQuizOption(
 }
 
 # Deletes a quiz option
-mutation AdminDeleteQuizOption($optionId: UUID!) @auth(level: USER) {
+mutation AdminDeleteQuizOption($optionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizOption_delete(id: $optionId)
 }
 
@@ -371,7 +371,7 @@ mutation AdminDeleteQuizOption($optionId: UUID!) @auth(level: USER) {
 mutation AdminUpdateQuizOptionOrder(
   $optionId: UUID!,
   $order: Int!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   quizOption_update(
     id: $optionId,
     data: {

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from './firebase.service';
+import { extractBearerToken } from '../common/decorators/auth-token.decorator';
 
 /**
  * Service for executing GraphQL operations against Firebase Data Connect.
@@ -218,11 +219,7 @@ export class DataConnectService {
    * Safe to call from guarded routes — FirebaseAuthGuard guarantees the token exists.
    */
   extractToken(request: any): string {
-    const authHeader = request.headers?.['authorization'];
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      return authHeader.split('Bearer ')[1];
-    }
-    return '';
+    return extractBearerToken(request);
   }
 }
 

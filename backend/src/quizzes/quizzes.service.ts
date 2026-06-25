@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CompletionService } from '../completion/completion.service';
+import { OrderingService } from '../common/services/ordering.service';
 import { assertReorderMembership } from '../common/utils/ordering';
 import {
   CreateQuizDto,
@@ -25,6 +26,7 @@ export class QuizzesService {
   constructor(
     private readonly dc: DataConnectService,
     private readonly completionService: CompletionService,
+    private readonly ordering: OrderingService,
   ) {}
 
   /**
@@ -144,10 +146,6 @@ export class QuizzesService {
     // Fetch existing questions to auto-calculate order
     const quiz = await this.getQuiz(quizId, authToken);
     const questions = quiz.adminQuestions ?? [];
-    const maxOrder = questions.reduce(
-      (max: number, q: any) => Math.max(max, q.order ?? 0),
-      0,
-    );
 
     // Insert question
     const questionResult = await this.dc.executeMutation(
@@ -155,7 +153,7 @@ export class QuizzesService {
       {
         quizId,
         questionText: dto.questionText,
-        order: maxOrder + 1,
+        order: this.ordering.nextOrder(questions),
         points: dto.points ?? 1.0,
         explanation: dto.explanation ?? null,
       },
@@ -272,17 +270,14 @@ export class QuizzesService {
 
     // Re-normalize the order of the remaining (non-deleted) questions
     const quiz = await this.getQuiz(quizId, authToken);
-    const remaining = (quiz.adminQuestions ?? []).filter(
-      (q: any) => q.id !== questionId,
-    );
-    await Promise.all(
-      remaining.map((q: any, index: number) =>
-        this.dc.executeMutation(
-          'AdminUpdateQuizQuestionOrder',
-          { questionId: q.id, order: index + 1 },
-          authToken,
-        ),
-      ),
+    const remaining = (quiz.adminQuestions ?? [])
+      .filter((q: any) => q.id !== questionId)
+      .map((q: any) => q.id);
+    await this.ordering.applyOrder(
+      remaining,
+      'AdminUpdateQuizQuestionOrder',
+      'questionId',
+      authToken,
     );
 
     return { success: true };
@@ -294,14 +289,12 @@ export class QuizzesService {
     const validIds = (quiz.adminQuestions ?? []).map((q: any) => q.id);
     assertReorderMembership(orderedIds, validIds, 'question');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateQuizQuestionOrder',
-        { questionId: id, order: index + 1 },
-        authToken,
-      ),
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateQuizQuestionOrder',
+      'questionId',
+      authToken,
     );
-    await Promise.all(updates);
     return { success: true, order: orderedIds };
   }
 
@@ -328,14 +321,12 @@ export class QuizzesService {
     const validIds = (existing?.quizOptions ?? []).map((o: any) => o.id);
     assertReorderMembership(orderedIds, validIds, 'option');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateQuizOptionOrder',
-        { optionId: id, order: index + 1 },
-        authToken,
-      ),
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateQuizOptionOrder',
+      'optionId',
+      authToken,
     );
-    await Promise.all(updates);
     return { success: true, order: orderedIds };
   }
 
