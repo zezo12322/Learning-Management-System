@@ -27,6 +27,10 @@ const ENTITY_RULES: Record<
   {
     allowedTypes: string[];
     requiresLecture: boolean;
+    // Public assets (thumbnails) are world-readable and stored as a public URL.
+    // Private assets (premium video/transcript) store only the storage path and
+    // are served via short-lived signed read URLs at request time (H2).
+    isPublic: boolean;
     buildPath: (courseId: string, lectureId: string | undefined, file: string) => string;
     confirm: { operation: string; idField: 'courseId' | 'lectureId'; urlField: string };
   }
@@ -34,12 +38,14 @@ const ENTITY_RULES: Record<
   [UploadEntityType.COURSE_THUMBNAIL]: {
     allowedTypes: ALLOWED_IMAGE_MIME_TYPES,
     requiresLecture: false,
+    isPublic: true,
     buildPath: (courseId, _l, file) => CourseStoragePaths.thumbnail(courseId, file),
     confirm: { operation: 'AdminUpdateCourse', idField: 'courseId', urlField: 'thumbnail' },
   },
   [UploadEntityType.LECTURE_VIDEO]: {
     allowedTypes: ALLOWED_VIDEO_MIME_TYPES,
     requiresLecture: true,
+    isPublic: false,
     buildPath: (courseId, lectureId, file) =>
       CourseStoragePaths.lectureVideo(courseId, lectureId!, file),
     confirm: { operation: 'AdminUpdateLecture', idField: 'lectureId', urlField: 'videoUrl' },
@@ -47,6 +53,7 @@ const ENTITY_RULES: Record<
   [UploadEntityType.LECTURE_TRANSCRIPT]: {
     allowedTypes: ['application/pdf'],
     requiresLecture: true,
+    isPublic: false,
     buildPath: (courseId, lectureId, file) =>
       CourseStoragePaths.lectureTranscript(courseId, lectureId!, file),
     confirm: { operation: 'AdminUpdateLecture', idField: 'lectureId', urlField: 'transcriptUrl' },
@@ -106,24 +113,58 @@ export class UploadsService {
       throw new BadRequestException(`File not found at path: ${dto.storagePath}`);
     }
 
-    const bucket = this.firebase.getBucket();
-    const downloadUrl = `https://storage.googleapis.com/${bucket.name}/${dto.storagePath}`;
-
     const entityId = rule.confirm.idField === 'lectureId' ? dto.lectureId : dto.courseId;
     if (!entityId) {
       throw new BadRequestException(`Missing ${rule.confirm.idField} for ${dto.entityType}`);
+    }
+
+    // For lecture-scoped uploads, the lecture must actually belong to the course
+    // we authorized against — otherwise a caller who owns course A could write a
+    // download URL onto a lecture in course B (IDOR) by pairing their own
+    // courseId/storagePath with a foreign lectureId.
+    if (rule.confirm.idField === 'lectureId') {
+      const lec = await this.dc.executeQuery(
+        'GetLectureContent',
+        { lectureId: dto.lectureId },
+        caller.token,
+      );
+      const owningCourseId = lec?.courseLecture?.section?.course?.id;
+      if (!owningCourseId) {
+        throw new BadRequestException(`Lecture ${dto.lectureId} not found`);
+      }
+      if (owningCourseId !== dto.courseId) {
+        throw new BadRequestException(
+          'Lecture does not belong to the specified course',
+        );
+      }
+    }
+
+    // Public assets (thumbnails) are made world-readable and stored as a public
+    // URL; private assets (premium video/transcript) store only the storage path
+    // and are served via signed read URLs on demand (H2).
+    let storedValue: string;
+    if (rule.isPublic) {
+      storedValue = await this.firebase.makeFilePublic(dto.storagePath);
+    } else {
+      storedValue = dto.storagePath;
     }
 
     await this.dc.executeMutation(
       rule.confirm.operation,
       {
         [rule.confirm.idField]: entityId,
-        [rule.confirm.urlField]: downloadUrl,
+        [rule.confirm.urlField]: storedValue,
       },
       caller.token,
     );
 
-    return { downloadUrl };
+    // For public assets return the URL; for private ones return a freshly
+    // signed read URL so the caller can verify the upload immediately.
+    const downloadUrl = rule.isPublic
+      ? storedValue
+      : await this.firebase.generateSignedReadUrl(dto.storagePath);
+
+    return { downloadUrl, storagePath: dto.storagePath };
   }
 
   /** Strip any path components; keep a safe basename. */

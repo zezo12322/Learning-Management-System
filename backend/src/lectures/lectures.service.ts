@@ -1,6 +1,13 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { FirebaseService } from '../firebase/firebase.service';
 import { OrderingService } from '../common/services/ordering.service';
+import { AccessService } from '../common/services/access.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto, LectureType } from './dto/lecture.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
@@ -9,7 +16,18 @@ export class LecturesService {
   constructor(
     private readonly dc: DataConnectService,
     private readonly ordering: OrderingService,
+    private readonly access: AccessService,
+    private readonly firebase: FirebaseService,
   ) {}
+
+  /** Replace stored private storage paths with short-lived signed read URLs (H2). */
+  private async signLectureUrls(lecture: any): Promise<any> {
+    return {
+      ...lecture,
+      videoUrl: await this.firebase.resolveReadUrl(lecture.videoUrl),
+      transcriptUrl: await this.firebase.resolveReadUrl(lecture.transcriptUrl),
+    };
+  }
 
   /**
    * Validates that the content matches the lecture type:
@@ -64,9 +82,23 @@ export class LecturesService {
   }
 
   async update(lectureId: string, dto: UpdateLectureDto, authToken: string) {
-    // Only enforce type-content consistency when the type is being set
+    // Only enforce type-content consistency when the type is being set. Validate
+    // against the MERGED state (incoming fields over the persisted record) so a
+    // PATCH that only changes `type` isn't wrongly rejected for a videoUrl/content
+    // that already exists on the lecture (M1).
     if (dto.type) {
-      this.validateTypeContent(dto.type, dto.videoUrl, dto.content);
+      const existing = await this.dc.executeQuery(
+        'GetLectureContent',
+        { lectureId },
+        authToken,
+      );
+      const current = existing?.courseLecture;
+      if (!current) {
+        throw new NotFoundException(`Lecture ${lectureId} not found`);
+      }
+      const videoUrl = dto.videoUrl !== undefined ? dto.videoUrl : current.videoUrl;
+      const content = dto.content !== undefined ? dto.content : current.content;
+      this.validateTypeContent(dto.type, videoUrl, content);
     }
     return this.dc.executeMutation(
       'AdminUpdateLecture',
@@ -154,13 +186,53 @@ export class LecturesService {
     );
   }
 
-  // Student-facing: get lecture content
-  async getContent(lectureId: string, authToken: string) {
+  /**
+   * Student-facing lecture content. Access is gated (H1): full content
+   * (videoUrl/content/transcriptUrl) is only returned to the course owner/admin,
+   * an actively-enrolled student, or for lectures explicitly marked free preview.
+   */
+  async getContent(
+    lectureId: string,
+    authToken: string,
+    uid: string | undefined,
+    isAdmin: boolean,
+  ) {
     const data = await this.dc.executeQuery(
       'GetLectureContent',
       { lectureId },
       authToken,
     );
-    return data?.courseLecture ?? null;
+    const lecture = data?.courseLecture;
+    if (!lecture) {
+      throw new NotFoundException(`Lecture ${lectureId} not found`);
+    }
+
+    // Free preview lectures are open to any authenticated user.
+    if (lecture.isFreePreview) return this.signLectureUrls(lecture);
+
+    const courseId = lecture.section?.course?.id;
+    if (courseId) {
+      // Course owner / admin / assigned instructor may always view.
+      try {
+        await this.access.assertCourseAccess(courseId, uid, authToken, isAdmin);
+        return this.signLectureUrls(lecture);
+      } catch {
+        // Not an owner — fall through to the enrollment check.
+      }
+
+      // Actively-enrolled students may view.
+      const enrollmentData = await this.dc.executeQuery(
+        'GetUserEnrollmentForCourse',
+        { courseId },
+        authToken,
+      );
+      if (enrollmentData?.enrollments?.[0]?.status === 'ACTIVE') {
+        return this.signLectureUrls(lecture);
+      }
+    }
+
+    throw new ForbiddenException(
+      'You must be enrolled in this course to view this lecture',
+    );
   }
 }

@@ -60,13 +60,20 @@ export class FirebaseService implements OnModuleInit {
 
     /**
      * Upload a file buffer to Firebase Storage.
-     * Returns the public download URL.
+     *
+     * Private by default (H2): objects are NOT made world-readable. The return
+     * value is the storage *path*, which callers persist and later exchange for
+     * a short-lived signed read URL via {@link resolveReadUrl}. Pass
+     * `{ public: true }` only for genuinely public assets (e.g. course
+     * thumbnails shown on the public catalog), in which case the public URL is
+     * returned instead.
      */
     async uploadFile(
         filePath: string,
         buffer: Buffer,
         contentType: string,
         metadata?: Record<string, string>,
+        opts?: { public?: boolean },
     ): Promise<string> {
         const bucket = this.getBucket();
         const file = bucket.file(filePath);
@@ -78,10 +85,50 @@ export class FirebaseService implements OnModuleInit {
             },
         });
 
-        // Make the file publicly readable
-        await file.makePublic();
+        if (opts?.public) {
+            await file.makePublic();
+            return `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+        }
 
+        // Private: return the path; read access is granted on demand via signed URLs.
+        return filePath;
+    }
+
+    /**
+     * Make an already-uploaded object public and return its public URL.
+     * Used for genuinely public assets (e.g. course thumbnails).
+     */
+    async makeFilePublic(filePath: string): Promise<string> {
+        const bucket = this.getBucket();
+        await bucket.file(filePath).makePublic();
         return `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    }
+
+    /**
+     * Mint a short-lived V4 signed READ url for a private object (H2).
+     */
+    async generateSignedReadUrl(
+        filePath: string,
+        expiresInMinutes = 60,
+    ): Promise<string> {
+        const bucket = this.getBucket();
+        const [url] = await bucket.file(filePath).getSignedUrl({
+            version: 'v4',
+            action: 'read',
+            expires: Date.now() + expiresInMinutes * 60 * 1000,
+        });
+        return url;
+    }
+
+    /**
+     * Resolve a stored asset reference to a fetchable URL. Full http(s) URLs
+     * (legacy/public objects) are returned unchanged; bare storage paths are
+     * exchanged for a short-lived signed read URL.
+     */
+    async resolveReadUrl(stored?: string | null): Promise<string | null> {
+        if (!stored) return stored ?? null;
+        if (/^https?:\/\//i.test(stored)) return stored;
+        return this.generateSignedReadUrl(stored);
     }
 
     /**

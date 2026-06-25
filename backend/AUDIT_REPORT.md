@@ -19,7 +19,32 @@
 
 ---
 
-## Remediation status (updated 2026-06-25)
+## Remediation status (updated 2026-06-25 — round 2)
+
+### Round 2 (HIGH + MEDIUM + missing features)
+Backend builds (`nest build` ✅), typechecks (`tsc` ✅), tests pass (✅). Connector/schema edits are validated for syntax balance but **require a redeploy** (`firebase deploy --only dataconnect`) + SDK regen, plus a Postgres migration for the new `CourseSection.deletedAt` column.
+
+- **H1 — Lecture content gating:** ✅ `GET /lectures/:lectureId` now returns full content only to the course owner/admin, an ACTIVE enrollee, or for `isFreePreview` lectures.
+- **H2 — Private storage:** ✅ Uploads are private by default; thumbnails stay public, premium video/transcript/templates store storage *paths* and are served via short-lived **signed read URLs** (`resolveReadUrl`). *Note: micro-lesson `assetUrl` is admin-supplied (not a backend upload) so it's unchanged; legacy public URLs already in the DB pass through.*
+- **H3 — confirmUpload IDOR:** ✅ Lecture uploads now verify the `lectureId` belongs to the authorized `courseId`.
+- **H4 — Section deletion:** ✅ Switched to **soft-delete** (`CourseSection.deletedAt` + `AdminSoftDeleteSection`); all section list queries filter `deletedAt: null`. Eliminates the FK/orphan hazard. *(quiz/option hard-deletes with children — see "Remaining".)*
+- **H5 — Enrollment:** ✅ New `EnrollmentModule` (`POST /courses/:id/enroll`, `/missions/:id/enroll`, status GETs) with existence/published checks and reactivation instead of duplicate rows.
+- **H6 — Submissions & grading:** ✅ New `SubmissionsModule` — student submit (enrollment-gated), `GET /me/submissions`, instructor `GET /submissions/pending`, `POST /submissions/:id/grade` (mission-ownership authorized, scores validated against rubric `maxPoints`, criterion scoring is now an upsert). Wires corrected mission completion (`markMissionEnrollmentCompleted` looks up the *student's* enrollment, fixing the old auth.uid bug).
+- **M1** ✅ lecture-update type validation now merges with the persisted record. **M3** ✅ grading ignores answers to soft-deleted questions. **M4** ✅ `getQuizForTaking` is enrollment/owner gated. **M5** ✅ mission update re-checks target-course ownership. **M6** ✅ template `title` validated via DTO. **M7** ✅ upstream DC/SQL error bodies no longer returned to clients. **M8** ✅ CORS restricted to `CORS_ORIGINS` env + global rate limiting (`@nestjs/throttler`, 100/60s). **M9** ✅ new `UsersModule` (`POST /me/sync`, `GET /me`, `PATCH /me/profile`) for provisioning.
+- **Bonus — Catalog:** ✅ new `CatalogModule` (`GET /catalog/courses` public discovery, `GET /catalog/courses/:id/curriculum`) so students can browse/enroll.
+
+**Required follow-up by you:** (1) `firebase deploy --only dataconnect` + regenerate SDKs (connector ops added/changed: `GetCourseForEnrollment`, `GetMissionForEnrollment`, `GetSubmissionForGrading`, `GetEnrollmentForUserMission`, `AdminSoftDeleteSection`, `AddCriterionScore`→upsert, `GradeSubmission` updatedAt, section list filters). (2) Apply the `course_sections.deletedAt` column migration. (3) Set `CORS_ORIGINS` for prod. (4) `npm install` already added `@nestjs/throttler` to package.json — commit the lockfile.
+
+**Remaining / deferred (documented, not yet applied):**
+- **M2** race conditions (duplicate in-progress attempts, non-atomic question+options/reorder) — needs DB partial-unique index + Data Connect transactions.
+- **DB constraints/indexes** (§5): enrollment uniqueness, polymorphic "exactly-one" CHECKs, FK/filter indexes — need careful migrations.
+- **Quiz/option hard-delete with children** (rest of H4) — `AdminDeleteQuiz`/`AdminDeleteQuizOption` can still hit FK issues if children/attempt-answers exist; soft-delete conflicts with the `lecture @unique` constraint, so deferred for a dedicated pass.
+- **GetPendingSubmissions** is staff-gated but not scoped to the instructor's own missions (cross-instructor visibility).
+- **Mission `attemptNumber`** stays 1 (no increment logic). **Paid-course payment gating** on enrollment deferred (payments unimplemented). **Certificates / sessions / payments** modules still absent.
+
+---
+
+### Round 1 (CRITICAL)
 
 - **C1 — Connector authorization:** ✅ *Code applied.* All privileged operations (`Admin*` plus `GradeSubmission`, `AddCriterionScore`, `GetPendingSubmissions`, `GetCourseInstructors`, `GetQuestionOptions`) now carry `@auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'")`, blocking plain students from calling them directly from the client SDK. Student/public/ownership-resolution ops remain `USER`/`PUBLIC`. **Requires deploy:** `firebase deploy --only dataconnect` + SDK regeneration. Per-instructor (A-vs-B) row-level ownership still enforced by the backend guards (by design, per chosen approach).
 - **C2 — Leaked service-account key:** ⚠️ *Partially applied.* `git rm --cached backend/firebase-service-account.json` staged (file untracked, kept locally; no code referenced it directly — only via `GOOGLE_APPLICATION_CREDENTIALS`). **Still required by you:** (1) rotate the key in GCP IAM, (2) commit the untracking, (3) scrub it from git history and force-push (it is already pushed to `origin`).

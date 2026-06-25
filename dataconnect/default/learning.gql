@@ -52,7 +52,7 @@ mutation UpdateLectureProgress(
 
 # Counts total lectures vs completed lectures for a course
 query GetCourseCompletionStatus($courseId: UUID!) @auth(level: USER) {
-  sections: courseSections(where: { courseId: { eq: $courseId } }) {
+  sections: courseSections(where: { courseId: { eq: $courseId }, deletedAt: { eq: null } }) {
     completionLectures: courseLectures_on_section(where: { deletedAt: { eq: null } }) {
       id
       completionProgress: lectureProgresses_on_lecture(

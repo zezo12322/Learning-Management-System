@@ -19,6 +19,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
+import { CreateTemplateDto } from './dto/template.dto';
 
 @Controller('missions/:missionId/templates')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
@@ -31,11 +32,11 @@ export class TemplatesController {
   @UseInterceptors(FileInterceptor('file', { storage: undefined }))
   upload(
     @Param('missionId') missionId: string,
-    @Body('title') title: string,
+    @Body() dto: CreateTemplateDto,
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
     @AuthToken() token: string,
   ) {
-    return this.templatesService.upload(missionId, title, file, token);
+    return this.templatesService.upload(missionId, dto.title, file, token);
   }
 
   @Get()

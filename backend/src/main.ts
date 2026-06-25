@@ -17,8 +17,17 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS for frontend clients
-  app.enableCors();
+  // Enable CORS for known frontend origins only (M8). Configure via the
+  // CORS_ORIGINS env var (comma-separated). If unset, default to localhost dev
+  // origins rather than reflecting every origin.
+  const corsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.enableCors({
+    origin: corsOrigins,
+    credentials: true,
+  });
 
   // Global prefix for all routes
   app.setGlobalPrefix('api/v1');

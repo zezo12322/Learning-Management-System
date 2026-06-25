@@ -53,9 +53,12 @@ export class MissionsController {
   update(
     @Param('missionId') missionId: string,
     @Body() dto: UpdateMissionDto,
+    @CurrentUser('uid') uid: string,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.missionsService.update(missionId, dto, token);
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.missionsService.update(missionId, dto, token, uid, isAdmin);
   }
 
   @Delete(':missionId')

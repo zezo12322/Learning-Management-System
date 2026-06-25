@@ -103,6 +103,7 @@ type CourseSection @table(name: "course_sections") {
   order: Int!
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
 }
 
 type CourseLecture @table(name: "course_lectures") {

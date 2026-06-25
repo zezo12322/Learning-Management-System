@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
@@ -18,6 +19,7 @@ import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guar
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
@@ -87,9 +89,15 @@ export class LecturesController {
     return this.lecturesService.move(lectureId, dto, token);
   }
 
-  // Student-facing: get lecture content
+  // Student-facing: get lecture content (access-gated in the service — H1)
   @Get('lectures/:lectureId')
-  getContent(@Param('lectureId') lectureId: string, @AuthToken() token: string) {
-    return this.lecturesService.getContent(lectureId, token);
+  getContent(
+    @Param('lectureId') lectureId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+    @Req() req: any,
+  ) {
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.lecturesService.getContent(lectureId, token, uid, isAdmin);
   }
 }
