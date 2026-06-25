@@ -15,37 +15,37 @@ import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('missions')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 @Roles('admin', 'instructor')
 export class MissionsController {
-  constructor(
-    private readonly missionsService: MissionsService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly missionsService: MissionsService) {}
 
   @Post()
-  create(@Body() dto: CreateMissionDto, @Req() req: any) {
+  create(
+    @Body() dto: CreateMissionDto,
+    @CurrentUser('uid') uid: string,
+    @AuthToken() token: string,
+    @Req() req: any,
+  ) {
+    // create needs the caller's role (for the course-ownership check on dto.courseId),
+    // which RolesGuard places on request.userRoles.
     const isAdmin = (req.userRoles ?? []).includes('admin');
-    return this.missionsService.create(
-      dto,
-      this.dc.extractToken(req),
-      req.user?.uid,
-      isAdmin,
-    );
+    return this.missionsService.create(dto, token, uid, isAdmin);
   }
 
   @Get()
-  findAll(@Req() req: any) {
-    return this.missionsService.findMyList(this.dc.extractToken(req));
+  findAll(@AuthToken() token: string) {
+    return this.missionsService.findMyList(token);
   }
 
   @Get(':missionId')
   @UseGuards(CourseAccessGuard)
-  findOne(@Param('missionId') missionId: string, @Req() req: any) {
-    return this.missionsService.findOne(missionId, this.dc.extractToken(req));
+  findOne(@Param('missionId') missionId: string, @AuthToken() token: string) {
+    return this.missionsService.findOne(missionId, token);
   }
 
   @Patch(':missionId')
@@ -53,14 +53,14 @@ export class MissionsController {
   update(
     @Param('missionId') missionId: string,
     @Body() dto: UpdateMissionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.missionsService.update(missionId, dto, this.dc.extractToken(req));
+    return this.missionsService.update(missionId, dto, token);
   }
 
   @Delete(':missionId')
   @UseGuards(CourseAccessGuard)
-  softDelete(@Param('missionId') missionId: string, @Req() req: any) {
-    return this.missionsService.softDelete(missionId, this.dc.extractToken(req));
+  softDelete(@Param('missionId') missionId: string, @AuthToken() token: string) {
+    return this.missionsService.softDelete(missionId, token);
   }
 }

@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { OrderingService } from '../common/services/ordering.service';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
 export class SectionsService {
-  constructor(private readonly dc: DataConnectService) {}
+  constructor(
+    private readonly dc: DataConnectService,
+    private readonly ordering: OrderingService,
+  ) {}
 
   async create(courseId: string, dto: CreateSectionDto, authToken: string) {
     // Fetch existing sections to auto-calculate order
@@ -15,14 +19,10 @@ export class SectionsService {
       authToken,
     );
     const sections = course?.course?.adminSections ?? [];
-    const maxOrder = sections.reduce(
-      (max: number, s: any) => Math.max(max, s.order ?? 0),
-      0,
-    );
 
     return this.dc.executeMutation(
       'AdminCreateSection',
-      { courseId, title: dto.title, order: maxOrder + 1 },
+      { courseId, title: dto.title, order: this.ordering.nextOrder(sections) },
       authToken,
     );
   }
@@ -52,18 +52,10 @@ export class SectionsService {
       { courseId },
       authToken,
     );
-    const remaining = (course?.course?.adminSections ?? []).filter(
-      (s: any) => s.id !== sectionId,
-    );
-    await Promise.all(
-      remaining.map((s: any, index: number) =>
-        this.dc.executeMutation(
-          'AdminUpdateSectionOrder',
-          { sectionId: s.id, order: index + 1 },
-          authToken,
-        ),
-      ),
-    );
+    const remaining = (course?.course?.adminSections ?? [])
+      .filter((s: any) => s.id !== sectionId)
+      .map((s: any) => s.id);
+    await this.ordering.applyOrder(remaining, 'AdminUpdateSectionOrder', 'sectionId', authToken);
 
     return { success: true };
   }
@@ -74,14 +66,7 @@ export class SectionsService {
     const validIds = (course?.course?.adminSections ?? []).map((s: any) => s.id);
     assertReorderMembership(orderedIds, validIds, 'section');
 
-    const updates = orderedIds.map((id, index) =>
-      this.dc.executeMutation(
-        'AdminUpdateSectionOrder',
-        { sectionId: id, order: index + 1 },
-        authToken,
-      ),
-    );
-    await Promise.all(updates);
+    await this.ordering.applyOrder(orderedIds, 'AdminUpdateSectionOrder', 'sectionId', authToken);
     return { success: true, order: orderedIds };
   }
 }

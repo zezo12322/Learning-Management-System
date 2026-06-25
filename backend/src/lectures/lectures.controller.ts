@@ -8,7 +8,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
@@ -18,15 +17,12 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class LecturesController {
-  constructor(
-    private readonly lecturesService: LecturesService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly lecturesService: LecturesService) {}
 
   @Post('courses/:courseId/sections/:sectionId/lectures')
   @Roles('admin', 'instructor')
@@ -36,9 +32,9 @@ export class LecturesController {
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Body() dto: CreateLectureDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.lecturesService.create(courseId, sectionId, dto, this.dc.extractToken(req));
+    return this.lecturesService.create(courseId, sectionId, dto, token);
   }
 
   @Patch('courses/:courseId/sections/:sectionId/lectures/:lectureId')
@@ -48,9 +44,9 @@ export class LecturesController {
   update(
     @Param('lectureId') lectureId: string,
     @Body() dto: UpdateLectureDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.lecturesService.update(lectureId, dto, this.dc.extractToken(req));
+    return this.lecturesService.update(lectureId, dto, token);
   }
 
   @Delete('courses/:courseId/sections/:sectionId/lectures/:lectureId')
@@ -61,14 +57,9 @@ export class LecturesController {
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Param('lectureId') lectureId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.lecturesService.softDelete(
-      courseId,
-      sectionId,
-      lectureId,
-      this.dc.extractToken(req),
-    );
+    return this.lecturesService.softDelete(courseId, sectionId, lectureId, token);
   }
 
   @Put('courses/:courseId/sections/:sectionId/lectures/reorder')
@@ -79,9 +70,9 @@ export class LecturesController {
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.lecturesService.reorder(courseId, sectionId, dto.orderedIds, this.dc.extractToken(req));
+    return this.lecturesService.reorder(courseId, sectionId, dto.orderedIds, token);
   }
 
   @Patch('courses/:courseId/lectures/:lectureId/move')
@@ -91,14 +82,14 @@ export class LecturesController {
   move(
     @Param('lectureId') lectureId: string,
     @Body() dto: MoveLectureDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.lecturesService.move(lectureId, dto, this.dc.extractToken(req));
+    return this.lecturesService.move(lectureId, dto, token);
   }
 
   // Student-facing: get lecture content
   @Get('lectures/:lectureId')
-  getContent(@Param('lectureId') lectureId: string, @Req() req: any) {
-    return this.lecturesService.getContent(lectureId, this.dc.extractToken(req));
+  getContent(@Param('lectureId') lectureId: string, @AuthToken() token: string) {
+    return this.lecturesService.getContent(lectureId, token);
   }
 }

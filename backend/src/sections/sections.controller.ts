@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { SectionsService } from './sections.service';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto';
@@ -18,25 +17,22 @@ import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('courses/:courseId/sections')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 @Roles('admin', 'instructor')
 export class SectionsController {
-  constructor(
-    private readonly sectionsService: SectionsService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly sectionsService: SectionsService) {}
 
   @Post()
   @UseGuards(CourseAccessGuard)
   create(
     @Param('courseId') courseId: string,
     @Body() dto: CreateSectionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.sectionsService.create(courseId, dto, this.dc.extractToken(req));
+    return this.sectionsService.create(courseId, dto, token);
   }
 
   @Patch(':sectionId')
@@ -45,9 +41,9 @@ export class SectionsController {
   update(
     @Param('sectionId') sectionId: string,
     @Body() dto: UpdateSectionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.sectionsService.update(sectionId, dto, this.dc.extractToken(req));
+    return this.sectionsService.update(sectionId, dto, token);
   }
 
   @Delete(':sectionId')
@@ -56,9 +52,9 @@ export class SectionsController {
   delete(
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.sectionsService.delete(courseId, sectionId, this.dc.extractToken(req));
+    return this.sectionsService.delete(courseId, sectionId, token);
   }
 
   @Put('reorder')
@@ -66,8 +62,8 @@ export class SectionsController {
   reorder(
     @Param('courseId') courseId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.sectionsService.reorder(courseId, dto.orderedIds, this.dc.extractToken(req));
+    return this.sectionsService.reorder(courseId, dto.orderedIds, token);
   }
 }

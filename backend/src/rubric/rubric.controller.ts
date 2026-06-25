@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { RubricService } from './rubric.service';
 import { CreateCriterionDto, UpdateCriterionDto } from './dto/criterion.dto';
@@ -18,25 +17,22 @@ import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('missions/:missionId/rubric')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 @Roles('admin', 'instructor')
 export class RubricController {
-  constructor(
-    private readonly rubricService: RubricService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly rubricService: RubricService) {}
 
   @Post()
   @UseGuards(CourseAccessGuard)
   create(
     @Param('missionId') missionId: string,
     @Body() dto: CreateCriterionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.rubricService.create(missionId, dto, this.dc.extractToken(req));
+    return this.rubricService.create(missionId, dto, token);
   }
 
   @Patch(':criterionId')
@@ -45,9 +41,9 @@ export class RubricController {
   update(
     @Param('criterionId') criterionId: string,
     @Body() dto: UpdateCriterionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.rubricService.update(criterionId, dto, this.dc.extractToken(req));
+    return this.rubricService.update(criterionId, dto, token);
   }
 
   @Delete(':criterionId')
@@ -56,9 +52,9 @@ export class RubricController {
   delete(
     @Param('missionId') missionId: string,
     @Param('criterionId') criterionId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.rubricService.delete(missionId, criterionId, this.dc.extractToken(req));
+    return this.rubricService.delete(missionId, criterionId, token);
   }
 
   @Put('reorder')
@@ -66,8 +62,8 @@ export class RubricController {
   reorder(
     @Param('missionId') missionId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.rubricService.reorder(missionId, dto.orderedIds, this.dc.extractToken(req));
+    return this.rubricService.reorder(missionId, dto.orderedIds, token);
   }
 }

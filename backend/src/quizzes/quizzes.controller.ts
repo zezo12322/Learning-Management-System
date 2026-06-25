@@ -8,7 +8,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
 import {
@@ -26,15 +25,12 @@ import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guar
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class QuizzesController {
-  constructor(
-    private readonly quizzesService: QuizzesService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly quizzesService: QuizzesService) {}
 
   // ==========================================
   // QUIZ BUILDER — Admin or owning Instructor only.
@@ -50,9 +46,9 @@ export class QuizzesController {
     @Param('courseId') courseId: string,
     @Param('lectureId') lectureId: string,
     @Body() dto: CreateQuizDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.createQuiz(courseId, lectureId, dto, this.dc.extractToken(req));
+    return this.quizzesService.createQuiz(courseId, lectureId, dto, token);
   }
 
   // Answer-key view (includes isCorrect) — builders only.
@@ -60,14 +56,14 @@ export class QuizzesController {
   @Roles('admin', 'instructor')
   @OwnsResource('quiz')
   @UseGuards(ResourceOwnershipGuard)
-  getQuiz(@Param('quizId') quizId: string, @Req() req: any) {
-    return this.quizzesService.getQuiz(quizId, this.dc.extractToken(req));
+  getQuiz(@Param('quizId') quizId: string, @AuthToken() token: string) {
+    return this.quizzesService.getQuiz(quizId, token);
   }
 
   // Student-safe view (no isCorrect) — used to render the quiz for taking.
   @Get('courses/:courseId/quizzes/:quizId/questions')
-  getQuizForTaking(@Param('quizId') quizId: string, @Req() req: any) {
-    return this.quizzesService.getQuizForTaking(quizId, this.dc.extractToken(req));
+  getQuizForTaking(@Param('quizId') quizId: string, @AuthToken() token: string) {
+    return this.quizzesService.getQuizForTaking(quizId, token);
   }
 
   @Patch('courses/:courseId/quizzes/:quizId')
@@ -77,17 +73,17 @@ export class QuizzesController {
   updateQuiz(
     @Param('quizId') quizId: string,
     @Body() dto: UpdateQuizDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.updateQuiz(quizId, dto, this.dc.extractToken(req));
+    return this.quizzesService.updateQuiz(quizId, dto, token);
   }
 
   @Delete('courses/:courseId/quizzes/:quizId')
   @Roles('admin', 'instructor')
   @OwnsResource('quiz')
   @UseGuards(ResourceOwnershipGuard)
-  deleteQuiz(@Param('quizId') quizId: string, @Req() req: any) {
-    return this.quizzesService.deleteQuiz(quizId, this.dc.extractToken(req));
+  deleteQuiz(@Param('quizId') quizId: string, @AuthToken() token: string) {
+    return this.quizzesService.deleteQuiz(quizId, token);
   }
 
   // ==========================================
@@ -101,9 +97,9 @@ export class QuizzesController {
   createQuestion(
     @Param('quizId') quizId: string,
     @Body() dto: CreateQuestionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.createQuestion(quizId, dto, this.dc.extractToken(req));
+    return this.quizzesService.createQuestion(quizId, dto, token);
   }
 
   @Patch('courses/:courseId/quizzes/:quizId/questions/:questionId')
@@ -113,9 +109,9 @@ export class QuizzesController {
   updateQuestion(
     @Param('questionId') questionId: string,
     @Body() dto: UpdateQuestionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.updateQuestion(questionId, dto, this.dc.extractToken(req));
+    return this.quizzesService.updateQuestion(questionId, dto, token);
   }
 
   @Delete('courses/:courseId/quizzes/:quizId/questions/:questionId')
@@ -125,9 +121,9 @@ export class QuizzesController {
   softDeleteQuestion(
     @Param('quizId') quizId: string,
     @Param('questionId') questionId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.softDeleteQuestion(quizId, questionId, this.dc.extractToken(req));
+    return this.quizzesService.softDeleteQuestion(quizId, questionId, token);
   }
 
   @Put('courses/:courseId/quizzes/:quizId/questions/reorder')
@@ -137,9 +133,9 @@ export class QuizzesController {
   reorderQuestions(
     @Param('quizId') quizId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.reorderQuestions(quizId, dto.orderedIds, this.dc.extractToken(req));
+    return this.quizzesService.reorderQuestions(quizId, dto.orderedIds, token);
   }
 
   // ==========================================
@@ -153,17 +149,17 @@ export class QuizzesController {
   updateOption(
     @Param('optionId') optionId: string,
     @Body() dto: UpdateQuizOptionDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.updateOption(optionId, dto, this.dc.extractToken(req));
+    return this.quizzesService.updateOption(optionId, dto, token);
   }
 
   @Delete('courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId')
   @Roles('admin', 'instructor')
   @OwnsResource('option')
   @UseGuards(ResourceOwnershipGuard)
-  deleteOption(@Param('optionId') optionId: string, @Req() req: any) {
-    return this.quizzesService.deleteOption(optionId, this.dc.extractToken(req));
+  deleteOption(@Param('optionId') optionId: string, @AuthToken() token: string) {
+    return this.quizzesService.deleteOption(optionId, token);
   }
 
   @Put('courses/:courseId/quizzes/:quizId/questions/:questionId/options/reorder')
@@ -173,9 +169,9 @@ export class QuizzesController {
   reorderOptions(
     @Param('questionId') questionId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.reorderOptions(questionId, dto.orderedIds, this.dc.extractToken(req));
+    return this.quizzesService.reorderOptions(questionId, dto.orderedIds, token);
   }
 
   // ==========================================
@@ -184,8 +180,8 @@ export class QuizzesController {
   // ==========================================
 
   @Post('courses/:courseId/quizzes/:quizId/attempts')
-  startAttempt(@Param('quizId') quizId: string, @Req() req: any) {
-    return this.quizzesService.startAttempt(quizId, this.dc.extractToken(req));
+  startAttempt(@Param('quizId') quizId: string, @AuthToken() token: string) {
+    return this.quizzesService.startAttempt(quizId, token);
   }
 
   @Post('courses/:courseId/quizzes/:quizId/attempts/:attemptId/answers')
@@ -193,18 +189,18 @@ export class QuizzesController {
     @Param('attemptId') attemptId: string,
     @Body() dto: SubmitAnswerDto,
     @CurrentUser('uid') uid: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.submitAnswer(attemptId, dto, this.dc.extractToken(req), uid);
+    return this.quizzesService.submitAnswer(attemptId, dto, token, uid);
   }
 
   @Post('courses/:courseId/quizzes/:quizId/attempts/:attemptId/finish')
   finishAttempt(
     @Param('attemptId') attemptId: string,
     @CurrentUser('uid') uid: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.finishAttempt(attemptId, this.dc.extractToken(req), uid);
+    return this.quizzesService.finishAttempt(attemptId, token, uid);
   }
 
   // ==========================================
@@ -215,8 +211,8 @@ export class QuizzesController {
   heartbeat(
     @Param('attemptId') attemptId: string,
     @CurrentUser('uid') uid: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.quizzesService.heartbeat(attemptId, this.dc.extractToken(req), uid);
+    return this.quizzesService.heartbeat(attemptId, token, uid);
   }
 }

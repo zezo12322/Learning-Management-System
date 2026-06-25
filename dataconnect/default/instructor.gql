@@ -3,7 +3,7 @@
 # ==========================================
 
 # Gets all student submissions pending review and grading
-query GetPendingSubmissions @auth(level: USER) {
+query GetPendingSubmissions @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   missionSubmissions(
     where: { status: { eq: PENDING } }, 
     orderBy: [{ submittedAt: ASC }]
@@ -25,7 +25,7 @@ query GetPendingSubmissions @auth(level: USER) {
 mutation AdminAddCourseInstructor(
   $courseId: UUID!,
   $userId: String!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseInstructor_insert(
     data: {
       courseId: $courseId,
@@ -38,7 +38,7 @@ mutation AdminAddCourseInstructor(
 mutation AdminRemoveCourseInstructor(
   $courseId: UUID!,
   $userId: String!
-) @auth(level: USER) {
+) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseInstructor_delete(
     key: {
       courseId: $courseId,
@@ -48,7 +48,7 @@ mutation AdminRemoveCourseInstructor(
 }
 
 # Lists all instructors for a specific course
-query GetCourseInstructors($courseId: UUID!) @auth(level: USER) {
+query GetCourseInstructors($courseId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
   courseInstructors(where: { courseId: { eq: $courseId } }) {
     user {
       id

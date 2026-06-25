@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { MicroLessonsService } from './micro-lessons.service';
 import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
@@ -18,25 +17,22 @@ import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
-import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('missions/:missionId/micro-lessons')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 @Roles('admin', 'instructor')
 export class MicroLessonsController {
-  constructor(
-    private readonly microLessonsService: MicroLessonsService,
-    private readonly dc: DataConnectService,
-  ) {}
+  constructor(private readonly microLessonsService: MicroLessonsService) {}
 
   @Post()
   @UseGuards(CourseAccessGuard)
   create(
     @Param('missionId') missionId: string,
     @Body() dto: CreateMicroLessonDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.microLessonsService.create(missionId, dto, this.dc.extractToken(req));
+    return this.microLessonsService.create(missionId, dto, token);
   }
 
   @Patch(':microLessonId')
@@ -45,9 +41,9 @@ export class MicroLessonsController {
   update(
     @Param('microLessonId') microLessonId: string,
     @Body() dto: UpdateMicroLessonDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.microLessonsService.update(microLessonId, dto, this.dc.extractToken(req));
+    return this.microLessonsService.update(microLessonId, dto, token);
   }
 
   @Delete(':microLessonId')
@@ -56,13 +52,9 @@ export class MicroLessonsController {
   delete(
     @Param('missionId') missionId: string,
     @Param('microLessonId') microLessonId: string,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.microLessonsService.delete(
-      missionId,
-      microLessonId,
-      this.dc.extractToken(req),
-    );
+    return this.microLessonsService.delete(missionId, microLessonId, token);
   }
 
   @Put('reorder')
@@ -70,8 +62,8 @@ export class MicroLessonsController {
   reorder(
     @Param('missionId') missionId: string,
     @Body() dto: ReorderDto,
-    @Req() req: any,
+    @AuthToken() token: string,
   ) {
-    return this.microLessonsService.reorder(missionId, dto.orderedIds, this.dc.extractToken(req));
+    return this.microLessonsService.reorder(missionId, dto.orderedIds, token);
   }
 }
