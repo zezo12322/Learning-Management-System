@@ -20,6 +20,8 @@ import 'package:optimatech_lms/features/auth/presentation/views/widgets/remember
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/section_label.dart';
 import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
 
+import '../../manager/login_cubit/log_in_state.dart';
+
 class LogInForm extends StatefulWidget {
   const LogInForm({super.key});
 
@@ -87,7 +89,7 @@ class _LogInFormState extends State<LogInForm> {
               Navigator.pushNamedAndRemoveUntil(context, HomeView.routeName, (route) => false,);
             }
             if (state.status == LogInStatus.failure && state.errorMessage != null) {
-              buildSnackBar(context: context, text: state.errorMessage!);
+              buildSnackBar(context: context, text: state.errorMessage!, isError: true);
             }
           },
           child: Form(
