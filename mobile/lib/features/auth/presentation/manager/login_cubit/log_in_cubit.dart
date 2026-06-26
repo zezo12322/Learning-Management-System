@@ -1,9 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:optimatech_lms/core/utils/app_validators.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
-
-part 'log_in_state.dart';
+import 'log_in_state.dart';
 
 class LogInCubit extends Cubit<LogInState> {
   LogInCubit({required AuthRepository authRepository}) : _authRepository = authRepository, super(const LogInState());
@@ -72,6 +70,7 @@ class LogInCubit extends Cubit<LogInState> {
       (success) => emit(
         state.copyWith(
           status: LogInStatus.success,
+          errorMessage: null,
         ),
       ),
     );

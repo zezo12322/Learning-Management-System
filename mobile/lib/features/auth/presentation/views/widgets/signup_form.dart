@@ -10,6 +10,7 @@ import 'package:optimatech_lms/core/widgets/custom_text_field.dart';
 import 'package:optimatech_lms/core/widgets/password_text_field.dart';
 import 'package:optimatech_lms/core/widgets/primary_button.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_state.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/already_have_account.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/custom_checkbox.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/section_label.dart';

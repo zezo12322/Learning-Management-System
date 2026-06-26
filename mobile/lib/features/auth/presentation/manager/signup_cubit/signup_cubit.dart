@@ -1,16 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
-
-part 'signup_state.dart';
+import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   SignupCubit({required AuthRepository authRepository}) : _authRepository = authRepository, super(const SignupState());
   final AuthRepository _authRepository;
 
   void toggleTerms(bool value){
-    emit(state.copyWith(isAgree: value));
+    emit(state.copyWith(status: SignupStatus.initial, isAgree: value));
   }
 
   void fullNameChanged(){
@@ -70,6 +68,7 @@ class SignupCubit extends Cubit<SignupState> {
       (success) => emit(
         state.copyWith(
           status: SignupStatus.success,
+          errorMessage: null,
         ),
       ),
     );
