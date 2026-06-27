@@ -17,18 +17,20 @@ class SignUpView extends StatelessWidget {
     return Scaffold(
       appBar: customAppBar(),
       extendBodyBehindAppBar: true,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Gap(kToolbarHeight + MediaQuery.of(context).padding.top),
-            const SignupHeader(),
-            Gap(8.h),
-            BlocProvider(
-              create: (context) => getIt<SignupCubit>(),
-              child: const SignupForm(),
-            ),
-            Gap(MediaQuery.of(context).padding.bottom),
-          ],
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Gap(kToolbarHeight + MediaQuery.of(context).padding.top),
+              const SignupHeader(),
+              Gap(8.h),
+              BlocProvider(
+                create: (context) => getIt<SignupCubit>(),
+                child: const SignupForm(),
+              ),
+              const Gap(kToolbarHeight * 0.5),
+            ],
+          ),
         ),
       ),
     );

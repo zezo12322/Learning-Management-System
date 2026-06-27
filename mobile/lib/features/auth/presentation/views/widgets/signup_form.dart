@@ -97,6 +97,8 @@ class _SignupFormState extends State<SignupForm> {
           listener: (context, state) {
             if (state.status == SignupStatus.success) {
               buildSnackBar(context: context, text: 'auth.signup_screen.success'.tr());
+              clearFields();
+              Navigator.pop(context);
             }
             if (state.status == SignupStatus.failure && state.errorMessage != null) {
               buildSnackBar(context: context, isError: true, text: state.errorMessage!);
