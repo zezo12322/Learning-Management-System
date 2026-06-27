@@ -22,6 +22,7 @@ import { UsersModule } from './users/users.module';
 import { EnrollmentModule } from './enrollment/enrollment.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { CatalogModule } from './catalog/catalog.module';
     EnrollmentModule,
     SubmissionsModule,
     CatalogModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -63,6 +65,7 @@ import { CatalogModule } from './catalog/catalog.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    FirebaseAuthStrategy,
   ],
 })
 export class AppModule { }

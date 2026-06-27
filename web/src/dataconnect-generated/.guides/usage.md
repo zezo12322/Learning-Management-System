@@ -12,7 +12,7 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useAdminCreateCourse, useAdminDeleteCourse, useAdminCreateSession, useAdminCancelSession, useAdminCreateSubscriptionTier, useAdminDeprecateSubscriptionTier, useAdminCreateCategory, useMyCertificates, useVerifyCertificate, useListPublishedCourses } from '@dataconnect/generated/react';
+import { useAdminCreateCourse, useAdminDeleteCourse, useAdminCreateSession, useAdminCancelSession, useAdminCreateSubscriptionTier, useAdminDeprecateSubscriptionTier, useAdminCreateCategory, useGetUserClaims, useMyCertificates, useVerifyCertificate } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
 const { data, isPending, isSuccess, isError, error } = useAdminCreateCourse(adminCreateCourseVars);
@@ -29,11 +29,11 @@ const { data, isPending, isSuccess, isError, error } = useAdminDeprecateSubscrip
 
 const { data, isPending, isSuccess, isError, error } = useAdminCreateCategory(adminCreateCategoryVars);
 
+const { data, isPending, isSuccess, isError, error } = useGetUserClaims(getUserClaimsVars);
+
 const { data, isPending, isSuccess, isError, error } = useMyCertificates();
 
 const { data, isPending, isSuccess, isError, error } = useVerifyCertificate(verifyCertificateVars);
-
-const { data, isPending, isSuccess, isError, error } = useListPublishedCourses();
 
 ```
 
@@ -72,7 +72,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { adminCreateCourse, adminDeleteCourse, adminCreateSession, adminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, myCertificates, verifyCertificate, listPublishedCourses } from '@dataconnect/generated';
+import { adminCreateCourse, adminDeleteCourse, adminCreateSession, adminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, getUserClaims, myCertificates, verifyCertificate } from '@dataconnect/generated';
 
 
 // Operation AdminCreateCourse:  For variables, look at type AdminCreateCourseVars in ../index.d.ts
@@ -96,14 +96,14 @@ const { data } = await AdminDeprecateSubscriptionTier(dataConnect, adminDeprecat
 // Operation AdminCreateCategory:  For variables, look at type AdminCreateCategoryVars in ../index.d.ts
 const { data } = await AdminCreateCategory(dataConnect, adminCreateCategoryVars);
 
+// Operation GetUserClaims:  For variables, look at type GetUserClaimsVars in ../index.d.ts
+const { data } = await GetUserClaims(dataConnect, getUserClaimsVars);
+
 // Operation MyCertificates: 
 const { data } = await MyCertificates(dataConnect);
 
 // Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
 const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
-
-// Operation ListPublishedCourses: 
-const { data } = await ListPublishedCourses(dataConnect);
 
 
 ```

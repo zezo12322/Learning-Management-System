@@ -1370,6 +1370,24 @@ export interface GetTemplateMissionVariables {
   templateId: UUIDString;
 }
 
+export interface GetUserClaimsData {
+  user?: {
+    id: string;
+    userRoles_on_user: ({
+      role: {
+        name: string;
+      };
+    })[];
+    profile_on_user?: {
+      company?: string | null;
+    };
+  } & User_Key;
+}
+
+export interface GetUserClaimsVariables {
+  uid: string;
+}
+
 export interface GetUserEnrollmentForCourseData {
   enrollments: ({
     id: UUIDString;
@@ -1808,6 +1826,18 @@ export const adminCreateCategoryRef: AdminCreateCategoryRef;
 
 export function adminCreateCategory(vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
 export function adminCreateCategory(dc: DataConnect, vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
+
+interface GetUserClaimsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
+  operationName: string;
+}
+export const getUserClaimsRef: GetUserClaimsRef;
+
+export function getUserClaims(vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
+export function getUserClaims(dc: DataConnect, vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
 
 interface MyCertificatesRef {
   /* Allow users to create refs without passing in DataConnect */
