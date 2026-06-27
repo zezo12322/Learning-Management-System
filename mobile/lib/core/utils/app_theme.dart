@@ -34,6 +34,7 @@ class AppTheme {
       scrolledUnderElevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark,
       ),
     ),
 
@@ -186,6 +187,7 @@ class AppTheme {
       scrolledUnderElevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
       ),
     ),
 
@@ -197,7 +199,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        elevation: 0,
+        elevation: 4,
+        shadowColor: Colors.black45,
       ),
     ),
 

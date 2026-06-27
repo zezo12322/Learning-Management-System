@@ -80,9 +80,9 @@
       "privacy_policy": "سياسة الخصوصية.",
       "create_account_button": "إنشاء حساب",
       "already_have_account": "لديك حساب بالفعل؟",
-      "login": "تسجيل الدخول"
+      "login": "تسجيل الدخول",
+      "success": "تم انشاء الحساب بنجاح."
     },
-    "success": "تم انشاء الحساب بنجاح.",
     "error":{
       "weakPassword": "كلمة المرور ضعيفة جدًا.",
       "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
