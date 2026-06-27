@@ -32,12 +32,12 @@ class AuthRepositoryImpl implements AuthRepository {
     try{
       User user = await firebaseAuthService.signInWithGoogle();
       final userModel = UserModel.fromFirebaseUser(user);
-      await fireStoreService.addData(
-        collectionPath: 'users',
-        docId: user.uid,
-        data: userModel.toMap(),
-        merge: true,
-      );
+      // await fireStoreService.addData(
+      //   collectionPath: 'users',
+      //   docId: user.uid,
+      //   data: userModel.toMap(),
+      //   merge: true,
+      // );
       return right(userModel.toEntity());
     }on CustomExceptions catch (e) {
       return left(ServerFailure(e.message));
@@ -51,16 +51,16 @@ class AuthRepositoryImpl implements AuthRepository {
     try{
       User user = await firebaseAuthService.createUserWithEmailPassword(email: email, password: password);
       await user.updateDisplayName(fullName);
-      await fireStoreService.addData(
-        collectionPath: 'users',
-        docId: user.uid,
-        data: UserModel(
-          name: fullName,
-          email: email,
-          uId: user.uid,
-          phone: phone,
-        ).toMap(),
-      );
+      // await fireStoreService.addData(
+      //   collectionPath: 'users',
+      //   docId: user.uid,
+      //   data: UserModel(
+      //     name: fullName,
+      //     email: email,
+      //     uId: user.uid,
+      //     phone: phone,
+      //   ).toMap(),
+      // );
       UserEntity userEntity = UserModel.fromFirebaseUser(user).toEntity();
       return right(userEntity);
     }on CustomExceptions catch (e) {
