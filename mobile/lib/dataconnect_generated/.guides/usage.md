@@ -8,9 +8,9 @@ DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execut
 DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
+DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
 DefaultConnector.instance.MyCertificates().execute();
 DefaultConnector.instance.VerifyCertificate(verifyCertificateVariables).execute();
-DefaultConnector.instance.ListPublishedCourses().execute();
 
 ```
 

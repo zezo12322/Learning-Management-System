@@ -1,0 +1,13 @@
+query GetUserClaims($uid: String!) @auth(level: NO_ACCESS) {
+  user(id: $uid) {
+    id
+    userRoles_on_user {
+      role {
+        name
+      }
+    }
+    profile_on_user {
+      company
+    }
+  }
+}

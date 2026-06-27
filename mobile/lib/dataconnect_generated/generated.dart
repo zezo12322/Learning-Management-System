@@ -18,6 +18,8 @@ part 'admin_deprecate_subscription_tier.dart';
 
 part 'admin_create_category.dart';
 
+part 'get_user_claims.dart';
+
 part 'my_certificates.dart';
 
 part 'verify_certificate.dart';
@@ -749,6 +751,11 @@ class DefaultConnector {
   
   AdminCreateCategoryVariablesBuilder adminCreateCategory ({required String name, }) {
     return AdminCreateCategoryVariablesBuilder(dataConnect, name: name,);
+  }
+  
+  
+  GetUserClaimsVariablesBuilder getUserClaims ({required String uid, }) {
+    return GetUserClaimsVariablesBuilder(dataConnect, uid: uid,);
   }
   
   

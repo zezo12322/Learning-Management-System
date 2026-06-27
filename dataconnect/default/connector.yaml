@@ -1,17 +1,23 @@
 connectorId: default
 generate:
   dartSdk:
-    - outputDir: ..\..\mobile\lib\dataconnect_generated
+    - outputDir: ../../mobile/lib/dataconnect_generated
       package: dataconnect_generated/generated.dart
       clientCache: {}
   javascriptSdk:
-    - outputDir: ..\..\web\src\dataconnect-generated
+    - outputDir: ../../web/src/dataconnect-generated
       package: "@dataconnect/generated"
-      packageJsonDir: ..\..\web
+      packageJsonDir: ../../web
       react: true
       angular: false
       clientCache: {}
-  adminNodeSdk:
-    - outputDir: ..\..\api\src\dataconnect-admin-generated
+    - outputDir: ../../functions/dataconnect-generated
+      package: "@dataconnect/functions-generated"
+      packageJsonDir: ../../functions
+      react: false
+      angular: false
+      clientCache: {}
+    - adminNodeSdk:
+      outputDir: "../../functions/dataconnect-admin-generated"
       package: "@dataconnect/admin-generated"
-      packageJsonDir: ..\..\api
+      packageJsonDir: "../../functions"
