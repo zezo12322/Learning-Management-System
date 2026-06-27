@@ -14,7 +14,9 @@ class LogInView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
           child: Column(
             children: [
               const LogInHeader(),
@@ -22,10 +24,11 @@ class LogInView extends StatelessWidget {
                 create: (context) => getIt<LogInCubit>(),
                 child: const LogInForm(),
               ),
-              Gap(MediaQuery.of(context).padding.bottom),
+              const Gap(kToolbarHeight * 0.5),
             ],
           ),
-        )
+        ),
+      ),
     );
   }
 }

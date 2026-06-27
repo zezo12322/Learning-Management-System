@@ -80,9 +80,9 @@
       "privacy_policy": "Privacy Policy.",
       "create_account_button": "Create Account",
       "already_have_account": "Already have an account?",
-      "login": "Login"
+      "login": "Login",
+      "success": "The Account is created successfully."
     },
-    "success": "The Account is created successfully.",
     "error":{
       "weakPassword": "The password provided is too weak.",
       "emailAlreadyInUse": "An account already exists for that email.",
