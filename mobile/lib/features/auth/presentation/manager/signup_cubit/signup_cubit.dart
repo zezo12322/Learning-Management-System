@@ -1,16 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
-
-part 'signup_state.dart';
+import 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
   SignupCubit({required AuthRepository authRepository}) : _authRepository = authRepository, super(const SignupState());
   final AuthRepository _authRepository;
 
   void toggleTerms(bool value){
-    emit(state.copyWith(isAgree: value));
+    emit(state.copyWith(status: SignupStatus.initial, isAgree: value));
   }
 
   void fullNameChanged(){
@@ -25,7 +23,7 @@ class SignupCubit extends Cubit<SignupState> {
   }
   void phoneChanged(){
     if(state.phoneError != null){
-      emit(state.copyWith(passwordError: null));
+      emit(state.copyWith(phoneError: null));
     }
   }
   void passwordChanged(){
@@ -58,7 +56,7 @@ class SignupCubit extends Cubit<SignupState> {
 
     emit(state.copyWith(status: SignupStatus.loading, errorMessage: null));
 
-    final response = await _authRepository.signupWithEmail(email: email, password: password);
+    final response = await _authRepository.signupWithEmail(email: email, password: password, fullName: fullName, phone: phone);
 
     response.fold(
       (failure) => emit(
@@ -70,6 +68,7 @@ class SignupCubit extends Cubit<SignupState> {
       (success) => emit(
         state.copyWith(
           status: SignupStatus.success,
+          errorMessage: null,
         ),
       ),
     );
