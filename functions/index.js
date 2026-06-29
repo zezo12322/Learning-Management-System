@@ -14,7 +14,7 @@ const adminDC = getDataConnect({
 
 // ==========================================
 // FUNCTION 1: THE OAUTH SAFETY NET
-// Automatically handles users who sign up via Google
+// Automatically handles users who sign up via Google/GitHub
 // ==========================================
 exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async (user) => {
   console.log(`🚀 [START] Triggered for UID: ${user.uid}`);
@@ -41,7 +41,6 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
 
     const userData = response.data?.user;
 
-    // The Automation Block for missing users
     if (!userData) {
       console.log(`⚠️ [NEW USER] UID: ${user.uid} not in DB. Executing creation mutation...`);
 
@@ -65,7 +64,6 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
       return;
     }
 
-    // Standard Claims Mapping for existing users
     const roles = userData.userRoles_on_user ? userData.userRoles_on_user.map(ur => ur.role.name) : [];
     const companyId = userData.profile_on_user ? userData.profile_on_user.company : null;
 
@@ -86,7 +84,6 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
 exports.registerStudent = functions.region('europe-west3').https.onCall(async (data, context) => {
   const { email, password, name } = data;
 
-  // Strict backend validation
   if (!email || !password || !name) {
     throw new functions.https.HttpsError('invalid-argument', 'Email, password, and name are strictly required.');
   }
@@ -94,7 +91,6 @@ exports.registerStudent = functions.region('europe-west3').https.onCall(async (d
   console.log(`🚀 [START] API Registration for: ${email}`);
 
   try {
-    // 1. Create the Auth account WITH the name attached instantly
     const userRecord = await admin.auth().createUser({
       email: email,
       password: password,
@@ -104,7 +100,6 @@ exports.registerStudent = functions.region('europe-west3').https.onCall(async (d
     const uid = userRecord.uid;
     console.log(`✅ [AUTH] Account created: ${uid}`);
 
-    // 2. Insert the exact data into PostgreSQL
     const insertMutation = `
           mutation createDefaultUser($uid: String!, $email: String!, $name: String!) {
             user_insert(data: { id: $uid, email: $email, name: $name })
@@ -116,17 +111,12 @@ exports.registerStudent = functions.region('europe-west3').https.onCall(async (d
     });
     console.log(`✅ [DB INSERT] PostgreSQL record created for ${name}`);
 
-    // 3. Attach the default student claims
     const defaultClaims = { roles: ['student'], companyId: null };
     await admin.auth().setCustomUserClaims(uid, defaultClaims);
 
     console.log(`🎉 [SUCCESS] Registration complete via registerStudent API!`);
 
-    // 4. Return a success signal to the frontend
-    return {
-      success: true,
-      uid: uid
-    };
+    return { success: true, uid: uid };
 
   } catch (error) {
     console.error("❌ [API ERROR in registerStudent]", error);
@@ -135,5 +125,42 @@ exports.registerStudent = functions.region('europe-west3').https.onCall(async (d
       throw new functions.https.HttpsError('already-exists', error.message);
     }
     throw new functions.https.HttpsError('internal', 'Backend registration failed.');
+  }
+});
+
+
+// ==========================================
+// FUNCTION 3: THE DELETION CASCADE
+// Wipes PostgreSQL data AND Cloud Storage files when an Auth account is deleted
+// ==========================================
+exports.cleanupUserData = functions.region('europe-west3').auth.user().onDelete(async (user) => {
+  console.log(`🗑️ [START] Deletion cascade triggered for UID: ${user.uid}`);
+
+  try {
+    // 1. Wipe the PostgreSQL Database via Data Connect
+    const deleteMutation = `
+          mutation deleteUserRecord($uid: String!) {
+            user_delete(id: $uid)
+          }
+        `;
+
+    console.log(`📡 [DB DELETE] Removing PostgreSQL record for ${user.email}...`);
+    await adminDC.executeGraphql(deleteMutation, {
+      variables: { uid: user.uid }
+    });
+    console.log(`✅ [SUCCESS] PostgreSQL records wiped for ${user.uid}`);
+
+    // 2. Wipe the physical files from Cloud Storage
+    console.log(`🧹 [STORAGE] Searching for files under users/${user.uid}/...`);
+    const bucket = admin.storage().bucket();
+
+    // deleteFiles() recursively deletes the folder and everything inside it
+    await bucket.deleteFiles({
+      prefix: `users/${user.uid}/`
+    });
+    console.log(`✅ [SUCCESS] All physical storage files vaporized for ${user.uid}`);
+
+  } catch (error) {
+    console.error("❌ [CRITICAL ERROR in cleanupUserData]", error);
   }
 });
