@@ -60,7 +60,8 @@ export class ProgressController {
         // Collapse a burst of heartbeats for the same (user, lecture) into one
         // pending job — only the latest position matters. Combined with the
         // worker clamp this keeps writes bounded regardless of client cadence.
-        jobId: `progress:${uid}:${lectureId}`,
+        // No ':' — BullMQ rejects it in custom job ids (Redis key separator).
+        jobId: `progress-${uid}-${lectureId}`,
         removeOnComplete: true,
         removeOnFail: 100,
         attempts: 3,

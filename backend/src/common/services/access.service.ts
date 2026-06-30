@@ -26,7 +26,9 @@ export class AccessService {
     const data = await this.dc.executeQuery('GetMyCourseAccess', { courseId }, token);
     const course = data?.course;
     if (!course) throw new NotFoundException(`Course ${courseId} not found`);
-    this.assertOwnsCourse(course, uid);
+    if (!this.ownsCourse(course, uid)) {
+      throw new ForbiddenException('You do not have access to this course');
+    }
   }
 
   /** Throws 403/404 unless the caller may manage the given mission. */
@@ -40,36 +42,6 @@ export class AccessService {
     const data = await this.dc.executeQuery('GetMyMissionAccess', { missionId }, token);
     const mission = data?.mission;
     if (!mission) throw new NotFoundException(`Mission ${missionId} not found`);
-    this.assertOwnsMission(mission, uid);
-  }
-
-  /**
-   * True when a course node already carries the ownership facts
-   * (author/createdBy/instructor link) rather than just `{ id }`. Lets a caller
-   * that already fetched the course (e.g. ResourceOwnershipGuard's leaf→owner
-   * query) authorize in-process instead of issuing GetMyCourseAccess.
-   */
-  courseHasOwnershipFacts(course: any): boolean {
-    return !!course && ('author' in course || 'createdBy' in course);
-  }
-
-  /** Mission counterpart of {@link courseHasOwnershipFacts}. */
-  missionHasOwnershipFacts(mission: any): boolean {
-    return (
-      !!mission &&
-      ('author' in mission || 'createdBy' in mission || 'course' in mission)
-    );
-  }
-
-  /** Throws 403 unless `uid` owns the already-fetched course node. */
-  assertOwnsCourse(course: any, uid?: string): void {
-    if (!this.ownsCourse(course, uid)) {
-      throw new ForbiddenException('You do not have access to this course');
-    }
-  }
-
-  /** Throws 403 unless `uid` owns the already-fetched mission node. */
-  assertOwnsMission(mission: any, uid?: string): void {
     const owns =
       mission.author?.id === uid ||
       mission.createdBy?.id === uid ||
@@ -77,6 +49,28 @@ export class AccessService {
     if (!owns) {
       throw new ForbiddenException('You do not have access to this mission');
     }
+  }
+
+  /**
+   * True when `uid` is the course's author or createdBy. This is the subset of
+   * ownership that can be decided from an already-fetched course node WITHOUT
+   * the assigned-instructor join (which Data Connect won't let us inline into
+   * the leaf→owner queries). ResourceOwnershipGuard uses this as an allow-only
+   * fast path; a `false` result means "fall back to the authoritative query",
+   * never "deny" — an assigned instructor is not a creator but still has access.
+   */
+  isCourseCreator(course: any, uid?: string): boolean {
+    return !!uid && (course?.author?.id === uid || course?.createdBy?.id === uid);
+  }
+
+  /** Mission counterpart of {@link isCourseCreator} (mission or its course). */
+  isMissionCreator(mission: any, uid?: string): boolean {
+    return (
+      !!uid &&
+      (mission?.author?.id === uid ||
+        mission?.createdBy?.id === uid ||
+        this.isCourseCreator(mission?.course, uid))
+    );
   }
 
   private ownsCourse(course: any, uid?: string): boolean {

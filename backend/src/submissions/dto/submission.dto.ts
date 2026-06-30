@@ -2,13 +2,13 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsUUID,
   IsNumber,
   IsArray,
   Min,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 import { Type } from 'class-transformer';
 
 export class CreateSubmissionDto {
@@ -20,7 +20,7 @@ export class CreateSubmissionDto {
 }
 
 export class CriterionScoreDto {
-  @IsUUID()
+  @IsFlexUUID()
   criterionId: string;
 
   @IsNumber()

@@ -772,6 +772,17 @@ export interface AdminUpdateSectionVariables {
   title: string;
 }
 
+export interface AdminUpsertLectureProgressData {
+  lectureProgress_upsert: LectureProgress_Key;
+}
+
+export interface AdminUpsertLectureProgressVariables {
+  userId: string;
+  lectureId: UUIDString;
+  lastWatchedSecond: number;
+  completedAt?: TimestampString | null;
+}
+
 export interface Attendance_Key {
   id: UUIDString;
   __typename?: 'Attendance_Key';
@@ -901,6 +912,22 @@ export interface GetCourseCompletionStatusData {
   })[];
 }
 
+export interface GetCourseCompletionStatusForUserData {
+  sections: ({
+    userCompletionLectures: ({
+      id: UUIDString;
+      userCompletionProgress: ({
+        completedAt?: TimestampString | null;
+      })[];
+    } & CourseLecture_Key)[];
+  })[];
+}
+
+export interface GetCourseCompletionStatusForUserVariables {
+  courseId: UUIDString;
+  userId: string;
+}
+
 export interface GetCourseCompletionStatusVariables {
   courseId: UUIDString;
 }
@@ -982,6 +1009,21 @@ export interface GetCriterionMissionData {
   rubricCriterion?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1027,12 +1069,34 @@ export interface GetLectureContentData {
     section: {
       course: {
         id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
       } & Course_Key;
     };
   } & CourseLecture_Key;
 }
 
 export interface GetLectureContentVariables {
+  lectureId: UUIDString;
+}
+
+export interface GetLectureDurationData {
+  courseLecture?: {
+    id: UUIDString;
+    duration?: number | null;
+    section: {
+      course: {
+        id: UUIDString;
+      } & Course_Key;
+    };
+  } & CourseLecture_Key;
+}
+
+export interface GetLectureDurationVariables {
   lectureId: UUIDString;
 }
 
@@ -1062,6 +1126,21 @@ export interface GetMicroLessonMissionData {
   missionMicroLesson?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1171,6 +1250,12 @@ export interface GetOptionCourseData {
           section: {
             course: {
               id: UUIDString;
+              author: {
+                id: string;
+              } & User_Key;
+              createdBy: {
+                id: string;
+              } & User_Key;
             } & Course_Key;
           };
         };
@@ -1226,6 +1311,12 @@ export interface GetQuestionCourseData {
         section: {
           course: {
             id: UUIDString;
+            author: {
+              id: string;
+            } & User_Key;
+            createdBy: {
+              id: string;
+            } & User_Key;
           } & Course_Key;
         };
       };
@@ -1318,6 +1409,12 @@ export interface GetQuizSettingsData {
       section: {
         course: {
           id: UUIDString;
+          author: {
+            id: string;
+          } & User_Key;
+          createdBy: {
+            id: string;
+          } & User_Key;
         } & Course_Key;
       };
     } & CourseLecture_Key;
@@ -1332,6 +1429,12 @@ export interface GetSectionCourseData {
   courseSection?: {
     course: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
     } & Course_Key;
   };
 }
@@ -1362,6 +1465,21 @@ export interface GetTemplateMissionData {
   missionTemplate?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1386,6 +1504,19 @@ export interface GetUserClaimsData {
 
 export interface GetUserClaimsVariables {
   uid: string;
+}
+
+export interface GetUserEnrollmentForCourseByUserData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+
+export interface GetUserEnrollmentForCourseByUserVariables {
+  courseId: UUIDString;
+  userId: string;
 }
 
 export interface GetUserEnrollmentForCourseData {
@@ -2223,6 +2354,30 @@ export const updateLectureProgressRef: UpdateLectureProgressRef;
 export function updateLectureProgress(vars: UpdateLectureProgressVariables): MutationPromise<UpdateLectureProgressData, UpdateLectureProgressVariables>;
 export function updateLectureProgress(dc: DataConnect, vars: UpdateLectureProgressVariables): MutationPromise<UpdateLectureProgressData, UpdateLectureProgressVariables>;
 
+interface AdminUpsertLectureProgressRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpsertLectureProgressVariables): MutationRef<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpsertLectureProgressVariables): MutationRef<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+  operationName: string;
+}
+export const adminUpsertLectureProgressRef: AdminUpsertLectureProgressRef;
+
+export function adminUpsertLectureProgress(vars: AdminUpsertLectureProgressVariables): MutationPromise<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+export function adminUpsertLectureProgress(dc: DataConnect, vars: AdminUpsertLectureProgressVariables): MutationPromise<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+
+interface GetLectureDurationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetLectureDurationVariables): QueryRef<GetLectureDurationData, GetLectureDurationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetLectureDurationVariables): QueryRef<GetLectureDurationData, GetLectureDurationVariables>;
+  operationName: string;
+}
+export const getLectureDurationRef: GetLectureDurationRef;
+
+export function getLectureDuration(vars: GetLectureDurationVariables, options?: ExecuteQueryOptions): QueryPromise<GetLectureDurationData, GetLectureDurationVariables>;
+export function getLectureDuration(dc: DataConnect, vars: GetLectureDurationVariables, options?: ExecuteQueryOptions): QueryPromise<GetLectureDurationData, GetLectureDurationVariables>;
+
 interface GetCourseCompletionStatusRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetCourseCompletionStatusVariables): QueryRef<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
@@ -2234,6 +2389,30 @@ export const getCourseCompletionStatusRef: GetCourseCompletionStatusRef;
 
 export function getCourseCompletionStatus(vars: GetCourseCompletionStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
 export function getCourseCompletionStatus(dc: DataConnect, vars: GetCourseCompletionStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
+
+interface GetCourseCompletionStatusForUserRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCourseCompletionStatusForUserVariables): QueryRef<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables): QueryRef<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+  operationName: string;
+}
+export const getCourseCompletionStatusForUserRef: GetCourseCompletionStatusForUserRef;
+
+export function getCourseCompletionStatusForUser(vars: GetCourseCompletionStatusForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+export function getCourseCompletionStatusForUser(dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+
+interface GetUserEnrollmentForCourseByUserRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserEnrollmentForCourseByUserVariables): QueryRef<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables): QueryRef<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+  operationName: string;
+}
+export const getUserEnrollmentForCourseByUserRef: GetUserEnrollmentForCourseByUserRef;
+
+export function getUserEnrollmentForCourseByUser(vars: GetUserEnrollmentForCourseByUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+export function getUserEnrollmentForCourseByUser(dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
 
 interface UpdateEnrollmentStatusRef {
   /* Allow users to create refs without passing in DataConnect */

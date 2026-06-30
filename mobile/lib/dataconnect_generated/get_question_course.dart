@@ -156,7 +156,51 @@ class GetQuestionCourseQuizQuestionQuizLectureSection {
 @immutable
 class GetQuestionCourseQuizQuestionQuizLectureSectionCourse {
   final String id;
+  final GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor author;
+  final GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy createdBy;
   GetQuestionCourseQuizQuestionQuizLectureSectionCourse.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor.fromJson(json['author']),
+  createdBy = GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy.fromJson(json['createdBy']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetQuestionCourseQuizQuestionQuizLectureSectionCourse otherTyped = other as GetQuestionCourseQuizQuestionQuizLectureSectionCourse;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    return json;
+  }
+
+  GetQuestionCourseQuizQuestionQuizLectureSectionCourse({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+  });
+}
+
+@immutable
+class GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor {
+  final String id;
+  GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -168,7 +212,7 @@ class GetQuestionCourseQuizQuestionQuizLectureSectionCourse {
       return false;
     }
 
-    final GetQuestionCourseQuizQuestionQuizLectureSectionCourse otherTyped = other as GetQuestionCourseQuizQuestionQuizLectureSectionCourse;
+    final GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor otherTyped = other as GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor;
     return id == otherTyped.id;
     
   }
@@ -182,7 +226,41 @@ class GetQuestionCourseQuizQuestionQuizLectureSectionCourse {
     return json;
   }
 
-  GetQuestionCourseQuizQuestionQuizLectureSectionCourse({
+  GetQuestionCourseQuizQuestionQuizLectureSectionCourseAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy {
+  final String id;
+  GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy otherTyped = other as GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetQuestionCourseQuizQuestionQuizLectureSectionCourseCreatedBy({
     required this.id,
   });
 }

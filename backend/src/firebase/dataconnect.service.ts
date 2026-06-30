@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from './firebase.service';
 import { extractBearerToken } from '../common/decorators/auth-token.decorator';
+import { ADMIN_OPERATIONS } from './admin-operations';
 
 /**
  * Service for executing GraphQL operations against Firebase Data Connect.
@@ -19,6 +20,8 @@ import { extractBearerToken } from '../common/decorators/auth-token.decorator';
 export class DataConnectService {
   private readonly logger = new Logger(DataConnectService.name);
   private readonly baseUrl: string;
+  /** Service-level base (no /connectors/...), used for the admin :executeGraphql endpoint. */
+  private readonly serviceBaseUrl: string;
   private readonly apiKey: string;
   private readonly timeoutMs: number;
 
@@ -31,7 +34,8 @@ export class DataConnectService {
     const serviceId = this.configService.get<string>('FDC_SERVICE_ID', 'learning-management-syst-3cc3a-service');
     const connectorId = this.configService.get<string>('FDC_CONNECTOR_ID', 'default');
 
-    this.baseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}/connectors/${connectorId}`;
+    this.serviceBaseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
+    this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
     this.apiKey = this.configService.get<string>('FIREBASE_API_KEY', '');
     this.timeoutMs = Number(this.configService.get<string>('FDC_TIMEOUT_MS', '15000'));
 
@@ -95,6 +99,13 @@ export class DataConnectService {
     authToken?: string,
     useAdmin = false,
   ): Promise<T> {
+    // Admin operations must bypass @auth, which the connector endpoints can't do.
+    // Route registered ones to the service-level :executeGraphql admin endpoint;
+    // anything else falls through to the connector path unchanged.
+    if (useAdmin && ADMIN_OPERATIONS[operationName]) {
+      return this.executeAdminGraphql<T>(operationName, variables);
+    }
+
     const url = `${this.baseUrl}:${action}`;
 
     const headers: Record<string, string> = {
@@ -169,6 +180,76 @@ export class DataConnectService {
       );
       throw new HttpException(
         `Data Connect operation "${operationName}" returned errors`,
+        this.mapGraphqlErrorStatus(result.errors),
+      );
+    }
+
+    return result.data as T;
+  }
+
+  /**
+   * Execute a privileged operation via the service-level `:executeGraphql`
+   * endpoint. This runs with the service-account's admin credentials and
+   * bypasses `@auth` — the only way to run NO_ACCESS / admin-only operations.
+   * Sends the raw GraphQL from {@link ADMIN_OPERATIONS} (executeGraphql does not
+   * accept connector operation *names*).
+   */
+  private async executeAdminGraphql<T>(
+    operationName: string,
+    variables?: Record<string, any>,
+  ): Promise<T> {
+    const query = ADMIN_OPERATIONS[operationName];
+    const url = `${this.serviceBaseUrl}:executeGraphql`;
+
+    const adminToken = await this.firebaseService.getAdminAccessToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${adminToken}`,
+    };
+
+    this.logger.debug(`FDC admin executeGraphql: ${operationName}`);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query, operationName, variables: variables ?? {} }),
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+    } catch (err: any) {
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+        this.logger.error(`FDC admin executeGraphql timed out for ${operationName}`);
+        throw new GatewayTimeoutException(
+          `Data Connect admin operation "${operationName}" timed out`,
+        );
+      }
+      this.logger.error(
+        `FDC admin executeGraphql network error for ${operationName}: ${err?.message}`,
+      );
+      throw new BadGatewayException(
+        `Data Connect admin operation "${operationName}" could not be reached`,
+      );
+    }
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      this.logger.error(
+        `FDC admin executeGraphql failed for ${operationName}: ${response.status} ${errorBody}`,
+      );
+      throw new HttpException(
+        `Data Connect admin operation "${operationName}" failed`,
+        this.mapStatus(response.status),
+      );
+    }
+
+    const result = await response.json();
+    if (result.errors && result.errors.length > 0) {
+      this.logger.error(
+        `FDC admin executeGraphql errors for ${operationName}: ${JSON.stringify(result.errors)}`,
+      );
+      throw new HttpException(
+        `Data Connect admin operation "${operationName}" returned errors`,
         this.mapGraphqlErrorStatus(result.errors),
       );
     }

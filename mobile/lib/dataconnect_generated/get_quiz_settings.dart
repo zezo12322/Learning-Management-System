@@ -156,7 +156,51 @@ class GetQuizSettingsCourseQuizLectureSection {
 @immutable
 class GetQuizSettingsCourseQuizLectureSectionCourse {
   final String id;
+  final GetQuizSettingsCourseQuizLectureSectionCourseAuthor author;
+  final GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy createdBy;
   GetQuizSettingsCourseQuizLectureSectionCourse.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetQuizSettingsCourseQuizLectureSectionCourseAuthor.fromJson(json['author']),
+  createdBy = GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy.fromJson(json['createdBy']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetQuizSettingsCourseQuizLectureSectionCourse otherTyped = other as GetQuizSettingsCourseQuizLectureSectionCourse;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    return json;
+  }
+
+  GetQuizSettingsCourseQuizLectureSectionCourse({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+  });
+}
+
+@immutable
+class GetQuizSettingsCourseQuizLectureSectionCourseAuthor {
+  final String id;
+  GetQuizSettingsCourseQuizLectureSectionCourseAuthor.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -168,7 +212,7 @@ class GetQuizSettingsCourseQuizLectureSectionCourse {
       return false;
     }
 
-    final GetQuizSettingsCourseQuizLectureSectionCourse otherTyped = other as GetQuizSettingsCourseQuizLectureSectionCourse;
+    final GetQuizSettingsCourseQuizLectureSectionCourseAuthor otherTyped = other as GetQuizSettingsCourseQuizLectureSectionCourseAuthor;
     return id == otherTyped.id;
     
   }
@@ -182,7 +226,41 @@ class GetQuizSettingsCourseQuizLectureSectionCourse {
     return json;
   }
 
-  GetQuizSettingsCourseQuizLectureSectionCourse({
+  GetQuizSettingsCourseQuizLectureSectionCourseAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy {
+  final String id;
+  GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy otherTyped = other as GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetQuizSettingsCourseQuizLectureSectionCourseCreatedBy({
     required this.id,
   });
 }

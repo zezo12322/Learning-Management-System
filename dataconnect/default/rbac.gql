@@ -64,12 +64,15 @@ query GetMyMissionAccess($missionId: UUID!) @auth(level: USER) {
 # Used by ResourceOwnershipGuard to resolve a child resource's owning
 # course/mission, so the route's :courseId/:missionId need not be trusted.
 #
-# Each `course` / `mission` node also selects the same ownership facts as
-# GetMyCourseAccess / GetMyMissionAccess (author, createdBy, the caller's
-# instructor link). This lets the guard authorize from a single query instead
-# of resolving the owner here and re-querying ownership separately. The guard
-# falls back to the dedicated access query if these fields are absent (e.g. an
-# older deployed connector), so the change is deploy-order independent.
+# Each `course` / `mission` node also selects author/createdBy so the guard can
+# authorize a course/mission *creator* from this single query. The assigned-
+# instructor link is deliberately NOT selected here: Data Connect rejects the
+# same aliased-with-arguments relation (courseInstructors_on_course filtered by
+# auth.uid) repeated across operations. Non-creators (incl. assigned
+# instructors) and older connectors that don't return these fields fall back to
+# GetMyCourseAccess / GetMyMissionAccess, which carry the instructor-link check.
+# The fast path therefore only ever *allows* — denial is always the authoritative
+# fallback query's decision.
 # ==========================================
 
 query GetQuestionCourse($questionId: UUID!) @auth(level: USER) {
@@ -78,9 +81,6 @@ query GetQuestionCourse($questionId: UUID!) @auth(level: USER) {
       id
       author { id }
       createdBy { id }
-      myInstructorLink: courseInstructors_on_course(
-        where: { userId: { eq_expr: "auth.uid" } }
-      ) { user { id } }
     } } } }
   }
 }
@@ -91,9 +91,6 @@ query GetOptionCourse($optionId: UUID!) @auth(level: USER) {
       id
       author { id }
       createdBy { id }
-      myInstructorLink: courseInstructors_on_course(
-        where: { userId: { eq_expr: "auth.uid" } }
-      ) { user { id } }
     } } } } }
   }
 }
@@ -104,9 +101,6 @@ query GetSectionCourse($sectionId: UUID!) @auth(level: USER) {
       id
       author { id }
       createdBy { id }
-      myInstructorLink: courseInstructors_on_course(
-        where: { userId: { eq_expr: "auth.uid" } }
-      ) { user { id } }
     }
   }
 }
@@ -121,9 +115,6 @@ query GetMicroLessonMission($microLessonId: UUID!) @auth(level: USER) {
         id
         author { id }
         createdBy { id }
-        myMissionCourseInstructorLink: courseInstructors_on_course(
-          where: { userId: { eq_expr: "auth.uid" } }
-        ) { user { id } }
       }
     }
   }
@@ -139,9 +130,6 @@ query GetCriterionMission($criterionId: UUID!) @auth(level: USER) {
         id
         author { id }
         createdBy { id }
-        myMissionCourseInstructorLink: courseInstructors_on_course(
-          where: { userId: { eq_expr: "auth.uid" } }
-        ) { user { id } }
       }
     }
   }
@@ -157,9 +145,6 @@ query GetTemplateMission($templateId: UUID!) @auth(level: USER) {
         id
         author { id }
         createdBy { id }
-        myMissionCourseInstructorLink: courseInstructors_on_course(
-          where: { userId: { eq_expr: "auth.uid" } }
-        ) { user { id } }
       }
     }
   }

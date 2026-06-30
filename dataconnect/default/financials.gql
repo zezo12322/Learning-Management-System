@@ -8,6 +8,7 @@ mutation LogPayment(
   payment_insert(
     data: {
       userId_expr: "auth.uid",
+      customerEmailSnapshot_expr: "auth.token.email",
       gateway: $gateway,
       status: PENDING,
       referenceId: $referenceId,

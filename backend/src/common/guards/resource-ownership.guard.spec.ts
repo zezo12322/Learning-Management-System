@@ -5,8 +5,9 @@ import { OwnsResourceMeta } from '../decorators/owns-resource.decorator';
 
 /**
  * Uses a REAL AccessService over a shared mocked DataConnectService so we can
- * assert the *number* of queries: the fast path authorizes from the leaf query
- * alone (1 call), the fallback re-queries ownership (2 calls).
+ * assert the *number* of queries: a creator is authorized from the leaf query
+ * alone (1 call); an assigned instructor / non-owner re-queries ownership
+ * (2 calls).
  */
 describe('ResourceOwnershipGuard', () => {
   let dc: { executeQuery: jest.Mock; extractToken: jest.Mock };
@@ -26,12 +27,10 @@ describe('ResourceOwnershipGuard', () => {
 
   const meta = (m: OwnsResourceMeta) => reflector.getAllAndOverride.mockReturnValue(m);
 
-  const ownedCourse = (uid: string) => ({
-    id: 'c1',
-    author: { id: uid },
-    createdBy: { id: 'x' },
-    myInstructorLink: [],
-  });
+  // Leaf→owner result for a course the caller created (fast-pathable).
+  const createdCourse = (uid: string) => ({ id: 'c1', author: { id: uid }, createdBy: { id: 'x' } });
+  // ...and one created by someone else (forces the fallback query).
+  const otherCourse = () => ({ id: 'c1', author: { id: 'someone' }, createdBy: { id: 'x' } });
 
   it('allows the route when no @OwnsResource metadata is present', async () => {
     reflector.getAllAndOverride.mockReturnValue(undefined);
@@ -60,9 +59,9 @@ describe('ResourceOwnershipGuard', () => {
   });
 
   describe('course-rooted leaf (section)', () => {
-    it('fast path: authorizes the owner from the leaf query alone (no second query)', async () => {
+    it('fast path: authorizes a course creator from the leaf query alone (no second query)', async () => {
       meta({ type: 'section', param: 'sectionId' });
-      dc.executeQuery.mockResolvedValue({ courseSection: { course: ownedCourse('u1') } });
+      dc.executeQuery.mockResolvedValue({ courseSection: { course: createdCourse('u1') } });
       const ctx = ctxWith({ userRoles: ['instructor'], user: { uid: 'u1' }, params: { sectionId: 's1' } });
 
       await expect(guard.canActivate(ctx)).resolves.toBe(true);
@@ -70,20 +69,41 @@ describe('ResourceOwnershipGuard', () => {
       expect(dc.executeQuery).toHaveBeenCalledWith('GetSectionCourse', { sectionId: 's1' }, 'tok');
     });
 
-    it('fast path: rejects a non-owner without a second query', async () => {
+    it('fallback: authorizes an assigned (non-creator) instructor via the second query', async () => {
       meta({ type: 'section', param: 'sectionId' });
-      dc.executeQuery.mockResolvedValue({ courseSection: { course: ownedCourse('someone-else') } });
+      dc.executeQuery.mockImplementation((op: string) => {
+        if (op === 'GetSectionCourse') return Promise.resolve({ courseSection: { course: otherCourse() } });
+        // The authoritative query carries the assigned-instructor link.
+        if (op === 'GetMyCourseAccess')
+          return Promise.resolve({ course: { author: { id: 'someone' }, createdBy: { id: 'x' }, myInstructorLink: [{ user: { id: 'u1' } }] } });
+        return Promise.resolve({});
+      });
+      const ctx = ctxWith({ userRoles: ['instructor'], user: { uid: 'u1' }, params: { sectionId: 's1' } });
+
+      await expect(guard.canActivate(ctx)).resolves.toBe(true);
+      expect(dc.executeQuery).toHaveBeenCalledTimes(2);
+      expect(dc.executeQuery).toHaveBeenNthCalledWith(2, 'GetMyCourseAccess', { courseId: 'c1' }, 'tok');
+    });
+
+    it('fallback: denies a non-owner after the authoritative query', async () => {
+      meta({ type: 'section', param: 'sectionId' });
+      dc.executeQuery.mockImplementation((op: string) => {
+        if (op === 'GetSectionCourse') return Promise.resolve({ courseSection: { course: otherCourse() } });
+        if (op === 'GetMyCourseAccess')
+          return Promise.resolve({ course: { author: { id: 'someone' }, createdBy: { id: 'x' }, myInstructorLink: [] } });
+        return Promise.resolve({});
+      });
       const ctx = ctxWith({ userRoles: ['instructor'], user: { uid: 'u1' }, params: { sectionId: 's1' } });
 
       await expect(guard.canActivate(ctx)).rejects.toBeInstanceOf(ForbiddenException);
-      expect(dc.executeQuery).toHaveBeenCalledTimes(1);
+      expect(dc.executeQuery).toHaveBeenCalledTimes(2);
     });
 
-    it('fallback: re-queries ownership when the leaf query lacks ownership facts', async () => {
+    it('fallback: re-queries when the leaf query omits author/createdBy (older connector)', async () => {
       meta({ type: 'section', param: 'sectionId' });
       dc.executeQuery.mockImplementation((op: string) => {
         if (op === 'GetSectionCourse') return Promise.resolve({ courseSection: { course: { id: 'c1' } } });
-        if (op === 'GetMyCourseAccess') return Promise.resolve({ course: ownedCourse('u1') });
+        if (op === 'GetMyCourseAccess') return Promise.resolve({ course: createdCourse('u1') });
         return Promise.resolve({});
       });
       const ctx = ctxWith({ userRoles: ['instructor'], user: { uid: 'u1' }, params: { sectionId: 's1' } });
