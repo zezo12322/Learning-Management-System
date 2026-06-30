@@ -6,6 +6,7 @@ describe('UploadsService', () => {
   let firebase: any;
   let dc: any;
   let access: { assertCourseAccess: jest.Mock };
+  let transcoding: { enqueue: jest.Mock };
   let svc: UploadsService;
   const caller = { uid: 'u1', token: 'tok', isAdmin: false };
 
@@ -19,7 +20,8 @@ describe('UploadsService', () => {
     };
     dc = { executeQuery: jest.fn(), executeMutation: jest.fn().mockResolvedValue({}) };
     access = { assertCourseAccess: jest.fn().mockResolvedValue(undefined) };
-    svc = new UploadsService(firebase, dc as any, access as any);
+    transcoding = { enqueue: jest.fn().mockResolvedValue({ jobId: 'transcode:L1', status: 'queued' }) };
+    svc = new UploadsService(firebase, dc as any, access as any, transcoding as any);
   });
 
   describe('generateSignedUrl', () => {
@@ -76,6 +78,31 @@ describe('UploadsService', () => {
       );
       expect(firebase.makeFilePublic).not.toHaveBeenCalled();
       expect(res.downloadUrl).toBe('signed-read');
+    });
+
+    it('auto-enqueues secure-HLS transcode for a confirmed lecture video', async () => {
+      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
+      const res = await svc.confirmUpload(dto, caller);
+      expect(transcoding.enqueue).toHaveBeenCalledWith('c1', 'L1', dto.storagePath, 'u1');
+      expect(res.transcode).toEqual({ jobId: 'transcode:L1', status: 'queued' });
+    });
+
+    it('does not fail the upload when transcode enqueue throws', async () => {
+      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
+      transcoding.enqueue.mockRejectedValueOnce(new Error('redis down'));
+      const res = await svc.confirmUpload(dto, caller);
+      expect(res.storagePath).toBe(dto.storagePath);
+      expect(res.transcode).toBeUndefined();
+    });
+
+    it('does not enqueue transcode for thumbnail uploads', async () => {
+      const thumbDto = {
+        entityType: UploadEntityType.COURSE_THUMBNAIL,
+        courseId: 'c1',
+        storagePath: 'courses/c1/thumbnail/x.png',
+      } as any;
+      await svc.confirmUpload(thumbDto, caller);
+      expect(transcoding.enqueue).not.toHaveBeenCalled();
     });
 
     it('rejects a storagePath outside the course prefix', async () => {
