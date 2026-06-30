@@ -166,6 +166,16 @@ export class FirebaseService implements OnModuleInit {
     }
 
     /**
+     * Download a private object's raw bytes via the Admin SDK (bypasses Storage
+     * rules). Used by the streaming layer to read the AES-128 content key and the
+     * stored HLS playlists, which must never be exposed to clients directly.
+     */
+    async downloadFile(filePath: string): Promise<Buffer> {
+        const [buffer] = await this.getBucket().file(filePath).download();
+        return buffer;
+    }
+
+    /**
      * Check if a file exists at the given path.
      */
     async fileExists(filePath: string): Promise<boolean> {

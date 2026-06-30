@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebaseService } from '../firebase/firebase.service';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { AccessService } from '../common/services/access.service';
+import { TranscodingService } from '../transcoding/transcoding.service';
 import {
   SignedUrlRequestDto,
   ConfirmUploadDto,
@@ -62,10 +63,13 @@ const ENTITY_RULES: Record<
 
 @Injectable()
 export class UploadsService {
+  private readonly logger = new Logger(UploadsService.name);
+
   constructor(
     private readonly firebase: FirebaseService,
     private readonly dc: DataConnectService,
     private readonly access: AccessService,
+    private readonly transcoding: TranscodingService,
   ) {}
 
   async generateSignedUrl(dto: SignedUrlRequestDto, caller: UploadCaller) {
@@ -164,7 +168,27 @@ export class UploadsService {
       ? storedValue
       : await this.firebase.generateSignedReadUrl(dto.storagePath);
 
-    return { downloadUrl, storagePath: dto.storagePath };
+    // Lecture videos auto-enter secure-HLS packaging: the worker will later
+    // overwrite videoUrl (currently the raw MP4 path) with the HLS master and
+    // store the probed duration. A queue failure (e.g. Redis down) must not fail
+    // the upload — the instructor can re-trigger via POST …/video/transcode.
+    let transcode: { jobId: string; status: string } | undefined;
+    if (dto.entityType === UploadEntityType.LECTURE_VIDEO) {
+      try {
+        transcode = await this.transcoding.enqueue(
+          dto.courseId,
+          dto.lectureId!,
+          dto.storagePath,
+          caller.uid,
+        );
+      } catch (err: any) {
+        this.logger.error(
+          `Failed to auto-enqueue transcode for lecture ${dto.lectureId}: ${err?.message}`,
+        );
+      }
+    }
+
+    return { downloadUrl, storagePath: dto.storagePath, transcode };
   }
 
   /** Strip any path components; keep a safe basename. */

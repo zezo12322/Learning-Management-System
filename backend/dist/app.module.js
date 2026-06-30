@@ -11,6 +11,8 @@ const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const schedule_1 = require("@nestjs/schedule");
 const throttler_1 = require("@nestjs/throttler");
+const bullmq_1 = require("@nestjs/bullmq");
+const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const config_module_1 = require("@nestjs/config/dist/config.module");
 const common_module_1 = require("./common/common.module");
@@ -25,12 +27,15 @@ const micro_lessons_module_1 = require("./micro-lessons/micro-lessons.module");
 const templates_module_1 = require("./templates/templates.module");
 const rubric_module_1 = require("./rubric/rubric.module");
 const uploads_module_1 = require("./uploads/uploads.module");
+const streaming_module_1 = require("./streaming/streaming.module");
+const transcoding_module_1 = require("./transcoding/transcoding.module");
 const progress_module_1 = require("./progress/progress.module");
 const completion_module_1 = require("./completion/completion.module");
 const users_module_1 = require("./users/users.module");
 const enrollment_module_1 = require("./enrollment/enrollment.module");
 const submissions_module_1 = require("./submissions/submissions.module");
 const catalog_module_1 = require("./catalog/catalog.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,6 +47,21 @@ exports.AppModule = AppModule = __decorate([
                 envFilePath: '.env',
             }),
             schedule_1.ScheduleModule.forRoot(),
+            bullmq_1.BullModule.forRootAsync({
+                inject: [config_1.ConfigService],
+                useFactory: (config) => ({
+                    connection: {
+                        host: config.get('REDIS_HOST', '127.0.0.1'),
+                        port: Number(config.get('REDIS_PORT', '6379')),
+                        password: config.get('REDIS_PASSWORD') || undefined,
+                        maxRetriesPerRequest: null,
+                    },
+                    defaultJobOptions: {
+                        removeOnComplete: true,
+                        removeOnFail: 100,
+                    },
+                }),
+            }),
             throttler_1.ThrottlerModule.forRoot([
                 {
                     ttl: 60000,
@@ -60,12 +80,15 @@ exports.AppModule = AppModule = __decorate([
             templates_module_1.TemplatesModule,
             rubric_module_1.RubricModule,
             uploads_module_1.UploadsModule,
+            streaming_module_1.StreamingModule,
+            transcoding_module_1.TranscodingModule,
             progress_module_1.ProgressModule,
             completion_module_1.CompletionModule,
             users_module_1.UsersModule,
             enrollment_module_1.EnrollmentModule,
             submissions_module_1.SubmissionsModule,
             catalog_module_1.CatalogModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

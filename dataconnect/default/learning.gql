@@ -32,7 +32,7 @@ mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
 
 # Updates the authenticated user's progress for a watched lecture
 mutation UpdateLectureProgress(
-  $lectureId: UUID!, 
+  $lectureId: UUID!,
   $lastWatchedSecond: Int!,
   $completedAt: Timestamp
 ) @auth(level: USER) {
@@ -44,6 +44,43 @@ mutation UpdateLectureProgress(
       completedAt: $completedAt
     }
   )
+}
+
+# Server-only upsert of lecture progress with an EXPLICIT userId.
+#
+# Used by the BullMQ progress worker (ProgressProcessor), which runs in the
+# background with the service-account credential and has NO auth.uid. The uid is
+# captured & trusted at enqueue time from the request's verified Firebase token,
+# placed in the job payload, and passed here. Declared NO_ACCESS so it can ONLY
+# be invoked via executeMutationAsAdmin — never reachable by an end-user token.
+mutation AdminUpsertLectureProgress(
+  $userId: String!,
+  $lectureId: UUID!,
+  $lastWatchedSecond: Int!,
+  $completedAt: Timestamp
+) @auth(level: NO_ACCESS) {
+  lectureProgress_upsert(
+    data: {
+      userId: $userId,
+      lectureId: $lectureId,
+      lastWatchedSecond: $lastWatchedSecond,
+      completedAt: $completedAt
+    }
+  )
+}
+
+# Server-only fetch of a lecture's duration (+ owning course) for the worker's
+# auto-completion rule. Runs as admin (no auth.uid), so NO_ACCESS.
+query GetLectureDuration($lectureId: UUID!) @auth(level: NO_ACCESS) {
+  courseLecture(id: $lectureId) {
+    id
+    duration
+    section {
+      course {
+        id
+      }
+    }
+  }
 }
 
 # ==========================================
@@ -61,6 +98,43 @@ query GetCourseCompletionStatus($courseId: UUID!) @auth(level: USER) {
         completedAt
       }
     }
+  }
+}
+
+# Server-only counterpart of GetCourseCompletionStatus, scoped by an EXPLICIT
+# userId instead of auth.uid. Used by the progress worker's admin completion
+# check (no auth.uid available). NO_ACCESS → only reachable via admin execution.
+query GetCourseCompletionStatusForUser(
+  $courseId: UUID!,
+  $userId: String!
+) @auth(level: NO_ACCESS) {
+  sections: courseSections(where: { courseId: { eq: $courseId }, deletedAt: { eq: null } }) {
+    userCompletionLectures: courseLectures_on_section(where: { deletedAt: { eq: null } }) {
+      id
+      userCompletionProgress: lectureProgresses_on_lecture(
+        where: { userId: { eq: $userId } }
+      ) {
+        completedAt
+      }
+    }
+  }
+}
+
+# Server-only enrollment lookup by EXPLICIT userId (worker completion cascade).
+query GetUserEnrollmentForCourseByUser(
+  $courseId: UUID!,
+  $userId: String!
+) @auth(level: NO_ACCESS) {
+  enrollments(
+    where: {
+      userId: { eq: $userId },
+      courseId: { eq: $courseId },
+      targetType: { eq: COURSE }
+    }
+  ) {
+    id
+    status
+    completedAt
   }
 }
 
