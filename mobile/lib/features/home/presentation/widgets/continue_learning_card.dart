@@ -7,16 +7,17 @@ import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 class ContinueLearningCard extends StatelessWidget {
   const ContinueLearningCard({
     super.key,
-    this.title = 'UI/UX Design Principles',
-    this.progress = 0.65,
-    this.lessonsCompleted = 12,
-    this.totalLessons = 20,
-    this.timeLeft = '4h 30m left',
+    required this.title,
+    required this.image,
+    required this.progress,
+    required this.lessonsCompleted,
+    required this.totalLessons,
+    required this.timeLeft,
     this.onPlayTap,
     this.onTap,
   });
-
   final String title;
+  final String image;
   final double progress;
   final int lessonsCompleted;
   final int totalLessons;
@@ -24,18 +25,14 @@ class ContinueLearningCard extends StatelessWidget {
   final VoidCallback? onPlayTap;
   final VoidCallback? onTap;
 
-  static const Color _badgeBackground = Color(0xFFEEF2FF);
-  static const Color _badgeText = Color(0xFF6366F1);
-  static const Color _imageBackground = Color(0xFFF5F3FF);
-
   @override
   Widget build(BuildContext context) {
     final progressPercent = (progress * 100).round();
 
     return Material(
-      color: AppColors.surface,
-      elevation: 2,
-      shadowColor: Colors.black.withValues(alpha: 0.06),
+      color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+      elevation: 4,
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(20.r),
       child: InkWell(
         onTap: onTap,
@@ -59,13 +56,16 @@ class ContinueLearningCard extends StatelessWidget {
                             vertical: 4.h,
                           ),
                           decoration: BoxDecoration(
-                            color: _badgeBackground,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
                             'In Progress',
                             style: TextStyles.labelSmall.copyWith(
-                              color: _badgeText,
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeights.semiBold,
                             ),
                           ),
@@ -86,7 +86,8 @@ class ContinueLearningCard extends StatelessWidget {
                           children: [
                             _MetaItem(
                               icon: Icons.menu_book_outlined,
-                              label: '$lessonsCompleted of $totalLessons lessons',
+                              label:
+                                  '$lessonsCompleted of $totalLessons lessons',
                             ),
                             Gap(12.w),
                             _MetaItem(
@@ -113,7 +114,7 @@ class ContinueLearningCard extends StatelessWidget {
                               value: progress,
                               minHeight: 8.h,
                               backgroundColor: AppColors.disableBackground,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -130,10 +131,13 @@ class ContinueLearningCard extends StatelessWidget {
                   ),
                   Gap(12.w),
                   Material(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     shape: const CircleBorder(),
                     elevation: 2,
-                    shadowColor: AppColors.primary.withValues(alpha: 0.35),
+                    shadowColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.35),
                     child: InkWell(
                       onTap: onPlayTap,
                       customBorder: const CircleBorder(),
@@ -165,45 +169,14 @@ class _CourseThumbnail extends StatelessWidget {
       width: 88.w,
       height: 88.w,
       decoration: BoxDecoration(
-        color: ContinueLearningCard._imageBackground,
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            top: 14.h,
-            left: 14.w,
-            child: Icon(
-              Icons.smart_toy_outlined,
-              size: 22.sp,
-              color: ContinueLearningCard._badgeText,
-            ),
+        image: const DecorationImage(
+          image: NetworkImage(
+            'https://imgs.search.brave.com/wedomm6qA0X0lfUy6EQ1A-qYXNCcWvMXpjtpugyjKp8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9saWZl/aW5kdWVzc2VsZG9y/Zi5jb20vd3AtY29u/dGVudC91cGxvYWRz/LzIwMjAvMDMvVW5p/dmVyc2l0eS1Db3Vy/c2VzLUZyZWUtT25s/aW5lLndlYnA',
           ),
-          Positioned(
-            bottom: 16.h,
-            right: 16.w,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Text(
-                'Aa',
-                style: TextStyles.labelSmall.copyWith(
-                  color: ContinueLearningCard._badgeText,
-                  fontWeight: FontWeights.bold,
-                ),
-              ),
-            ),
-          ),
-          Icon(
-            Icons.local_florist_outlined,
-            size: 28.sp,
-            color: ContinueLearningCard._badgeText.withValues(alpha: 0.7),
-          ),
-        ],
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }

@@ -62,6 +62,12 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     Gap(14.h),
                     ContinueLearningCard(
+                      title: 'UI/UX Design Principles',
+                      image: 'assets/images/course_thumbnail.png',
+                      progress: 0.65,
+                      lessonsCompleted: 12,
+                      totalLessons: 20,
+                      timeLeft: '4h 30m left',
                       onTap: () {},
                       onPlayTap: () {},
                     ),
