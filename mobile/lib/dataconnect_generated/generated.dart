@@ -84,7 +84,15 @@ part 'enroll_in_mission.dart';
 
 part 'update_lecture_progress.dart';
 
+part 'admin_upsert_lecture_progress.dart';
+
+part 'get_lecture_duration.dart';
+
 part 'get_course_completion_status.dart';
+
+part 'get_course_completion_status_for_user.dart';
+
+part 'get_user_enrollment_for_course_by_user.dart';
 
 part 'update_enrollment_status.dart';
 
@@ -919,8 +927,28 @@ class DefaultConnector {
   }
   
   
+  AdminUpsertLectureProgressVariablesBuilder adminUpsertLectureProgress ({required String userId, required String lectureId, required int lastWatchedSecond, }) {
+    return AdminUpsertLectureProgressVariablesBuilder(dataConnect, userId: userId,lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,);
+  }
+  
+  
+  GetLectureDurationVariablesBuilder getLectureDuration ({required String lectureId, }) {
+    return GetLectureDurationVariablesBuilder(dataConnect, lectureId: lectureId,);
+  }
+  
+  
   GetCourseCompletionStatusVariablesBuilder getCourseCompletionStatus ({required String courseId, }) {
     return GetCourseCompletionStatusVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetCourseCompletionStatusForUserVariablesBuilder getCourseCompletionStatusForUser ({required String courseId, required String userId, }) {
+    return GetCourseCompletionStatusForUserVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
+  }
+  
+  
+  GetUserEnrollmentForCourseByUserVariablesBuilder getUserEnrollmentForCourseByUser ({required String courseId, required String userId, }) {
+    return GetUserEnrollmentForCourseByUserVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
   
   

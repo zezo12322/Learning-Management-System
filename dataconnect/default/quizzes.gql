@@ -62,8 +62,10 @@ mutation FinishQuizAttemptIfOpen($attemptId: UUID!, $score: Float!, $passed: Boo
 
 # Sweep query for the server-side timer (KAN-115): every in-progress,
 # time-limited attempt. Called by the QuizExpiryTask cron with admin
-# credentials, so it is NOT scoped to a single auth.uid.
-query GetExpiredAttempts @auth(level: USER) {
+# credentials (executeGraphql, which bypasses @auth), so it is NOT scoped to a
+# single auth.uid. NO_ACCESS prevents any end-user from reading all users'
+# in-progress attempts directly via the connector SDK.
+query GetExpiredAttempts @auth(level: NO_ACCESS) {
   quizAttempts(where: { completedAt: { eq: null } }) {
     id
     startedAt
@@ -146,15 +148,12 @@ query GetQuizSettings($quizId: UUID!) @auth(level: USER) {
       id
       type
       section {
-        # Ownership facts let ResourceOwnershipGuard authorize without a second
-        # query; see the leaf→owner note in rbac.gql.
+        # author/createdBy let ResourceOwnershipGuard fast-path a course creator
+        # without a second query; see the leaf→owner note in rbac.gql.
         course {
           id
           author { id }
           createdBy { id }
-          myInstructorLink: courseInstructors_on_course(
-            where: { userId: { eq_expr: "auth.uid" } }
-          ) { user { id } }
         }
       }
     }

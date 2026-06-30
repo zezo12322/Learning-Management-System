@@ -1,4 +1,5 @@
-import { IsString, IsInt, IsEnum, IsOptional, IsArray, IsUUID, Min } from 'class-validator';
+import { IsString, IsInt, IsEnum, IsOptional, IsArray, Min } from 'class-validator';
+import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 
 export enum MissionDifficulty {
   BEGINNER = 'BEGINNER',
@@ -18,7 +19,7 @@ export class CreateMissionDto {
   @Min(1)
   durationMinutes: number;
 
-  @IsUUID()
+  @IsFlexUUID()
   categoryId: string;
 
   @IsEnum(MissionDifficulty)
@@ -29,7 +30,7 @@ export class CreateMissionDto {
   skillsTested: string[];
 
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   courseId?: string;
 }
 
@@ -48,7 +49,7 @@ export class UpdateMissionDto {
   durationMinutes?: number;
 
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   categoryId?: string;
 
   @IsOptional()
@@ -61,6 +62,6 @@ export class UpdateMissionDto {
   skillsTested?: string[];
 
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   courseId?: string;
 }

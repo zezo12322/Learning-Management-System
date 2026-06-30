@@ -32,7 +32,7 @@ type User @table(name: "users") {
 }
 
 type Profile @table(name: "profiles", key: ["user"]) {
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   bio: String
   company: String
   phone: String
@@ -52,7 +52,7 @@ type Permission @table(name: "permissions") {
 }
 
 type UserRole @table(name: "user_roles", key: ["user", "role"]) {
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   role: Role!
 }
 
@@ -84,8 +84,8 @@ type Course @table(name: "courses") {
   thumbnail: String
   category: Category! 
   tags: [String!]!    
-  author: User! @ref(onDelete: CASCADE)       
-  createdBy: User! @ref(onDelete: CASCADE)    
+  author: User!       
+  createdBy: User!    
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
   deletedAt: Timestamp 
@@ -93,7 +93,7 @@ type Course @table(name: "courses") {
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
   course: Course!
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
 }
 
 type CourseSection @table(name: "course_sections") {
@@ -165,8 +165,8 @@ type Mission @table(name: "missions") {
   category: Category! 
   difficulty: MissionDifficulty! 
   skillsTested: [String!]!
-  author: User! @ref(onDelete: CASCADE)       
-  createdBy: User! @ref(onDelete: CASCADE)    
+  author: User!       
+  createdBy: User!    
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
   deletedAt: Timestamp
@@ -203,8 +203,8 @@ type RubricCriterion @table(name: "rubric_criteria") {
 type MissionSubmission @table(name: "mission_submissions") {
   id: UUID! @default(expr: "uuidV4()")
   mission: Mission!
-  student: User! @ref(onDelete: CASCADE)
-  grader: User @ref(onDelete: SET_NULL)
+  student: User!
+  grader: User
   fileUrl: String!
   feedback: String
   status: SubmissionStatus! @default(expr: "'PENDING'") 
@@ -224,7 +224,7 @@ type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["sub
 # ==========================================
 type Enrollment @table(name: "enrollments") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   targetType: EnrollmentTarget! 
   course: Course 
   mission: Mission 
@@ -234,7 +234,7 @@ type Enrollment @table(name: "enrollments") {
 }
 
 type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) {
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   lecture: CourseLecture!
   lastWatchedSecond: Int!
   completedAt: Timestamp
@@ -242,7 +242,7 @@ type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) 
 
 type QuizAttempt @table(name: "quiz_attempts") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   quiz: CourseQuiz!
   score: Float      
   passed: Boolean   
@@ -260,7 +260,7 @@ type Session @table(name: "sessions") {
   id: UUID! @default(expr: "uuidV4()")
   course: Course!
   title: String!
-  hostUser: User @ref(onDelete: SET_NULL)     
+  hostUser: User     
   capacity: Int       
   startTime: Timestamp!
   endTime: Timestamp!
@@ -274,7 +274,7 @@ type Session @table(name: "sessions") {
 
 type Attendance @table(name: "attendance") {
   id: UUID! @default(expr: "uuidV4()")
-  student: User! @ref(onDelete: CASCADE)
+  student: User!
   session: Session!
   status: AttendanceStatus!
   method: AttendanceMethod!
@@ -286,7 +286,7 @@ type Attendance @table(name: "attendance") {
 # ==========================================
 type Certificate @table(name: "certificates") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @ref(onDelete: CASCADE)
+  user: User!
   targetType: CertificateTarget! 
   course: Course
   mission: Mission
@@ -312,10 +312,13 @@ type Payment @table(name: "payments") {
   id: UUID! @default(expr: "uuidV4()")
   
   # 1. Relation is now optional (User instead of User!) and uses SET_NULL
-  user: User @ref(onDelete: SET_NULL)
+  user: User
   
   # 2. Static Snapshot: Store this at checkout so you never lose the audit trail!
-  customerEmailSnapshot: String! 
+  #    Default '' makes the column migration non-destructive (existing rows get
+  #    filled automatically). New rows always set the real value in LogPayment
+  #    via auth.token.email, so the default only ever applies to back-migration.
+  customerEmailSnapshot: String! @default(expr: "''")
   
   gateway: PaymentGateway!
   status: PaymentStatus!
@@ -330,7 +333,7 @@ type UserSubscription @table(name: "user_subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
   
   # Subscriptions are kept for historical metrics, but the user link is severed
-  user: User @ref(onDelete: SET_NULL)
+  user: User
   
   tier: SubscriptionTier!
   payment: Payment           

@@ -1,4 +1,4 @@
-const { adminCreateCourseRef, adminDeleteCourseRef, adminCreateSessionRef, adminCancelSessionRef, adminCreateSubscriptionTierRef, adminDeprecateSubscriptionTierRef, adminCreateCategoryRef, getUserClaimsRef, myCertificatesRef, verifyCertificateRef, listPublishedCoursesRef, getCourseCurriculumRef, getLectureContentRef, getUserLectureProgressRef, getMyCourseProgressRef, getCourseForEnrollmentRef, adminGetCourseRef, adminListMyCoursesRef, adminUpdateCourseRef, adminUpdateCourseStatusRef, adminCreateSectionRef, adminUpdateSectionRef, adminSoftDeleteSectionRef, adminUpdateSectionOrderRef, adminCreateLectureFullRef, adminUpdateLectureRef, adminSoftDeleteLectureRef, adminUpdateLectureOrderRef, adminMoveLectureToSectionRef, adminSoftDeleteLecturesBySectionRef, logPaymentRef, addPaymentItemRef, myPaymentHistoryRef, getPendingSubmissionsRef, adminAddCourseInstructorRef, adminRemoveCourseInstructorRef, getCourseInstructorsRef, enrollInCourseRef, enrollInMissionRef, updateLectureProgressRef, getCourseCompletionStatusRef, updateEnrollmentStatusRef, getUserEnrollmentForCourseRef, getUserEnrollmentForMissionRef, getMissionForEnrollmentRef, submitMissionRef, mySubmissionsRef, gradeSubmissionRef, addCriterionScoreRef, getSubmissionForGradingRef, getEnrollmentForUserMissionRef, adminCreateMissionRef, adminUpdateMissionRef, adminSoftDeleteMissionRef, adminGetMissionRef, adminListMyMissionsRef, adminCreateMicroLessonRef, adminUpdateMicroLessonRef, adminDeleteMicroLessonRef, adminUpdateMicroLessonOrderRef, adminCreateMissionTemplateRef, adminDeleteMissionTemplateRef, getMissionTemplatesRef, adminCreateRubricCriterionRef, adminUpdateRubricCriterionRef, adminDeleteRubricCriterionRef, adminUpdateRubricCriterionOrderRef, getQuizQuestionsRef, startQuizAttemptRef, submitQuizAnswerRef, finishQuizAttemptIfOpenRef, getExpiredAttemptsRef, getUserQuizAttemptsRef, getQuizAttemptByIdRef, getQuizQuestionPointsRef, getAttemptAnswersWithCorrectRef, getQuizSettingsRef, getQuestionOptionsRef, getOptionWithQuestionRef, getActiveQuizSessionRef, adminGetQuizRef, adminCreateQuizRef, adminUpdateQuizRef, adminDeleteQuizRef, adminCreateQuizQuestionRef, adminUpdateQuizQuestionRef, adminSoftDeleteQuizQuestionRef, adminUpdateQuizQuestionOrderRef, adminCreateQuizOptionRef, adminUpdateQuizOptionRef, adminDeleteQuizOptionRef, adminUpdateQuizOptionOrderRef, getMyCourseAccessRef, getMyMissionAccessRef, getQuestionCourseRef, getOptionCourseRef, getSectionCourseRef, getMicroLessonMissionRef, getCriterionMissionRef, getTemplateMissionRef, getCourseSessionsRef, checkInToSessionRef, syncUserRef, getMeRef, updateMyProfileRef, connectorConfig } = require('../index.cjs.js');
+const { adminCreateCourseRef, adminDeleteCourseRef, adminCreateSessionRef, adminCancelSessionRef, adminCreateSubscriptionTierRef, adminDeprecateSubscriptionTierRef, adminCreateCategoryRef, getUserClaimsRef, myCertificatesRef, verifyCertificateRef, listPublishedCoursesRef, getCourseCurriculumRef, getLectureContentRef, getUserLectureProgressRef, getMyCourseProgressRef, getCourseForEnrollmentRef, adminGetCourseRef, adminListMyCoursesRef, adminUpdateCourseRef, adminUpdateCourseStatusRef, adminCreateSectionRef, adminUpdateSectionRef, adminSoftDeleteSectionRef, adminUpdateSectionOrderRef, adminCreateLectureFullRef, adminUpdateLectureRef, adminSoftDeleteLectureRef, adminUpdateLectureOrderRef, adminMoveLectureToSectionRef, adminSoftDeleteLecturesBySectionRef, logPaymentRef, addPaymentItemRef, myPaymentHistoryRef, getPendingSubmissionsRef, adminAddCourseInstructorRef, adminRemoveCourseInstructorRef, getCourseInstructorsRef, enrollInCourseRef, enrollInMissionRef, updateLectureProgressRef, adminUpsertLectureProgressRef, getLectureDurationRef, getCourseCompletionStatusRef, getCourseCompletionStatusForUserRef, getUserEnrollmentForCourseByUserRef, updateEnrollmentStatusRef, getUserEnrollmentForCourseRef, getUserEnrollmentForMissionRef, getMissionForEnrollmentRef, submitMissionRef, mySubmissionsRef, gradeSubmissionRef, addCriterionScoreRef, getSubmissionForGradingRef, getEnrollmentForUserMissionRef, adminCreateMissionRef, adminUpdateMissionRef, adminSoftDeleteMissionRef, adminGetMissionRef, adminListMyMissionsRef, adminCreateMicroLessonRef, adminUpdateMicroLessonRef, adminDeleteMicroLessonRef, adminUpdateMicroLessonOrderRef, adminCreateMissionTemplateRef, adminDeleteMissionTemplateRef, getMissionTemplatesRef, adminCreateRubricCriterionRef, adminUpdateRubricCriterionRef, adminDeleteRubricCriterionRef, adminUpdateRubricCriterionOrderRef, getQuizQuestionsRef, startQuizAttemptRef, submitQuizAnswerRef, finishQuizAttemptIfOpenRef, getExpiredAttemptsRef, getUserQuizAttemptsRef, getQuizAttemptByIdRef, getQuizQuestionPointsRef, getAttemptAnswersWithCorrectRef, getQuizSettingsRef, getQuestionOptionsRef, getOptionWithQuestionRef, getActiveQuizSessionRef, adminGetQuizRef, adminCreateQuizRef, adminUpdateQuizRef, adminDeleteQuizRef, adminCreateQuizQuestionRef, adminUpdateQuizQuestionRef, adminSoftDeleteQuizQuestionRef, adminUpdateQuizQuestionOrderRef, adminCreateQuizOptionRef, adminUpdateQuizOptionRef, adminDeleteQuizOptionRef, adminUpdateQuizOptionOrderRef, getMyCourseAccessRef, getMyMissionAccessRef, getQuestionCourseRef, getOptionCourseRef, getSectionCourseRef, getMicroLessonMissionRef, getCriterionMissionRef, getTemplateMissionRef, getCourseSessionsRef, checkInToSessionRef, syncUserRef, getMeRef, updateMyProfileRef, connectorConfig } = require('../index.cjs.js');
 const { validateArgs, CallerSdkTypeEnum } = require('firebase/data-connect');
 const { useDataConnectQuery, useDataConnectMutation, validateReactArgs } = require('@tanstack-query-firebase/react/data-connect');
 
@@ -294,10 +294,36 @@ exports.useUpdateLectureProgress = function useUpdateLectureProgress(dcOrOptions
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
+exports.useAdminUpsertLectureProgress = function useAdminUpsertLectureProgress(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return adminUpsertLectureProgressRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+exports.useGetLectureDuration = function useGetLectureDuration(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getLectureDurationRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
 
 exports.useGetCourseCompletionStatus = function useGetCourseCompletionStatus(dcOrVars, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   const ref = getCourseCompletionStatusRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCourseCompletionStatusForUser = function useGetCourseCompletionStatusForUser(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCourseCompletionStatusForUserRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetUserEnrollmentForCourseByUser = function useGetUserEnrollmentForCourseByUser(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getUserEnrollmentForCourseByUserRef(dcInstance, inputVars);
   return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 exports.useUpdateEnrollmentStatus = function useUpdateEnrollmentStatus(dcOrOptions, options) {

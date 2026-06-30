@@ -54,7 +54,51 @@ class GetSectionCourseCourseSection {
 @immutable
 class GetSectionCourseCourseSectionCourse {
   final String id;
+  final GetSectionCourseCourseSectionCourseAuthor author;
+  final GetSectionCourseCourseSectionCourseCreatedBy createdBy;
   GetSectionCourseCourseSectionCourse.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetSectionCourseCourseSectionCourseAuthor.fromJson(json['author']),
+  createdBy = GetSectionCourseCourseSectionCourseCreatedBy.fromJson(json['createdBy']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetSectionCourseCourseSectionCourse otherTyped = other as GetSectionCourseCourseSectionCourse;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    return json;
+  }
+
+  GetSectionCourseCourseSectionCourse({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+  });
+}
+
+@immutable
+class GetSectionCourseCourseSectionCourseAuthor {
+  final String id;
+  GetSectionCourseCourseSectionCourseAuthor.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -66,7 +110,7 @@ class GetSectionCourseCourseSectionCourse {
       return false;
     }
 
-    final GetSectionCourseCourseSectionCourse otherTyped = other as GetSectionCourseCourseSectionCourse;
+    final GetSectionCourseCourseSectionCourseAuthor otherTyped = other as GetSectionCourseCourseSectionCourseAuthor;
     return id == otherTyped.id;
     
   }
@@ -80,7 +124,41 @@ class GetSectionCourseCourseSectionCourse {
     return json;
   }
 
-  GetSectionCourseCourseSectionCourse({
+  GetSectionCourseCourseSectionCourseAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetSectionCourseCourseSectionCourseCreatedBy {
+  final String id;
+  GetSectionCourseCourseSectionCourseCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetSectionCourseCourseSectionCourseCreatedBy otherTyped = other as GetSectionCourseCourseSectionCourseCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetSectionCourseCourseSectionCourseCreatedBy({
     required this.id,
   });
 }

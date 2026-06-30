@@ -1,4 +1,5 @@
-import { IsString, IsInt, IsEnum, IsOptional, IsArray, IsUUID, Min } from 'class-validator';
+import { IsString, IsInt, IsEnum, IsOptional, IsArray, Min } from 'class-validator';
+import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 
 export enum CourseLevel {
   BEGINNER = 'BEGINNER',
@@ -30,7 +31,7 @@ export class CreateCourseDto {
   @IsEnum(CourseLevel)
   level: CourseLevel;
 
-  @IsUUID()
+  @IsFlexUUID()
   categoryId: string;
 
   @IsArray()
@@ -61,7 +62,7 @@ export class UpdateCourseDto {
   level?: CourseLevel;
 
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   categoryId?: string;
 
   @IsOptional()

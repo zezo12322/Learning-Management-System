@@ -16,9 +16,10 @@ import {
 
 /**
  * The leaf's owning course/mission, plus the resolved owner node. The node
- * carries the ownership facts (author/createdBy/instructor link) when the
- * deployed connector returns them, letting the guard authorize without a
- * second query; `id` is kept for the fallback access query when it doesn't.
+ * carries author/createdBy when the deployed connector returns them, letting
+ * the guard fast-path a creator without a second query; `id` is kept for the
+ * authoritative fallback access query (used for assigned instructors and when
+ * the connector predates the enriched fields).
  */
 type ResolvedOwner =
   | { kind: 'course'; id: string; node: any }
@@ -32,10 +33,11 @@ type ResolvedOwner =
  * course/mission and instead resolves the *actual* owner of the leaf, then
  * checks ownership. Admins bypass.
  *
- * The leaf→owner queries also return the owner's ownership facts, so the guard
- * authorizes in a single query. If those facts are absent (e.g. an older
- * deployed connector that predates that change), it falls back to the dedicated
- * AccessService query — keeping the behavior correct regardless of deploy order.
+ * The leaf→owner queries also return author/createdBy, so a course/mission
+ * *creator* is authorized from that single query. Assigned instructors (and
+ * older connectors that omit those fields) fall through to the authoritative
+ * AccessService query, which also checks the assigned-instructor link. The fast
+ * path only ever allows, so behavior is correct regardless of deploy order.
  *
  * MUST run after FirebaseAuthGuard + RolesGuard (reads `request.userRoles`).
  * Activated by the @OwnsResource decorator.
@@ -114,21 +116,17 @@ export class ResourceOwnershipGuard implements CanActivate {
     const resolved = await this.resolvers[meta.type](leafId, token);
     if (!resolved) throw new NotFoundException(`${meta.type} ${leafId} not found`);
 
-    // isAdmin is false here — admins already returned above.
+    // Fast path: the leaf query carries author/createdBy, so a creator is
+    // authorized from this single query. A non-creator (incl. an assigned
+    // instructor) or an older connector that omits these fields is NOT denied
+    // here — it falls through to the authoritative access query, which also
+    // checks the assigned-instructor link. isAdmin is false (admins returned above).
     if (resolved.kind === 'course') {
-      // Fast path: the leaf query already returned ownership facts. Otherwise
-      // fall back to the dedicated access query (deploy-order independent).
-      if (this.access.courseHasOwnershipFacts(resolved.node)) {
-        this.access.assertOwnsCourse(resolved.node, uid);
-      } else {
-        await this.access.assertCourseAccess(resolved.id, uid, token, false);
-      }
+      if (this.access.isCourseCreator(resolved.node, uid)) return true;
+      await this.access.assertCourseAccess(resolved.id, uid, token, false);
     } else {
-      if (this.access.missionHasOwnershipFacts(resolved.node)) {
-        this.access.assertOwnsMission(resolved.node, uid);
-      } else {
-        await this.access.assertMissionAccess(resolved.id, uid, token, false);
-      }
+      if (this.access.isMissionCreator(resolved.node, uid)) return true;
+      await this.access.assertMissionAccess(resolved.id, uid, token, false);
     }
     return true;
   }
