@@ -3,22 +3,23 @@ const admin = require("firebase-admin");
 const { getDataConnect } = require("firebase-admin/data-connect");
 const { z } = require("zod");
 
-// Import our custom Rate Limiter service (Adapter Pattern)
+// Internal Modular Dependencies
 const RateLimiter = require("./rateLimiter");
+const { requireRole } = require("./authUtils");
 
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 admin.initializeApp();
 
-// Initialize Firebase Data Connect (PostgreSQL connection)
+// Target connection for PostgreSQL via Data Connect
 const adminDC = getDataConnect({
   serviceId: 'learning-management-syst-3cc3a-service',
   location: 'europe-west8'
 });
 
 // ============================================================================
-// SCHEMAS & VALIDATION (Zod)
+// SCHEMAS & DATA VALIDATION (Zod)
 // ============================================================================
 const registrationSchema = z.object({
   name: z.string()
@@ -36,20 +37,19 @@ const registrationSchema = z.object({
     .max(64, "Password cannot exceed 64 characters.")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
     .regex(/[0-9]/, "Password must contain at least one number.")
-    // The officially defined OWASP special character set
+    // Explicit OWASP defined special character matrix
     .regex(/[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/, "Password must contain at least one special character.")
 });
 
 // ============================================================================
-// FUNCTION 1: THE OAUTH SAFETY NET (Background Trigger)
-// Catches users who bypass the frontend form by using Google/GitHub/Apple login.
-// Ensures they are added to the database and given the default 'student' role.
+// BACKGROUND HANDLER 1: THE OAUTH CLAIM SYNC & AUTO-PROVISIONER
+// Triggers when a user authenticates via third-party providers (Google, GitHub, etc.)
+// Reconciles token claims with database persistence states.
 // ============================================================================
 exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async (user) => {
   console.log(`🚀 [START] syncClaims triggered for UID: ${user.uid}`);
 
   try {
-    // 1. Check if the user already exists in PostgreSQL
     const query = `
       query getUserClaims($uid: String!) {
         user(id: $uid) {
@@ -71,9 +71,9 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
 
     const userData = response.data?.user;
 
-    // 2. If missing (OAuth signup), create their DB record and assign 'student'
+    // Provision row if account bypasses the application registration endpoint
     if (!userData) {
-      console.log(`⚠️ [NEW USER] UID: ${user.uid} not in DB. Executing creation mutation...`);
+      console.log(`⚠️ [NEW OAUTH USER] UID: ${user.uid} absent from relational storage. Executing creation...`);
 
       const userEmail = user.email || `no-email-${user.uid}@example.com`;
       const userName = user.displayName || "New Student";
@@ -91,68 +91,65 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
       const defaultClaims = { roles: ['student'], companyId: null };
       await admin.auth().setCustomUserClaims(user.uid, defaultClaims);
 
-      console.log(`🎉 [SUCCESS] Default Student claims attached via syncClaims!`);
+      console.log(`🎉 [SUCCESS] Relational record created and default student claims attached.`);
       return;
     }
 
-    // 3. If they exist (e.g., an Admin logged in), sync their existing DB roles to their Auth Token
+    // Map existing identities back down into the authorization token
     const roles = userData.userRoles_on_user ? userData.userRoles_on_user.map(ur => ur.role.name) : [];
     const companyId = userData.profile_on_user ? userData.profile_on_user.company : null;
 
     const claims = { roles, companyId };
     await admin.auth().setCustomUserClaims(user.uid, claims);
-    console.log(`🎉 [SUCCESS] Custom claims synced to Auth successfully!`);
+    console.log(`🎉 [SUCCESS] Custom verification claims synced to token.`);
 
   } catch (error) {
-    console.error("❌ [CRITICAL ERROR in syncClaims]", error);
+    console.error("❌ [CRITICAL ERROR inside syncClaims]", error);
   }
 });
 
-
 // ============================================================================
-// FUNCTION 2: REGISTRATION API (Callable HTTPS)
-// The endpoint your frontend calls to register a user with Email/Password.
-// Protected by IP-based Rate Limiting and strict Zod input validation.
+// CALLABLE ENDPOINT 1: STUDENT REGISTRATION PIPELINE
+// Validates parameters via Zod schema, checks IP rate constraints, provisions 
+// identity inside Auth and inserts target entity inside PostgreSQL.
 // ============================================================================
 exports.registerStudent = functions.region('europe-west3').https.onCall(async (data, context) => {
-  // 1. RATE LIMITING CHECK
+  // 1. IP-Based Rate Limiter Verification
   const rawIp = context.rawRequest.ip || "unknown-ip";
   try {
-    // Enforce: Max 10 requests per 1 minute (60,000 ms) per IP address
+    // Upper threshold limit: Max 10 executions per minute per source IP
     await RateLimiter.checkLimit(`ip_${rawIp}`, 10, "1 m");
   } catch (error) {
     if (error.message === 'RATE_LIMIT_EXCEEDED') {
-      console.warn(`🚨 [SECURITY] Registration IP limit exceeded: ${rawIp}`);
+      console.warn(`🚨 [SECURITY] Execution rate exceeded for IP: ${rawIp}`);
       throw new functions.https.HttpsError('resource-exhausted', 'Too many attempts. Please slow down.');
     }
-    console.error("⚠️ [WARNING] Rate limiter service failure:", error);
+    console.error("⚠️ [WARNING] Rate Limiter failure:", error);
   }
 
-  // 2. STRICT DATA VALIDATION (Zod)
+  // 2. Schema Structure Verification
   let validatedData;
   try {
-    console.log(`🛡️ [VALIDATION] Checking input schema...`);
     validatedData = registrationSchema.parse(data);
   } catch (error) {
     console.warn(`🚨 [VALIDATION FAILED] ${error.errors[0].message}`);
-    // Throw the specific Zod error message back to the frontend UI
     throw new functions.https.HttpsError('invalid-argument', error.errors[0].message);
   }
 
   const { email, password, name } = validatedData;
-  console.log(`🚀 [START] API Registration for: ${email}`);
+  console.log(`🚀 [START] Structured registration handling for: ${email}`);
 
   try {
-    // 3. CREATE FIREBASE AUTH ACCOUNT
+    // 3. Provision Core Identity Object
     const userRecord = await admin.auth().createUser({
       email: email,
       password: password,
       displayName: name,
     });
     const uid = userRecord.uid;
-    console.log(`✅ [AUTH] Account created: ${uid}`);
+    console.log(`✅ [AUTH] Base account identity instantiated: ${uid}`);
 
-    // 4. CREATE POSTGRESQL RECORD
+    // 4. Provision Related Persistent State Records
     const insertMutation = `
           mutation createDefaultUser($uid: String!, $email: String!, $name: String!) {
             user_insert(data: { id: $uid, email: $email, name: $name })
@@ -161,59 +158,77 @@ exports.registerStudent = functions.region('europe-west3').https.onCall(async (d
     await adminDC.executeGraphql(insertMutation, {
       variables: { uid, email, name }
     });
-    console.log(`✅ [DB INSERT] PostgreSQL record created for ${name}`);
+    console.log(`✅ [DB INSERT] Relational database persistence mapped.`);
 
-    // 5. ATTACH DEFAULT ROLES
+    // 5. Append Explicit Scopes
     const defaultClaims = { roles: ['student'], companyId: null };
     await admin.auth().setCustomUserClaims(uid, defaultClaims);
 
-    console.log(`🎉 [SUCCESS] Registration complete via registerStudent API!`);
-
+    console.log(`🎉 [SUCCESS] Pipeline transaction resolved successfully.`);
     return { success: true, uid: uid };
 
   } catch (error) {
-    console.error("❌ [API ERROR in registerStudent]", error);
+    console.error("❌ [API ERROR inside registerStudent]", error);
     if (error.code) {
       throw new functions.https.HttpsError('already-exists', error.message);
     }
-    throw new functions.https.HttpsError('internal', 'Backend registration failed.');
+    throw new functions.https.HttpsError('internal', 'Backend transaction failure during execution.');
   }
 });
 
-
 // ============================================================================
-// FUNCTION 3: DELETION CASCADE (Background Trigger)
-// Automatically fires when a user clicks "Delete Account" or an Admin removes them.
-// Keeps the system perfectly clean by wiping orphaned data and ghost files.
+// BACKGROUND HANDLER 2: CASCADING SYSTEM DELETION WIPE
+// Fires asynchronously when a user entity is purged from Firebase Auth.
+// Removes corresponding relational tuples and binary object files from storage.
 // ============================================================================
 exports.cleanupUserData = functions.region('europe-west3').auth.user().onDelete(async (user) => {
-  console.log(`🗑️ [START] Deletion cascade triggered for UID: ${user.uid}`);
+  console.log(`🗑️ [START] Purge cascade execution initialized for UID: ${user.uid}`);
 
   try {
-    // 1. WIPE POSTGRESQL DATABASE
+    // 1. Database Row Level Extraction
     const deleteMutation = `
           mutation deleteUserRecord($uid: String!) {
             user_delete(id: $uid)
           }
         `;
 
-    console.log(`📡 [DB DELETE] Removing PostgreSQL records for ${user.email}...`);
+    console.log(`📡 [DB PURGE] Removing primary records matching identifier...`);
     await adminDC.executeGraphql(deleteMutation, {
       variables: { uid: user.uid }
     });
-    console.log(`✅ [SUCCESS] PostgreSQL records wiped for ${user.uid}`);
+    console.log(`✅ [SUCCESS] Relational row data wiped.`);
 
-    // 2. WIPE CLOUD STORAGE FILES
-    console.log(`🧹 [STORAGE] Searching for physical files under users/${user.uid}/...`);
+    // 2. Binary Object Blob Subtree Removal
+    console.log(`🧹 [STORAGE PURGE] Purging structural objects inside users/${user.uid}/...`);
     const bucket = admin.storage().bucket();
 
-    // This recursively deletes the user's folder and every avatar/PDF inside it
     await bucket.deleteFiles({
       prefix: `users/${user.uid}/`
     });
-    console.log(`✅ [SUCCESS] All physical storage files vaporized for ${user.uid}`);
+    console.log(`✅ [SUCCESS] System environment space reclaimed completely.`);
 
   } catch (error) {
-    console.error("❌ [CRITICAL ERROR in cleanupUserData]", error);
+    console.error("❌ [CRITICAL ERROR inside cleanupUserData]", error);
   }
+});
+
+// ============================================================================
+// CALLABLE ENDPOINT 2: SECURE CONTENT INGESTION PIPELINE (PUBLISH COURSE)
+// Gatekept via token verification middleware. Restricts usage to elevated
+// administrative and instructor level custom scopes.
+// ============================================================================
+exports.publishCourse = functions.region('europe-west3').https.onCall(async (data, context) => {
+
+  // 1. RBAC Token Enforcement Layer
+  requireRole(context, ['admin', 'instructor']);
+
+  console.log(`✅ [RBAC VALIDATED] Client execution context approved for UID: ${context.auth.uid}`);
+
+  // 2. Payload Schema Processing 
+  // (Integrate additional course verification schema definitions here)
+
+  // 3. Data Connect Mutation Target Handling
+  // ...
+
+  return { success: true };
 });
