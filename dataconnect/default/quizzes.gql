@@ -146,7 +146,16 @@ query GetQuizSettings($quizId: UUID!) @auth(level: USER) {
       id
       type
       section {
-        course { id }
+        # Ownership facts let ResourceOwnershipGuard authorize without a second
+        # query; see the leaf→owner note in rbac.gql.
+        course {
+          id
+          author { id }
+          createdBy { id }
+          myInstructorLink: courseInstructors_on_course(
+            where: { userId: { eq_expr: "auth.uid" } }
+          ) { user { id } }
+        }
       }
     }
   }
