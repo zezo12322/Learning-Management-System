@@ -63,40 +63,104 @@ query GetMyMissionAccess($missionId: UUID!) @auth(level: USER) {
 # LEAF → OWNER CHAIN RESOLUTION
 # Used by ResourceOwnershipGuard to resolve a child resource's owning
 # course/mission, so the route's :courseId/:missionId need not be trusted.
+#
+# Each `course` / `mission` node also selects the same ownership facts as
+# GetMyCourseAccess / GetMyMissionAccess (author, createdBy, the caller's
+# instructor link). This lets the guard authorize from a single query instead
+# of resolving the owner here and re-querying ownership separately. The guard
+# falls back to the dedicated access query if these fields are absent (e.g. an
+# older deployed connector), so the change is deploy-order independent.
 # ==========================================
 
 query GetQuestionCourse($questionId: UUID!) @auth(level: USER) {
   quizQuestion(id: $questionId) {
-    quiz { lecture { section { course { id } } } }
+    quiz { lecture { section { course {
+      id
+      author { id }
+      createdBy { id }
+      myInstructorLink: courseInstructors_on_course(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) { user { id } }
+    } } } }
   }
 }
 
 query GetOptionCourse($optionId: UUID!) @auth(level: USER) {
   quizOption(id: $optionId) {
-    question { quiz { lecture { section { course { id } } } } }
+    question { quiz { lecture { section { course {
+      id
+      author { id }
+      createdBy { id }
+      myInstructorLink: courseInstructors_on_course(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) { user { id } }
+    } } } } }
   }
 }
 
 query GetSectionCourse($sectionId: UUID!) @auth(level: USER) {
   courseSection(id: $sectionId) {
-    course { id }
+    course {
+      id
+      author { id }
+      createdBy { id }
+      myInstructorLink: courseInstructors_on_course(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) { user { id } }
+    }
   }
 }
 
 query GetMicroLessonMission($microLessonId: UUID!) @auth(level: USER) {
   missionMicroLesson(id: $microLessonId) {
-    mission { id }
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+        myMissionCourseInstructorLink: courseInstructors_on_course(
+          where: { userId: { eq_expr: "auth.uid" } }
+        ) { user { id } }
+      }
+    }
   }
 }
 
 query GetCriterionMission($criterionId: UUID!) @auth(level: USER) {
   rubricCriterion(id: $criterionId) {
-    mission { id }
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+        myMissionCourseInstructorLink: courseInstructors_on_course(
+          where: { userId: { eq_expr: "auth.uid" } }
+        ) { user { id } }
+      }
+    }
   }
 }
 
 query GetTemplateMission($templateId: UUID!) @auth(level: USER) {
   missionTemplate(id: $templateId) {
-    mission { id }
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+        myMissionCourseInstructorLink: courseInstructors_on_course(
+          where: { userId: { eq_expr: "auth.uid" } }
+        ) { user { id } }
+      }
+    }
   }
 }
