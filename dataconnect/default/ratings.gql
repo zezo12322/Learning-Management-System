@@ -1,0 +1,78 @@
+# ==========================================
+# COURSE RATINGS
+# ==========================================
+
+# Create-or-update the current user's rating for a course. The composite key
+# (user, course) on CourseRating makes this idempotent: re-rating overwrites the
+# previous value instead of inserting a duplicate. createdAt keeps its original
+# value on update (upsert only writes the supplied fields); updatedAt is bumped.
+mutation UpsertCourseRating($courseId: UUID!, $rating: Int!, $review: String) @auth(level: USER) {
+  courseRating_upsert(
+    data: {
+      userId_expr: "auth.uid"
+      courseId: $courseId
+      rating: $rating
+      review: $review
+      updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Remove the current user's own rating. Scoped to auth.uid so a user can only
+# ever delete their own row, regardless of the courseId supplied.
+mutation DeleteCourseRating($courseId: UUID!) @auth(level: USER) {
+  courseRating_deleteMany(
+    where: { userId: { eq_expr: "auth.uid" }, courseId: { eq: $courseId } }
+  )
+}
+
+# The current user's rating for a course (null if they haven't rated it).
+query GetMyCourseRating($courseId: UUID!) @auth(level: USER) {
+  courseRatings(
+    where: { userId: { eq_expr: "auth.uid" }, courseId: { eq: $courseId } }
+  ) {
+    rating
+    review
+    createdAt
+    updatedAt
+  }
+}
+
+# Public, paginated list of reviews shown on a course page ("View All"). Reviewer
+# name/avatar are exposed deliberately, the same way ListPublishedCourses exposes
+# the author's name. $limit/$offset drive paging; the service clamps them.
+query ListCourseRatings($courseId: UUID!, $limit: Int, $offset: Int) @auth(level: PUBLIC, insecureReason: "Course reviews are public, like the course listing itself.") {
+  courseRatings(
+    where: { courseId: { eq: $courseId } }
+    orderBy: [{ updatedAt: DESC }]
+    limit: $limit
+    offset: $offset
+  ) {
+    rating
+    review
+    createdAt
+    updatedAt
+    user {
+      name
+      avatar
+    }
+  }
+}
+
+# Lightweight projection (rating value only) used to compute the average / count
+# / star distribution in the service layer, mirroring how course completion is
+# derived on-read from GetCourseCompletionStatus. Also drives the denormalised
+# aggregate recompute after each rating write.
+query GetCourseRatingsForSummary($courseId: UUID!) @auth(level: PUBLIC, insecureReason: "Aggregate rating stats are public course metadata.") {
+  courseRatings(where: { courseId: { eq: $courseId } }) {
+    rating
+  }
+}
+
+# Writes the denormalised rating aggregate back onto the Course row. Runs with
+# NO_ACCESS: only the backend service account may set it (via executeMutationAsAdmin),
+# never an end user directly — otherwise a client could spoof a course's score.
+# Mirrored (without @auth) in ADMIN_OPERATIONS for the :executeGraphql admin path.
+mutation AdminUpdateCourseRatingAggregate($courseId: UUID!, $avgRating: Float!, $ratingCount: Int!) @auth(level: NO_ACCESS) {
+  course_update(id: $courseId, data: { avgRating: $avgRating, ratingCount: $ratingCount })
+}

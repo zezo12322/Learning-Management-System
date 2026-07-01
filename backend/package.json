@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:dc": "node test/dataconnect-e2e/run-e2e.mjs",
+    "test:e2e:ratings": "node test/ratings-e2e/run-ratings.mjs",
     "test:e2e:stream": "node test/streaming-e2e/run-smoke.mjs"
   },
   "dependencies": {

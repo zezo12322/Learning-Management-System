@@ -33,41 +33,6 @@ class CoursesCubit extends Cubit<CoursesState> {
         ),
       ),
     );
-    // emit(state.copyWith(status: CoursesStatus.loading));
-    // try {
-    //   // TODO: استبدل sampleCourses بنداء usecase حقيقي لما الـ data layer يتجهز
-    //   final courses = sampleCourses
-    //       .map(
-    //         (c) => CourseItem(
-    //       id: c.id,
-    //       title: c.title,
-    //       instructorName: c.instructorName,
-    //       rating: c.rating,
-    //       reviewCount: c.reviewCount,
-    //       level: c.level,
-    //       lessonCount: c.lessonCount,
-    //       progress: c.progress,
-    //       status: c.status,
-    //       thumbnailImage: c.thumbnailImage,
-    //     ),
-    //   )
-    //       .toList();
-    //
-    //   emit(
-    //     state.copyWith(
-    //       status: CoursesStatus.loaded,
-    //       allCourses: courses,
-    //       filteredCourses: _filter(courses, state.selectedFilter),
-    //     ),
-    //   );
-    // } catch (e) {
-    //   emit(
-    //     state.copyWith(
-    //       status: CoursesStatus.failure,
-    //       errorMessage: 'حصل خطأ أثناء تحميل الكورسات',
-    //     ),
-    //   );
-    // }
   }
 
   void selectFilterChip(CourseFilterChip chip) {

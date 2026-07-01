@@ -184,8 +184,7 @@ class RatingRow extends StatelessWidget {
         Icon(Icons.star_rounded, size: 14.r, color: AppColors.warning),
         SizedBox(width: 3.w),
         Text(
-          //'${courseItem.rating} (${_formatCount(courseItem.reviewCount)})',
-          '${3.7} (500})',
+          '${courseItem.avgRating} (${courseItem.ratingCount})',
           style: context.textTheme.bodySmall?.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w600,

@@ -1,7 +1,7 @@
 class CategoryEntity {
   final String id;
   final String name;
-  final String description;
+  final String? description;
 
   CategoryEntity({
     required this.id,

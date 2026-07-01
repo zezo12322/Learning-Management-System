@@ -78,6 +78,8 @@ class _CoursesListView extends StatelessWidget {
             tags: course.tags,
             instructors: course.instructors,
             isBookmarked: bookmarkedIds.contains(course.id),
+            avgRating: course.avgRating,
+            ratingCount: course.ratingCount,
           ),
           onTap: () {},
           onBookmarkTap: () => context.read<CoursesCubit>().toggleBookmark(course.id),
