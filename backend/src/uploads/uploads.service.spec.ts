@@ -20,7 +20,7 @@ describe('UploadsService', () => {
     };
     dc = { executeQuery: jest.fn(), executeMutation: jest.fn().mockResolvedValue({}) };
     access = { assertCourseAccess: jest.fn().mockResolvedValue(undefined) };
-    transcoding = { enqueue: jest.fn().mockResolvedValue({ jobId: 'transcode:L1', status: 'queued' }) };
+    transcoding = { enqueue: jest.fn().mockResolvedValue({ jobId: 'transcode-L1', status: 'queued' }) };
     svc = new UploadsService(firebase, dc as any, access as any, transcoding as any);
   });
 
@@ -84,15 +84,16 @@ describe('UploadsService', () => {
       dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
       const res = await svc.confirmUpload(dto, caller);
       expect(transcoding.enqueue).toHaveBeenCalledWith('c1', 'L1', dto.storagePath, 'u1');
-      expect(res.transcode).toEqual({ jobId: 'transcode:L1', status: 'queued' });
+      expect(res.transcode).toEqual({ jobId: 'transcode-L1', status: 'queued' });
     });
 
     it('does not fail the upload when transcode enqueue throws', async () => {
       dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
       transcoding.enqueue.mockRejectedValueOnce(new Error('redis down'));
       const res = await svc.confirmUpload(dto, caller);
+      // The upload still succeeds; the enqueue failure is surfaced, not thrown.
       expect(res.storagePath).toBe(dto.storagePath);
-      expect(res.transcode).toBeUndefined();
+      expect(res.transcode?.status).toContain('enqueue_failed');
     });
 
     it('does not enqueue transcode for thumbnail uploads', async () => {

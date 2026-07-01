@@ -54,7 +54,58 @@ class GetMicroLessonMissionMissionMicroLesson {
 @immutable
 class GetMicroLessonMissionMissionMicroLessonMission {
   final String id;
+  final GetMicroLessonMissionMissionMicroLessonMissionAuthor author;
+  final GetMicroLessonMissionMissionMicroLessonMissionCreatedBy createdBy;
+  final GetMicroLessonMissionMissionMicroLessonMissionCourse? course;
   GetMicroLessonMissionMissionMicroLessonMission.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetMicroLessonMissionMissionMicroLessonMissionAuthor.fromJson(json['author']),
+  createdBy = GetMicroLessonMissionMissionMicroLessonMissionCreatedBy.fromJson(json['createdBy']),
+  course = json['course'] == null ? null : GetMicroLessonMissionMissionMicroLessonMissionCourse.fromJson(json['course']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetMicroLessonMissionMissionMicroLessonMission otherTyped = other as GetMicroLessonMissionMissionMicroLessonMission;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy && 
+    course == otherTyped.course;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode, course.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    if (course != null) {
+      json['course'] = course!.toJson();
+    }
+    return json;
+  }
+
+  GetMicroLessonMissionMissionMicroLessonMission({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+    this.course,
+  });
+}
+
+@immutable
+class GetMicroLessonMissionMissionMicroLessonMissionAuthor {
+  final String id;
+  GetMicroLessonMissionMissionMicroLessonMissionAuthor.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -66,7 +117,7 @@ class GetMicroLessonMissionMissionMicroLessonMission {
       return false;
     }
 
-    final GetMicroLessonMissionMissionMicroLessonMission otherTyped = other as GetMicroLessonMissionMissionMicroLessonMission;
+    final GetMicroLessonMissionMissionMicroLessonMissionAuthor otherTyped = other as GetMicroLessonMissionMissionMicroLessonMissionAuthor;
     return id == otherTyped.id;
     
   }
@@ -80,7 +131,153 @@ class GetMicroLessonMissionMissionMicroLessonMission {
     return json;
   }
 
-  GetMicroLessonMissionMissionMicroLessonMission({
+  GetMicroLessonMissionMissionMicroLessonMissionAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetMicroLessonMissionMissionMicroLessonMissionCreatedBy {
+  final String id;
+  GetMicroLessonMissionMissionMicroLessonMissionCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetMicroLessonMissionMissionMicroLessonMissionCreatedBy otherTyped = other as GetMicroLessonMissionMissionMicroLessonMissionCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetMicroLessonMissionMissionMicroLessonMissionCreatedBy({
+    required this.id,
+  });
+}
+
+@immutable
+class GetMicroLessonMissionMissionMicroLessonMissionCourse {
+  final String id;
+  final GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor author;
+  final GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy createdBy;
+  GetMicroLessonMissionMissionMicroLessonMissionCourse.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor.fromJson(json['author']),
+  createdBy = GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy.fromJson(json['createdBy']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetMicroLessonMissionMissionMicroLessonMissionCourse otherTyped = other as GetMicroLessonMissionMissionMicroLessonMissionCourse;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    return json;
+  }
+
+  GetMicroLessonMissionMissionMicroLessonMissionCourse({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+  });
+}
+
+@immutable
+class GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor {
+  final String id;
+  GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor otherTyped = other as GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetMicroLessonMissionMissionMicroLessonMissionCourseAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy {
+  final String id;
+  GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy otherTyped = other as GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetMicroLessonMissionMissionMicroLessonMissionCourseCreatedBy({
     required this.id,
   });
 }

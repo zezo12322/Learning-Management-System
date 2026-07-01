@@ -54,7 +54,58 @@ class GetTemplateMissionMissionTemplate {
 @immutable
 class GetTemplateMissionMissionTemplateMission {
   final String id;
+  final GetTemplateMissionMissionTemplateMissionAuthor author;
+  final GetTemplateMissionMissionTemplateMissionCreatedBy createdBy;
+  final GetTemplateMissionMissionTemplateMissionCourse? course;
   GetTemplateMissionMissionTemplateMission.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetTemplateMissionMissionTemplateMissionAuthor.fromJson(json['author']),
+  createdBy = GetTemplateMissionMissionTemplateMissionCreatedBy.fromJson(json['createdBy']),
+  course = json['course'] == null ? null : GetTemplateMissionMissionTemplateMissionCourse.fromJson(json['course']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetTemplateMissionMissionTemplateMission otherTyped = other as GetTemplateMissionMissionTemplateMission;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy && 
+    course == otherTyped.course;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode, course.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    if (course != null) {
+      json['course'] = course!.toJson();
+    }
+    return json;
+  }
+
+  GetTemplateMissionMissionTemplateMission({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+    this.course,
+  });
+}
+
+@immutable
+class GetTemplateMissionMissionTemplateMissionAuthor {
+  final String id;
+  GetTemplateMissionMissionTemplateMissionAuthor.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -66,7 +117,7 @@ class GetTemplateMissionMissionTemplateMission {
       return false;
     }
 
-    final GetTemplateMissionMissionTemplateMission otherTyped = other as GetTemplateMissionMissionTemplateMission;
+    final GetTemplateMissionMissionTemplateMissionAuthor otherTyped = other as GetTemplateMissionMissionTemplateMissionAuthor;
     return id == otherTyped.id;
     
   }
@@ -80,7 +131,153 @@ class GetTemplateMissionMissionTemplateMission {
     return json;
   }
 
-  GetTemplateMissionMissionTemplateMission({
+  GetTemplateMissionMissionTemplateMissionAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetTemplateMissionMissionTemplateMissionCreatedBy {
+  final String id;
+  GetTemplateMissionMissionTemplateMissionCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetTemplateMissionMissionTemplateMissionCreatedBy otherTyped = other as GetTemplateMissionMissionTemplateMissionCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetTemplateMissionMissionTemplateMissionCreatedBy({
+    required this.id,
+  });
+}
+
+@immutable
+class GetTemplateMissionMissionTemplateMissionCourse {
+  final String id;
+  final GetTemplateMissionMissionTemplateMissionCourseAuthor author;
+  final GetTemplateMissionMissionTemplateMissionCourseCreatedBy createdBy;
+  GetTemplateMissionMissionTemplateMissionCourse.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  author = GetTemplateMissionMissionTemplateMissionCourseAuthor.fromJson(json['author']),
+  createdBy = GetTemplateMissionMissionTemplateMissionCourseCreatedBy.fromJson(json['createdBy']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetTemplateMissionMissionTemplateMissionCourse otherTyped = other as GetTemplateMissionMissionTemplateMissionCourse;
+    return id == otherTyped.id && 
+    author == otherTyped.author && 
+    createdBy == otherTyped.createdBy;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, author.hashCode, createdBy.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['author'] = author.toJson();
+    json['createdBy'] = createdBy.toJson();
+    return json;
+  }
+
+  GetTemplateMissionMissionTemplateMissionCourse({
+    required this.id,
+    required this.author,
+    required this.createdBy,
+  });
+}
+
+@immutable
+class GetTemplateMissionMissionTemplateMissionCourseAuthor {
+  final String id;
+  GetTemplateMissionMissionTemplateMissionCourseAuthor.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetTemplateMissionMissionTemplateMissionCourseAuthor otherTyped = other as GetTemplateMissionMissionTemplateMissionCourseAuthor;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetTemplateMissionMissionTemplateMissionCourseAuthor({
+    required this.id,
+  });
+}
+
+@immutable
+class GetTemplateMissionMissionTemplateMissionCourseCreatedBy {
+  final String id;
+  GetTemplateMissionMissionTemplateMissionCourseCreatedBy.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetTemplateMissionMissionTemplateMissionCourseCreatedBy otherTyped = other as GetTemplateMissionMissionTemplateMissionCourseCreatedBy;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetTemplateMissionMissionTemplateMissionCourseCreatedBy({
     required this.id,
   });
 }

@@ -315,7 +315,10 @@ type Payment @table(name: "payments") {
   user: User 
   
   # 2. Static Snapshot: Store this at checkout so you never lose the audit trail!
-  customerEmailSnapshot: String! 
+  #    Default '' makes the column migration non-destructive (existing rows get
+  #    filled automatically). New rows always set the real value in LogPayment
+  #    via auth.token.email, so the default only ever applies to back-migration.
+  customerEmailSnapshot: String! @default(expr: "''")
   
   gateway: PaymentGateway!
   status: PaymentStatus!

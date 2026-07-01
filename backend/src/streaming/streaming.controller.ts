@@ -8,6 +8,7 @@ import {
   Ip,
   UseGuards,
   BadRequestException,
+  StreamableFile,
 } from '@nestjs/common';
 import { StreamingService } from './streaming.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -87,11 +88,22 @@ export class StreamingController {
     @CurrentUser('admin') isAdmin: boolean,
     @Ip() ip: string,
     @Query('kt') kt?: string,
-  ): Promise<Buffer> {
+  ): Promise<StreamableFile> {
     if (!kt) {
       throw new BadRequestException('Missing key token');
     }
-    return this.streaming.getKey(lectureId, uid, token, isAdmin === true, kt, ip);
+    const key = await this.streaming.getKey(
+      lectureId,
+      uid,
+      token,
+      isAdmin === true,
+      kt,
+      ip,
+    );
+    // Wrap in StreamableFile so Nest sends the raw 16 bytes; returning a bare
+    // Buffer makes Nest JSON-serialize it ({"type":"Buffer",...}), which breaks
+    // HLS decryption.
+    return new StreamableFile(key, { type: 'application/octet-stream' });
   }
 
   /**
