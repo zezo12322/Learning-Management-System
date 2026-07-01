@@ -14,11 +14,8 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getUserClaims, myCertificates, verifyCertificate, listPublishedCourses, getCourseCurriculum, getLectureContent, getUserLectureProgress, getMyCourseProgress, getCourseForEnrollment, adminGetCourse } from '@dataconnect/functions-generated';
+import { myCertificates, verifyCertificate, listPublishedCourses, getCourseCurriculum, getLectureContent, getUserLectureProgress, getMyCourseProgress, getCourseForEnrollment, adminGetCourse, adminListMyCourses } from '@dataconnect/functions-generated';
 
-
-// Operation GetUserClaims:  For variables, look at type GetUserClaimsVars in ../index.d.ts
-const { data } = await GetUserClaims(dataConnect, getUserClaimsVars);
 
 // Operation MyCertificates: 
 const { data } = await MyCertificates(dataConnect);
@@ -46,6 +43,9 @@ const { data } = await GetCourseForEnrollment(dataConnect, getCourseForEnrollmen
 
 // Operation AdminGetCourse:  For variables, look at type AdminGetCourseVars in ../index.d.ts
 const { data } = await AdminGetCourse(dataConnect, adminGetCourseVars);
+
+// Operation AdminListMyCourses: 
+const { data } = await AdminListMyCourses(dataConnect);
 
 
 ```

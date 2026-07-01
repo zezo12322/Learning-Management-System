@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
-DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
-DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
-DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
-DefaultConnector.instance.InstructorCancelSession(instructorCancelSessionVariables).execute();
-DefaultConnector.instance.SuperAdminCancelSession(superAdminCancelSessionVariables).execute();
-DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
-DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
-DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
-DefaultConnector.instance.LogPayment(logPaymentVariables).execute();
+DefaultConnector.instance.MyCertificates().execute();
+DefaultConnector.instance.VerifyCertificate(verifyCertificateVariables).execute();
+DefaultConnector.instance.ListPublishedCourses().execute();
+DefaultConnector.instance.GetCourseCurriculum(getCourseCurriculumVariables).execute();
+DefaultConnector.instance.GetLectureContent(getLectureContentVariables).execute();
+DefaultConnector.instance.GetUserLectureProgress(getUserLectureProgressVariables).execute();
+DefaultConnector.instance.GetMyCourseProgress(getMyCourseProgressVariables).execute();
+DefaultConnector.instance.GetCourseForEnrollment(getCourseForEnrollmentVariables).execute();
+DefaultConnector.instance.AdminGetCourse(adminGetCourseVariables).execute();
+DefaultConnector.instance.AdminListMyCourses().execute();
 
 ```
 
