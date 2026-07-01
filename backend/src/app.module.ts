@@ -26,6 +26,7 @@ import { UsersModule } from './users/users.module';
 import { EnrollmentModule } from './enrollment/enrollment.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { RatingsModule } from './ratings/ratings.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { CatalogModule } from './catalog/catalog.module';
     EnrollmentModule,
     SubmissionsModule,
     CatalogModule,
+    RatingsModule,
   ],
   controllers: [AppController],
   providers: [
