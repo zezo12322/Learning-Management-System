@@ -1760,74 +1760,74 @@ class DefaultConnector {
     );
   }
 
-  LogPaymentVariablesBuilder logPayment({
-    required PaymentGateway gateway,
-    required String referenceId,
-    required int amount,
-  }) {
-    return LogPaymentVariablesBuilder(
-      dataConnect,
-      gateway: gateway,
-      referenceId: referenceId,
-      amount: amount,
-    );
-  }
-
-  AddPaymentItemVariablesBuilder addPaymentItem({
-    required String paymentId,
-    required PaymentItemTarget targetType,
-    required int price,
-  }) {
-    return AddPaymentItemVariablesBuilder(
-      dataConnect,
-      paymentId: paymentId,
-      targetType: targetType,
-      price: price,
-    );
-  }
-
-  MyPaymentHistoryVariablesBuilder myPaymentHistory() {
-    return MyPaymentHistoryVariablesBuilder(
-      dataConnect,
-    );
-  }
-
-  GetPendingSubmissionsVariablesBuilder getPendingSubmissions() {
-    return GetPendingSubmissionsVariablesBuilder(
-      dataConnect,
-    );
-  }
-
-  AdminAddCourseInstructorVariablesBuilder adminAddCourseInstructor({
-    required String courseId,
-    required String userId,
-  }) {
-    return AdminAddCourseInstructorVariablesBuilder(
-      dataConnect,
-      courseId: courseId,
-      userId: userId,
-    );
-  }
-
-  AdminRemoveCourseInstructorVariablesBuilder adminRemoveCourseInstructor({
-    required String courseId,
-    required String userId,
-  }) {
-    return AdminRemoveCourseInstructorVariablesBuilder(
-      dataConnect,
-      courseId: courseId,
-      userId: userId,
-    );
-  }
-
-  GetCourseInstructorsVariablesBuilder getCourseInstructors({
-    required String courseId,
-  }) {
-    return GetCourseInstructorsVariablesBuilder(
-      dataConnect,
-      courseId: courseId,
-    );
-  }
+  // LogPaymentVariablesBuilder logPayment({
+  //   required PaymentGateway gateway,
+  //   required String referenceId,
+  //   required int amount,
+  // }) {
+  //   return LogPaymentVariablesBuilder(
+  //     dataConnect,
+  //     gateway: gateway,
+  //     referenceId: referenceId,
+  //     amount: amount,
+  //   );
+  // }
+  //
+  // AddPaymentItemVariablesBuilder addPaymentItem({
+  //   required String paymentId,
+  //   required PaymentItemTarget targetType,
+  //   required int price,
+  // }) {
+  //   return AddPaymentItemVariablesBuilder(
+  //     dataConnect,
+  //     paymentId: paymentId,
+  //     targetType: targetType,
+  //     price: price,
+  //   );
+  // }
+  //
+  // MyPaymentHistoryVariablesBuilder myPaymentHistory() {
+  //   return MyPaymentHistoryVariablesBuilder(
+  //     dataConnect,
+  //   );
+  // }
+  //
+  // GetPendingSubmissionsVariablesBuilder getPendingSubmissions() {
+  //   return GetPendingSubmissionsVariablesBuilder(
+  //     dataConnect,
+  //   );
+  // }
+  //
+  // AdminAddCourseInstructorVariablesBuilder adminAddCourseInstructor({
+  //   required String courseId,
+  //   required String userId,
+  // }) {
+  //   return AdminAddCourseInstructorVariablesBuilder(
+  //     dataConnect,
+  //     courseId: courseId,
+  //     userId: userId,
+  //   );
+  // }
+  //
+  // AdminRemoveCourseInstructorVariablesBuilder adminRemoveCourseInstructor({
+  //   required String courseId,
+  //   required String userId,
+  // }) {
+  //   return AdminRemoveCourseInstructorVariablesBuilder(
+  //     dataConnect,
+  //     courseId: courseId,
+  //     userId: userId,
+  //   );
+  // }
+  //
+  // GetCourseInstructorsVariablesBuilder getCourseInstructors({
+  //   required String courseId,
+  // }) {
+  //   return GetCourseInstructorsVariablesBuilder(
+  //     dataConnect,
+  //     courseId: courseId,
+  //   );
+  // }
 
   GetCourseSessionsVariablesBuilder getCourseSessions({
     required String courseId,
