@@ -1,0 +1,151 @@
+# ==========================================
+# RBAC — OWNERSHIP RESOLUTION
+# Used by CourseAccessGuard / AccessService. The global role (admin/instructor/
+# student) is NOT here — it lives in the caller's Firebase custom claims and is
+# read off the decoded token by RolesGuard. These queries only resolve
+# resource ownership, via Course.author, Course.createdBy and the
+# CourseInstructor join.
+# ==========================================
+
+# Returns ownership facts for a course relative to the caller:
+# author / createdBy, plus a (filtered) CourseInstructor row if the caller
+# is an assigned instructor. Empty instructor list + non-matching author = no access.
+query GetMyCourseAccess($courseId: UUID!) @auth(level: USER) {
+  course(id: $courseId) {
+    id
+    author {
+      id
+    }
+    createdBy {
+      id
+    }
+    myInstructorLink: courseInstructors_on_course(
+      where: { userId: { eq_expr: "auth.uid" } }
+    ) {
+      user {
+        id
+      }
+    }
+  }
+}
+
+# Ownership facts for a mission (and its owning course, if any).
+# A standalone mission (no course) falls back to its own author/createdBy.
+query GetMyMissionAccess($missionId: UUID!) @auth(level: USER) {
+  mission(id: $missionId) {
+    id
+    author {
+      id
+    }
+    createdBy {
+      id
+    }
+    course {
+      id
+      author {
+        id
+      }
+      createdBy {
+        id
+      }
+      myMissionCourseInstructorLink: courseInstructors_on_course(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) {
+        user {
+          id
+        }
+      }
+    }
+  }
+}
+
+# ==========================================
+# LEAF → OWNER CHAIN RESOLUTION
+# Used by ResourceOwnershipGuard to resolve a child resource's owning
+# course/mission, so the route's :courseId/:missionId need not be trusted.
+#
+# Each `course` / `mission` node also selects author/createdBy so the guard can
+# authorize a course/mission *creator* from this single query. The assigned-
+# instructor link is deliberately NOT selected here: Data Connect rejects the
+# same aliased-with-arguments relation (courseInstructors_on_course filtered by
+# auth.uid) repeated across operations. Non-creators (incl. assigned
+# instructors) and older connectors that don't return these fields fall back to
+# GetMyCourseAccess / GetMyMissionAccess, which carry the instructor-link check.
+# The fast path therefore only ever *allows* — denial is always the authoritative
+# fallback query's decision.
+# ==========================================
+
+query GetQuestionCourse($questionId: UUID!) @auth(level: USER) {
+  quizQuestion(id: $questionId) {
+    quiz { lecture { section { course {
+      id
+      author { id }
+      createdBy { id }
+    } } } }
+  }
+}
+
+query GetOptionCourse($optionId: UUID!) @auth(level: USER) {
+  quizOption(id: $optionId) {
+    question { quiz { lecture { section { course {
+      id
+      author { id }
+      createdBy { id }
+    } } } } }
+  }
+}
+
+query GetSectionCourse($sectionId: UUID!) @auth(level: USER) {
+  courseSection(id: $sectionId) {
+    course {
+      id
+      author { id }
+      createdBy { id }
+    }
+  }
+}
+
+query GetMicroLessonMission($microLessonId: UUID!) @auth(level: USER) {
+  missionMicroLesson(id: $microLessonId) {
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+      }
+    }
+  }
+}
+
+query GetCriterionMission($criterionId: UUID!) @auth(level: USER) {
+  rubricCriterion(id: $criterionId) {
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+      }
+    }
+  }
+}
+
+query GetTemplateMission($templateId: UUID!) @auth(level: USER) {
+  missionTemplate(id: $templateId) {
+    mission {
+      id
+      author { id }
+      createdBy { id }
+      course {
+        id
+        author { id }
+        createdBy { id }
+      }
+    }
+  }
+}

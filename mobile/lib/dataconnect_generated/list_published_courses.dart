@@ -25,7 +25,7 @@ class ListPublishedCoursesCourses {
   final String? thumbnail;
   final List<String> tags;
   final ListPublishedCoursesCoursesCategory category;
-  final List<ListPublishedCoursesCoursesCourseInstructorsOnCourse> courseInstructors_on_course;
+  final ListPublishedCoursesCoursesAuthor author;
   ListPublishedCoursesCourses.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -37,9 +37,7 @@ class ListPublishedCoursesCourses {
         .map((e) => nativeFromJson<String>(e))
         .toList(),
   category = ListPublishedCoursesCoursesCategory.fromJson(json['category']),
-  courseInstructors_on_course = (json['courseInstructors_on_course'] as List<dynamic>)
-        .map((e) => ListPublishedCoursesCoursesCourseInstructorsOnCourse.fromJson(e))
-        .toList();
+  author = ListPublishedCoursesCoursesAuthor.fromJson(json['author']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -57,11 +55,11 @@ class ListPublishedCoursesCourses {
     thumbnail == otherTyped.thumbnail && 
     tags == otherTyped.tags && 
     category == otherTyped.category && 
-    courseInstructors_on_course == otherTyped.courseInstructors_on_course;
+    author == otherTyped.author;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, category.hashCode, courseInstructors_on_course.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, category.hashCode, author.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -77,7 +75,7 @@ class ListPublishedCoursesCourses {
     }
     json['tags'] = tags.map((e) => nativeToJson<String>(e)).toList();
     json['category'] = category.toJson();
-    json['courseInstructors_on_course'] = courseInstructors_on_course.map((e) => e.toJson()).toList();
+    json['author'] = author.toJson();
     return json;
   }
 
@@ -89,7 +87,7 @@ class ListPublishedCoursesCourses {
     this.thumbnail,
     required this.tags,
     required this.category,
-    required this.courseInstructors_on_course,
+    required this.author,
   });
 }
 
@@ -128,44 +126,10 @@ class ListPublishedCoursesCoursesCategory {
 }
 
 @immutable
-class ListPublishedCoursesCoursesCourseInstructorsOnCourse {
-  final ListPublishedCoursesCoursesCourseInstructorsOnCourseUser user;
-  ListPublishedCoursesCoursesCourseInstructorsOnCourse.fromJson(dynamic json):
-  
-  user = ListPublishedCoursesCoursesCourseInstructorsOnCourseUser.fromJson(json['user']);
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final ListPublishedCoursesCoursesCourseInstructorsOnCourse otherTyped = other as ListPublishedCoursesCoursesCourseInstructorsOnCourse;
-    return user == otherTyped.user;
-    
-  }
-  @override
-  int get hashCode => user.hashCode;
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['user'] = user.toJson();
-    return json;
-  }
-
-  ListPublishedCoursesCoursesCourseInstructorsOnCourse({
-    required this.user,
-  });
-}
-
-@immutable
-class ListPublishedCoursesCoursesCourseInstructorsOnCourseUser {
+class ListPublishedCoursesCoursesAuthor {
   final String name;
   final String? avatar;
-  ListPublishedCoursesCoursesCourseInstructorsOnCourseUser.fromJson(dynamic json):
+  ListPublishedCoursesCoursesAuthor.fromJson(dynamic json):
   
   name = nativeFromJson<String>(json['name']),
   avatar = json['avatar'] == null ? null : nativeFromJson<String>(json['avatar']);
@@ -178,7 +142,7 @@ class ListPublishedCoursesCoursesCourseInstructorsOnCourseUser {
       return false;
     }
 
-    final ListPublishedCoursesCoursesCourseInstructorsOnCourseUser otherTyped = other as ListPublishedCoursesCoursesCourseInstructorsOnCourseUser;
+    final ListPublishedCoursesCoursesAuthor otherTyped = other as ListPublishedCoursesCoursesAuthor;
     return name == otherTyped.name && 
     avatar == otherTyped.avatar;
     
@@ -196,7 +160,7 @@ class ListPublishedCoursesCoursesCourseInstructorsOnCourseUser {
     return json;
   }
 
-  ListPublishedCoursesCoursesCourseInstructorsOnCourseUser({
+  ListPublishedCoursesCoursesAuthor({
     required this.name,
     this.avatar,
   });
