@@ -1,9 +1,9 @@
 import 'package:firebase_data_connect/firebase_data_connect.dart';
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
-import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource.dart';
+import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource.dart';
 import 'package:optimatech_lms/features/courses/data/models/courses_model.dart';
 
-import '../../../../core/error/exceptions.dart';
+import '../../../../../core/error/exceptions.dart';
 
 class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
   final DefaultConnector _connector;
@@ -13,7 +13,6 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
   Future<List<CourseModel>> getPublishedCourses() async{
     try{
       final result = await _connector.listPublishedCourses().execute();
-
       return result.data.courses.map(CourseModel.fromConnectorResult).toList();
     } on DataConnectError catch (e) {
       throw CustomExceptions(message: e.message ?? 'Data Connect error');

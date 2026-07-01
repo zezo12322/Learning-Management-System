@@ -5,12 +5,17 @@ import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_i
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
-import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource_impl.dart';
+import 'package:optimatech_lms/features/courses/data/datasources/categories_remote_datasource/categories_remote_datasource.dart';
+import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource_impl.dart';
+import 'package:optimatech_lms/features/courses/data/repositories/categories_repository_impl.dart';
 import 'package:optimatech_lms/features/courses/data/repositories/courses_repository_impl.dart';
 import 'package:optimatech_lms/features/courses/domain/repositories/courses_repository.dart';
+import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
 
 import '../../dataconnect_generated/generated.dart';
-import '../../features/courses/data/datasources/courses_remote_datasource.dart';
+import '../../features/courses/data/datasources/categories_remote_datasource/categories_remote_datasource_impl.dart';
+import '../../features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource.dart';
+import '../../features/courses/domain/repositories/categories_repository.dart';
 import '../../features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 
 final getIt = GetIt.instance;
@@ -24,5 +29,9 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<CoursesRemoteDatasource>(() => CoursesRemoteDatasourceImpl(DefaultConnector.instance));
   getIt.registerLazySingleton<CoursesRepository>(() => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()));
   getIt.registerFactory<CoursesCubit>(() => CoursesCubit(repository: getIt<CoursesRepository>()));
+  getIt.registerLazySingleton<CategoriesRemoteDatasource>(() => CategoriesRemoteDatasourceImpl(DefaultConnector.instance));
+  getIt.registerLazySingleton<CategoriesRepository>(() => CategoriesRepositoryImpl(getIt<CategoriesRemoteDatasource>()));
+  getIt.registerFactory<CategoriesCubit>(() => CategoriesCubit(repository: getIt<CategoriesRepository>()));
+
   
 }
