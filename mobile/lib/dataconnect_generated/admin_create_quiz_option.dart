@@ -4,9 +4,10 @@ class AdminCreateQuizOptionVariablesBuilder {
   String questionId;
   String text;
   int order;
+  bool isCorrect;
 
   final FirebaseDataConnect _dataConnect;
-  AdminCreateQuizOptionVariablesBuilder(this._dataConnect, {required  this.questionId,required  this.text,required  this.order,});
+  AdminCreateQuizOptionVariablesBuilder(this._dataConnect, {required  this.questionId,required  this.text,required  this.order,required  this.isCorrect,});
   Deserializer<AdminCreateQuizOptionData> dataDeserializer = (dynamic json)  => AdminCreateQuizOptionData.fromJson(jsonDecode(json));
   Serializer<AdminCreateQuizOptionVariables> varsSerializer = (AdminCreateQuizOptionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<AdminCreateQuizOptionData, AdminCreateQuizOptionVariables>> execute() {
@@ -14,7 +15,7 @@ class AdminCreateQuizOptionVariablesBuilder {
   }
 
   MutationRef<AdminCreateQuizOptionData, AdminCreateQuizOptionVariables> ref() {
-    AdminCreateQuizOptionVariables vars= AdminCreateQuizOptionVariables(questionId: questionId,text: text,order: order,);
+    AdminCreateQuizOptionVariables vars= AdminCreateQuizOptionVariables(questionId: questionId,text: text,order: order,isCorrect: isCorrect,);
     return _dataConnect.mutation("AdminCreateQuizOption", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -92,12 +93,14 @@ class AdminCreateQuizOptionVariables {
   final String questionId;
   final String text;
   final int order;
+  final bool isCorrect;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateQuizOptionVariables.fromJson(Map<String, dynamic> json):
   
   questionId = nativeFromJson<String>(json['questionId']),
   text = nativeFromJson<String>(json['text']),
-  order = nativeFromJson<int>(json['order']);
+  order = nativeFromJson<int>(json['order']),
+  isCorrect = nativeFromJson<bool>(json['isCorrect']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -110,11 +113,12 @@ class AdminCreateQuizOptionVariables {
     final AdminCreateQuizOptionVariables otherTyped = other as AdminCreateQuizOptionVariables;
     return questionId == otherTyped.questionId && 
     text == otherTyped.text && 
-    order == otherTyped.order;
+    order == otherTyped.order && 
+    isCorrect == otherTyped.isCorrect;
     
   }
   @override
-  int get hashCode => Object.hashAll([questionId.hashCode, text.hashCode, order.hashCode]);
+  int get hashCode => Object.hashAll([questionId.hashCode, text.hashCode, order.hashCode, isCorrect.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -122,6 +126,7 @@ class AdminCreateQuizOptionVariables {
     json['questionId'] = nativeToJson<String>(questionId);
     json['text'] = nativeToJson<String>(text);
     json['order'] = nativeToJson<int>(order);
+    json['isCorrect'] = nativeToJson<bool>(isCorrect);
     return json;
   }
 
@@ -129,6 +134,7 @@ class AdminCreateQuizOptionVariables {
     required this.questionId,
     required this.text,
     required this.order,
+    required this.isCorrect,
   });
 }
 

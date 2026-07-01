@@ -2,15 +2,15 @@
 
 ```dart
 DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
-DefaultConnector.instance.AdminDeleteCourse(adminDeleteCourseVariables).execute();
-DefaultConnector.instance.AdminCreateCourseSection(adminCreateCourseSectionVariables).execute();
-DefaultConnector.instance.AdminCreateLecture(adminCreateLectureVariables).execute();
-DefaultConnector.instance.InstructorCourses().execute();
+DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
+DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
 DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
-DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execute();
+DefaultConnector.instance.InstructorCancelSession(instructorCancelSessionVariables).execute();
+DefaultConnector.instance.SuperAdminCancelSession(superAdminCancelSessionVariables).execute();
 DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
-DefaultConnector.instance.ListSubscriptionTiers().execute();
+DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
+DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.UpdateLectureProgress({ ... })
-.completedAt(...)
+await DefaultConnector.instance.UpdateMyProfile({ ... })
+.bio(...)
 .execute();
 ```
 
