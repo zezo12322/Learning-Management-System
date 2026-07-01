@@ -185,6 +185,7 @@ export class UploadsService {
         this.logger.error(
           `Failed to auto-enqueue transcode for lecture ${dto.lectureId}: ${err?.message}`,
         );
+        transcode = { jobId: 'error', status: `enqueue_failed: ${err?.message}` } as any;
       }
     }
 

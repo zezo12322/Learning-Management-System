@@ -62,8 +62,12 @@ query GetLectureContent($lectureId: UUID!) @auth(level: USER) {
     transcriptUrl
     isFreePreview
     section {
+      # author/createdBy let ResourceOwnershipGuard fast-path a course creator
+      # without a second query; see the leaf→owner note in rbac.gql.
       course {
         id
+        author { id }
+        createdBy { id }
       }
     }
   }

@@ -20,7 +20,9 @@ export class TranscodingService {
 
   /** Stable per-lecture job id so a lecture has at most one active transcode. */
   private jobId(lectureId: string): string {
-    return `transcode:${lectureId}`;
+    // No ':' — BullMQ reserves it as a Redis key separator and rejects it in
+    // custom job ids.
+    return `transcode-${lectureId}`;
   }
 
   /**

@@ -5,12 +5,12 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
-  IsUUID,
   Min,
   Max,
   ValidateNested,
   ArrayMinSize,
 } from 'class-validator';
+import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 import { Type } from 'class-transformer';
 
 // ==========================================
@@ -81,7 +81,7 @@ export class CreateQuestionDto {
 
 export class UpdateQuizOptionInputDto {
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   id?: string;
 
   @IsString()
@@ -131,9 +131,9 @@ export class UpdateQuizOptionDto {
 // ==========================================
 
 export class SubmitAnswerDto {
-  @IsUUID()
+  @IsFlexUUID()
   questionId: string;
 
-  @IsUUID()
+  @IsFlexUUID()
   selectedOptionId: string;
 }

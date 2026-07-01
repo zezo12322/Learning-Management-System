@@ -51,6 +51,28 @@ export class AccessService {
     }
   }
 
+  /**
+   * True when `uid` is the course's author or createdBy. This is the subset of
+   * ownership that can be decided from an already-fetched course node WITHOUT
+   * the assigned-instructor join (which Data Connect won't let us inline into
+   * the leaf→owner queries). ResourceOwnershipGuard uses this as an allow-only
+   * fast path; a `false` result means "fall back to the authoritative query",
+   * never "deny" — an assigned instructor is not a creator but still has access.
+   */
+  isCourseCreator(course: any, uid?: string): boolean {
+    return !!uid && (course?.author?.id === uid || course?.createdBy?.id === uid);
+  }
+
+  /** Mission counterpart of {@link isCourseCreator} (mission or its course). */
+  isMissionCreator(mission: any, uid?: string): boolean {
+    return (
+      !!uid &&
+      (mission?.author?.id === uid ||
+        mission?.createdBy?.id === uid ||
+        this.isCourseCreator(mission?.course, uid))
+    );
+  }
+
   private ownsCourse(course: any, uid?: string): boolean {
     return (
       course.author?.id === uid ||
