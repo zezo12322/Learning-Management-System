@@ -37,66 +37,6 @@ extension CourseStatusX on CourseStatus {
   }
 }
 
-class CourseItem {
-  final String id;
-  final String title;
-  final String instructorName;
-  final String? instructorAvatar;
-  final double rating;
-  final int reviewCount;
-  final String level;
-  final int lessonCount;
-  final double progress;
-  final CourseStatus? status;
-  final String thumbnailImage;
-  final bool isBookmarked;
-
-  const CourseItem({
-    required this.id,
-    required this.title,
-    required this.instructorName,
-    this.instructorAvatar,
-    required this.rating,
-    required this.reviewCount,
-    required this.level,
-    required this.lessonCount,
-    required this.progress,
-    this.status,
-    required this.thumbnailImage,
-    this.isBookmarked = false,
-  });
-
-  CourseItem copyWith({
-    String? id,
-    String? title,
-    String? instructorName,
-    String? instructorAvatar,
-    double? rating,
-    int? reviewCount,
-    String? level,
-    int? lessonCount,
-    double? progress,
-    CourseStatus? status,
-    String? thumbnailImage,
-    bool? isBookmarked,
-  }) {
-    return CourseItem(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      instructorName: instructorName ?? this.instructorName,
-      instructorAvatar: instructorAvatar ?? this.instructorAvatar,
-      rating: rating ?? this.rating,
-      reviewCount: reviewCount ?? this.reviewCount,
-      level: level ?? this.level,
-      lessonCount: lessonCount ?? this.lessonCount,
-      progress: progress ?? this.progress,
-      status: status ?? this.status,
-      thumbnailImage: thumbnailImage ?? this.thumbnailImage,
-      isBookmarked: isBookmarked ?? this.isBookmarked,
-    );
-  }
-}
-
 class CourseCard extends StatelessWidget {
   const CourseCard({
     super.key,
@@ -133,7 +73,7 @@ class CourseCard extends StatelessWidget {
             children: [
               // Thumbnail
               _CourseThumbnail(
-                imagePath: item.thumbnail!,
+                imagePath: item.thumbnail,
               ),
               // Content
               Expanded(
@@ -288,7 +228,7 @@ class RatingRow extends StatelessWidget {
 class _CourseThumbnail extends StatelessWidget {
   const _CourseThumbnail({required this.imagePath});
 
-  final String imagePath;
+  final String? imagePath;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +240,7 @@ class _CourseThumbnail extends StatelessWidget {
           width: 110.w,
           height: double.infinity,
           child: CachedNetworkImage(
-            imageUrl: imagePath,
+            imageUrl: imagePath ?? '',
             fit: BoxFit.cover,
             placeholder: (_,__) =>
                 Skeletonizer(child: Image.asset('assets/images/placeholder.png',fit: BoxFit.cover),),
