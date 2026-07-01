@@ -2,15 +2,15 @@
 
 ```dart
 DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
-DefaultConnector.instance.AdminDeleteCourse(adminDeleteCourseVariables).execute();
+DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
+DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
 DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
-DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execute();
+DefaultConnector.instance.InstructorCancelSession(instructorCancelSessionVariables).execute();
+DefaultConnector.instance.SuperAdminCancelSession(superAdminCancelSessionVariables).execute();
 DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
 DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
-DefaultConnector.instance.LogPayment(logPaymentVariables).execute();
-DefaultConnector.instance.AddPaymentItem(addPaymentItemVariables).execute();
 
 ```
 

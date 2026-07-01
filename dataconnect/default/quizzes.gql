@@ -2,388 +2,116 @@
 # STUDENT — QUIZ TAKING
 # ==========================================
 
-# Fetches all questions and their options for a particular quiz lecture
 query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
   courseQuizs(where: { lectureId: { eq: $lectureId } }) {
-    id
-    passingScore
-    maxAttempts
-    timeLimitMinutes
-    takeQuestions: quizQuestions_on_quiz(
-        where: { deletedAt: { eq: null } },
-        orderBy: [{ order: ASC }]
-    ) {
-      id
-      questionText
-      points
-      takeOptions: quizOptions_on_question(orderBy: [{ order: ASC }]) {
-        id
-        text
-      }
+    id passingScore maxAttempts timeLimitMinutes
+    takeQuestions: quizQuestions_on_quiz(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) {
+      id questionText points takeOptions: quizOptions_on_question(orderBy: [{ order: ASC }]) { id text }
     }
   }
 }
 
-# Initializes a new attempt for taking a quiz
 mutation StartQuizAttempt($quizId: UUID!) @auth(level: USER) {
-  quizAttempt_insert(
-    data: { userId_expr: "auth.uid", quizId: $quizId }
-  )
+  quizAttempt_insert(data: { userId_expr: "auth.uid", quizId: $quizId })
 }
 
-# Logs an answer to a specific quiz question during an active attempt
-mutation SubmitQuizAnswer(
-  $attemptId: UUID!, 
-  $questionId: UUID!, 
-  $optionId: UUID! 
-) @auth(level: USER) {
-  quizAttemptAnswer_upsert(
-    data: {
-      attemptId: $attemptId,
-      questionId: $questionId,
-      selectedOptionId: $optionId
-    }
-  )
+mutation SubmitQuizAnswer($attemptId: UUID!, $questionId: UUID!, $optionId: UUID!) @auth(level: USER) {
+  quizAttemptAnswer_upsert(data: { attemptId: $attemptId, questionId: $questionId, selectedOptionId: $optionId })
 }
 
-# Atomically finalize an attempt only if it is still open (completedAt == null).
-# Returns the number of rows updated: 1 = this call finalized it, 0 = it was
-# already finalized by a concurrent finish/timeout (idempotency guard, H2).
 mutation FinishQuizAttemptIfOpen($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: USER) {
   quizAttempt_updateMany(
-    where: { id: { eq: $attemptId }, completedAt: { eq: null } },
-    data: {
-      score: $score,
-      passed: $passed,
-      completedAt_expr: "request.time"
-    }
+    where: { id: { eq: $attemptId }, completedAt: { eq: null }, userId: { eq_expr: "auth.uid" } },
+    data: { score: $score, passed: $passed, completedAt_expr: "request.time" }
   )
 }
 
-# Sweep query for the server-side timer (KAN-115): every in-progress,
-# time-limited attempt. Called by the QuizExpiryTask cron with admin
-# credentials (executeGraphql, which bypasses @auth), so it is NOT scoped to a
-# single auth.uid. NO_ACCESS prevents any end-user from reading all users'
-# in-progress attempts directly via the connector SDK.
 query GetExpiredAttempts @auth(level: NO_ACCESS) {
-  quizAttempts(where: { completedAt: { eq: null } }) {
-    id
-    startedAt
-    quiz {
-      id
-      timeLimitMinutes
-    }
-  }
+  quizAttempts(where: { completedAt: { eq: null } }) { id startedAt quiz { id timeLimitMinutes } }
 }
 
-# Counts user's attempts for a specific quiz (max-attempt validation)
 query GetUserQuizAttempts($quizId: UUID!) @auth(level: USER) {
-  quizAttempts(
-    where: {
-      userId: { eq_expr: "auth.uid" },
-      quizId: { eq: $quizId }
-    },
-    orderBy: [{ startedAt: DESC }]
-  ) {
-    id
-    completedAt
-    score
-    passed
-    startedAt
+  quizAttempts(where: { userId: { eq_expr: "auth.uid" }, quizId: { eq: $quizId } }, orderBy: [{ startedAt: DESC }]) {
+    id completedAt score passed startedAt
   }
 }
 
-# Retrieves a specific attempt's details for ownership and status validation
 query GetQuizAttemptById($attemptId: UUID!) @auth(level: USER) {
-  quizAttempt(id: $attemptId) {
-    id
-    completedAt
-    startedAt
-    score
-    passed
-    user { id }
-    quiz {
-      id
-      passingScore
-      maxAttempts
-      timeLimitMinutes
-    }
-  }
+  quizAttempt(id: $attemptId) { id completedAt startedAt score passed user { id } quiz { id passingScore maxAttempts timeLimitMinutes } }
 }
 
-# Fetches every non-deleted question's points for a quiz, so the grading
-# denominator is the full quiz (unanswered questions count as zero).
 query GetQuizQuestionPoints($quizId: UUID!) @auth(level: USER) {
-  quizQuestions(
-    where: { quizId: { eq: $quizId }, deletedAt: { eq: null } }
-  ) {
-    id
-    points
-  }
+  quizQuestions(where: { quizId: { eq: $quizId }, deletedAt: { eq: null } }) { id points }
 }
 
-# Fetches all answers for an attempt with correct flags for auto-grading
 query GetAttemptAnswersWithCorrect($attemptId: UUID!) @auth(level: USER) {
-  quizAttemptAnswers(where: { attemptId: { eq: $attemptId } }) {
-    question {
-      id
-      points
-    }
-    selectedOption {
-      id
-      isCorrect
-    }
-  }
+  quizAttemptAnswers(where: { attemptId: { eq: $attemptId } }) { question { id points } selectedOption { id isCorrect } }
 }
 
-# Retrieves quiz settings by quiz id, plus the owning lecture/course for
-# enrollment checks and completion triggers (student-safe — no correct answers)
 query GetQuizSettings($quizId: UUID!) @auth(level: USER) {
-  courseQuiz(id: $quizId) {
-    id
-    passingScore
-    maxAttempts
-    timeLimitMinutes
-    lecture {
-      id
-      type
-      section {
-        # author/createdBy let ResourceOwnershipGuard fast-path a course creator
-        # without a second query; see the leaf→owner note in rbac.gql.
-        course {
-          id
-          author { id }
-          createdBy { id }
-        }
-      }
-    }
-  }
+  courseQuiz(id: $quizId) { id passingScore maxAttempts timeLimitMinutes lecture { id type section { course { id author { id } createdBy { id } } } } }
 }
 
-# Retrieves all options for a specific question (used for option diffing on update)
-query GetQuestionOptions($questionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizOptions(
-    where: { questionId: { eq: $questionId } },
-    orderBy: [{ order: ASC }]
-  ) {
-    id
-    text
-    order
-    isCorrect
-  }
+query GetQuestionOptions($questionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizOptions(where: { questionId: { eq: $questionId } }, orderBy: [{ order: ASC }]) { id text order isCorrect }
 }
 
-# Retrieves a quiz option with its owning question and quiz (relational validation)
 query GetOptionWithQuestion($optionId: UUID!) @auth(level: USER) {
-  quizOption(id: $optionId) {
-    id
-    question {
-      id
-      quiz { id }
-    }
-  }
+  quizOption(id: $optionId) { id question { id quiz { id } } }
 }
 
-# Retrieves attempt start time and quiz time limit for session timeout checks
 query GetActiveQuizSession($attemptId: UUID!) @auth(level: USER) {
-  quizAttempt(id: $attemptId) {
-    id
-    startedAt
-    completedAt
-    user {
-      id
-    }
-    quiz {
-      timeLimitMinutes
-      passingScore
-    }
-  }
+  quizAttempt(id: $attemptId) { id startedAt completedAt user { id } quiz { timeLimitMinutes passingScore } }
 }
 
 # ==========================================
 # ADMIN / INSTRUCTOR — QUIZ BUILDER
 # ==========================================
 
-# Retrieves quiz with all questions, options, and correct answers (admin view)
-query AdminGetQuiz($quizId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseQuiz(id: $quizId) {
-    id
-    passingScore
-    maxAttempts
-    timeLimitMinutes
-    createdAt
-    updatedAt
-    lecture {
-      id
-      title
-      section {
-        course { id }
-      }
-    }
-    adminQuestions: quizQuestions_on_quiz(
-      where: { deletedAt: { eq: null } },
-      orderBy: [{ order: ASC }]
-    ) {
-      id
-      questionText
-      order
-      points
-      explanation
-      adminOptions: quizOptions_on_question(orderBy: [{ order: ASC }]) {
-        id
-        text
-        order
-        isCorrect
-      }
-    }
-  }
+query AdminGetQuiz($quizId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseQuiz(id: $quizId) { id passingScore maxAttempts timeLimitMinutes createdAt updatedAt lecture { id title section { course { id } } } adminQuestions: quizQuestions_on_quiz(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) { id questionText order points explanation adminOptions: quizOptions_on_question(orderBy: [{ order: ASC }]) { id text order isCorrect } } }
 }
 
-# Creates a new quiz for a QUIZ-type lecture
-mutation AdminCreateQuiz(
-  $lectureId: UUID!,
-  $passingScore: Float!,
-  $maxAttempts: Int!,
-  $timeLimitMinutes: Int
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseQuiz_insert(
-    data: {
-      lectureId: $lectureId,
-      passingScore: $passingScore,
-      maxAttempts: $maxAttempts,
-      timeLimitMinutes: $timeLimitMinutes
-    }
-  )
+mutation AdminCreateQuiz($lectureId: UUID!, $passingScore: Float!, $maxAttempts: Int!, $timeLimitMinutes: Int) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseQuiz_insert(data: { lectureId: $lectureId, passingScore: $passingScore, maxAttempts: $maxAttempts, timeLimitMinutes: $timeLimitMinutes })
 }
 
-# Updates quiz settings
-mutation AdminUpdateQuiz(
-  $quizId: UUID!,
-  $passingScore: Float,
-  $maxAttempts: Int,
-  $timeLimitMinutes: Int
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseQuiz_update(
-    id: $quizId,
-    data: {
-      passingScore: $passingScore,
-      maxAttempts: $maxAttempts,
-      timeLimitMinutes: $timeLimitMinutes,
-      updatedAt_expr: "request.time"
-    }
-  )
+mutation AdminUpdateQuiz($quizId: UUID!, $passingScore: Float, $maxAttempts: Int, $timeLimitMinutes: Int) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseQuiz_update(id: $quizId, data: { passingScore: $passingScore, maxAttempts: $maxAttempts, timeLimitMinutes: $timeLimitMinutes, updatedAt_expr: "request.time" })
 }
 
-# Deletes a quiz
-mutation AdminDeleteQuiz($quizId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
+mutation AdminDeleteQuiz($quizId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   courseQuiz_delete(id: $quizId)
 }
 
-# Creates a quiz question
-mutation AdminCreateQuizQuestion(
-  $quizId: UUID!,
-  $questionText: String!,
-  $order: Int!,
-  $points: Float!,
-  $explanation: String
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizQuestion_insert(
-    data: {
-      quizId: $quizId,
-      questionText: $questionText,
-      order: $order,
-      points: $points,
-      explanation: $explanation
-    }
-  )
+mutation AdminCreateQuizQuestion($quizId: UUID!, $questionText: String!, $order: Int!, $points: Float!, $explanation: String) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizQuestion_insert(data: { quizId: $quizId, questionText: $questionText, order: $order, points: $points, explanation: $explanation })
 }
 
-# Updates a quiz question
-mutation AdminUpdateQuizQuestion(
-  $questionId: UUID!,
-  $questionText: String,
-  $points: Float,
-  $explanation: String
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizQuestion_update(
-    id: $questionId,
-    data: {
-      questionText: $questionText,
-      points: $points,
-      explanation: $explanation
-    }
-  )
+mutation AdminUpdateQuizQuestion($questionId: UUID!, $questionText: String, $points: Float, $explanation: String) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizQuestion_update(id: $questionId, data: { questionText: $questionText, points: $points, explanation: $explanation })
 }
 
-# Soft-deletes a quiz question
-mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizQuestion_update(
-    id: $questionId,
-    data: {
-      deletedAt_expr: "request.time"
-    }
-  )
+mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizQuestion_update(id: $questionId, data: { deletedAt_expr: "request.time" })
 }
 
-# Updates a quiz question's order position
-mutation AdminUpdateQuizQuestionOrder(
-  $questionId: UUID!,
-  $order: Int!
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizQuestion_update(
-    id: $questionId,
-    data: {
-      order: $order
-    }
-  )
+mutation AdminUpdateQuizQuestionOrder($questionId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizQuestion_update(id: $questionId, data: { order: $order })
 }
 
-# Creates a quiz option
-mutation AdminCreateQuizOption(
-  $questionId: UUID!,
-  $text: String!,
-  $order: Int!,
-  $isCorrect: Boolean!
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizOption_insert(
-    data: {
-      questionId: $questionId,
-      text: $text,
-      order: $order,
-      isCorrect: $isCorrect
-    }
-  )
+mutation AdminCreateQuizOption($questionId: UUID!, $text: String!, $order: Int!, $isCorrect: Boolean!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizOption_insert(data: { questionId: $questionId, text: $text, order: $order, isCorrect: $isCorrect })
 }
 
-# Updates a quiz option
-mutation AdminUpdateQuizOption(
-  $optionId: UUID!,
-  $text: String,
-  $isCorrect: Boolean
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizOption_update(
-    id: $optionId,
-    data: {
-      text: $text,
-      isCorrect: $isCorrect
-    }
-  )
+mutation AdminUpdateQuizOption($optionId: UUID!, $text: String, $isCorrect: Boolean) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizOption_update(id: $optionId, data: { text: $text, isCorrect: $isCorrect })
 }
 
-# Deletes a quiz option
-mutation AdminDeleteQuizOption($optionId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
+mutation AdminDeleteQuizOption($optionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   quizOption_delete(id: $optionId)
 }
 
-# Updates a quiz option's order position
-mutation AdminUpdateQuizOptionOrder(
-  $optionId: UUID!,
-  $order: Int!
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  quizOption_update(
-    id: $optionId,
-    data: {
-      order: $order
-    }
-  )
+mutation AdminUpdateQuizOptionOrder($optionId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  quizOption_update(id: $optionId, data: { order: $order })
 }
