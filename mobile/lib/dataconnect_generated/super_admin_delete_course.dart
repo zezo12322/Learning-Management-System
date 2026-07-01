@@ -1,26 +1,26 @@
 part of 'generated.dart';
 
-class AdminDeleteCourseVariablesBuilder {
+class SuperAdminDeleteCourseVariablesBuilder {
   String courseId;
 
   final FirebaseDataConnect _dataConnect;
-  AdminDeleteCourseVariablesBuilder(this._dataConnect, {required  this.courseId,});
-  Deserializer<AdminDeleteCourseData> dataDeserializer = (dynamic json)  => AdminDeleteCourseData.fromJson(jsonDecode(json));
-  Serializer<AdminDeleteCourseVariables> varsSerializer = (AdminDeleteCourseVariables vars) => jsonEncode(vars.toJson());
-  Future<OperationResult<AdminDeleteCourseData, AdminDeleteCourseVariables>> execute() {
+  SuperAdminDeleteCourseVariablesBuilder(this._dataConnect, {required  this.courseId,});
+  Deserializer<SuperAdminDeleteCourseData> dataDeserializer = (dynamic json)  => SuperAdminDeleteCourseData.fromJson(jsonDecode(json));
+  Serializer<SuperAdminDeleteCourseVariables> varsSerializer = (SuperAdminDeleteCourseVariables vars) => jsonEncode(vars.toJson());
+  Future<OperationResult<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>> execute() {
     return ref().execute();
   }
 
-  MutationRef<AdminDeleteCourseData, AdminDeleteCourseVariables> ref() {
-    AdminDeleteCourseVariables vars= AdminDeleteCourseVariables(courseId: courseId,);
-    return _dataConnect.mutation("AdminDeleteCourse", dataDeserializer, varsSerializer, vars);
+  MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables> ref() {
+    SuperAdminDeleteCourseVariables vars= SuperAdminDeleteCourseVariables(courseId: courseId,);
+    return _dataConnect.mutation("SuperAdminDeleteCourse", dataDeserializer, varsSerializer, vars);
   }
 }
 
 @immutable
-class AdminDeleteCourseCourseUpdate {
+class SuperAdminDeleteCourseCourseUpdate {
   final String id;
-  AdminDeleteCourseCourseUpdate.fromJson(dynamic json):
+  SuperAdminDeleteCourseCourseUpdate.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -32,7 +32,7 @@ class AdminDeleteCourseCourseUpdate {
       return false;
     }
 
-    final AdminDeleteCourseCourseUpdate otherTyped = other as AdminDeleteCourseCourseUpdate;
+    final SuperAdminDeleteCourseCourseUpdate otherTyped = other as SuperAdminDeleteCourseCourseUpdate;
     return id == otherTyped.id;
     
   }
@@ -46,17 +46,17 @@ class AdminDeleteCourseCourseUpdate {
     return json;
   }
 
-  AdminDeleteCourseCourseUpdate({
+  SuperAdminDeleteCourseCourseUpdate({
     required this.id,
   });
 }
 
 @immutable
-class AdminDeleteCourseData {
-  final AdminDeleteCourseCourseUpdate? course_update;
-  AdminDeleteCourseData.fromJson(dynamic json):
+class SuperAdminDeleteCourseData {
+  final SuperAdminDeleteCourseCourseUpdate? course_update;
+  SuperAdminDeleteCourseData.fromJson(dynamic json):
   
-  course_update = json['course_update'] == null ? null : AdminDeleteCourseCourseUpdate.fromJson(json['course_update']);
+  course_update = json['course_update'] == null ? null : SuperAdminDeleteCourseCourseUpdate.fromJson(json['course_update']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -66,7 +66,7 @@ class AdminDeleteCourseData {
       return false;
     }
 
-    final AdminDeleteCourseData otherTyped = other as AdminDeleteCourseData;
+    final SuperAdminDeleteCourseData otherTyped = other as SuperAdminDeleteCourseData;
     return course_update == otherTyped.course_update;
     
   }
@@ -82,16 +82,16 @@ class AdminDeleteCourseData {
     return json;
   }
 
-  AdminDeleteCourseData({
+  SuperAdminDeleteCourseData({
     this.course_update,
   });
 }
 
 @immutable
-class AdminDeleteCourseVariables {
+class SuperAdminDeleteCourseVariables {
   final String courseId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
-  AdminDeleteCourseVariables.fromJson(Map<String, dynamic> json):
+  SuperAdminDeleteCourseVariables.fromJson(Map<String, dynamic> json):
   
   courseId = nativeFromJson<String>(json['courseId']);
   @override
@@ -103,7 +103,7 @@ class AdminDeleteCourseVariables {
       return false;
     }
 
-    final AdminDeleteCourseVariables otherTyped = other as AdminDeleteCourseVariables;
+    final SuperAdminDeleteCourseVariables otherTyped = other as SuperAdminDeleteCourseVariables;
     return courseId == otherTyped.courseId;
     
   }
@@ -117,7 +117,7 @@ class AdminDeleteCourseVariables {
     return json;
   }
 
-  AdminDeleteCourseVariables({
+  SuperAdminDeleteCourseVariables({
     required this.courseId,
   });
 }

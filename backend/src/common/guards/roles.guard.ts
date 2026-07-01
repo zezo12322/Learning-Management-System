@@ -7,17 +7,46 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY, AppRole } from '../decorators/roles.decorator';
 
+function normalizeRoles(request: any): AppRole[] {
+  const existing = request.userRoles;
+  if (Array.isArray(existing) && existing.length > 0) {
+    return existing;
+  }
+
+  const user = request.user ?? {};
+  const roles = new Set<string>();
+
+  if (Array.isArray(user.roles)) {
+    for (const role of user.roles) {
+      if (typeof role === 'string' && role.trim()) {
+        roles.add(role.trim().toLowerCase());
+      }
+    }
+  }
+
+  if (typeof user.role === 'string' && user.role.trim()) {
+    roles.add(user.role.trim().toLowerCase());
+  }
+
+  if (user.admin === true) {
+    roles.add('admin');
+  }
+
+  roles.add('student');
+
+  const normalized = Array.from(roles).filter(
+    (role): role is AppRole =>
+      role === 'admin' || role === 'instructor' || role === 'student',
+  );
+
+  request.userRoles = normalized;
+  return normalized;
+}
+
 /**
- * Authorizes a request by the caller's global role, carried as a Firebase
- * custom claim on the ID token:
- *   - `role`  → 'admin' | 'instructor' | 'student'
- *   - `admin` → boolean convenience flag (true ⇒ admin)
- *
- * Claims are already decoded onto `request.user` by FirebaseAuthGuard, so this
- * guard needs no I/O. It also caches the normalized roles on `request.userRoles`
- * for downstream guards (e.g. CourseAccessGuard).
- *
- * MUST run after FirebaseAuthGuard.
+ * Authorizes a request by the caller's global role list, carried in Firebase
+ * custom claims and normalized onto `request.userRoles` by FirebaseAuthGuard.
+ * The guard also tolerates legacy single-role claims for backwards compatibility.
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -25,41 +54,21 @@ export class RolesGuard implements CanActivate {
 
   canActivate(ctx: ExecutionContext): boolean {
     const request = ctx.switchToHttp().getRequest();
-    const roles = this.resolveRoles(request);
+    const roles = normalizeRoles(request);
 
     const required = this.reflector.getAllAndOverride<AppRole[]>(ROLES_KEY, [
       ctx.getHandler(),
       ctx.getClass(),
     ]);
 
-    // No @Roles on the route → any authenticated user may proceed.
-    if (!required || required.length === 0) return true;
+    if (!required || required.length === 0) {
+      return true;
+    }
 
-    if (!required.some((r) => roles.includes(r))) {
+    if (!required.some((role) => roles.includes(role))) {
       throw new ForbiddenException(`Requires one of roles: ${required.join(', ')}`);
     }
+
     return true;
-  }
-
-  /** Normalize the token's role claim into an AppRole[] and memoize it. */
-  private resolveRoles(request: any): AppRole[] {
-    if (request.userRoles) return request.userRoles;
-
-    const user = request.user ?? {};
-    const roles: AppRole[] = [];
-
-    if (user.admin === true) roles.push('admin');
-
-    const claim = String(user.role ?? '').toLowerCase();
-    if ((claim === 'admin' || claim === 'instructor' || claim === 'student') &&
-        !roles.includes(claim as AppRole)) {
-      roles.push(claim as AppRole);
-    }
-
-    // Every authenticated user is at least a student.
-    if (!roles.includes('student')) roles.push('student');
-
-    request.userRoles = roles;
-    return roles;
   }
 }

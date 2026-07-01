@@ -25,6 +25,13 @@ describe('RolesGuard', () => {
     expect(req.userRoles).toEqual(expect.arrayContaining(['admin']));
   });
 
+  it('grants admin from the Firebase roles array', () => {
+    const req: any = { user: { roles: ['admin'] } };
+    const { guard, ctx } = ctxFor(req, ['admin']);
+    expect(guard.canActivate(ctx)).toBe(true);
+    expect(req.userRoles).toEqual(expect.arrayContaining(['admin', 'student']));
+  });
+
   it('grants instructor from the role claim string', () => {
     const { guard, ctx } = ctxFor({ user: { role: 'instructor' } }, ['instructor']);
     expect(guard.canActivate(ctx)).toBe(true);

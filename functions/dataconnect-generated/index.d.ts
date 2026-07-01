@@ -130,14 +130,6 @@ export interface AdminAddCourseInstructorVariables {
   userId: string;
 }
 
-export interface AdminCancelSessionData {
-  session_update?: Session_Key | null;
-}
-
-export interface AdminCancelSessionVariables {
-  sessionId: UUIDString;
-}
-
 export interface AdminCreateCategoryData {
   category_insert: Category_Key;
 }
@@ -295,14 +287,6 @@ export interface AdminCreateSubscriptionTierVariables {
   price: number;
   billingCycle: BillingCycle;
   features: string[];
-}
-
-export interface AdminDeleteCourseData {
-  course_update?: Course_Key | null;
-}
-
-export interface AdminDeleteCourseVariables {
-  courseId: UUIDString;
 }
 
 export interface AdminDeleteMicroLessonData {
@@ -772,6 +756,17 @@ export interface AdminUpdateSectionVariables {
   title: string;
 }
 
+export interface AdminUpsertLectureProgressData {
+  lectureProgress_upsert: LectureProgress_Key;
+}
+
+export interface AdminUpsertLectureProgressVariables {
+  userId: string;
+  lectureId: UUIDString;
+  lastWatchedSecond: number;
+  completedAt?: TimestampString | null;
+}
+
 export interface Attendance_Key {
   id: UUIDString;
   __typename?: 'Attendance_Key';
@@ -901,6 +896,22 @@ export interface GetCourseCompletionStatusData {
   })[];
 }
 
+export interface GetCourseCompletionStatusForUserData {
+  sections: ({
+    userCompletionLectures: ({
+      id: UUIDString;
+      userCompletionProgress: ({
+        completedAt?: TimestampString | null;
+      })[];
+    } & CourseLecture_Key)[];
+  })[];
+}
+
+export interface GetCourseCompletionStatusForUserVariables {
+  courseId: UUIDString;
+  userId: string;
+}
+
 export interface GetCourseCompletionStatusVariables {
   courseId: UUIDString;
 }
@@ -982,6 +993,21 @@ export interface GetCriterionMissionData {
   rubricCriterion?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1027,12 +1053,34 @@ export interface GetLectureContentData {
     section: {
       course: {
         id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
       } & Course_Key;
     };
   } & CourseLecture_Key;
 }
 
 export interface GetLectureContentVariables {
+  lectureId: UUIDString;
+}
+
+export interface GetLectureDurationData {
+  courseLecture?: {
+    id: UUIDString;
+    duration?: number | null;
+    section: {
+      course: {
+        id: UUIDString;
+      } & Course_Key;
+    };
+  } & CourseLecture_Key;
+}
+
+export interface GetLectureDurationVariables {
   lectureId: UUIDString;
 }
 
@@ -1062,6 +1110,21 @@ export interface GetMicroLessonMissionData {
   missionMicroLesson?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1171,6 +1234,12 @@ export interface GetOptionCourseData {
           section: {
             course: {
               id: UUIDString;
+              author: {
+                id: string;
+              } & User_Key;
+              createdBy: {
+                id: string;
+              } & User_Key;
             } & Course_Key;
           };
         };
@@ -1226,6 +1295,12 @@ export interface GetQuestionCourseData {
         section: {
           course: {
             id: UUIDString;
+            author: {
+              id: string;
+            } & User_Key;
+            createdBy: {
+              id: string;
+            } & User_Key;
           } & Course_Key;
         };
       };
@@ -1318,6 +1393,12 @@ export interface GetQuizSettingsData {
       section: {
         course: {
           id: UUIDString;
+          author: {
+            id: string;
+          } & User_Key;
+          createdBy: {
+            id: string;
+          } & User_Key;
         } & Course_Key;
       };
     } & CourseLecture_Key;
@@ -1332,6 +1413,12 @@ export interface GetSectionCourseData {
   courseSection?: {
     course: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
     } & Course_Key;
   };
 }
@@ -1362,6 +1449,21 @@ export interface GetTemplateMissionData {
   missionTemplate?: {
     mission: {
       id: UUIDString;
+      author: {
+        id: string;
+      } & User_Key;
+      createdBy: {
+        id: string;
+      } & User_Key;
+      course?: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
     } & Mission_Key;
   };
 }
@@ -1386,6 +1488,19 @@ export interface GetUserClaimsData {
 
 export interface GetUserClaimsVariables {
   uid: string;
+}
+
+export interface GetUserEnrollmentForCourseByUserData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+
+export interface GetUserEnrollmentForCourseByUserVariables {
+  courseId: UUIDString;
+  userId: string;
 }
 
 export interface GetUserEnrollmentForCourseData {
@@ -1446,6 +1561,22 @@ export interface GradeSubmissionVariables {
   feedback?: string | null;
 }
 
+export interface InstructorCancelSessionData {
+  session_updateMany: number;
+}
+
+export interface InstructorCancelSessionVariables {
+  sessionId: UUIDString;
+}
+
+export interface InstructorDeleteCourseData {
+  course_updateMany: number;
+}
+
+export interface InstructorDeleteCourseVariables {
+  courseId: UUIDString;
+}
+
 export interface LectureProgress_Key {
   userId: string;
   lectureId: UUIDString;
@@ -1479,6 +1610,7 @@ export interface LogPaymentVariables {
   referenceId: string;
   amount: number;
   currency?: string | null;
+  customerEmailSnapshot: string;
 }
 
 export interface MissionMicroLesson_Key {
@@ -1527,6 +1659,7 @@ export interface MyCertificatesData {
 export interface MyPaymentHistoryData {
   payments: ({
     id: UUIDString;
+    customerEmailSnapshot: string;
     gateway: PaymentGateway;
     status: PaymentStatus;
     amount: number;
@@ -1664,6 +1797,22 @@ export interface SubscriptionTier_Key {
   __typename?: 'SubscriptionTier_Key';
 }
 
+export interface SuperAdminCancelSessionData {
+  session_update?: Session_Key | null;
+}
+
+export interface SuperAdminCancelSessionVariables {
+  sessionId: UUIDString;
+}
+
+export interface SuperAdminDeleteCourseData {
+  course_update?: Course_Key | null;
+}
+
+export interface SuperAdminDeleteCourseVariables {
+  courseId: UUIDString;
+}
+
 export interface SyncUserData {
   user_upsert: User_Key;
 }
@@ -1675,7 +1824,7 @@ export interface SyncUserVariables {
 }
 
 export interface UpdateEnrollmentStatusData {
-  enrollment_update?: Enrollment_Key | null;
+  enrollment_updateMany: number;
 }
 
 export interface UpdateEnrollmentStatusVariables {
@@ -1755,17 +1904,29 @@ export const adminCreateCourseRef: AdminCreateCourseRef;
 export function adminCreateCourse(vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
 export function adminCreateCourse(dc: DataConnect, vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
 
-interface AdminDeleteCourseRef {
+interface InstructorDeleteCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeleteCourseVariables): MutationRef<AdminDeleteCourseData, AdminDeleteCourseVariables>;
+  (vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeleteCourseVariables): MutationRef<AdminDeleteCourseData, AdminDeleteCourseVariables>;
+  (dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
   operationName: string;
 }
-export const adminDeleteCourseRef: AdminDeleteCourseRef;
+export const instructorDeleteCourseRef: InstructorDeleteCourseRef;
 
-export function adminDeleteCourse(vars: AdminDeleteCourseVariables): MutationPromise<AdminDeleteCourseData, AdminDeleteCourseVariables>;
-export function adminDeleteCourse(dc: DataConnect, vars: AdminDeleteCourseVariables): MutationPromise<AdminDeleteCourseData, AdminDeleteCourseVariables>;
+export function instructorDeleteCourse(vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
+export function instructorDeleteCourse(dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
+
+interface SuperAdminDeleteCourseRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+  operationName: string;
+}
+export const superAdminDeleteCourseRef: SuperAdminDeleteCourseRef;
+
+export function superAdminDeleteCourse(vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+export function superAdminDeleteCourse(dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
 
 interface AdminCreateSessionRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -1779,17 +1940,29 @@ export const adminCreateSessionRef: AdminCreateSessionRef;
 export function adminCreateSession(vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
 export function adminCreateSession(dc: DataConnect, vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
 
-interface AdminCancelSessionRef {
+interface InstructorCancelSessionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCancelSessionVariables): MutationRef<AdminCancelSessionData, AdminCancelSessionVariables>;
+  (vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCancelSessionVariables): MutationRef<AdminCancelSessionData, AdminCancelSessionVariables>;
+  (dc: DataConnect, vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
   operationName: string;
 }
-export const adminCancelSessionRef: AdminCancelSessionRef;
+export const instructorCancelSessionRef: InstructorCancelSessionRef;
 
-export function adminCancelSession(vars: AdminCancelSessionVariables): MutationPromise<AdminCancelSessionData, AdminCancelSessionVariables>;
-export function adminCancelSession(dc: DataConnect, vars: AdminCancelSessionVariables): MutationPromise<AdminCancelSessionData, AdminCancelSessionVariables>;
+export function instructorCancelSession(vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
+export function instructorCancelSession(dc: DataConnect, vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
+
+interface SuperAdminCancelSessionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+  operationName: string;
+}
+export const superAdminCancelSessionRef: SuperAdminCancelSessionRef;
+
+export function superAdminCancelSession(vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+export function superAdminCancelSession(dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
 
 interface AdminCreateSubscriptionTierRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2139,6 +2312,30 @@ export const updateLectureProgressRef: UpdateLectureProgressRef;
 export function updateLectureProgress(vars: UpdateLectureProgressVariables): MutationPromise<UpdateLectureProgressData, UpdateLectureProgressVariables>;
 export function updateLectureProgress(dc: DataConnect, vars: UpdateLectureProgressVariables): MutationPromise<UpdateLectureProgressData, UpdateLectureProgressVariables>;
 
+interface AdminUpsertLectureProgressRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpsertLectureProgressVariables): MutationRef<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpsertLectureProgressVariables): MutationRef<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+  operationName: string;
+}
+export const adminUpsertLectureProgressRef: AdminUpsertLectureProgressRef;
+
+export function adminUpsertLectureProgress(vars: AdminUpsertLectureProgressVariables): MutationPromise<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+export function adminUpsertLectureProgress(dc: DataConnect, vars: AdminUpsertLectureProgressVariables): MutationPromise<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+
+interface GetLectureDurationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetLectureDurationVariables): QueryRef<GetLectureDurationData, GetLectureDurationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetLectureDurationVariables): QueryRef<GetLectureDurationData, GetLectureDurationVariables>;
+  operationName: string;
+}
+export const getLectureDurationRef: GetLectureDurationRef;
+
+export function getLectureDuration(vars: GetLectureDurationVariables, options?: ExecuteQueryOptions): QueryPromise<GetLectureDurationData, GetLectureDurationVariables>;
+export function getLectureDuration(dc: DataConnect, vars: GetLectureDurationVariables, options?: ExecuteQueryOptions): QueryPromise<GetLectureDurationData, GetLectureDurationVariables>;
+
 interface GetCourseCompletionStatusRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetCourseCompletionStatusVariables): QueryRef<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
@@ -2150,6 +2347,30 @@ export const getCourseCompletionStatusRef: GetCourseCompletionStatusRef;
 
 export function getCourseCompletionStatus(vars: GetCourseCompletionStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
 export function getCourseCompletionStatus(dc: DataConnect, vars: GetCourseCompletionStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
+
+interface GetCourseCompletionStatusForUserRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCourseCompletionStatusForUserVariables): QueryRef<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables): QueryRef<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+  operationName: string;
+}
+export const getCourseCompletionStatusForUserRef: GetCourseCompletionStatusForUserRef;
+
+export function getCourseCompletionStatusForUser(vars: GetCourseCompletionStatusForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+export function getCourseCompletionStatusForUser(dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+
+interface GetUserEnrollmentForCourseByUserRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserEnrollmentForCourseByUserVariables): QueryRef<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables): QueryRef<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+  operationName: string;
+}
+export const getUserEnrollmentForCourseByUserRef: GetUserEnrollmentForCourseByUserRef;
+
+export function getUserEnrollmentForCourseByUser(vars: GetUserEnrollmentForCourseByUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+export function getUserEnrollmentForCourseByUser(dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
 
 interface UpdateEnrollmentStatusRef {
   /* Allow users to create refs without passing in DataConnect */
