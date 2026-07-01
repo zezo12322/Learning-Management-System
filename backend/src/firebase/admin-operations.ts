@@ -123,6 +123,20 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // --- Denormalised course rating aggregate (RatingsService) ---
+  AdminUpdateCourseRatingAggregate: /* GraphQL */ `
+    mutation AdminUpdateCourseRatingAggregate(
+      $courseId: UUID!
+      $avgRating: Float!
+      $ratingCount: Int!
+    ) {
+      course_update(
+        id: $courseId
+        data: { avgRating: $avgRating, ratingCount: $ratingCount }
+      )
+    }
+  `,
+
   // --- Server-side quiz expiry sweep (QuizExpiryTask cron) ---
   GetExpiredAttempts: /* GraphQL */ `
     query GetExpiredAttempts {
