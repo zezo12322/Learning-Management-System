@@ -586,6 +586,16 @@ export interface AdminUpdateCourseData {
   course_update?: Course_Key | null;
 }
 
+export interface AdminUpdateCourseRatingAggregateData {
+  course_update?: Course_Key | null;
+}
+
+export interface AdminUpdateCourseRatingAggregateVariables {
+  courseId: UUIDString;
+  avgRating: number;
+  ratingCount: number;
+}
+
 export interface AdminUpdateCourseStatusData {
   course_update?: Course_Key | null;
 }
@@ -808,6 +818,12 @@ export interface CourseQuiz_Key {
   __typename?: 'CourseQuiz_Key';
 }
 
+export interface CourseRating_Key {
+  userId: string;
+  courseId: UUIDString;
+  __typename?: 'CourseRating_Key';
+}
+
 export interface CourseSection_Key {
   id: UUIDString;
   __typename?: 'CourseSection_Key';
@@ -816,6 +832,14 @@ export interface CourseSection_Key {
 export interface Course_Key {
   id: UUIDString;
   __typename?: 'Course_Key';
+}
+
+export interface DeleteCourseRatingData {
+  courseRating_deleteMany: number;
+}
+
+export interface DeleteCourseRatingVariables {
+  courseId: UUIDString;
 }
 
 export interface EnrollInCourseData {
@@ -966,6 +990,16 @@ export interface GetCourseInstructorsData {
 }
 
 export interface GetCourseInstructorsVariables {
+  courseId: UUIDString;
+}
+
+export interface GetCourseRatingsForSummaryData {
+  courseRatings: ({
+    rating: number;
+  })[];
+}
+
+export interface GetCourseRatingsForSummaryVariables {
   courseId: UUIDString;
 }
 
@@ -1193,6 +1227,19 @@ export interface GetMyCourseProgressData {
 }
 
 export interface GetMyCourseProgressVariables {
+  courseId: UUIDString;
+}
+
+export interface GetMyCourseRatingData {
+  courseRatings: ({
+    rating: number;
+    review?: string | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  })[];
+}
+
+export interface GetMyCourseRatingVariables {
   courseId: UUIDString;
 }
 
@@ -1583,6 +1630,25 @@ export interface LectureProgress_Key {
   __typename?: 'LectureProgress_Key';
 }
 
+export interface ListCourseRatingsData {
+  courseRatings: ({
+    rating: number;
+    review?: string | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    user: {
+      name: string;
+      avatar?: string | null;
+    };
+  })[];
+}
+
+export interface ListCourseRatingsVariables {
+  courseId: UUIDString;
+  limit?: number | null;
+  offset?: number | null;
+}
+
 export interface ListPublishedCoursesData {
   courses: ({
     id: UUIDString;
@@ -1591,6 +1657,8 @@ export interface ListPublishedCoursesData {
     level: CourseLevel;
     thumbnail?: string | null;
     tags: string[];
+    avgRating: number;
+    ratingCount: number;
     category: {
       name: string;
     };
@@ -1852,6 +1920,16 @@ export interface UpdateMyProfileVariables {
   company?: string | null;
   phone?: string | null;
   preferences?: unknown | null;
+}
+
+export interface UpsertCourseRatingData {
+  courseRating_upsert: CourseRating_Key;
+}
+
+export interface UpsertCourseRatingVariables {
+  courseId: UUIDString;
+  rating: number;
+  review?: string | null;
 }
 
 export interface UserRole_Key {
@@ -3067,6 +3145,78 @@ export const adminUpdateQuizOptionOrderRef: AdminUpdateQuizOptionOrderRef;
 
 export function adminUpdateQuizOptionOrder(vars: AdminUpdateQuizOptionOrderVariables): MutationPromise<AdminUpdateQuizOptionOrderData, AdminUpdateQuizOptionOrderVariables>;
 export function adminUpdateQuizOptionOrder(dc: DataConnect, vars: AdminUpdateQuizOptionOrderVariables): MutationPromise<AdminUpdateQuizOptionOrderData, AdminUpdateQuizOptionOrderVariables>;
+
+interface UpsertCourseRatingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
+  operationName: string;
+}
+export const upsertCourseRatingRef: UpsertCourseRatingRef;
+
+export function upsertCourseRating(vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
+export function upsertCourseRating(dc: DataConnect, vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
+
+interface DeleteCourseRatingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
+  operationName: string;
+}
+export const deleteCourseRatingRef: DeleteCourseRatingRef;
+
+export function deleteCourseRating(vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
+export function deleteCourseRating(dc: DataConnect, vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
+
+interface GetMyCourseRatingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
+  operationName: string;
+}
+export const getMyCourseRatingRef: GetMyCourseRatingRef;
+
+export function getMyCourseRating(vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
+export function getMyCourseRating(dc: DataConnect, vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
+
+interface ListCourseRatingsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
+  operationName: string;
+}
+export const listCourseRatingsRef: ListCourseRatingsRef;
+
+export function listCourseRatings(vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
+export function listCourseRatings(dc: DataConnect, vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
+
+interface GetCourseRatingsForSummaryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
+  operationName: string;
+}
+export const getCourseRatingsForSummaryRef: GetCourseRatingsForSummaryRef;
+
+export function getCourseRatingsForSummary(vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
+export function getCourseRatingsForSummary(dc: DataConnect, vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
+
+interface AdminUpdateCourseRatingAggregateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
+  operationName: string;
+}
+export const adminUpdateCourseRatingAggregateRef: AdminUpdateCourseRatingAggregateRef;
+
+export function adminUpdateCourseRatingAggregate(vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
+export function adminUpdateCourseRatingAggregate(dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
 
 interface GetMyCourseAccessRef {
   /* Allow users to create refs without passing in DataConnect */
