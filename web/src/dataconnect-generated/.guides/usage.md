@@ -12,28 +12,28 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useAdminCreateCourse, useAdminDeleteCourse, useAdminCreateSession, useAdminCancelSession, useAdminCreateSubscriptionTier, useAdminDeprecateSubscriptionTier, useAdminCreateCategory, useGetUserClaims, useMyCertificates, useVerifyCertificate } from '@dataconnect/generated/react';
+import { useGetCourseSessions, useCheckInToSession, useMyCertificates, useVerifyCertificate, useListPublishedCourses, useGetCourseCurriculum, useGetLectureContent, useGetUserLectureProgress, useGetMyCourseProgress, useGetCourseForEnrollment } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
-const { data, isPending, isSuccess, isError, error } = useAdminCreateCourse(adminCreateCourseVars);
+const { data, isPending, isSuccess, isError, error } = useGetCourseSessions(getCourseSessionsVars);
 
-const { data, isPending, isSuccess, isError, error } = useAdminDeleteCourse(adminDeleteCourseVars);
-
-const { data, isPending, isSuccess, isError, error } = useAdminCreateSession(adminCreateSessionVars);
-
-const { data, isPending, isSuccess, isError, error } = useAdminCancelSession(adminCancelSessionVars);
-
-const { data, isPending, isSuccess, isError, error } = useAdminCreateSubscriptionTier(adminCreateSubscriptionTierVars);
-
-const { data, isPending, isSuccess, isError, error } = useAdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVars);
-
-const { data, isPending, isSuccess, isError, error } = useAdminCreateCategory(adminCreateCategoryVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetUserClaims(getUserClaimsVars);
+const { data, isPending, isSuccess, isError, error } = useCheckInToSession(checkInToSessionVars);
 
 const { data, isPending, isSuccess, isError, error } = useMyCertificates();
 
 const { data, isPending, isSuccess, isError, error } = useVerifyCertificate(verifyCertificateVars);
+
+const { data, isPending, isSuccess, isError, error } = useListPublishedCourses();
+
+const { data, isPending, isSuccess, isError, error } = useGetCourseCurriculum(getCourseCurriculumVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetLectureContent(getLectureContentVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetUserLectureProgress(getUserLectureProgressVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetMyCourseProgress(getMyCourseProgressVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetCourseForEnrollment(getCourseForEnrollmentVars);
 
 ```
 
@@ -72,38 +72,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { adminCreateCourse, adminDeleteCourse, adminCreateSession, adminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, getUserClaims, myCertificates, verifyCertificate } from '@dataconnect/generated';
+import { getCourseSessions, checkInToSession, myCertificates, verifyCertificate, listPublishedCourses, getCourseCurriculum, getLectureContent, getUserLectureProgress, getMyCourseProgress, getCourseForEnrollment } from '@dataconnect/generated';
 
 
-// Operation AdminCreateCourse:  For variables, look at type AdminCreateCourseVars in ../index.d.ts
-const { data } = await AdminCreateCourse(dataConnect, adminCreateCourseVars);
+// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
+const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
 
-// Operation AdminDeleteCourse:  For variables, look at type AdminDeleteCourseVars in ../index.d.ts
-const { data } = await AdminDeleteCourse(dataConnect, adminDeleteCourseVars);
-
-// Operation AdminCreateSession:  For variables, look at type AdminCreateSessionVars in ../index.d.ts
-const { data } = await AdminCreateSession(dataConnect, adminCreateSessionVars);
-
-// Operation AdminCancelSession:  For variables, look at type AdminCancelSessionVars in ../index.d.ts
-const { data } = await AdminCancelSession(dataConnect, adminCancelSessionVars);
-
-// Operation AdminCreateSubscriptionTier:  For variables, look at type AdminCreateSubscriptionTierVars in ../index.d.ts
-const { data } = await AdminCreateSubscriptionTier(dataConnect, adminCreateSubscriptionTierVars);
-
-// Operation AdminDeprecateSubscriptionTier:  For variables, look at type AdminDeprecateSubscriptionTierVars in ../index.d.ts
-const { data } = await AdminDeprecateSubscriptionTier(dataConnect, adminDeprecateSubscriptionTierVars);
-
-// Operation AdminCreateCategory:  For variables, look at type AdminCreateCategoryVars in ../index.d.ts
-const { data } = await AdminCreateCategory(dataConnect, adminCreateCategoryVars);
-
-// Operation GetUserClaims:  For variables, look at type GetUserClaimsVars in ../index.d.ts
-const { data } = await GetUserClaims(dataConnect, getUserClaimsVars);
+// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
+const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
 
 // Operation MyCertificates: 
 const { data } = await MyCertificates(dataConnect);
 
 // Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
 const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
+
+// Operation ListPublishedCourses: 
+const { data } = await ListPublishedCourses(dataConnect);
+
+// Operation GetCourseCurriculum:  For variables, look at type GetCourseCurriculumVars in ../index.d.ts
+const { data } = await GetCourseCurriculum(dataConnect, getCourseCurriculumVars);
+
+// Operation GetLectureContent:  For variables, look at type GetLectureContentVars in ../index.d.ts
+const { data } = await GetLectureContent(dataConnect, getLectureContentVars);
+
+// Operation GetUserLectureProgress:  For variables, look at type GetUserLectureProgressVars in ../index.d.ts
+const { data } = await GetUserLectureProgress(dataConnect, getUserLectureProgressVars);
+
+// Operation GetMyCourseProgress:  For variables, look at type GetMyCourseProgressVars in ../index.d.ts
+const { data } = await GetMyCourseProgress(dataConnect, getMyCourseProgressVars);
+
+// Operation GetCourseForEnrollment:  For variables, look at type GetCourseForEnrollmentVars in ../index.d.ts
+const { data } = await GetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars);
 
 
 ```
