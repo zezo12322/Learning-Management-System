@@ -19,6 +19,7 @@ class MyPaymentHistoryVariablesBuilder {
 @immutable
 class MyPaymentHistoryPayments {
   final String id;
+  final String customerEmailSnapshot;
   final EnumValue<PaymentGateway> gateway;
   final EnumValue<PaymentStatus> status;
   final int amount;
@@ -29,6 +30,7 @@ class MyPaymentHistoryPayments {
   MyPaymentHistoryPayments.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
+  customerEmailSnapshot = nativeFromJson<String>(json['customerEmailSnapshot']),
   gateway = paymentGatewayDeserializer(json['gateway']),
   status = paymentStatusDeserializer(json['status']),
   amount = nativeFromJson<int>(json['amount']),
@@ -49,6 +51,7 @@ class MyPaymentHistoryPayments {
 
     final MyPaymentHistoryPayments otherTyped = other as MyPaymentHistoryPayments;
     return id == otherTyped.id && 
+    customerEmailSnapshot == otherTyped.customerEmailSnapshot && 
     gateway == otherTyped.gateway && 
     status == otherTyped.status && 
     amount == otherTyped.amount && 
@@ -59,12 +62,13 @@ class MyPaymentHistoryPayments {
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, gateway.hashCode, status.hashCode, amount.hashCode, currency.hashCode, referenceId.hashCode, createdAt.hashCode, paymentItems_on_payment.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, customerEmailSnapshot.hashCode, gateway.hashCode, status.hashCode, amount.hashCode, currency.hashCode, referenceId.hashCode, createdAt.hashCode, paymentItems_on_payment.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
+    json['customerEmailSnapshot'] = nativeToJson<String>(customerEmailSnapshot);
     json['gateway'] = 
     paymentGatewaySerializer(gateway)
     ;
@@ -81,6 +85,7 @@ class MyPaymentHistoryPayments {
 
   MyPaymentHistoryPayments({
     required this.id,
+    required this.customerEmailSnapshot,
     required this.gateway,
     required this.status,
     required this.amount,

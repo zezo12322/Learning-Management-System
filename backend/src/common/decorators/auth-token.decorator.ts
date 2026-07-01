@@ -1,12 +1,14 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-/** Parse the raw Firebase ID token (the Bearer value) from a request. */
+/** Parse the raw Firebase ID token from an HTTP request. */
 export function extractBearerToken(req: any): string {
-  const header = req?.headers?.['authorization'];
-  if (header && header.startsWith('Bearer ')) {
-    return header.split('Bearer ')[1];
+  const header = req?.headers?.authorization;
+  if (typeof header !== 'string') {
+    return '';
   }
-  return '';
+
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
 }
 
 /**

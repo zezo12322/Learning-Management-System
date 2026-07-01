@@ -3,11 +3,13 @@ mutation LogPayment(
   $gateway: PaymentGateway!, 
   $referenceId: String!,
   $amount: Int!,
-  $currency: String = "EGP"
+  $currency: String = "EGP",
+  $customerEmailSnapshot: String!
 ) @auth(level: USER) { 
   payment_insert(
     data: {
       userId_expr: "auth.uid",
+      customerEmailSnapshot: $customerEmailSnapshot,
       gateway: $gateway,
       status: PENDING,
       referenceId: $referenceId,
@@ -42,6 +44,7 @@ mutation AddPaymentItem(
 query MyPaymentHistory @auth(level: USER) {
   payments(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ createdAt: DESC }]) {
     id
+    customerEmailSnapshot
     gateway
     status
     amount

@@ -6,6 +6,7 @@ const { z } = require("zod");
 // Internal Modular Dependencies
 const RateLimiter = require("./rateLimiter");
 const { requireRole } = require("./authUtils");
+const EncryptionService = require("./encryptionService");
 
 // ============================================================================
 // INITIALIZATION
@@ -37,14 +38,27 @@ const registrationSchema = z.object({
     .max(64, "Password cannot exceed 64 characters.")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
     .regex(/[0-9]/, "Password must contain at least one number.")
-    // Explicit OWASP defined special character matrix
-    .regex(/[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/, "Password must contain at least one special character.")
+    .regex(/[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/, "Password must contain at least one special character."),
+
+  nationalId: z.string().length(14, "National ID must be exactly 14 digits.")
 });
+
+const roleChangeSchema = z.object({
+  targetUid: z.string().min(1, "Target UID is required."),
+  newRole: z.enum(['student', 'instructor', 'admin'], {
+    errorMap: () => ({ message: "Invalid role specified." })
+  })
+});
+
+// Database UUID Mapping
+const ROLE_IDS = {
+  'admin': '00000000-0000-0000-0000-000000000004',
+  'instructor': '00000000-0000-0000-0000-000000000005',
+  'student': '00000000-0000-0000-0000-000000000006'
+};
 
 // ============================================================================
 // BACKGROUND HANDLER 1: THE OAUTH CLAIM SYNC & AUTO-PROVISIONER
-// Triggers when a user authenticates via third-party providers (Google, GitHub, etc.)
-// Reconciles token claims with database persistence states.
 // ============================================================================
 exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async (user) => {
   console.log(`🚀 [START] syncClaims triggered for UID: ${user.uid}`);
@@ -71,7 +85,6 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
 
     const userData = response.data?.user;
 
-    // Provision row if account bypasses the application registration endpoint
     if (!userData) {
       console.log(`⚠️ [NEW OAUTH USER] UID: ${user.uid} absent from relational storage. Executing creation...`);
 
@@ -79,8 +92,14 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
       const userName = user.displayName || "New Student";
 
       const insertMutation = `
-          mutation createDefaultUser($uid: String!, $email: String!, $name: String!) {
+          mutation createDefaultUserAndProfile($uid: String!, $email: String!, $name: String!) {
             user_insert(data: { id: $uid, email: $email, name: $name })
+            profile_insert(data: { userId: $uid, bio: "", company: "", phone: "" })
+            
+            userRole_insert(data: { 
+                userId: $uid, 
+                roleId: "00000000-0000-0000-0000-000000000006" 
+            })
           }
         `;
 
@@ -91,11 +110,10 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
       const defaultClaims = { roles: ['student'], companyId: null };
       await admin.auth().setCustomUserClaims(user.uid, defaultClaims);
 
-      console.log(`🎉 [SUCCESS] Relational record created and default student claims attached.`);
+      console.log(`🎉 [SUCCESS] Relational record created, profile setup, and roles attached.`);
       return;
     }
 
-    // Map existing identities back down into the authorization token
     const roles = userData.userRoles_on_user ? userData.userRoles_on_user.map(ur => ur.role.name) : [];
     const companyId = userData.profile_on_user ? userData.profile_on_user.company : null;
 
@@ -110,98 +128,188 @@ exports.syncClaims = functions.region('europe-west3').auth.user().onCreate(async
 
 // ============================================================================
 // CALLABLE ENDPOINT 1: STUDENT REGISTRATION PIPELINE
-// Validates parameters via Zod schema, checks IP rate constraints, provisions 
-// identity inside Auth and inserts target entity inside PostgreSQL.
 // ============================================================================
-exports.registerStudent = functions.region('europe-west3').https.onCall(async (data, context) => {
-  // 1. IP-Based Rate Limiter Verification
-  const rawIp = context.rawRequest.ip || "unknown-ip";
-  try {
-    // Upper threshold limit: Max 10 executions per minute per source IP
-    await RateLimiter.checkLimit(`ip_${rawIp}`, 10, "1 m");
-  } catch (error) {
-    if (error.message === 'RATE_LIMIT_EXCEEDED') {
-      console.warn(`🚨 [SECURITY] Execution rate exceeded for IP: ${rawIp}`);
-      throw new functions.https.HttpsError('resource-exhausted', 'Too many attempts. Please slow down.');
+exports.registerStudent = functions
+  .region('europe-west3')
+  .runWith({ secrets: ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN", "APP_ENCRYPTION_KEY"] })
+  .https.onCall(async (data, context) => {
+
+    const rawIp = context.rawRequest.ip || "unknown-ip";
+    try {
+      await RateLimiter.checkLimit(`ip_${rawIp}`, 10, "1 m");
+    } catch (error) {
+      if (error.message === 'RATE_LIMIT_EXCEEDED') {
+        console.warn(`🚨 [SECURITY] Execution rate exceeded for IP: ${rawIp}`);
+        throw new functions.https.HttpsError('resource-exhausted', 'Too many attempts. Please slow down.');
+      }
+      console.error("⚠️ [WARNING] Rate Limiter failure:", error);
     }
-    console.error("⚠️ [WARNING] Rate Limiter failure:", error);
-  }
 
-  // 2. Schema Structure Verification
-  let validatedData;
-  try {
-    validatedData = registrationSchema.parse(data);
-  } catch (error) {
-    console.warn(`🚨 [VALIDATION FAILED] ${error.errors[0].message}`);
-    throw new functions.https.HttpsError('invalid-argument', error.errors[0].message);
-  }
-
-  const { email, password, name } = validatedData;
-  console.log(`🚀 [START] Structured registration handling for: ${email}`);
-
-  try {
-    // 3. Provision Core Identity Object
-    const userRecord = await admin.auth().createUser({
-      email: email,
-      password: password,
-      displayName: name,
-    });
-    const uid = userRecord.uid;
-    console.log(`✅ [AUTH] Base account identity instantiated: ${uid}`);
-
-    // 4. Provision Related Persistent State Records
-    const insertMutation = `
-          mutation createDefaultUser($uid: String!, $email: String!, $name: String!) {
-            user_insert(data: { id: $uid, email: $email, name: $name })
-          }
-        `;
-    await adminDC.executeGraphql(insertMutation, {
-      variables: { uid, email, name }
-    });
-    console.log(`✅ [DB INSERT] Relational database persistence mapped.`);
-
-    // 5. Append Explicit Scopes
-    const defaultClaims = { roles: ['student'], companyId: null };
-    await admin.auth().setCustomUserClaims(uid, defaultClaims);
-
-    console.log(`🎉 [SUCCESS] Pipeline transaction resolved successfully.`);
-    return { success: true, uid: uid };
-
-  } catch (error) {
-    console.error("❌ [API ERROR inside registerStudent]", error);
-    if (error.code) {
-      throw new functions.https.HttpsError('already-exists', error.message);
+    let validatedData;
+    try {
+      validatedData = registrationSchema.parse(data);
+    } catch (error) {
+      console.warn(`🚨 [VALIDATION FAILED] ${error.errors[0].message}`);
+      throw new functions.https.HttpsError('invalid-argument', error.errors[0].message);
     }
-    throw new functions.https.HttpsError('internal', 'Backend transaction failure during execution.');
-  }
-});
+
+    const { email, password, name, nationalId } = validatedData;
+    console.log(`🚀 [START] Structured registration handling for: ${email}`);
+
+    try {
+      const userRecord = await admin.auth().createUser({
+        email: email,
+        password: password,
+        displayName: name,
+      });
+      const uid = userRecord.uid;
+      console.log(`✅ [AUTH] Base account identity instantiated: ${uid}`);
+
+      const safeNationalId = EncryptionService.encrypt(nationalId, process.env.APP_ENCRYPTION_KEY);
+
+      const insertMutation = `
+              mutation createDefaultUser($uid: String!, $email: String!, $name: String!, $nid: String!) {
+                user_insert(data: { 
+                    id: $uid, 
+                    email: $email, 
+                    name: $name,
+                    encryptedNationalId: $nid
+                })
+
+                userRole_insert(data: { 
+                    userId: $uid, 
+                    roleId: "00000000-0000-0000-0000-000000000006" 
+                })
+              }
+            `;
+      await adminDC.executeGraphql(insertMutation, {
+        variables: { uid, email, name, nid: safeNationalId }
+      });
+      console.log(`✅ [DB INSERT] Relational database persistence mapped.`);
+
+      const defaultClaims = { roles: ['student'], companyId: null };
+      await admin.auth().setCustomUserClaims(uid, defaultClaims);
+
+      console.log(`🎉 [SUCCESS] Pipeline transaction resolved successfully.`);
+      return { success: true, uid: uid };
+
+    } catch (error) {
+      console.error("❌ [API ERROR inside registerStudent]", error);
+      if (error.code) {
+        throw new functions.https.HttpsError('already-exists', error.message);
+      }
+      throw new functions.https.HttpsError('internal', 'Backend transaction failure during execution.');
+    }
+  });
+
+// ============================================================================
+// CALLABLE ENDPOINT 2: ROLE MANAGEMENT PIPELINE (ADMIN ONLY)
+// ============================================================================
+exports.changeUserRole = functions
+  .region('europe-west3')
+  .runWith({ secrets: ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"] })
+  .https.onCall(async (data, context) => {
+
+    const callerUid = context.auth?.uid;
+    try {
+      await RateLimiter.checkLimit(`uid_${callerUid}`, 20, "1 m");
+    } catch (error) {
+      if (error.message === 'RATE_LIMIT_EXCEEDED') {
+        throw new functions.https.HttpsError('resource-exhausted', 'Too many attempts.');
+      }
+    }
+
+    requireRole(context, ['admin']);
+
+    let validatedData;
+    try {
+      validatedData = roleChangeSchema.parse(data);
+    } catch (error) {
+      throw new functions.https.HttpsError('invalid-argument', error.errors[0].message);
+    }
+
+    const { targetUid, newRole } = validatedData;
+    const newRoleId = ROLE_IDS[newRole];
+
+    if (callerUid === targetUid) {
+      throw new functions.https.HttpsError('permission-denied', 'Administrators cannot change their own roles.');
+    }
+
+    console.log(`🛡️ [ADMIN ACTION] UID ${callerUid} is changing UID ${targetUid} to ${newRole}`);
+
+    try {
+      const fetchQuery = `
+                query getTargetUserRoles($uid: String!) {
+                    user(id: $uid) {
+                        userRoles_on_user {
+                            roleId
+                        }
+                    }
+                }
+            `;
+      const userRes = await adminDC.executeGraphql(fetchQuery, { variables: { uid: targetUid } });
+      const currentRoles = userRes.data?.user?.userRoles_on_user || [];
+
+      for (const currentRole of currentRoles) {
+        const deleteMutation = `
+                    mutation removeRole($uid: String!, $roleId: UUID!) {
+                        userRole_delete(key: { userId: $uid, roleId: $roleId })
+                    }
+                `;
+        await adminDC.executeGraphql(deleteMutation, {
+          variables: { uid: targetUid, roleId: currentRole.roleId }
+        });
+      }
+
+      const insertMutation = `
+                mutation assignNewRole($uid: String!, $roleId: UUID!) {
+                    userRole_insert(data: { userId: $uid, roleId: $roleId })
+                }
+            `;
+      await adminDC.executeGraphql(insertMutation, {
+        variables: { uid: targetUid, roleId: newRoleId }
+      });
+
+      const userRecord = await admin.auth().getUser(targetUid);
+      const currentClaims = userRecord.customClaims || {};
+
+      const newClaims = {
+        ...currentClaims,
+        roles: [newRole]
+      };
+      await admin.auth().setCustomUserClaims(targetUid, newClaims);
+
+      console.log(`🎉 [SUCCESS] Role fully synchronized across Database and Token.`);
+      return { success: true, message: `User successfully updated to ${newRole}.` };
+
+    } catch (error) {
+      console.error("❌ [API ERROR inside changeUserRole]", error);
+      if (error.code === 'auth/user-not-found') {
+        throw new functions.https.HttpsError('not-found', 'The requested user does not exist.');
+      }
+      throw new functions.https.HttpsError('internal', 'Backend transaction failure during role update.');
+    }
+  });
 
 // ============================================================================
 // BACKGROUND HANDLER 2: CASCADING SYSTEM DELETION WIPE
-// Fires asynchronously when a user entity is purged from Firebase Auth.
-// Removes corresponding relational tuples and binary object files from storage.
 // ============================================================================
 exports.cleanupUserData = functions.region('europe-west3').auth.user().onDelete(async (user) => {
   console.log(`🗑️ [START] Purge cascade execution initialized for UID: ${user.uid}`);
 
   try {
-    // 1. Database Row Level Extraction
     const deleteMutation = `
           mutation deleteUserRecord($uid: String!) {
             user_delete(id: $uid)
           }
         `;
 
-    console.log(`📡 [DB PURGE] Removing primary records matching identifier...`);
     await adminDC.executeGraphql(deleteMutation, {
       variables: { uid: user.uid }
     });
     console.log(`✅ [SUCCESS] Relational row data wiped.`);
 
-    // 2. Binary Object Blob Subtree Removal
-    console.log(`🧹 [STORAGE PURGE] Purging structural objects inside users/${user.uid}/...`);
     const bucket = admin.storage().bucket();
-
     await bucket.deleteFiles({
       prefix: `users/${user.uid}/`
     });
@@ -210,25 +318,4 @@ exports.cleanupUserData = functions.region('europe-west3').auth.user().onDelete(
   } catch (error) {
     console.error("❌ [CRITICAL ERROR inside cleanupUserData]", error);
   }
-});
-
-// ============================================================================
-// CALLABLE ENDPOINT 2: SECURE CONTENT INGESTION PIPELINE (PUBLISH COURSE)
-// Gatekept via token verification middleware. Restricts usage to elevated
-// administrative and instructor level custom scopes.
-// ============================================================================
-exports.publishCourse = functions.region('europe-west3').https.onCall(async (data, context) => {
-
-  // 1. RBAC Token Enforcement Layer
-  requireRole(context, ['admin', 'instructor']);
-
-  console.log(`✅ [RBAC VALIDATED] Client execution context approved for UID: ${context.auth.uid}`);
-
-  // 2. Payload Schema Processing 
-  // (Integrate additional course verification schema definitions here)
-
-  // 3. Data Connect Mutation Target Handling
-  // ...
-
-  return { success: true };
 });
