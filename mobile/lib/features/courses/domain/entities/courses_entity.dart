@@ -12,6 +12,9 @@ class CourseEntity {
   final List<String> tags;
   final List<CourseInstructorEntity> instructors;
   final bool isBookmarked;
+  final double avgRating;
+  final int ratingCount;
+
 
   const CourseEntity({
     required this.id,
@@ -26,6 +29,8 @@ class CourseEntity {
     required this.tags,
     required this.instructors,
     this.isBookmarked = false,
+    required this.avgRating,
+    required this.ratingCount,
   });
 }
 

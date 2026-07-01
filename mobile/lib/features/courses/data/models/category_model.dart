@@ -1,9 +1,10 @@
+import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/category_entity.dart';
 
 class CategoryModel {
   final String id;
   final String name;
-  final String description;
+  final String? description;
 
   CategoryModel({
     required this.id,
@@ -14,7 +15,7 @@ class CategoryModel {
   factory CategoryModel.fromConnectorResult(ListCategoriesCategories result,) {
     return CategoryModel(
       id: result.id,
-      name: result.title,
+      name: result.name,
       description: result.description,
     );
   }

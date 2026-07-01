@@ -10,6 +10,8 @@ class CourseModel {
   final List<String> tags;
   final Category category;
   final Author author;
+  final double avgRating;
+  final int ratingCount;
 
   const CourseModel({
     required this.id,
@@ -20,6 +22,8 @@ class CourseModel {
     required this.tags,
     required this.category,
     required this.author,
+    required this.avgRating,
+    required this.ratingCount,
   });
 
   factory CourseModel.fromConnectorResult(
@@ -37,6 +41,8 @@ class CourseModel {
         name: result.author.name,
         avatar: result.author.avatar,
       ),
+      avgRating: result.avgRating.toDouble(),
+      ratingCount: result.ratingCount,
     );
   }
 
@@ -54,6 +60,8 @@ class CourseModel {
       author: Author.fromJson(
         json['author'] as Map<String, dynamic>,
       ),
+      avgRating: (json['avgRating'] as num).toDouble(),
+      ratingCount: json['ratingCount'] as int,
     );
   }
 
@@ -67,6 +75,8 @@ class CourseModel {
       'tags': tags,
       'category': category.toJson(),
       'author': author.toJson(),
+      'avgRating': avgRating,
+      'ratingCount': ratingCount,
     };
   }
 
@@ -87,6 +97,8 @@ class CourseModel {
           avatar: author.avatar,
         ),
       ],
+      avgRating: avgRating,
+      ratingCount: ratingCount,
     );
   }
 }

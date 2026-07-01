@@ -11,8 +11,8 @@ class CategoriesRemoteDatasourceImpl extends CategoriesRemoteDatasource{
   @override
   Future<List<CategoryModel>> getCategories() async{
     try{
-      final result = await _connector.listPublishedCourses().execute();
-      return result.data.courses.map(CategoryModel.fromConnectorResult).toList();
+      final result = await _connector.listCategories().execute();
+      return result.data.categories.map(CategoryModel.fromConnectorResult).toList();
     } on DataConnectError catch (e) {
       throw CustomExceptions(message: e.message ?? 'Data Connect error');
     } catch (e){

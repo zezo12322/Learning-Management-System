@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/widgets/custom_search_bar.dart';
+import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/courses_category_Section.dart';
@@ -16,8 +17,15 @@ class CoursesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<CoursesCubit>()..init(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CoursesCubit>(
+          create: (context) => getIt<CoursesCubit>()..init(),
+        ),
+        BlocProvider<CategoriesCubit>(
+          create: (context) => getIt<CategoriesCubit>()..loadCategories(),
+        ),
+      ],
       child: const CourseBody(),
     );
   }

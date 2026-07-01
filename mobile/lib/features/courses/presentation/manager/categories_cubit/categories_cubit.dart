@@ -7,7 +7,7 @@ class CategoriesCubit extends Cubit<CategoriesState> {
 
   final CategoriesRepository repository;
 
-  Future<void> loadCourses() async {
+  Future<void> loadCategories() async {
     emit(state.copyWith(status: CategoriesStatus.loading, errorMessage: null));
 
     final result = await repository.getCategories();
