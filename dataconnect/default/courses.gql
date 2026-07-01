@@ -6,7 +6,7 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
   courses(
     where: { status: { eq: PUBLISHED }, deletedAt: { eq: null } }, 
     orderBy: [{ createdAt: DESC }]
-  ) { id title price level thumbnail tags category { name } author { name avatar } }
+  ) { id title price level thumbnail tags avgRating ratingCount category { name } author { name avatar } }
 }
 
 query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {

@@ -24,6 +24,8 @@ class ListPublishedCoursesCourses {
   final EnumValue<CourseLevel> level;
   final String? thumbnail;
   final List<String> tags;
+  final double avgRating;
+  final int ratingCount;
   final ListPublishedCoursesCoursesCategory category;
   final ListPublishedCoursesCoursesAuthor author;
   ListPublishedCoursesCourses.fromJson(dynamic json):
@@ -36,6 +38,8 @@ class ListPublishedCoursesCourses {
   tags = (json['tags'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
         .toList(),
+  avgRating = nativeFromJson<double>(json['avgRating']),
+  ratingCount = nativeFromJson<int>(json['ratingCount']),
   category = ListPublishedCoursesCoursesCategory.fromJson(json['category']),
   author = ListPublishedCoursesCoursesAuthor.fromJson(json['author']);
   @override
@@ -54,12 +58,14 @@ class ListPublishedCoursesCourses {
     level == otherTyped.level && 
     thumbnail == otherTyped.thumbnail && 
     tags == otherTyped.tags && 
+    avgRating == otherTyped.avgRating && 
+    ratingCount == otherTyped.ratingCount && 
     category == otherTyped.category && 
     author == otherTyped.author;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, category.hashCode, author.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, price.hashCode, level.hashCode, thumbnail.hashCode, tags.hashCode, avgRating.hashCode, ratingCount.hashCode, category.hashCode, author.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -74,6 +80,8 @@ class ListPublishedCoursesCourses {
       json['thumbnail'] = nativeToJson<String?>(thumbnail);
     }
     json['tags'] = tags.map((e) => nativeToJson<String>(e)).toList();
+    json['avgRating'] = nativeToJson<double>(avgRating);
+    json['ratingCount'] = nativeToJson<int>(ratingCount);
     json['category'] = category.toJson();
     json['author'] = author.toJson();
     return json;
@@ -86,6 +94,8 @@ class ListPublishedCoursesCourses {
     required this.level,
     this.thumbnail,
     required this.tags,
+    required this.avgRating,
+    required this.ratingCount,
     required this.category,
     required this.author,
   });

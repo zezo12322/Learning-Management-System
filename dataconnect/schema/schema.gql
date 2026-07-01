@@ -82,13 +82,20 @@ type Course @table(name: "courses") {
   language: String!
   level: CourseLevel!
   thumbnail: String
-  category: Category! 
-  tags: [String!]!    
-  author: User!        
-  createdBy: User!     
+  category: Category!
+  tags: [String!]!
+  author: User!
+  createdBy: User!
+  # Denormalised rating aggregate, recomputed by RatingsService on every rating
+  # write. Lets catalog/recommendation cards show a star score without an N+1
+  # over CourseRating. The authoritative value is always derivable on-read via
+  # GetCourseRatingsForSummary; these columns are a cache. Non-null defaults keep
+  # the column migration non-destructive (existing rows backfill to 0).
+  avgRating: Float! @default(value: 0)
+  ratingCount: Int! @default(value: 0)
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp 
+  deletedAt: Timestamp
 }
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
@@ -234,10 +241,22 @@ type Enrollment @table(name: "enrollments") {
 }
 
 type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) {
-  user: User! 
+  user: User!
   lecture: CourseLecture!
   lastWatchedSecond: Int!
   completedAt: Timestamp
+}
+
+# One rating per (user, course). The composite key enforces that uniqueness at
+# the database level and lets the write path use a single upsert (create-or-edit),
+# mirroring LectureProgress.
+type CourseRating @table(name: "course_ratings", key: ["user", "course"]) {
+  user: User!
+  course: Course!
+  rating: Int!          # 1–5 stars
+  review: String        # optional free-text review
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
 }
 
 type QuizAttempt @table(name: "quiz_attempts") {

@@ -1,4 +1,4 @@
-import { adminCreateCourseRef, instructorDeleteCourseRef, superAdminDeleteCourseRef, adminCreateSessionRef, instructorCancelSessionRef, superAdminCancelSessionRef, adminCreateSubscriptionTierRef, adminDeprecateSubscriptionTierRef, adminCreateCategoryRef, getUserClaimsRef, myCertificatesRef, verifyCertificateRef, listPublishedCoursesRef, getCourseCurriculumRef, getLectureContentRef, getUserLectureProgressRef, getMyCourseProgressRef, getCourseForEnrollmentRef, adminGetCourseRef, adminListMyCoursesRef, adminUpdateCourseRef, adminUpdateCourseStatusRef, adminCreateSectionRef, adminUpdateSectionRef, adminSoftDeleteSectionRef, adminUpdateSectionOrderRef, adminCreateLectureFullRef, adminUpdateLectureRef, adminSoftDeleteLectureRef, adminUpdateLectureOrderRef, adminMoveLectureToSectionRef, adminSoftDeleteLecturesBySectionRef, logPaymentRef, addPaymentItemRef, myPaymentHistoryRef, getPendingSubmissionsRef, adminAddCourseInstructorRef, adminRemoveCourseInstructorRef, getCourseInstructorsRef, enrollInCourseRef, enrollInMissionRef, updateLectureProgressRef, adminUpsertLectureProgressRef, getLectureDurationRef, getCourseCompletionStatusRef, getCourseCompletionStatusForUserRef, getUserEnrollmentForCourseByUserRef, updateEnrollmentStatusRef, getUserEnrollmentForCourseRef, getUserEnrollmentForMissionRef, getMissionForEnrollmentRef, submitMissionRef, mySubmissionsRef, gradeSubmissionRef, addCriterionScoreRef, getSubmissionForGradingRef, getEnrollmentForUserMissionRef, adminCreateMissionRef, adminUpdateMissionRef, adminSoftDeleteMissionRef, adminGetMissionRef, adminListMyMissionsRef, adminCreateMicroLessonRef, adminUpdateMicroLessonRef, adminDeleteMicroLessonRef, adminUpdateMicroLessonOrderRef, adminCreateMissionTemplateRef, adminDeleteMissionTemplateRef, getMissionTemplatesRef, adminCreateRubricCriterionRef, adminUpdateRubricCriterionRef, adminDeleteRubricCriterionRef, adminUpdateRubricCriterionOrderRef, getQuizQuestionsRef, startQuizAttemptRef, submitQuizAnswerRef, finishQuizAttemptIfOpenRef, getExpiredAttemptsRef, getUserQuizAttemptsRef, getQuizAttemptByIdRef, getQuizQuestionPointsRef, getAttemptAnswersWithCorrectRef, getQuizSettingsRef, getQuestionOptionsRef, getOptionWithQuestionRef, getActiveQuizSessionRef, adminGetQuizRef, adminCreateQuizRef, adminUpdateQuizRef, adminDeleteQuizRef, adminCreateQuizQuestionRef, adminUpdateQuizQuestionRef, adminSoftDeleteQuizQuestionRef, adminUpdateQuizQuestionOrderRef, adminCreateQuizOptionRef, adminUpdateQuizOptionRef, adminDeleteQuizOptionRef, adminUpdateQuizOptionOrderRef, getMyCourseAccessRef, getMyMissionAccessRef, getQuestionCourseRef, getOptionCourseRef, getSectionCourseRef, getMicroLessonMissionRef, getCriterionMissionRef, getTemplateMissionRef, getCourseSessionsRef, checkInToSessionRef, syncUserRef, getMeRef, updateMyProfileRef, connectorConfig } from '../../esm/index.esm.js';
+import { adminCreateCourseRef, instructorDeleteCourseRef, superAdminDeleteCourseRef, adminCreateSessionRef, instructorCancelSessionRef, superAdminCancelSessionRef, adminCreateSubscriptionTierRef, adminDeprecateSubscriptionTierRef, adminCreateCategoryRef, getUserClaimsRef, myCertificatesRef, verifyCertificateRef, listPublishedCoursesRef, getCourseCurriculumRef, getLectureContentRef, getUserLectureProgressRef, getMyCourseProgressRef, getCourseForEnrollmentRef, adminGetCourseRef, adminListMyCoursesRef, adminUpdateCourseRef, adminUpdateCourseStatusRef, adminCreateSectionRef, adminUpdateSectionRef, adminSoftDeleteSectionRef, adminUpdateSectionOrderRef, adminCreateLectureFullRef, adminUpdateLectureRef, adminSoftDeleteLectureRef, adminUpdateLectureOrderRef, adminMoveLectureToSectionRef, adminSoftDeleteLecturesBySectionRef, logPaymentRef, addPaymentItemRef, myPaymentHistoryRef, getPendingSubmissionsRef, adminAddCourseInstructorRef, adminRemoveCourseInstructorRef, getCourseInstructorsRef, enrollInCourseRef, enrollInMissionRef, updateLectureProgressRef, adminUpsertLectureProgressRef, getLectureDurationRef, getCourseCompletionStatusRef, getCourseCompletionStatusForUserRef, getUserEnrollmentForCourseByUserRef, updateEnrollmentStatusRef, getUserEnrollmentForCourseRef, getUserEnrollmentForMissionRef, getMissionForEnrollmentRef, submitMissionRef, mySubmissionsRef, gradeSubmissionRef, addCriterionScoreRef, getSubmissionForGradingRef, getEnrollmentForUserMissionRef, adminCreateMissionRef, adminUpdateMissionRef, adminSoftDeleteMissionRef, adminGetMissionRef, adminListMyMissionsRef, adminCreateMicroLessonRef, adminUpdateMicroLessonRef, adminDeleteMicroLessonRef, adminUpdateMicroLessonOrderRef, adminCreateMissionTemplateRef, adminDeleteMissionTemplateRef, getMissionTemplatesRef, adminCreateRubricCriterionRef, adminUpdateRubricCriterionRef, adminDeleteRubricCriterionRef, adminUpdateRubricCriterionOrderRef, getQuizQuestionsRef, startQuizAttemptRef, submitQuizAnswerRef, finishQuizAttemptIfOpenRef, getExpiredAttemptsRef, getUserQuizAttemptsRef, getQuizAttemptByIdRef, getQuizQuestionPointsRef, getAttemptAnswersWithCorrectRef, getQuizSettingsRef, getQuestionOptionsRef, getOptionWithQuestionRef, getActiveQuizSessionRef, adminGetQuizRef, adminCreateQuizRef, adminUpdateQuizRef, adminDeleteQuizRef, adminCreateQuizQuestionRef, adminUpdateQuizQuestionRef, adminSoftDeleteQuizQuestionRef, adminUpdateQuizQuestionOrderRef, adminCreateQuizOptionRef, adminUpdateQuizOptionRef, adminDeleteQuizOptionRef, adminUpdateQuizOptionOrderRef, upsertCourseRatingRef, deleteCourseRatingRef, getMyCourseRatingRef, listCourseRatingsRef, getCourseRatingsForSummaryRef, adminUpdateCourseRatingAggregateRef, getMyCourseAccessRef, getMyMissionAccessRef, getQuestionCourseRef, getOptionCourseRef, getSectionCourseRef, getMicroLessonMissionRef, getCriterionMissionRef, getTemplateMissionRef, getCourseSessionsRef, checkInToSessionRef, syncUserRef, getMeRef, updateMyProfileRef, connectorConfig } from '../../esm/index.esm.js';
 import { validateArgs, CallerSdkTypeEnum } from 'firebase/data-connect';
 import { useDataConnectQuery, useDataConnectMutation, validateReactArgs } from '@tanstack-query-firebase/react/data-connect';
 
@@ -706,6 +706,48 @@ export function useAdminUpdateQuizOptionOrder(dcOrOptions, options) {
   const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return adminUpdateQuizOptionOrderRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useUpsertCourseRating(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return upsertCourseRatingRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useDeleteCourseRating(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return deleteCourseRatingRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+export function useGetMyCourseRating(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getMyCourseRatingRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useListCourseRatings(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = listCourseRatingsRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useGetCourseRatingsForSummary(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCourseRatingsForSummaryRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+export function useAdminUpdateCourseRatingAggregate(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return adminUpdateCourseRatingAggregateRef(dcInstance, vars);
   }
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
