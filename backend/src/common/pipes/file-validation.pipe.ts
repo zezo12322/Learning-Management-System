@@ -3,7 +3,6 @@ import {
   Injectable,
   BadRequestException,
 } from '@nestjs/common';
-import * as FileType from 'file-type';
 import {
   ALLOWED_TEMPLATE_EXTENSIONS,
   ALLOWED_TEMPLATE_MIME_TYPES,
@@ -60,7 +59,10 @@ export class FileValidationPipe implements PipeTransform {
     // Validate magic bytes (header signature) to prevent spoofed extensions.
     // .docx/.xlsx are ZIP-based, so file-type reports them as application/zip.
     if (file.buffer) {
-      const detected = await FileType.fromBuffer(file.buffer);
+      // file-type is ESM-only (v22). With tsconfig module=nodenext this dynamic
+      // import stays a native import() and loads correctly from our CJS build.
+      const { fileTypeFromBuffer } = await import('file-type');
+      const detected = await fileTypeFromBuffer(file.buffer);
       if (!detected) {
         throw new BadRequestException(
           'Could not determine the true file type from its contents',

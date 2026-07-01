@@ -1,26 +1,26 @@
 part of 'generated.dart';
 
-class AdminCancelSessionVariablesBuilder {
+class SuperAdminCancelSessionVariablesBuilder {
   String sessionId;
 
   final FirebaseDataConnect _dataConnect;
-  AdminCancelSessionVariablesBuilder(this._dataConnect, {required  this.sessionId,});
-  Deserializer<AdminCancelSessionData> dataDeserializer = (dynamic json)  => AdminCancelSessionData.fromJson(jsonDecode(json));
-  Serializer<AdminCancelSessionVariables> varsSerializer = (AdminCancelSessionVariables vars) => jsonEncode(vars.toJson());
-  Future<OperationResult<AdminCancelSessionData, AdminCancelSessionVariables>> execute() {
+  SuperAdminCancelSessionVariablesBuilder(this._dataConnect, {required  this.sessionId,});
+  Deserializer<SuperAdminCancelSessionData> dataDeserializer = (dynamic json)  => SuperAdminCancelSessionData.fromJson(jsonDecode(json));
+  Serializer<SuperAdminCancelSessionVariables> varsSerializer = (SuperAdminCancelSessionVariables vars) => jsonEncode(vars.toJson());
+  Future<OperationResult<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>> execute() {
     return ref().execute();
   }
 
-  MutationRef<AdminCancelSessionData, AdminCancelSessionVariables> ref() {
-    AdminCancelSessionVariables vars= AdminCancelSessionVariables(sessionId: sessionId,);
-    return _dataConnect.mutation("AdminCancelSession", dataDeserializer, varsSerializer, vars);
+  MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables> ref() {
+    SuperAdminCancelSessionVariables vars= SuperAdminCancelSessionVariables(sessionId: sessionId,);
+    return _dataConnect.mutation("SuperAdminCancelSession", dataDeserializer, varsSerializer, vars);
   }
 }
 
 @immutable
-class AdminCancelSessionSessionUpdate {
+class SuperAdminCancelSessionSessionUpdate {
   final String id;
-  AdminCancelSessionSessionUpdate.fromJson(dynamic json):
+  SuperAdminCancelSessionSessionUpdate.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -32,7 +32,7 @@ class AdminCancelSessionSessionUpdate {
       return false;
     }
 
-    final AdminCancelSessionSessionUpdate otherTyped = other as AdminCancelSessionSessionUpdate;
+    final SuperAdminCancelSessionSessionUpdate otherTyped = other as SuperAdminCancelSessionSessionUpdate;
     return id == otherTyped.id;
     
   }
@@ -46,17 +46,17 @@ class AdminCancelSessionSessionUpdate {
     return json;
   }
 
-  AdminCancelSessionSessionUpdate({
+  SuperAdminCancelSessionSessionUpdate({
     required this.id,
   });
 }
 
 @immutable
-class AdminCancelSessionData {
-  final AdminCancelSessionSessionUpdate? session_update;
-  AdminCancelSessionData.fromJson(dynamic json):
+class SuperAdminCancelSessionData {
+  final SuperAdminCancelSessionSessionUpdate? session_update;
+  SuperAdminCancelSessionData.fromJson(dynamic json):
   
-  session_update = json['session_update'] == null ? null : AdminCancelSessionSessionUpdate.fromJson(json['session_update']);
+  session_update = json['session_update'] == null ? null : SuperAdminCancelSessionSessionUpdate.fromJson(json['session_update']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -66,7 +66,7 @@ class AdminCancelSessionData {
       return false;
     }
 
-    final AdminCancelSessionData otherTyped = other as AdminCancelSessionData;
+    final SuperAdminCancelSessionData otherTyped = other as SuperAdminCancelSessionData;
     return session_update == otherTyped.session_update;
     
   }
@@ -82,16 +82,16 @@ class AdminCancelSessionData {
     return json;
   }
 
-  AdminCancelSessionData({
+  SuperAdminCancelSessionData({
     this.session_update,
   });
 }
 
 @immutable
-class AdminCancelSessionVariables {
+class SuperAdminCancelSessionVariables {
   final String sessionId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
-  AdminCancelSessionVariables.fromJson(Map<String, dynamic> json):
+  SuperAdminCancelSessionVariables.fromJson(Map<String, dynamic> json):
   
   sessionId = nativeFromJson<String>(json['sessionId']);
   @override
@@ -103,7 +103,7 @@ class AdminCancelSessionVariables {
       return false;
     }
 
-    final AdminCancelSessionVariables otherTyped = other as AdminCancelSessionVariables;
+    final SuperAdminCancelSessionVariables otherTyped = other as SuperAdminCancelSessionVariables;
     return sessionId == otherTyped.sessionId;
     
   }
@@ -117,7 +117,7 @@ class AdminCancelSessionVariables {
     return json;
   }
 
-  AdminCancelSessionVariables({
+  SuperAdminCancelSessionVariables({
     required this.sessionId,
   });
 }

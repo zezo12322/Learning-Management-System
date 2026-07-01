@@ -1,4 +1,5 @@
-import { IsString, IsEnum, IsOptional, IsUUID, Matches } from 'class-validator';
+import { IsString, IsEnum, IsOptional, Matches } from 'class-validator';
+import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 
 /**
  * Upload targets the backend knows how to authorize and place. The client never
@@ -16,12 +17,12 @@ export class SignedUrlRequestDto {
   entityType: UploadEntityType;
 
   // Owning course — used both to derive the path and to authorize the caller.
-  @IsUUID()
+  @IsFlexUUID()
   courseId: string;
 
   // Required for lecture-scoped uploads.
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   lectureId?: string;
 
   // Original filename — sanitized server-side; only a safe display suffix is kept.
@@ -39,11 +40,11 @@ export class ConfirmUploadDto {
   @IsEnum(UploadEntityType)
   entityType: UploadEntityType;
 
-  @IsUUID()
+  @IsFlexUUID()
   courseId: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsFlexUUID()
   lectureId?: string;
 
   // The exact path returned by /signed-url. Re-validated against the caller's

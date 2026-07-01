@@ -2,59 +2,20 @@
 # INSTRUCTOR MANAGEMENT
 # ==========================================
 
-# Gets all student submissions pending review and grading
-query GetPendingSubmissions @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  missionSubmissions(
-    where: { status: { eq: PENDING } }, 
-    orderBy: [{ submittedAt: ASC }]
-  ) {
-    id
-    fileUrl
-    submittedAt
-    attemptNumber 
-    student { name email }
-    mission {
-      title
-      difficulty
-      course { title }
-    }
+query GetPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  missionSubmissions(where: { status: { eq: PENDING } }, orderBy: [{ submittedAt: ASC }]) {
+    id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
   }
 }
 
-# Adds a co-instructor to a course
-mutation AdminAddCourseInstructor(
-  $courseId: UUID!,
-  $userId: String!
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseInstructor_insert(
-    data: {
-      courseId: $courseId,
-      userId: $userId
-    }
-  )
+mutation AdminAddCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructor_insert(data: { courseId: $courseId, userId: $userId })
 }
 
-# Removes a co-instructor from a course
-mutation AdminRemoveCourseInstructor(
-  $courseId: UUID!,
-  $userId: String!
-) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseInstructor_delete(
-    key: {
-      courseId: $courseId,
-      userId: $userId
-    }
-  )
+mutation AdminRemoveCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructor_delete(key: { courseId: $courseId, userId: $userId })
 }
 
-# Lists all instructors for a specific course
-query GetCourseInstructors($courseId: UUID!) @auth(expr: "auth.token.role == 'admin' || auth.token.role == 'instructor'") {
-  courseInstructors(where: { courseId: { eq: $courseId } }) {
-    user {
-      id
-      name
-      email
-      avatar
-    }
-  }
+query GetCourseInstructors($courseId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructors(where: { courseId: { eq: $courseId } }) { user { id name email avatar } }
 }

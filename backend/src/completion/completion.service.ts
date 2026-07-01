@@ -82,6 +82,68 @@ export class CompletionService {
   }
 
   /**
+   * Admin/worker variant of {@link checkCourseCompletion}. Runs with the
+   * service-account credential (no auth.uid), scoping every query by an
+   * explicit `userId`. Invoked by the BullMQ progress worker, which has no
+   * end-user token. Behaviour is otherwise identical: when every lecture in the
+   * course is complete for that user, their enrollment is transitioned to
+   * COMPLETED.
+   */
+  async checkCourseCompletionAsAdmin(
+    courseId: string,
+    userId: string,
+  ): Promise<void> {
+    try {
+      const data = await this.dc.executeQueryAsAdmin(
+        'GetCourseCompletionStatusForUser',
+        { courseId, userId },
+      );
+
+      const sections = data?.sections ?? [];
+      let totalLectures = 0;
+      let completedLectures = 0;
+
+      for (const section of sections) {
+        const lectures = section.userCompletionLectures ?? [];
+        for (const lecture of lectures) {
+          totalLectures++;
+          if (lecture.userCompletionProgress?.[0]?.completedAt) {
+            completedLectures++;
+          }
+        }
+      }
+
+      this.logger.debug(
+        `Course ${courseId} (user ${userId}): ${completedLectures}/${totalLectures} lectures completed`,
+      );
+
+      if (totalLectures > 0 && completedLectures === totalLectures) {
+        const enrollmentData = await this.dc.executeQueryAsAdmin(
+          'GetUserEnrollmentForCourseByUser',
+          { courseId, userId },
+        );
+
+        const enrollment = enrollmentData?.enrollments?.[0];
+        if (enrollment && enrollment.status !== 'COMPLETED') {
+          await this.dc.executeMutationAsAdmin('UpdateEnrollmentStatus', {
+            enrollmentId: enrollment.id,
+            status: 'COMPLETED',
+            completedAt: new Date().toISOString(),
+          });
+
+          this.logger.log(
+            `Course ${courseId} enrollment ${enrollment.id} (user ${userId}) marked as COMPLETED`,
+          );
+        }
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed admin completion check for course ${courseId} / user ${userId}: ${error.message}`,
+      );
+    }
+  }
+
+  /**
    * Trigger 1: After a quiz is passed, mark the quiz lecture as completed.
    */
   async onQuizPassed(

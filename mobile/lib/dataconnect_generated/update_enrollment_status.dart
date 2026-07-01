@@ -24,45 +24,11 @@ class UpdateEnrollmentStatusVariablesBuilder {
 }
 
 @immutable
-class UpdateEnrollmentStatusEnrollmentUpdate {
-  final String id;
-  UpdateEnrollmentStatusEnrollmentUpdate.fromJson(dynamic json):
-  
-  id = nativeFromJson<String>(json['id']);
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final UpdateEnrollmentStatusEnrollmentUpdate otherTyped = other as UpdateEnrollmentStatusEnrollmentUpdate;
-    return id == otherTyped.id;
-    
-  }
-  @override
-  int get hashCode => id.hashCode;
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['id'] = nativeToJson<String>(id);
-    return json;
-  }
-
-  UpdateEnrollmentStatusEnrollmentUpdate({
-    required this.id,
-  });
-}
-
-@immutable
 class UpdateEnrollmentStatusData {
-  final UpdateEnrollmentStatusEnrollmentUpdate? enrollment_update;
+  final int enrollment_updateMany;
   UpdateEnrollmentStatusData.fromJson(dynamic json):
   
-  enrollment_update = json['enrollment_update'] == null ? null : UpdateEnrollmentStatusEnrollmentUpdate.fromJson(json['enrollment_update']);
+  enrollment_updateMany = nativeFromJson<int>(json['enrollment_updateMany']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -73,23 +39,21 @@ class UpdateEnrollmentStatusData {
     }
 
     final UpdateEnrollmentStatusData otherTyped = other as UpdateEnrollmentStatusData;
-    return enrollment_update == otherTyped.enrollment_update;
+    return enrollment_updateMany == otherTyped.enrollment_updateMany;
     
   }
   @override
-  int get hashCode => enrollment_update.hashCode;
+  int get hashCode => enrollment_updateMany.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    if (enrollment_update != null) {
-      json['enrollment_update'] = enrollment_update!.toJson();
-    }
+    json['enrollment_updateMany'] = nativeToJson<int>(enrollment_updateMany);
     return json;
   }
 
   UpdateEnrollmentStatusData({
-    this.enrollment_update,
+    required this.enrollment_updateMany,
   });
 }
 

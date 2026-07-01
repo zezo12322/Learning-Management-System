@@ -16,6 +16,20 @@ export const CourseStoragePaths = {
 
   lectureTranscript: (courseId: string, lectureId: string, filename: string) =>
     `courses/${courseId}/lectures/${lectureId}/transcript/${filename}`,
+
+  // --- Secure HLS streaming (AES-128) ---
+
+  /** Directory holding a lecture's packaged HLS assets (playlists, segments, key). */
+  lectureHlsDir: (courseId: string, lectureId: string) =>
+    `courses/${courseId}/lectures/${lectureId}/hls`,
+
+  /** The HLS master/media playlist. Stored as the lecture's `videoUrl` path. */
+  lectureHlsMaster: (courseId: string, lectureId: string) =>
+    `courses/${courseId}/lectures/${lectureId}/hls/master.m3u8`,
+
+  /** The AES-128 content key. Never served directly — only via the key endpoint. */
+  lectureHlsKey: (courseId: string, lectureId: string) =>
+    `courses/${courseId}/lectures/${lectureId}/hls/enc.key`,
 } as const;
 
 // ==========================================
