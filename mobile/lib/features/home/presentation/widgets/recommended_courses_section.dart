@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:optimatech_lms/features/home/data/models/recomended_course_model.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/recommended_course_card.dart';
 
 class RecommendedCoursesSection extends StatelessWidget {
   const RecommendedCoursesSection({super.key});
 
+  // TODO: Replace with actual data
   static const _courses = [
-    _RecommendedCourseData(
+    RecommendedCourseModel(
       title: 'Mobile App Design',
       subtitle: '8 lessons • 2h 10m',
       icon: Icons.smartphone_outlined,
       iconColor: Color(0xFF6366F1),
       iconBackgroundColor: Color(0xFFEEF2FF),
     ),
-    _RecommendedCourseData(
+    RecommendedCourseModel(
       title: 'Product Analytics',
       subtitle: '10 lessons • 3h 45m',
       icon: Icons.insights_outlined,
       iconColor: Color(0xFF22C55E),
       iconBackgroundColor: Color(0xFFECFDF5),
     ),
-    _RecommendedCourseData(
+    RecommendedCourseModel(
       title: 'User Research Methods',
       subtitle: '6 lessons • 1h 50m',
       icon: Icons.favorite_outline_rounded,
@@ -36,11 +38,13 @@ class RecommendedCoursesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ------------- Recommended Courses Header -------------
         HomeSectionHeader(
           title: 'Recommended Courses',
           onViewAllTap: () {},
         ),
         Gap(14.h),
+        // ------------- Recommended Courses List -------------
         Column(
           children: [
             for (var i = 0; i < _courses.length; i++) ...[
@@ -59,20 +63,4 @@ class RecommendedCoursesSection extends StatelessWidget {
       ],
     );
   }
-}
-
-class _RecommendedCourseData {
-  const _RecommendedCourseData({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.iconColor,
-    required this.iconBackgroundColor,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBackgroundColor;
 }
