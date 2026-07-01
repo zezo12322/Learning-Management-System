@@ -1,14 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
 import 'package:optimatech_lms/core/widgets/app_header/app_header.dart';
+import 'package:optimatech_lms/features/home/presentation/widgets/glass_bottom_navbar.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
 import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/popular_courses_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/recommended_courses_section.dart';
+import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
+import 'package:optimatech_lms/features/wishlist/presentation/views/wishlist_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,14 +24,52 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
-  int _selectedNavIndex = 0;
+class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+
+  int currentScreen = 0;
+  late List<AnimationController> iconControllers;
+
+  @override
+  void initState() {
+    super.initState();
+    iconControllers = List.generate(
+      4,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
+    iconControllers[currentScreen].forward();
+  }
+
+  @override
+  void dispose() {
+    // controller.dispose();
+    for (var c in iconControllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  // Function to handle tab selection in the bottom navigation bar
+  void onTabTapped(int index) {
+    if (index == currentScreen) return;
+    setState(() => currentScreen = index);
+    if (index >= 0 && index < iconControllers.length) {
+      iconControllers[index].forward();
+    }
+    for (var i = 0; i < iconControllers.length; i++) {
+      if (i != index) iconControllers[i].reverse();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.surface,
-      body: SafeArea(
+    // Build body depending on the current selected tab.
+    Widget bodyWidget;
+    if (currentScreen == 0) {
+      bodyWidget = SafeArea(
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -78,6 +121,7 @@ class _HomeViewState extends State<HomeView> {
                     // ------------- Assignments Section -------------
                     const AssignmentsSection(),
                     Gap(28.h),
+                    // ------------- Recommended Courses Section -------------
                     const RecommendedCoursesSection(),
                     Gap(24.h),
                   ],
@@ -86,100 +130,45 @@ class _HomeViewState extends State<HomeView> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: _HomeBottomNavigationBar(
-        selectedIndex: _selectedNavIndex,
-        onDestinationSelected: (index) {
-          setState(() => _selectedNavIndex = index);
-        },
-      ),
-    );
-  }
-}
+      );
+    } else if (currentScreen == 1) {
+      bodyWidget = const CoursesView();
+    } else if (currentScreen == 2) {
+      bodyWidget = const WishlistView();
+    } else if (currentScreen == 3) {
+      bodyWidget = const ProfileView();
+    } else {
+      bodyWidget = const SizedBox.shrink();
+    }
 
-class _HomeBottomNavigationBar extends StatelessWidget {
-  const _HomeBottomNavigationBar({
-    required this.selectedIndex,
-    required this.onDestinationSelected,
-  });
-
-  final int selectedIndex;
-  final ValueChanged<int> onDestinationSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.border),
-        ),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          navigationBarTheme: NavigationBarThemeData(
-            height: 72.h,
-            backgroundColor: AppColors.surface,
-            indicatorColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            elevation: 0,
-            labelTextStyle: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                  fontFamily: 'Poppins',
-                );
-              }
-              return TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
-                fontFamily: 'Poppins',
-              );
-            }),
-            iconTheme: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return IconThemeData(
-                  color: AppColors.primary,
-                  size: 24.sp,
-                );
-              }
-              return IconThemeData(
-                color: AppColors.textSecondary,
-                size: 24.sp,
-              );
-            }),
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      body: bodyWidget,
+      bottomNavigationBar: GlassBottomNavBar(
+        currentIndex: currentScreen,
+        onTap: onTabTapped,
+        items: [
+          BottomNavItemData(
+            label: 'Home',
+            icon: const Icon(CupertinoIcons.home),
+            filledIcon: const Icon(CupertinoIcons.house_fill),
           ),
-        ),
-        child: NavigationBar(
-          selectedIndex: selectedIndex,
-          onDestinationSelected: onDestinationSelected,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home_rounded),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.menu_book_outlined),
-              selectedIcon: Icon(Icons.menu_book_rounded),
-              label: 'Courses',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.bookmark_outline_rounded),
-              selectedIcon: Icon(Icons.bookmark_rounded),
-              label: 'Saved',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              selectedIcon: Icon(Icons.person_rounded),
-              label: 'Profile',
-            ),
-          ],
-        ),
+          BottomNavItemData(
+            label: 'Courses',
+            icon: const Icon(CupertinoIcons.book_fill),
+            filledIcon: const Icon(CupertinoIcons.book_fill),
+          ),
+          BottomNavItemData(
+            label: 'wishlist',
+            icon: const Icon(Icons.table_bar_outlined),
+            filledIcon: const Icon(Icons.table_bar_rounded),
+          ),
+          BottomNavItemData(
+            label: 'Profile',
+            icon: const Icon(CupertinoIcons.person_alt_circle),
+            filledIcon: const Icon(Icons.person),
+          ),
+        ],
       ),
     );
   }
