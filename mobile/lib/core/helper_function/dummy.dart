@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:optimatech_lms/features/courses/domain/entities/category_entity.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import '../../features/courses/presentation/views/widgets/courses_category_Section.dart';
 import '../utils/app_colors.dart';
@@ -14,7 +15,17 @@ CourseEntity get dummySkeletonCourseItem => const CourseEntity(
   language: '',
   categoryName: '',
   tags: [],
-  instructors: [CourseInstructorEntity(name: 'Instructor name', avatar: null)]
+  instructors: [CourseInstructorEntity(name: 'Instructor name', avatar: null)],
+  avgRating: 4.4,
+  ratingCount: 500,
+  isBookmarked: false,
+);
+
+
+CategoryEntity get dummySkeletonCategoryItem => const CategoryEntity(
+  id: '_',
+  name: 'Category',
+  description: 'Category description placeholder',
 );
 
 List<CourseEntity> get sampleCourses => [
@@ -35,6 +46,8 @@ List<CourseEntity> get sampleCourses => [
     isBookmarked: false,
     thumbnail:
     'https://blog.pwskills.com/wp-content/uploads/2025/08/ux-design-courses.jpg',
+    avgRating: 4.3,
+    ratingCount: 600,
   ),
   const CourseEntity(
     id: '2',
@@ -53,6 +66,8 @@ List<CourseEntity> get sampleCourses => [
     isBookmarked: false,
     thumbnail:
     'https://blog.pwskills.com/wp-content/uploads/2025/08/ux-design-courses.jpg',
+    avgRating: 4.3,
+    ratingCount: 600,
   ),
   const CourseEntity(
     id: '3',
@@ -71,6 +86,8 @@ List<CourseEntity> get sampleCourses => [
     isBookmarked: false,
     thumbnail:
     'https://blog.pwskills.com/wp-content/uploads/2025/08/ux-design-courses.jpg',
+    avgRating: 4.3,
+    ratingCount: 600,
   ),
   const CourseEntity(
     id: '4',
@@ -89,6 +106,8 @@ List<CourseEntity> get sampleCourses => [
     isBookmarked: false,
     thumbnail:
     'https://blog.pwskills.com/wp-content/uploads/2025/08/ux-design-courses.jpg',
+    avgRating: 4.3,
+    ratingCount: 600,
   ),
   const CourseEntity(
     id: '5',
@@ -107,6 +126,8 @@ List<CourseEntity> get sampleCourses => [
     isBookmarked: false,
     thumbnail:
     'https://blog.pwskills.com/wp-content/uploads/2025/08/ux-design-courses.jpg',
+    avgRating: 4.3,
+    ratingCount: 600,
   ),
 ];
 
