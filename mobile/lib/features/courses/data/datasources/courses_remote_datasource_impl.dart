@@ -12,7 +12,7 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
   @override
   Future<List<CourseModel>> getPublishedCourses() async{
     try{
-      final result = await _connector.listPublishedCourses().execute(fetchPolicy: QueryFetchPolicy.serverOnly);
+      final result = await _connector.listPublishedCourses().execute();
 
       return result.data.courses.map(CourseModel.fromConnectorResult).toList();
     } on DataConnectError catch (e) {

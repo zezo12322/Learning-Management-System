@@ -3,7 +3,7 @@ class CourseEntity {
   final String id;
   final String title;
   final String? description;
-  final int price;
+  final double price;
   final String courseStatus; // DRAFT | PUBLISHED | ARCHIVED
   final String language;
   final String level; // BEGINNER | INTERMEDIATE | ADVANCED
