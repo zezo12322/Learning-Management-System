@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:optimatech_lms/features/courses/domain/entities/category_entity.dart';
+import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
+import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_state.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../../core/helper_function/dummy.dart';
 
@@ -41,23 +46,83 @@ class CoursesCategorySection extends StatelessWidget {
             onTap: () {},
           ),
           Gap(16.h),
-          SizedBox(
-            height: 72.h,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              separatorBuilder: (context, index) => Gap(12.w),
-              itemBuilder: (context, i) {
-                return CategoryItem(
-                  category: categories[i],
-                  isSelected: i == selectedIndex,
-                  onTap: () => onSelected(i),
-                );
-              },
-            ),
-          ),
+          CategoriesList(categories: categories, selectedIndex: selectedIndex, onSelected: onSelected),
         ],
       ),
+    );
+  }
+}
+
+class CategoriesList extends StatelessWidget {
+  const CategoriesList({
+    super.key,
+    required this.categories,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<CourseCategory> categories;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CategoriesCubit, CategoriesState>(
+    builder: (context, state) {
+      switch (state.status) {
+        case CategoriesStatus.initial:
+        case CategoriesStatus.loading:
+        return Skeletonizer(
+          child: SizedBox(
+            height: 72.h,
+            child: _CategoriesListView(
+              categories: List.generate(5, (_) => dummySkeletonCategoryItem),
+              selectedIndex: selectedIndex,
+              onSelected: onSelected,
+            ),
+          ),
+        );
+        case CategoriesStatus.failure:
+          return Text('حدث خطأ غير متوقع: ${state.errorMessage}');
+        case CategoriesStatus.loaded:
+          return SizedBox(
+            height: 42.h,
+            child: _CategoriesListView(
+              categories: state.categories,
+              selectedIndex: selectedIndex,
+              onSelected: onSelected,
+            ),
+          );
+      }
+    },
+  );
+  }
+}
+
+class _CategoriesListView extends StatelessWidget {
+  const _CategoriesListView({
+    required this.categories,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<CategoryEntity> categories;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: categories.length,
+      separatorBuilder: (context, index) => Gap(12.w),
+      itemBuilder: (context, i) {
+        return CategoryItem(
+          category: categories[i],
+          isSelected: i == selectedIndex,
+          onTap: () => onSelected(i),
+        );
+      },
     );
   }
 }
@@ -70,7 +135,7 @@ class CategoryItem extends StatelessWidget {
     required this.onTap,
   });
 
-  final CourseCategory category;
+  final CategoryEntity category;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -81,7 +146,7 @@ class CategoryItem extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 72.w,
-        height: 72.w,
+        height: 42.w,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
           color: isSelected
@@ -95,16 +160,16 @@ class CategoryItem extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(
-              category.icon,
-              size: 24.r,
-              color: isSelected ? context.theme.colorScheme.primary : category.iconColor,
-            ),
-            Gap(6.h),
+            // Icon(
+            //   category.icon,
+            //   size: 24.r,
+            //   color: isSelected ? context.theme.colorScheme.primary : category.iconColor,
+            // ),
+            // Gap(6.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: Text(
-                category.label,
+                category.name,
                 style: context.textTheme.labelSmall?.copyWith(
                   color: isSelected
                       ? context.theme.colorScheme.primary
