@@ -111,3 +111,11 @@ mutation AdminMoveLectureToSection($lectureId: UUID!, $newSectionId: UUID!, $ord
 mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   courseLecture_updateMany(where: { sectionId: { eq: $sectionId }, deletedAt: { eq: null } }, data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" })
 }
+# Retrieves all platform categories (e.g., for dropdowns and filtering)
+query ListCategories @auth(level: PUBLIC, insecureReason: "Categories are public taxonomy data.") {
+  categories(orderBy: [{ name: ASC }]) {
+    id
+    name
+    description
+  }
+}

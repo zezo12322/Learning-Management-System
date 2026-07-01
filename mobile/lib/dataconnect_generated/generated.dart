@@ -68,6 +68,8 @@ part 'admin_move_lecture_to_section.dart';
 
 part 'admin_soft_delete_lectures_by_section.dart';
 
+part 'list_categories.dart';
+
 part 'log_payment.dart';
 
 part 'add_payment_item.dart';
@@ -900,6 +902,11 @@ class DefaultConnector {
   
   AdminSoftDeleteLecturesBySectionVariablesBuilder adminSoftDeleteLecturesBySection ({required String sectionId, }) {
     return AdminSoftDeleteLecturesBySectionVariablesBuilder(dataConnect, sectionId: sectionId,);
+  }
+  
+  
+  ListCategoriesVariablesBuilder listCategories () {
+    return ListCategoriesVariablesBuilder(dataConnect, );
   }
   
   
