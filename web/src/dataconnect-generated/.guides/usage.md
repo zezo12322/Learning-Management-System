@@ -12,28 +12,28 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetPendingSubmissions, useAdminAddCourseInstructor, useAdminRemoveCourseInstructor, useGetCourseInstructors, useGetQuizQuestions, useStartQuizAttempt, useSubmitQuizAnswer, useFinishQuizAttemptIfOpen, useGetExpiredAttempts, useGetUserQuizAttempts } from '@dataconnect/generated/react';
+import { useGetCourseSessions, useCheckInToSession, useSyncUser, useGetMe, useUpdateMyProfile, useAdminCreateCourse, useInstructorDeleteCourse, useSuperAdminDeleteCourse, useAdminCreateSession, useInstructorCancelSession } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
-const { data, isPending, isSuccess, isError, error } = useGetPendingSubmissions();
+const { data, isPending, isSuccess, isError, error } = useGetCourseSessions(getCourseSessionsVars);
 
-const { data, isPending, isSuccess, isError, error } = useAdminAddCourseInstructor(adminAddCourseInstructorVars);
+const { data, isPending, isSuccess, isError, error } = useCheckInToSession(checkInToSessionVars);
 
-const { data, isPending, isSuccess, isError, error } = useAdminRemoveCourseInstructor(adminRemoveCourseInstructorVars);
+const { data, isPending, isSuccess, isError, error } = useSyncUser(syncUserVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetCourseInstructors(getCourseInstructorsVars);
+const { data, isPending, isSuccess, isError, error } = useGetMe();
 
-const { data, isPending, isSuccess, isError, error } = useGetQuizQuestions(getQuizQuestionsVars);
+const { data, isPending, isSuccess, isError, error } = useUpdateMyProfile(updateMyProfileVars);
 
-const { data, isPending, isSuccess, isError, error } = useStartQuizAttempt(startQuizAttemptVars);
+const { data, isPending, isSuccess, isError, error } = useAdminCreateCourse(adminCreateCourseVars);
 
-const { data, isPending, isSuccess, isError, error } = useSubmitQuizAnswer(submitQuizAnswerVars);
+const { data, isPending, isSuccess, isError, error } = useInstructorDeleteCourse(instructorDeleteCourseVars);
 
-const { data, isPending, isSuccess, isError, error } = useFinishQuizAttemptIfOpen(finishQuizAttemptIfOpenVars);
+const { data, isPending, isSuccess, isError, error } = useSuperAdminDeleteCourse(superAdminDeleteCourseVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetExpiredAttempts();
+const { data, isPending, isSuccess, isError, error } = useAdminCreateSession(adminCreateSessionVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetUserQuizAttempts(getUserQuizAttemptsVars);
+const { data, isPending, isSuccess, isError, error } = useInstructorCancelSession(instructorCancelSessionVars);
 
 ```
 
@@ -72,38 +72,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors, getQuizQuestions, startQuizAttempt, submitQuizAnswer, finishQuizAttemptIfOpen, getExpiredAttempts, getUserQuizAttempts } from '@dataconnect/generated';
+import { getCourseSessions, checkInToSession, syncUser, getMe, updateMyProfile, adminCreateCourse, instructorDeleteCourse, superAdminDeleteCourse, adminCreateSession, instructorCancelSession } from '@dataconnect/generated';
 
 
-// Operation GetPendingSubmissions: 
-const { data } = await GetPendingSubmissions(dataConnect);
+// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
+const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
 
-// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
-const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
+// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
+const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
 
-// Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
-const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
+// Operation SyncUser:  For variables, look at type SyncUserVars in ../index.d.ts
+const { data } = await SyncUser(dataConnect, syncUserVars);
 
-// Operation GetCourseInstructors:  For variables, look at type GetCourseInstructorsVars in ../index.d.ts
-const { data } = await GetCourseInstructors(dataConnect, getCourseInstructorsVars);
+// Operation GetMe: 
+const { data } = await GetMe(dataConnect);
 
-// Operation GetQuizQuestions:  For variables, look at type GetQuizQuestionsVars in ../index.d.ts
-const { data } = await GetQuizQuestions(dataConnect, getQuizQuestionsVars);
+// Operation UpdateMyProfile:  For variables, look at type UpdateMyProfileVars in ../index.d.ts
+const { data } = await UpdateMyProfile(dataConnect, updateMyProfileVars);
 
-// Operation StartQuizAttempt:  For variables, look at type StartQuizAttemptVars in ../index.d.ts
-const { data } = await StartQuizAttempt(dataConnect, startQuizAttemptVars);
+// Operation AdminCreateCourse:  For variables, look at type AdminCreateCourseVars in ../index.d.ts
+const { data } = await AdminCreateCourse(dataConnect, adminCreateCourseVars);
 
-// Operation SubmitQuizAnswer:  For variables, look at type SubmitQuizAnswerVars in ../index.d.ts
-const { data } = await SubmitQuizAnswer(dataConnect, submitQuizAnswerVars);
+// Operation InstructorDeleteCourse:  For variables, look at type InstructorDeleteCourseVars in ../index.d.ts
+const { data } = await InstructorDeleteCourse(dataConnect, instructorDeleteCourseVars);
 
-// Operation FinishQuizAttemptIfOpen:  For variables, look at type FinishQuizAttemptIfOpenVars in ../index.d.ts
-const { data } = await FinishQuizAttemptIfOpen(dataConnect, finishQuizAttemptIfOpenVars);
+// Operation SuperAdminDeleteCourse:  For variables, look at type SuperAdminDeleteCourseVars in ../index.d.ts
+const { data } = await SuperAdminDeleteCourse(dataConnect, superAdminDeleteCourseVars);
 
-// Operation GetExpiredAttempts: 
-const { data } = await GetExpiredAttempts(dataConnect);
+// Operation AdminCreateSession:  For variables, look at type AdminCreateSessionVars in ../index.d.ts
+const { data } = await AdminCreateSession(dataConnect, adminCreateSessionVars);
 
-// Operation GetUserQuizAttempts:  For variables, look at type GetUserQuizAttemptsVars in ../index.d.ts
-const { data } = await GetUserQuizAttempts(dataConnect, getUserQuizAttemptsVars);
+// Operation InstructorCancelSession:  For variables, look at type InstructorCancelSessionVars in ../index.d.ts
+const { data } = await InstructorCancelSession(dataConnect, instructorCancelSessionVars);
 
 
 ```
