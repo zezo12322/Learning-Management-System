@@ -13,15 +13,15 @@ class PopularCourseCard extends StatelessWidget {
     required this.headerColor,
     required this.icon,
     this.onTap,
+    required this.image,
   });
-
   final String title;
   final String studentCount;
   final double rating;
   final Color headerColor;
   final IconData icon;
+  final String image;
   final VoidCallback? onTap;
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -39,13 +39,13 @@ class PopularCourseCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _CourseHeader(
-                color: headerColor,
-                rating: rating,
-                icon: icon,
+              CourseHeader(
+                courseImage: image,
+                headerContainerColor: headerColor,
+                headerContainerIcon: icon,
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 14.h),
+                padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 0.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -56,7 +56,7 @@ class PopularCourseCard extends StatelessWidget {
                         fontWeight: FontWeights.bold,
                         color: AppColors.textPrimary,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Gap(8.h),
@@ -78,6 +78,27 @@ class PopularCourseCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        Gap(8.w),
+                        Text(
+                          '•',
+                          style: TextStyles.labelSmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        Gap(8.w),
+                        Icon(
+                          Icons.star_rounded,
+                          size: 14.sp,
+                          color: AppColors.warning,
+                        ),
+                        Gap(4.w),
+                        Text(
+                          rating.toStringAsFixed(1),
+                          style: TextStyles.labelSmall.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeights.semiBold,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -91,61 +112,50 @@ class PopularCourseCard extends StatelessWidget {
   }
 }
 
-class _CourseHeader extends StatelessWidget {
-  const _CourseHeader({
-    required this.color,
-    required this.rating,
-    required this.icon,
+class CourseHeader extends StatelessWidget {
+  const CourseHeader({
+    super.key,
+    required this.courseImage,
+    required this.headerContainerColor,
+    required this.headerContainerIcon,
   });
 
-  final Color color;
-  final double rating;
-  final IconData icon;
+  final String courseImage;
+  final Color headerContainerColor;
+  final IconData headerContainerIcon;
 
   @override
   Widget build(BuildContext context) {
+    final imageProvider = courseImage.startsWith('http')
+        ? NetworkImage(courseImage)
+        : AssetImage(courseImage) as ImageProvider;
+
     return Container(
-      height: 96.h,
+      height: 130.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: color,
         borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+        image: DecorationImage(
+          image: imageProvider,
+          fit: BoxFit.cover,
+        ),
       ),
       child: Stack(
         children: [
-          Center(
-            child: Icon(
-              icon,
-              size: 40.sp,
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
-          ),
           Positioned(
-            top: 10.h,
-            right: 10.w,
+            top: 14.h,
+            left: 12.w,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              width: 44.w,
+              height: 44.w,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.r),
+                color: headerContainerColor.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(14.r),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.star_rounded,
-                    size: 14.sp,
-                    color: AppColors.warning,
-                  ),
-                  Gap(2.w),
-                  Text(
-                    rating.toStringAsFixed(1),
-                    style: TextStyles.labelSmall.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeights.semiBold,
-                    ),
-                  ),
-                ],
+              child: Icon(
+                headerContainerIcon,
+                size: 24.sp,
+                color: AppColors.whiteColor,
               ),
             ),
           ),
