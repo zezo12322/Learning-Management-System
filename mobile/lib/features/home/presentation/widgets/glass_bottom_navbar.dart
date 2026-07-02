@@ -75,8 +75,8 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                 child: Container(
                   height: 60,
                   decoration: BoxDecoration(
-                    color: context.theme.colorScheme.surface
-                        .withValues(alpha: 0.16),
+                    color: context.theme.scaffoldBackgroundColor
+                        .withValues(alpha: 0.94),
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(
                       color: context.theme.colorScheme.onSurface

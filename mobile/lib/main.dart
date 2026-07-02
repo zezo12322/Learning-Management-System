@@ -13,7 +13,8 @@ import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -52,7 +53,7 @@ class OptimaTechLMS extends StatelessWidget {
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context, child){
+      builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           // Localization
@@ -60,7 +61,7 @@ class OptimaTechLMS extends StatelessWidget {
           supportedLocales: context.supportedLocales,
           localizationsDelegates: context.localizationDelegates,
           // Theme
-          themeMode: ThemeMode.system,
+          themeMode: ThemeMode.dark,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
           // Routing

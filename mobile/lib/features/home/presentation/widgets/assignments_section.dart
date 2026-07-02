@@ -15,14 +15,14 @@ class AssignmentsSection extends StatelessWidget {
       status: 'Available',
       description: 'Open for submission',
       icon: Icons.description_outlined,
-      iconColor: Color(0xFF6366F1),
+      iconColor: AppColors.primary,
     ),
     AssignmentModel(
       count: 3,
       status: 'Submitted',
       description: 'Awaiting review',
       icon: Icons.send_outlined,
-      iconColor: Color(0xFF0EA5E9),
+      iconColor: AppColors.secondary,
     ),
     AssignmentModel(
       count: 2,
@@ -53,7 +53,7 @@ class AssignmentsSection extends StatelessWidget {
         Gap(14.h),
         // ------------- Assignments / Missions Cards -------------
         SizedBox(
-          height: 148.h,
+          height: 168.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: _assignments.length,

@@ -16,7 +16,7 @@ Widget glassContainer({required Widget child}) {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.whiteColor.withValues(alpha: 0.1),
                 child: Lottie.asset(
                   'assets/lottie/burger.json',
                   fit: BoxFit.cover,
@@ -45,10 +45,10 @@ Widget glassContainer({required Widget child}) {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: AppColors.whiteColor.withValues(alpha: 0.1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
+                  color: AppColors.blackColor.withValues(alpha: 0.4),
                   blurRadius: 80,
                   offset: const Offset(0, 40),
                 ),

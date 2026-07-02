@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
 class PopularCourseCard extends StatelessWidget {
@@ -24,8 +23,10 @@ class PopularCourseCard extends StatelessWidget {
   final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Material(
-      color: AppColors.surface,
+      color: colorScheme.surface,
       borderRadius: BorderRadius.circular(18.r),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -34,7 +35,7 @@ class PopularCourseCard extends StatelessWidget {
           width: 168.w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18.r),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colorScheme.outline),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +55,7 @@ class PopularCourseCard extends StatelessWidget {
                       style: TextStyles.labelLarge.copyWith(
                         fontSize: 14.sp,
                         fontWeight: FontWeights.bold,
-                        color: AppColors.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -65,14 +66,14 @@ class PopularCourseCard extends StatelessWidget {
                         Icon(
                           Icons.people_outline_rounded,
                           size: 14.sp,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                         Gap(4.w),
                         Expanded(
                           child: Text(
                             studentCount,
                             style: TextStyles.labelSmall.copyWith(
-                              color: AppColors.textSecondary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -82,20 +83,20 @@ class PopularCourseCard extends StatelessWidget {
                         Text(
                           '•',
                           style: TextStyles.labelSmall.copyWith(
-                            color: AppColors.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         Gap(8.w),
                         Icon(
                           Icons.star_rounded,
                           size: 14.sp,
-                          color: AppColors.warning,
+                          color: colorScheme.secondary,
                         ),
                         Gap(4.w),
                         Text(
                           rating.toStringAsFixed(1),
                           style: TextStyles.labelSmall.copyWith(
-                            color: AppColors.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                             fontWeight: FontWeights.semiBold,
                           ),
                         ),
@@ -129,6 +130,7 @@ class CourseHeader extends StatelessWidget {
     final imageProvider = courseImage.startsWith('http')
         ? NetworkImage(courseImage)
         : AssetImage(courseImage) as ImageProvider;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       height: 130.h,
@@ -155,7 +157,7 @@ class CourseHeader extends StatelessWidget {
               child: Icon(
                 headerContainerIcon,
                 size: 24.sp,
-                color: AppColors.whiteColor,
+                color: colorScheme.onPrimary,
               ),
             ),
           ),

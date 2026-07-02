@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
 class HomeSectionHeader extends StatelessWidget {
@@ -22,7 +21,7 @@ class HomeSectionHeader extends StatelessWidget {
             title,
             style: TextStyles.titleSmall.copyWith(
               fontSize: 18.sp,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -37,14 +36,14 @@ class HomeSectionHeader extends StatelessWidget {
                 Text(
                   'View all',
                   style: TextStyles.labelMedium.copyWith(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeights.medium,
                   ),
                 ),
                 Icon(
                   Icons.chevron_right_rounded,
                   size: 18.sp,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
