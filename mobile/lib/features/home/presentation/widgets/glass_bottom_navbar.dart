@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/core/utils/extension.dart';
 
 class GlassBottomNavBar extends StatefulWidget {
   final int currentIndex;
@@ -57,7 +57,7 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
       padding: EdgeInsets.symmetric(horizontal: 25, vertical: verticalPadding),
       child: Material(
         elevation: 10,
-        shadowColor: Colors.black,
+        shadowColor: context.theme.shadowColor.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(100),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -75,14 +75,17 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                 child: Container(
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: context.theme.colorScheme.surface
+                        .withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: context.theme.colorScheme.onSurface
+                          .withValues(alpha: 0.08),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: context.theme.colorScheme.onSurface
+                            .withValues(alpha: 0.08),
                         blurRadius: 25,
                         offset: const Offset(10, 40),
                       ),
@@ -105,15 +108,17 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withValues(alpha: 0.8),
-                                Colors.white.withValues(alpha: 0.9),
+                                context.theme.colorScheme.primary,
+                                context.theme.colorScheme.primary
+                                    .withValues(alpha: 0.82),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withValues(alpha: 0.4),
+                                color: context.theme.colorScheme.primary
+                                    .withValues(alpha: 0.22),
                                 blurRadius: 20,
                               ),
                             ],
@@ -149,8 +154,8 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                                 height: 60,
                                 decoration: isSelected
                                     ? BoxDecoration(
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.4),
+                                        color: context.theme.colorScheme.primary
+                                            .withValues(alpha: 0.12),
                                         borderRadius:
                                             BorderRadius.circular(100),
                                       )
@@ -172,9 +177,9 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                                         data: IconThemeData(
                                           size: isSelected ? 22 : 19,
                                           color: isSelected
-                                              ? AppColors.primary
-                                                  .withValues(alpha: 0.9)
-                                              : Colors.black54,
+                                              ? context.theme.colorScheme.primary
+                                              : context.theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.9),
                                         ),
                                         child: isSelected
                                             ? item.filledIcon
@@ -186,11 +191,11 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                                       item.label,
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.w600,
                                         color: isSelected
-                                            ? AppColors.primary
-                                                .withValues(alpha: 0.6)
-                                            : Colors.black54,
+                                            ? context.theme.colorScheme.primary
+                                            : context.theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.9),
                                       ),
                                     ),
                                   ],

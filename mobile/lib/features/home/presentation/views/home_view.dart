@@ -160,8 +160,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ),
           BottomNavItemData(
             label: 'wishlist',
-            icon: const Icon(Icons.table_bar_outlined),
-            filledIcon: const Icon(Icons.table_bar_rounded),
+            icon: const Icon(CupertinoIcons.heart),
+            filledIcon: const Icon(CupertinoIcons.heart_fill),
           ),
           BottomNavItemData(
             label: 'Profile',
