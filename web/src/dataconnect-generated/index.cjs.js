@@ -285,6 +285,21 @@ exports.verifyCertificate = function verifyCertificate(dcOrVars, varsOrOptions, 
 }
 ;
 
+const listCategoriesRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListCategories');
+}
+listCategoriesRef.operationName = 'ListCategories';
+exports.listCategoriesRef = listCategoriesRef;
+
+exports.listCategories = function listCategories(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(listCategoriesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
 const listPublishedCoursesRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
@@ -297,6 +312,21 @@ exports.listPublishedCourses = function listPublishedCourses(dcOrOptions, option
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
   return executeQuery(listPublishedCoursesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const searchPublishedCoursesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'SearchPublishedCourses', inputVars);
+}
+searchPublishedCoursesRef.operationName = 'SearchPublishedCourses';
+exports.searchPublishedCoursesRef = searchPublishedCoursesRef;
+
+exports.searchPublishedCourses = function searchPublishedCourses(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(searchPublishedCoursesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
@@ -570,21 +600,6 @@ exports.adminSoftDeleteLecturesBySectionRef = adminSoftDeleteLecturesBySectionRe
 exports.adminSoftDeleteLecturesBySection = function adminSoftDeleteLecturesBySection(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(adminSoftDeleteLecturesBySectionRef(dcInstance, inputVars));
-}
-;
-
-const listCategoriesRef = (dc) => {
-  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'ListCategories');
-}
-listCategoriesRef.operationName = 'ListCategories';
-exports.listCategoriesRef = listCategoriesRef;
-
-exports.listCategories = function listCategories(dcOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(listCategoriesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 

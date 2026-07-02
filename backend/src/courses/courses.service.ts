@@ -4,7 +4,33 @@ import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto, CourseStatus }
 
 @Injectable()
 export class CoursesService {
-  constructor(private readonly dc: DataConnectService) {}
+  constructor(private readonly dc: DataConnectService) { }
+
+  // ==========================================
+  // PUBLIC / STUDENT QUERIES
+  // ==========================================
+
+  async searchCatalog(searchQuery: string, authToken: string) {
+    const data = await this.dc.executeQuery(
+      'SearchPublishedCourses',
+      { searchQuery },
+      authToken,
+    );
+    return data?.courses ?? [];
+  }
+
+  async getCategories(authToken: string) {
+    const data = await this.dc.executeQuery(
+      'ListCategories',
+      {},
+      authToken,
+    );
+    return data?.categories ?? [];
+  }
+
+  // ==========================================
+  // ADMIN / INSTRUCTOR MANAGEMENT
+  // ==========================================
 
   async create(dto: CreateCourseDto, authToken: string) {
     return this.dc.executeMutation(
