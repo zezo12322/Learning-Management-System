@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
 class ContinueLearningCard extends StatelessWidget {
@@ -29,10 +28,13 @@ class ContinueLearningCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progressPercent = (progress * 100).round();
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Material(
-      color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+      color: colorScheme.surface,
       elevation: 4,
-      shadowColor: Colors.black.withValues(alpha: 0.1),
+      shadowColor: theme.shadowColor.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(20.r),
       child: InkWell(
         onTap: onTap,
@@ -76,7 +78,7 @@ class ContinueLearningCard extends StatelessWidget {
                           style: TextStyles.labelLarge.copyWith(
                             fontSize: 15.sp,
                             fontWeight: FontWeights.bold,
-                            color: AppColors.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -113,8 +115,8 @@ class ContinueLearningCard extends StatelessWidget {
                             child: LinearProgressIndicator(
                               value: progress,
                               minHeight: 8.h,
-                              backgroundColor: AppColors.disableBackground,
-                              color: Theme.of(context).colorScheme.primary,
+                              backgroundColor: colorScheme.surfaceDim,
+                              color: colorScheme.primary,
                             ),
                           ),
                         ),
@@ -122,7 +124,7 @@ class ContinueLearningCard extends StatelessWidget {
                         Text(
                           '$progressPercent%',
                           style: TextStyles.labelMedium.copyWith(
-                            color: AppColors.textPrimary,
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeights.semiBold,
                           ),
                         ),
@@ -146,7 +148,7 @@ class ContinueLearningCard extends StatelessWidget {
                         height: 44.w,
                         child: Icon(
                           Icons.play_arrow_rounded,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           size: 28.sp,
                         ),
                       ),
@@ -165,11 +167,13 @@ class ContinueLearningCard extends StatelessWidget {
 class _CourseThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: 88.w,
       height: 88.w,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
         image: const DecorationImage(
           image: NetworkImage(
@@ -193,6 +197,8 @@ class _MetaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Flexible(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -200,14 +206,14 @@ class _MetaItem extends StatelessWidget {
           Icon(
             icon,
             size: 14.sp,
-            color: AppColors.textSecondary,
+            color: colorScheme.onSurfaceVariant,
           ),
           Gap(4.w),
           Flexible(
             child: Text(
               label,
               style: TextStyles.labelSmall.copyWith(
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

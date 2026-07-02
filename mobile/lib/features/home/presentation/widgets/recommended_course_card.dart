@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
 class RecommendedCourseCard extends StatelessWidget {
@@ -24,8 +23,10 @@ class RecommendedCourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Material(
-      color: AppColors.surface,
+      color: colorScheme.surface,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: onTap,
@@ -34,7 +35,7 @@ class RecommendedCourseCard extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colorScheme.outline),
           ),
           child: Row(
             children: [
@@ -60,7 +61,7 @@ class RecommendedCourseCard extends StatelessWidget {
                       title,
                       style: TextStyles.labelLarge.copyWith(
                         fontWeight: FontWeights.bold,
-                        color: AppColors.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -69,7 +70,7 @@ class RecommendedCourseCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyles.labelSmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -78,7 +79,7 @@ class RecommendedCourseCard extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 size: 22.sp,
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
             ],
           ),

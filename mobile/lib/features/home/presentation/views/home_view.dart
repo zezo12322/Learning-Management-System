@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
@@ -142,7 +141,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: bodyWidget,
       bottomNavigationBar: GlassBottomNavBar(
         currentIndex: currentScreen,

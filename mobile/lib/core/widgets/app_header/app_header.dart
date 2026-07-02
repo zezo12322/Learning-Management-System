@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/core/widgets/app_header/notification_button.dart';
 import 'package:optimatech_lms/core/widgets/app_header/app_header_avatar.dart';
@@ -23,6 +22,9 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Row(
       children: [
         AppHeaderAvatar(profilePicture: profilePicture),
@@ -34,7 +36,7 @@ class AppHeader extends StatelessWidget {
               Text(
                 'Welcome back, 👋',
                 style: TextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
               Text(
@@ -42,7 +44,7 @@ class AppHeader extends StatelessWidget {
                 style: TextStyles.titleSmall.copyWith(
                   fontSize: 22.sp,
                   fontWeight: FontWeights.bold,
-                  color: AppColors.textPrimary,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],

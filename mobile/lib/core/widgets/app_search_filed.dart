@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 
 class AppSearchField extends StatelessWidget {
@@ -24,33 +23,36 @@ class AppSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme;
+    final colorScheme = theme.colorScheme;
+
     return Material(
       elevation: 6,
-      color: context.theme.colorScheme.surfaceDim,
+      color: colorScheme.surfaceDim,
       borderRadius: BorderRadius.circular(14),
-      shadowColor: AppColors.border,
+      shadowColor: colorScheme.onSurface.withValues(alpha: 0.08),
       child: TextField(
-        style: context.theme.textTheme.bodyMedium?.copyWith(
-          color: AppColors.textPrimary,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface,
         ),
         controller: searchController,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: context.theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
           prefixIcon: Icon(
             prefixIcon,
             size: 26,
-            color: AppColors.placeholder,
+            color: colorScheme.onSurfaceVariant,
           ),
           suffixIcon: Icon(
             suffixIcon,
             size: 26,
-            color: AppColors.placeholder,
+            color: colorScheme.onSurfaceVariant,
           ),
           filled: true,
-          fillColor: AppColors.whiteColor,
+          fillColor: colorScheme.surface,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 14,
