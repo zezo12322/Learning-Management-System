@@ -131,35 +131,35 @@ List<CourseEntity> get sampleCourses => [
   ),
 ];
 
- const List<CourseCategory> defaultCategories = [
-  const CourseCategory(
-    label: 'All',
-    icon: Icons.grid_view_rounded,
-    iconColor: AppColors.primary,
-  ),
-  const CourseCategory(
-    label: 'Design',
-    icon: Icons.palette_outlined,
-    iconColor: AppColors.secondary,
-  ),
-  const CourseCategory(
-    label: 'Development',
-    icon: Icons.code_rounded,
-    iconColor: Color(0xffF59E0B),
-  ),
-  const CourseCategory(
-    label: 'Data Science',
-    icon: Icons.bar_chart_rounded,
-    iconColor: Color(0xff0EA5E9),
-  ),
-  const CourseCategory(
-    label: 'Business',
-    icon: Icons.business_center_outlined,
-    iconColor: Color(0xff22C55E),
-  ),
-  const CourseCategory(
-    label: 'Marketing',
-    icon: Icons.campaign_outlined,
-    iconColor: Color(0xffEF4444),
-  ),
-];
+//  const List<CourseCategory> defaultCategories = [
+//   const CourseCategory(
+//     label: 'All',
+//     icon: Icons.grid_view_rounded,
+//     iconColor: AppColors.primary,
+//   ),
+//   const CourseCategory(
+//     label: 'Design',
+//     icon: Icons.palette_outlined,
+//     iconColor: AppColors.secondary,
+//   ),
+//   const CourseCategory(
+//     label: 'Development',
+//     icon: Icons.code_rounded,
+//     iconColor: Color(0xffF59E0B),
+//   ),
+//   const CourseCategory(
+//     label: 'Data Science',
+//     icon: Icons.bar_chart_rounded,
+//     iconColor: Color(0xff0EA5E9),
+//   ),
+//   const CourseCategory(
+//     label: 'Business',
+//     icon: Icons.business_center_outlined,
+//     iconColor: Color(0xff22C55E),
+//   ),
+//   const CourseCategory(
+//     label: 'Marketing',
+//     icon: Icons.campaign_outlined,
+//     iconColor: Color(0xffEF4444),
+//   ),
+// ];

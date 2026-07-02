@@ -2,16 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 
-AppBar customAppBar ({String? title}){
-  return AppBar(
-    title: Text(title ?? ''),
-    leadingWidth: 80,
-    clipBehavior: Clip.none,
-    leading: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.h),
-      child: const CustomBackButton(),
-    ),
-  );
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
+  final Widget? titleWidget;
+  final bool showBackButton;
+  final bool centerTitle;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final double toolbarHeight;
+
+  const CustomAppBar({
+    super.key,
+    this.title,
+    this.titleWidget,
+    this.showBackButton = true,
+    this.centerTitle = true,
+    this.actions,
+    this.leading,
+    this.toolbarHeight = kToolbarHeight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      centerTitle: centerTitle,
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.none,
+      toolbarHeight: toolbarHeight,
+      leadingWidth: showBackButton ? 80.w : null,
+      title: titleWidget ?? Text(title ?? ''),
+      leading: leading ??
+          (showBackButton
+              ? Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: const CustomBackButton(),
+          )
+              : null),
+      actions: actions,
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(toolbarHeight);
 }
 
 class CustomBackButton extends StatelessWidget {
