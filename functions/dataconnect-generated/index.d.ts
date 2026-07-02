@@ -1836,6 +1836,28 @@ export interface RubricCriterion_Key {
   __typename?: 'RubricCriterion_Key';
 }
 
+export interface SearchPublishedCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    price: number;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    category: {
+      name: string;
+    };
+    author: {
+      name: string;
+      avatar?: string | null;
+    };
+  } & Course_Key)[];
+}
+
+export interface SearchPublishedCoursesVariables {
+  searchQuery: string;
+}
+
 export interface Session_Key {
   id: UUIDString;
   __typename?: 'Session_Key';
@@ -2122,6 +2144,18 @@ export const verifyCertificateRef: VerifyCertificateRef;
 export function verifyCertificate(vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
 export function verifyCertificate(dc: DataConnect, vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
 
+interface ListCategoriesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListCategoriesData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListCategoriesData, undefined>;
+  operationName: string;
+}
+export const listCategoriesRef: ListCategoriesRef;
+
+export function listCategories(options?: ExecuteQueryOptions): QueryPromise<ListCategoriesData, undefined>;
+export function listCategories(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<ListCategoriesData, undefined>;
+
 interface ListPublishedCoursesRef {
   /* Allow users to create refs without passing in DataConnect */
   (): QueryRef<ListPublishedCoursesData, undefined>;
@@ -2133,6 +2167,18 @@ export const listPublishedCoursesRef: ListPublishedCoursesRef;
 
 export function listPublishedCourses(options?: ExecuteQueryOptions): QueryPromise<ListPublishedCoursesData, undefined>;
 export function listPublishedCourses(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<ListPublishedCoursesData, undefined>;
+
+interface SearchPublishedCoursesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SearchPublishedCoursesVariables): QueryRef<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SearchPublishedCoursesVariables): QueryRef<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
+  operationName: string;
+}
+export const searchPublishedCoursesRef: SearchPublishedCoursesRef;
+
+export function searchPublishedCourses(vars: SearchPublishedCoursesVariables, options?: ExecuteQueryOptions): QueryPromise<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
+export function searchPublishedCourses(dc: DataConnect, vars: SearchPublishedCoursesVariables, options?: ExecuteQueryOptions): QueryPromise<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
 
 interface GetCourseCurriculumRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2361,18 +2407,6 @@ export const adminSoftDeleteLecturesBySectionRef: AdminSoftDeleteLecturesBySecti
 
 export function adminSoftDeleteLecturesBySection(vars: AdminSoftDeleteLecturesBySectionVariables): MutationPromise<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
 export function adminSoftDeleteLecturesBySection(dc: DataConnect, vars: AdminSoftDeleteLecturesBySectionVariables): MutationPromise<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
-
-interface ListCategoriesRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<ListCategoriesData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<ListCategoriesData, undefined>;
-  operationName: string;
-}
-export const listCategoriesRef: ListCategoriesRef;
-
-export function listCategories(options?: ExecuteQueryOptions): QueryPromise<ListCategoriesData, undefined>;
-export function listCategories(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<ListCategoriesData, undefined>;
 
 interface LogPaymentRef {
   /* Allow users to create refs without passing in DataConnect */

@@ -35,6 +35,7 @@ const users_module_1 = require("./users/users.module");
 const enrollment_module_1 = require("./enrollment/enrollment.module");
 const submissions_module_1 = require("./submissions/submissions.module");
 const catalog_module_1 = require("./catalog/catalog.module");
+const ratings_module_1 = require("./ratings/ratings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -87,6 +88,7 @@ exports.AppModule = AppModule = __decorate([
             enrollment_module_1.EnrollmentModule,
             submissions_module_1.SubmissionsModule,
             catalog_module_1.CatalogModule,
+            ratings_module_1.RatingsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
