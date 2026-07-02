@@ -28,7 +28,11 @@ part 'my_certificates.dart';
 
 part 'verify_certificate.dart';
 
+part 'list_categories.dart';
+
 part 'list_published_courses.dart';
+
+part 'search_published_courses.dart';
 
 part 'get_course_curriculum.dart';
 
@@ -67,8 +71,6 @@ part 'admin_update_lecture_order.dart';
 part 'admin_move_lecture_to_section.dart';
 
 part 'admin_soft_delete_lectures_by_section.dart';
-
-part 'list_categories.dart';
 
 part 'log_payment.dart';
 
@@ -805,8 +807,18 @@ class DefaultConnector {
   }
   
   
+  ListCategoriesVariablesBuilder listCategories () {
+    return ListCategoriesVariablesBuilder(dataConnect, );
+  }
+  
+  
   ListPublishedCoursesVariablesBuilder listPublishedCourses () {
     return ListPublishedCoursesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  SearchPublishedCoursesVariablesBuilder searchPublishedCourses ({required String searchQuery, }) {
+    return SearchPublishedCoursesVariablesBuilder(dataConnect, searchQuery: searchQuery,);
   }
   
   
@@ -902,11 +914,6 @@ class DefaultConnector {
   
   AdminSoftDeleteLecturesBySectionVariablesBuilder adminSoftDeleteLecturesBySection ({required String sectionId, }) {
     return AdminSoftDeleteLecturesBySectionVariablesBuilder(dataConnect, sectionId: sectionId,);
-  }
-  
-  
-  ListCategoriesVariablesBuilder listCategories () {
-    return ListCategoriesVariablesBuilder(dataConnect, );
   }
   
   
