@@ -1,10 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
+import 'package:optimatech_lms/features/courses/presentation/views/widgets/course_thumbnail.dart';
+import 'package:optimatech_lms/features/courses/presentation/views/widgets/rating_row.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 enum CourseStatus { inProgress, completed, newCourse, popular }
@@ -13,13 +15,13 @@ extension CourseStatusX on CourseStatus {
   String get label {
     switch (this) {
       case CourseStatus.inProgress:
-        return 'In Progress';
+        return 'courses.status.inProgress'.tr();
       case CourseStatus.completed:
-        return 'Completed';
+        return 'courses.status.completed'.tr();
       case CourseStatus.newCourse:
-        return 'New';
+        return 'courses.status.new'.tr();
       case CourseStatus.popular:
-        return 'Popular';
+        return 'courses.status.popular'.tr();
     }
   }
 
@@ -61,7 +63,7 @@ class CourseCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -72,7 +74,7 @@ class CourseCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Thumbnail
-              _CourseThumbnail(
+              CourseThumbnail(
                 imagePath: item.thumbnail,
               ),
               // Content
@@ -126,7 +128,7 @@ class CourseCard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 10.r,
-                            backgroundColor: context.theme.colorScheme.primary.withOpacity(0.15),
+                            backgroundColor: context.theme.colorScheme.primary.withValues(alpha: 0.15),
                             child: Icon(
                               Icons.person_rounded,
                               size: 12.r,
@@ -164,87 +166,6 @@ class CourseCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class RatingRow extends StatelessWidget {
-  const RatingRow({super.key, required this.courseItem});
-
-  final CourseEntity courseItem;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.star_rounded, size: 14.r, color: AppColors.warning),
-        SizedBox(width: 3.w),
-        Text(
-          '${courseItem.avgRating} (${courseItem.ratingCount})',
-          style: context.textTheme.bodySmall?.copyWith(
-            fontSize: 11.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        _dot(context),
-        Flexible(
-          child: Text(
-            courseItem.level,
-            style: context.textTheme.bodySmall?.copyWith(fontSize: 11.sp),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        _dot(context),
-        Flexible(
-          child: Text(
-            '${14} Lessons',
-            // '${courseItem.lessonCount} Lessons',
-            style: context.textTheme.bodySmall?.copyWith(fontSize: 11.sp),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _dot(BuildContext context) => Padding(
-    padding: EdgeInsets.symmetric(horizontal: 5.w),
-    child: Text(
-      '•',
-      style: context.textTheme.bodySmall?.copyWith(
-        color: context.theme.colorScheme.onSurfaceVariant,
-      ),
-    ),
-  );
-}
-
-class _CourseThumbnail extends StatelessWidget {
-  const _CourseThumbnail({required this.imagePath});
-
-  final String? imagePath;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
-        child: SizedBox(
-          width: 110.w,
-          height: double.infinity,
-          child: CachedNetworkImage(
-            imageUrl: imagePath ?? '',
-            fit: BoxFit.cover,
-            placeholder: (_,__) =>
-                Skeletonizer(child: Image.asset('assets/images/placeholder.png',fit: BoxFit.cover),),
-            errorWidget: (_,__,___) =>
-                Image.asset('assets/images/placeholder.png', fit: BoxFit.fill),
           ),
         ),
       ),

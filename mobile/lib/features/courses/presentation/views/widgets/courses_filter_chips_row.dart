@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
@@ -8,15 +9,15 @@ extension CourseFilterChipX on CourseFilterChip {
   String get label {
     switch (this) {
       case CourseFilterChip.all:
-        return 'All';
+        return 'courses.filters.all'.tr();
       case CourseFilterChip.inProgress:
-        return 'In Progress';
+        return 'courses.filters.inProgress'.tr();
       case CourseFilterChip.completed:
-        return 'Completed';
+        return 'courses.filters.completed'.tr();
       case CourseFilterChip.popular:
-        return 'Popular';
+        return 'courses.filters.popular'.tr();
       case CourseFilterChip.newCourses:
-        return 'New';
+        return 'courses.filters.new'.tr();
     }
   }
 
@@ -41,24 +42,25 @@ class CoursesFilterChipsRow extends StatelessWidget {
     super.key,
     required this.selected,
     required this.onSelected,
+    this.showIcons = true,
   });
 
   final CourseFilterChip selected;
   final ValueChanged<CourseFilterChip> onSelected;
+  final bool showIcons;
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      runSpacing: 8.h,
+      spacing: 10.w,
+      runSpacing: 10.h,
       children: CourseFilterChip.values.map((chip) {
         final isSelected = chip == selected;
-        return Padding(
-          padding: EdgeInsets.only(right: 10.w),
-          child: _FilterChip(
-            chip: chip,
-            isSelected: isSelected,
-            onTap: () => onSelected(chip),
-          ),
+        return _FilterChip(
+          chip: chip,
+          isSelected: isSelected,
+          onTap: () => onSelected(chip),
+          showIcons: showIcons,
         );
       }).toList(),
     );
@@ -70,11 +72,13 @@ class _FilterChip extends StatelessWidget {
     required this.chip,
     required this.isSelected,
     required this.onTap,
+    required this.showIcons,
   });
 
   final CourseFilterChip chip;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool showIcons;
 
   @override
   Widget build(BuildContext context) {
@@ -94,14 +98,16 @@ class _FilterChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              chip.icon,
-              size: 14.r,
-              color: isSelected
-                  ? context.theme.colorScheme.surface
-                  : context.theme.colorScheme.onSurfaceVariant,
-            ),
-            SizedBox(width: 6.w),
+            if (showIcons) ...[
+              Icon(
+                chip.icon,
+                size: 14.r,
+                color: isSelected
+                    ? context.theme.colorScheme.surface
+                    : context.theme.colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(width: 6.w),
+            ],
             Text(
               chip.label,
               style: context.textTheme.labelSmall?.copyWith(

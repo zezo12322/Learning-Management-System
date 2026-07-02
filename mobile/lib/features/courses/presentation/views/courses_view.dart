@@ -1,14 +1,19 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
-import 'package:optimatech_lms/core/widgets/custom_search_bar.dart';
+import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
+import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
+import 'package:optimatech_lms/core/widgets/notification_button.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/courses_category_Section.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/courses_list.dart';
+import 'package:optimatech_lms/features/courses/presentation/views/widgets/show_courses_filter_bottom_sheet.dart';
 
 class CoursesView extends StatelessWidget {
   const CoursesView({super.key});
@@ -37,12 +42,36 @@ class CourseBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Courses')),
+      appBar: CustomAppBar(
+        titleWidget: Text(
+          'courses.title'.tr(),
+          style: context.textTheme.titleMedium?.copyWith(
+            color: context.theme.colorScheme.onSurface,
+          ),
+        ),
+        showBackButton: false,
+        actions: [
+          NotificationButton(
+            count: 10,
+            onTap: () {},
+          ),
+          Gap(16.w),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w,),
-            child: CustomSearchBar(controller: null),
+            child: AppSearchField(
+              searchController: null,
+              onSearch: (){},
+              onFilter: () async{
+                final result = await showCoursesFilterBottomSheet(context);
+                if (result != null && context.mounted) {
+                  //context.read<CoursesCubit>().applyFilter(result);
+                }
+              },
+            ),
           ),
           Gap(16.h),
           BlocSelector<CoursesCubit, CoursesState, int>(

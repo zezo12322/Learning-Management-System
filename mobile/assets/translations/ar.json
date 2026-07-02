@@ -100,5 +100,47 @@
     "not_found": "الصفحة غير موجودة",
     "not_found_msg": "المسار الذي طلبته غير موجود.",
     "go_home": "الذهاب للرئيسية"
+  },
+  "courses": {
+    "title": "الكورسات",
+    "searchHint": "ابحث عن كورسات أو دروس أو اختبارات...",
+    "categories": {
+      "title": "التصنيفات",
+      "viewAll": "عرض الكل",
+      "empty": "لا توجد تصنيفات"
+    },
+    "list": {
+      "empty": "لا توجد كورسات",
+      "lessonsCount": "{count} درس"
+    },
+    "filters": {
+      "all": "الكل",
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "status": {
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "errors": {
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "filterSheet": {
+      "title": "تصفية",
+      "courseStatus": "حالة الكورس",
+      "sortBy": "الترتيب حسب",
+      "reset": "إعادة تعيين",
+      "apply": "تطبيق"
+    },
+    "sort": {
+      "newest": "الأحدث",
+      "oldest": "الأقدم",
+      "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
+      "priceHighToLow": "السعر: من الأعلى إلى الأقل"
+    }
   }
 }

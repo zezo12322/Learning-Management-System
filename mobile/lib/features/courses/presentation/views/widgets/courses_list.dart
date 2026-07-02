@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/helper_function/dummy.dart';
+import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
@@ -28,14 +30,12 @@ class CoursesList extends StatelessWidget {
             );
 
           case CoursesStatus.failure:
-          // return AppErrorWidget(
-          //   message: state.errorMessage ?? 'حدث خطأ غير متوقع',
-          //   onRetry: () => context.read<CoursesCubit>().loadCourses(),
-          // );
-            return Text('حدث خطأ غير متوقع: ${state.errorMessage}');
-
+          return AppErrorWidget(
+            message: state.errorMessage ?? 'courses.errors.unexpected'.tr(),
+            onRetry: () => context.read<CoursesCubit>().loadCourses(),
+          );
           case CoursesStatus.loaded:
-            if (state.filteredCourses.isEmpty) return const Center(child: Text('لا توجد كورسات'));
+            if (state.filteredCourses.isEmpty) return Center(child: Text('courses.list.empty'.tr()),);
             return _CoursesListView(
               courses: state.filteredCourses,
               bookmarkedIds: state.bookmarkedIds,
