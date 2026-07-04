@@ -142,5 +142,65 @@
       "priceLowToHigh": "Price: Low to High",
       "priceHighToLow": "Price: High to Low"
     }
+  },
+  "profile": {
+    "title": "My Profile",
+    "common": {
+      "edit": "Edit",
+      "view_all": "View All"
+    },
+    "header": {
+      "role": "Student",
+      "joined": "Joined March 2024",
+      "stats": {
+        "courses": "Courses Enrolled",
+        "courses_subtitle": "Active learning",
+        "hours": "Hours Learned",
+        "hours_subtitle": "+12 this week",
+        "assessments": "Assessments Completed",
+        "assessments_subtitle": "85% average score",
+        "certificates": "Certificates Earned",
+        "certificates_subtitle": "Keep it up!"
+      }
+    },
+    "sections": {
+      "user_information": "User Information",
+      "learning_statistics": "Learning Statistics",
+      "certificates": "Certificates",
+      "completed_courses": "Completed Courses",
+      "settings": "Settings"
+    },
+    "info": {
+      "full_name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "location": "Location",
+      "birth_date": "Date of Birth"
+    },
+    "statistics": {
+      "hours": "Hours Learned",
+      "hours_subtitle": "+12 this week",
+      "courses": "Courses Enrolled",
+      "courses_subtitle": "Active learning",
+      "certificates": "Certificates",
+      "certificates_subtitle": "Completed",
+      "assessments": "Assessments",
+      "assessments_subtitle": "85% Average"
+    },
+    "certificates": {
+      "issued_on": "Issued on {date}",
+      "verified": "Verified"
+    },
+    "completed_courses": {
+      "completed_on": "Completed on {date}",
+      "completed": "Completed"
+    },
+    "settings": {
+      "account": "Account Settings",
+      "notifications": "Notification Preferences",
+      "privacy": "Privacy & Security",
+      "help": "Help & Support",
+      "logout": "Logout"
+    }
   }
 }
