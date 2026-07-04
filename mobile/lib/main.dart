@@ -10,9 +10,8 @@ import 'package:optimatech_lms/core/services/bloc_observer_service.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
-import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
-import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
+import 'features/profile/presentation/manager/theme/theme_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
@@ -39,8 +38,10 @@ Future<void> main() async {
       ],
       path: AppConstants.translationsPath,
       fallbackLocale: const Locale('en'),
-      startLocale: const Locale('en'),
-      child: const OptimaTechLMS(),
+      child: BlocProvider(
+        create: (context) => getIt<ThemeCubit>()..loadTheme(),
+        child: const OptimaTechLMS(),
+      ),
     ),
   );
 }
@@ -54,20 +55,24 @@ class OptimaTechLMS extends StatelessWidget {
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context, child){
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // Localization
-          locale: context.locale,
-          supportedLocales: context.supportedLocales,
-          localizationsDelegates: context.localizationDelegates,
-          // Theme
-          themeMode: ThemeMode.system,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          // Routing
-          onGenerateRoute: generateRoute,
-          initialRoute: CoursesView.routeName,
+      builder: (context, child) {
+        return BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            // Localization
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
+            // Theme
+            themeMode: themeMode,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            // Routing
+            onGenerateRoute: generateRoute,
+            initialRoute: SplashView.routeName,
+          );
+          },
         );
       },
     );
