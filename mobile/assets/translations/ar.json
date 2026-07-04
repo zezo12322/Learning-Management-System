@@ -13,7 +13,15 @@
     "search": "بحث",
     "close": "إغلاق",
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "dialog": {
+      "error_title": "خطأ",
+      "success_title": "نجح",
+      "warning_title": "تحذير",
+      "ok": "حسناً",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء"
+    }
   },
   "errors": {
     "network": "لا يوجد اتصال بالإنترنت. تحقق من الشبكة.",
@@ -200,7 +208,13 @@
       "notifications": "تفضيلات الإشعارات",
       "privacy": "الخصوصية والأمان",
       "help": "المساعدة والدعم",
-      "logout": "تسجيل الخروج"
+      "logout": "تسجيل الخروج",
+      "logout_dialog": "تسجيل الخروج؟",
+      "log_out_confirmation": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+      "language": "اللغة",
+      "select_language": "اختر اللغة",
+      "change_Theme": " تغيير المظهر",
+      "select_theme": "اختر المظهر"
     }
   }
 }
