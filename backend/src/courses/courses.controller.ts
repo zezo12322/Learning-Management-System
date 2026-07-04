@@ -7,6 +7,8 @@ import {
   Body,
   Param,
   UseGuards,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto } from './dto/course.dto';
@@ -18,27 +20,54 @@ import { AuthToken } from '../common/decorators/auth-token.decorator';
 
 @Controller('courses')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
-@Roles('admin', 'instructor')
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService) { }
+
+  // ==========================================
+  // PUBLIC / STUDENT ROUTES
+  // ==========================================
+
+  @Get('search')
+  search(
+    @Query('q') searchQuery: string,
+    @AuthToken() token: string,
+  ) {
+    if (!searchQuery) {
+      throw new BadRequestException('Search query (q) is required');
+    }
+    return this.coursesService.searchCatalog(searchQuery, token);
+  }
+
+  @Get('categories')
+  getCategories(@AuthToken() token: string) {
+    return this.coursesService.getCategories(token);
+  }
+
+  // ==========================================
+  // ADMIN / INSTRUCTOR ROUTES
+  // ==========================================
 
   @Post()
+  @Roles('admin', 'instructor')
   create(@Body() dto: CreateCourseDto, @AuthToken() token: string) {
     return this.coursesService.create(dto, token);
   }
 
   @Get()
+  @Roles('admin', 'instructor')
   findAll(@AuthToken() token: string) {
     return this.coursesService.findMyList(token);
   }
 
   @Get(':courseId')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   findOne(@Param('courseId') courseId: string, @AuthToken() token: string) {
     return this.coursesService.findOne(courseId, token);
   }
 
   @Patch(':courseId')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   update(
     @Param('courseId') courseId: string,
@@ -49,6 +78,7 @@ export class CoursesController {
   }
 
   @Patch(':courseId/status')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   updateStatus(
     @Param('courseId') courseId: string,
@@ -59,6 +89,7 @@ export class CoursesController {
   }
 
   @Delete(':courseId')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   softDelete(@Param('courseId') courseId: string, @AuthToken() token: string) {
     return this.coursesService.softDelete(courseId, token);
@@ -69,6 +100,7 @@ export class CoursesController {
   // ==========================================
 
   @Post(':courseId/instructors')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   addInstructor(
     @Param('courseId') courseId: string,
@@ -79,6 +111,7 @@ export class CoursesController {
   }
 
   @Delete(':courseId/instructors/:userId')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   removeInstructor(
     @Param('courseId') courseId: string,
@@ -89,6 +122,7 @@ export class CoursesController {
   }
 
   @Get(':courseId/instructors')
+  @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
   getInstructors(@Param('courseId') courseId: string, @AuthToken() token: string) {
     return this.coursesService.getInstructors(courseId, token);
