@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.MyCertificates().execute();
-DefaultConnector.instance.VerifyCertificate(verifyCertificateVariables).execute();
-DefaultConnector.instance.ListPublishedCourses().execute();
-DefaultConnector.instance.GetCourseCurriculum(getCourseCurriculumVariables).execute();
-DefaultConnector.instance.GetLectureContent(getLectureContentVariables).execute();
-DefaultConnector.instance.GetUserLectureProgress(getUserLectureProgressVariables).execute();
-DefaultConnector.instance.GetMyCourseProgress(getMyCourseProgressVariables).execute();
-DefaultConnector.instance.GetCourseForEnrollment(getCourseForEnrollmentVariables).execute();
-DefaultConnector.instance.AdminGetCourse(adminGetCourseVariables).execute();
-DefaultConnector.instance.AdminListMyCourses().execute();
+DefaultConnector.instance.GetQuizQuestions(getQuizQuestionsVariables).execute();
+DefaultConnector.instance.StartQuizAttempt(startQuizAttemptVariables).execute();
+DefaultConnector.instance.SubmitQuizAnswer(submitQuizAnswerVariables).execute();
+DefaultConnector.instance.FinishQuizAttemptIfOpen(finishQuizAttemptIfOpenVariables).execute();
+DefaultConnector.instance.GetExpiredAttempts().execute();
+DefaultConnector.instance.GetUserQuizAttempts(getUserQuizAttemptsVariables).execute();
+DefaultConnector.instance.GetQuizAttemptById(getQuizAttemptByIdVariables).execute();
+DefaultConnector.instance.GetQuizQuestionPoints(getQuizQuestionPointsVariables).execute();
+DefaultConnector.instance.GetAttemptAnswersWithCorrect(getAttemptAnswersWithCorrectVariables).execute();
+DefaultConnector.instance.GetQuizSettings(getQuizSettingsVariables).execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.AdminUpdateQuizOption({ ... })
-.text(...)
+await DefaultConnector.instance.AdminUpdateRubricCriterion({ ... })
+.criterionName(...)
 .execute();
 ```
 

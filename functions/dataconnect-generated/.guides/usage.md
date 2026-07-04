@@ -14,38 +14,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { myCertificates, verifyCertificate, listPublishedCourses, getCourseCurriculum, getLectureContent, getUserLectureProgress, getMyCourseProgress, getCourseForEnrollment, adminGetCourse, adminListMyCourses } from '@dataconnect/functions-generated';
+import { getPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors, upsertCourseRating, deleteCourseRating, getMyCourseRating, listCourseRatings, getCourseRatingsForSummary, adminUpdateCourseRatingAggregate } from '@dataconnect/functions-generated';
 
 
-// Operation MyCertificates: 
-const { data } = await MyCertificates(dataConnect);
+// Operation GetPendingSubmissions: 
+const { data } = await GetPendingSubmissions(dataConnect);
 
-// Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
-const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
+// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
+const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
 
-// Operation ListPublishedCourses: 
-const { data } = await ListPublishedCourses(dataConnect);
+// Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
+const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
 
-// Operation GetCourseCurriculum:  For variables, look at type GetCourseCurriculumVars in ../index.d.ts
-const { data } = await GetCourseCurriculum(dataConnect, getCourseCurriculumVars);
+// Operation GetCourseInstructors:  For variables, look at type GetCourseInstructorsVars in ../index.d.ts
+const { data } = await GetCourseInstructors(dataConnect, getCourseInstructorsVars);
 
-// Operation GetLectureContent:  For variables, look at type GetLectureContentVars in ../index.d.ts
-const { data } = await GetLectureContent(dataConnect, getLectureContentVars);
+// Operation UpsertCourseRating:  For variables, look at type UpsertCourseRatingVars in ../index.d.ts
+const { data } = await UpsertCourseRating(dataConnect, upsertCourseRatingVars);
 
-// Operation GetUserLectureProgress:  For variables, look at type GetUserLectureProgressVars in ../index.d.ts
-const { data } = await GetUserLectureProgress(dataConnect, getUserLectureProgressVars);
+// Operation DeleteCourseRating:  For variables, look at type DeleteCourseRatingVars in ../index.d.ts
+const { data } = await DeleteCourseRating(dataConnect, deleteCourseRatingVars);
 
-// Operation GetMyCourseProgress:  For variables, look at type GetMyCourseProgressVars in ../index.d.ts
-const { data } = await GetMyCourseProgress(dataConnect, getMyCourseProgressVars);
+// Operation GetMyCourseRating:  For variables, look at type GetMyCourseRatingVars in ../index.d.ts
+const { data } = await GetMyCourseRating(dataConnect, getMyCourseRatingVars);
 
-// Operation GetCourseForEnrollment:  For variables, look at type GetCourseForEnrollmentVars in ../index.d.ts
-const { data } = await GetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars);
+// Operation ListCourseRatings:  For variables, look at type ListCourseRatingsVars in ../index.d.ts
+const { data } = await ListCourseRatings(dataConnect, listCourseRatingsVars);
 
-// Operation AdminGetCourse:  For variables, look at type AdminGetCourseVars in ../index.d.ts
-const { data } = await AdminGetCourse(dataConnect, adminGetCourseVars);
+// Operation GetCourseRatingsForSummary:  For variables, look at type GetCourseRatingsForSummaryVars in ../index.d.ts
+const { data } = await GetCourseRatingsForSummary(dataConnect, getCourseRatingsForSummaryVars);
 
-// Operation AdminListMyCourses: 
-const { data } = await AdminListMyCourses(dataConnect);
+// Operation AdminUpdateCourseRatingAggregate:  For variables, look at type AdminUpdateCourseRatingAggregateVars in ../index.d.ts
+const { data } = await AdminUpdateCourseRatingAggregate(dataConnect, adminUpdateCourseRatingAggregateVars);
 
 
 ```
