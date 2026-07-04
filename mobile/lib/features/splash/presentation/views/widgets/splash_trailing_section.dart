@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
+import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
 
 class SplashTrailingSection extends StatefulWidget {
   const SplashTrailingSection({super.key});
@@ -26,7 +28,12 @@ class _SplashTrailingSectionState extends State<SplashTrailingSection>
     );
 
     _controller.forward().then((_) {
-      if (mounted) Navigator.pushNamedAndRemoveUntil(context, LogInView.routeName, (r)=> false);
+      final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+      if(isLoggedIn && mounted){
+        Navigator.pushNamedAndRemoveUntil(context, HomeView.routeName, (r)=> false);
+      }else{
+        Navigator.pushNamedAndRemoveUntil(context, LogInView.routeName, (r)=> false);
+      }
     });
 
     _progressAnim = CurvedAnimation(
