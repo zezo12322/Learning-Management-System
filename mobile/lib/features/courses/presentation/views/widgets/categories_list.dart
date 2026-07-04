@@ -29,7 +29,7 @@ class CategoriesList extends StatelessWidget {
           case CategoriesStatus.loading:
             return Skeletonizer(
               child: SizedBox(
-                height: 72.h,
+                height: 42.h,
                 child: _CategoriesListView(
                   categories: List.generate(5, (_) => dummySkeletonCategoryItem),
                   selectedIndex: selectedIndex,
@@ -46,7 +46,10 @@ class CategoriesList extends StatelessWidget {
             return SizedBox(
               height: 42.h,
               child: _CategoriesListView(
-                categories: state.categories,
+                categories: <CategoryEntity>[
+                  const CategoryEntity(id: '-1', name: 'All', description: 'All courses'),
+                  ...state.categories,
+                ],
                 selectedIndex: selectedIndex,
                 onSelected: onSelected,
               ),
