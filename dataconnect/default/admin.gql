@@ -2,7 +2,6 @@
 # 1. COURSE CREATION & MANAGEMENT
 # ==========================================
 
-# Create a new course in DRAFT mode
 mutation AdminCreateCourse(
   $title: String!, 
   $description: String, 
@@ -11,7 +10,8 @@ mutation AdminCreateCourse(
   $level: CourseLevel!, 
   $categoryId: UUID!,
   $tags: [String!]!
-) @auth(level: USER) {
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   course_insert(
     data: {
       title: $title, 
@@ -28,10 +28,13 @@ mutation AdminCreateCourse(
   )
 }
 
-# Soft-delete a course (safely archives it without breaking records)
-mutation AdminDeleteCourse($courseId: UUID!) @auth(level: USER) {
-  course_update(
-    id: $courseId,
+mutation InstructorDeleteCourse($courseId: UUID!) 
+@auth(expr: "auth.token.roles != null && 'instructor' in auth.token.roles") {
+  course_updateMany(
+    where: {
+      id: { eq: $courseId },
+      authorId: { eq_expr: "auth.uid" } 
+    },
     data: {
       deletedAt_expr: "request.time",
       status: ARCHIVED
@@ -39,24 +42,13 @@ mutation AdminDeleteCourse($courseId: UUID!) @auth(level: USER) {
   )
 }
 
-# Add a lecture to an existing course section
-mutation AdminCreateLecture(
-  $sectionId: UUID!,
-  $title: String!,
-  $type: LectureType!,
-  $videoUrl: String,
-  $content: String,
-  $order: Int!
-) @auth(level: USER) {
-  courseLecture_insert(
+mutation SuperAdminDeleteCourse($courseId: UUID!) 
+@auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
+  course_update(
+    id: $courseId, 
     data: {
-      sectionId: $sectionId,
-      title: $title,
-      type: $type,
-      videoUrl: $videoUrl,
-      content: $content,
-      isFreePreview: false,
-      order: $order
+      deletedAt_expr: "request.time",
+      status: ARCHIVED
     }
   )
 }
@@ -65,7 +57,6 @@ mutation AdminCreateLecture(
 # 2. SESSION & LIVE CLASS SCHEDULING
 # ==========================================
 
-# Schedule a new Live Session or Physical Class
 mutation AdminCreateSession(
   $courseId: UUID!,
   $title: String!,
@@ -74,7 +65,8 @@ mutation AdminCreateSession(
   $endTime: Timestamp!,
   $type: SessionType!,
   $locationOrUrl: String!
-) @auth(level: USER) {
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   session_insert(
     data: {
       courseId: $courseId,
@@ -89,8 +81,21 @@ mutation AdminCreateSession(
   )
 }
 
-# Cancel a session
-mutation AdminCancelSession($sessionId: UUID!) @auth(level: USER) {
+mutation InstructorCancelSession($sessionId: UUID!) 
+@auth(expr: "auth.token.roles != null && 'instructor' in auth.token.roles") {
+  session_updateMany(
+    where: {
+      id: { eq: $sessionId },
+      hostUserId: { eq_expr: "auth.uid" } 
+    },
+    data: {
+      deletedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation SuperAdminCancelSession($sessionId: UUID!) 
+@auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   session_update(
     id: $sessionId,
     data: {
@@ -103,13 +108,13 @@ mutation AdminCancelSession($sessionId: UUID!) @auth(level: USER) {
 # 3. FINANCIAL & SUBSCRIPTION MANAGEMENT
 # ==========================================
 
-# Create a new Subscription Tier
 mutation AdminCreateSubscriptionTier(
   $name: String!,
   $price: Int!,
   $billingCycle: BillingCycle!,
   $features: [String!]!
-) @auth(level: USER) {
+) 
+@auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   subscriptionTier_insert(
     data: {
       name: $name,
@@ -121,8 +126,8 @@ mutation AdminCreateSubscriptionTier(
   )
 }
 
-# Deprecate an old subscription tier
-mutation AdminDeprecateSubscriptionTier($tierId: UUID!) @auth(level: USER) {
+mutation AdminDeprecateSubscriptionTier($tierId: UUID!) 
+@auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   subscriptionTier_update(
     id: $tierId,
     data: {
@@ -135,8 +140,8 @@ mutation AdminDeprecateSubscriptionTier($tierId: UUID!) @auth(level: USER) {
 # 4. PLATFORM TAXONOMY
 # ==========================================
 
-# Create a new course category
-mutation AdminCreateCategory($name: String!, $description: String) @auth(level: USER) {
+mutation AdminCreateCategory($name: String!, $description: String) 
+@auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   category_insert(
     data: {
       name: $name,

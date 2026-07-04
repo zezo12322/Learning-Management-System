@@ -32,7 +32,7 @@ type User @table(name: "users") {
 }
 
 type Profile @table(name: "profiles", key: ["user"]) {
-  user: User!
+  user: User! 
   bio: String
   company: String
   phone: String
@@ -52,7 +52,7 @@ type Permission @table(name: "permissions") {
 }
 
 type UserRole @table(name: "user_roles", key: ["user", "role"]) {
-  user: User!
+  user: User! 
   role: Role!
 }
 
@@ -80,20 +80,27 @@ type Course @table(name: "courses") {
   price: Int! 
   status: CourseStatus!
   language: String!
-  level: CourseLevel! 
+  level: CourseLevel!
   thumbnail: String
-  category: Category! 
-  tags: [String!]!    
-  author: User!       
-  createdBy: User!    
+  category: Category!
+  tags: [String!]!
+  author: User!
+  createdBy: User!
+  # Denormalised rating aggregate, recomputed by RatingsService on every rating
+  # write. Lets catalog/recommendation cards show a star score without an N+1
+  # over CourseRating. The authoritative value is always derivable on-read via
+  # GetCourseRatingsForSummary; these columns are a cache. Non-null defaults keep
+  # the column migration non-destructive (existing rows backfill to 0).
+  avgRating: Float! @default(value: 0)
+  ratingCount: Int! @default(value: 0)
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp 
+  deletedAt: Timestamp
 }
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
   course: Course!
-  user: User!
+  user: User! 
 }
 
 type CourseSection @table(name: "course_sections") {
@@ -103,6 +110,7 @@ type CourseSection @table(name: "course_sections") {
   order: Int!
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
 }
 
 type CourseLecture @table(name: "course_lectures") {
@@ -129,6 +137,7 @@ type CourseQuiz @table(name: "course_quizzes") {
   lecture: CourseLecture! @unique
   passingScore: Float!
   maxAttempts: Int!
+  timeLimitMinutes: Int
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }
@@ -162,9 +171,9 @@ type Mission @table(name: "missions") {
   durationMinutes: Int!
   category: Category! 
   difficulty: MissionDifficulty! 
-  skillsTested: [String!]! 
-  author: User!       
-  createdBy: User!    
+  skillsTested: [String!]!
+  author: User!        
+  createdBy: User!     
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
   deletedAt: Timestamp
@@ -201,8 +210,8 @@ type RubricCriterion @table(name: "rubric_criteria") {
 type MissionSubmission @table(name: "mission_submissions") {
   id: UUID! @default(expr: "uuidV4()")
   mission: Mission!
-  student: User!
-  grader: User
+  student: User! 
+  grader: User 
   fileUrl: String!
   feedback: String
   status: SubmissionStatus! @default(expr: "'PENDING'") 
@@ -214,7 +223,7 @@ type MissionSubmission @table(name: "mission_submissions") {
 type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["submission", "criterion"]) {
   submission: MissionSubmission!
   criterion: RubricCriterion!
-  score: Float! 
+  score: Float!
 }
 
 # ==========================================
@@ -222,7 +231,7 @@ type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["sub
 # ==========================================
 type Enrollment @table(name: "enrollments") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User!
+  user: User! 
   targetType: EnrollmentTarget! 
   course: Course 
   mission: Mission 
@@ -238,9 +247,21 @@ type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) 
   completedAt: Timestamp
 }
 
+# One rating per (user, course). The composite key enforces that uniqueness at
+# the database level and lets the write path use a single upsert (create-or-edit),
+# mirroring LectureProgress.
+type CourseRating @table(name: "course_ratings", key: ["user", "course"]) {
+  user: User!
+  course: Course!
+  rating: Int!          # 1–5 stars
+  review: String        # optional free-text review
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
 type QuizAttempt @table(name: "quiz_attempts") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User!
+  user: User! 
   quiz: CourseQuiz!
   score: Float      
   passed: Boolean   
@@ -251,7 +272,7 @@ type QuizAttempt @table(name: "quiz_attempts") {
 type QuizAttemptAnswer @table(name: "quiz_attempt_answers", key: ["attempt", "question"]) {
   attempt: QuizAttempt!
   question: QuizQuestion!
-  selectedOption: QuizOption! 
+  selectedOption: QuizOption!
 }
 
 type Session @table(name: "sessions") {
@@ -272,7 +293,7 @@ type Session @table(name: "sessions") {
 
 type Attendance @table(name: "attendance") {
   id: UUID! @default(expr: "uuidV4()")
-  student: User!
+  student: User! 
   session: Session!
   status: AttendanceStatus!
   method: AttendanceMethod!
@@ -284,7 +305,7 @@ type Attendance @table(name: "attendance") {
 # ==========================================
 type Certificate @table(name: "certificates") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User!
+  user: User! 
   targetType: CertificateTarget! 
   course: Course
   mission: Mission
@@ -308,7 +329,16 @@ type SubscriptionTier @table(name: "subscription_tiers") {
 
 type Payment @table(name: "payments") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User!
+  
+  # 1. Relation is now optional (User instead of User!) and implicitly uses SET_NULL
+  user: User 
+  
+  # 2. Static Snapshot: Store this at checkout so you never lose the audit trail!
+  #    Default '' makes the column migration non-destructive (existing rows get
+  #    filled automatically). New rows always set the real value in LogPayment
+  #    via auth.token.email, so the default only ever applies to back-migration.
+  customerEmailSnapshot: String! @default(expr: "''")
+  
   gateway: PaymentGateway!
   status: PaymentStatus!
   amount: Int!               
@@ -320,7 +350,10 @@ type Payment @table(name: "payments") {
 
 type UserSubscription @table(name: "user_subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User!
+  
+  # Subscriptions are kept for historical metrics, but the user link is severed
+  user: User 
+  
   tier: SubscriptionTier!
   payment: Payment           
   status: SubscriptionStatus!

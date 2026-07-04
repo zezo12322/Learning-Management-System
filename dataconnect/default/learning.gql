@@ -1,39 +1,66 @@
-# Enrolls the authenticated user into a specific course
+# ==========================================
+# STUDENT — ENROLLMENT
+# ==========================================
+
 mutation EnrollInCourse($courseId: UUID!) @auth(level: USER) {
-  enrollment_insert(
-    data: {
-      userId_expr: "auth.uid",
-      targetType: COURSE,
-      courseId: $courseId,
-      status: ACTIVE
-    }
-  )
+  enrollment_insert(data: { userId_expr: "auth.uid", targetType: COURSE, courseId: $courseId, status: ACTIVE })
 }
 
-# Enrolls the authenticated user into a specific mission
 mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
-  enrollment_insert(
-    data: {
-      userId_expr: "auth.uid",
-      targetType: MISSION,
-      missionId: $missionId,
-      status: ACTIVE
+  enrollment_insert(data: { userId_expr: "auth.uid", targetType: MISSION, missionId: $missionId, status: ACTIVE })
+}
+
+# ==========================================
+# STUDENT — PROGRESS TRACKING
+# ==========================================
+
+mutation UpdateLectureProgress($lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp) @auth(level: USER) {
+  lectureProgress_upsert(data: { userId_expr: "auth.uid", lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
+}
+
+mutation AdminUpsertLectureProgress($userId: String!, $lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp) @auth(level: NO_ACCESS) {
+  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
+}
+
+query GetLectureDuration($lectureId: UUID!) @auth(level: NO_ACCESS) {
+  courseLecture(id: $lectureId) { id duration section { course { id } } }
+}
+
+# ==========================================
+# COMPLETION TRACKING
+# ==========================================
+
+query GetCourseCompletionStatus($courseId: UUID!) @auth(level: USER) {
+  sections: courseSections(where: { courseId: { eq: $courseId }, deletedAt: { eq: null } }) {
+    completionLectures: courseLectures_on_section(where: { deletedAt: { eq: null } }) {
+      id completionProgress: lectureProgresses_on_lecture(where: { userId: { eq_expr: "auth.uid" } }) { completedAt }
     }
+  }
+}
+
+query GetCourseCompletionStatusForUser($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  sections: courseSections(where: { courseId: { eq: $courseId }, deletedAt: { eq: null } }) {
+    userCompletionLectures: courseLectures_on_section(where: { deletedAt: { eq: null } }) {
+      id userCompletionProgress: lectureProgresses_on_lecture(where: { userId: { eq: $userId } }) { completedAt }
+    }
+  }
+}
+
+query GetUserEnrollmentForCourseByUser($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  enrollments(where: { userId: { eq: $userId }, courseId: { eq: $courseId }, targetType: { eq: COURSE } }) { id status completedAt }
+}
+
+mutation UpdateEnrollmentStatus($enrollmentId: UUID!, $status: EnrollmentStatus!, $completedAt: Timestamp) @auth(level: USER) {
+  enrollment_updateMany(
+    where: { id: { eq: $enrollmentId }, userId: { eq_expr: "auth.uid" } },
+    data: { status: $status, completedAt: $completedAt }
   )
 }
 
-# Updates the authenticated user's progress for a watched lecture
-mutation UpdateLectureProgress(
-  $lectureId: UUID!, 
-  $lastWatchedSecond: Int!,
-  $completedAt: Timestamp
-) @auth(level: USER) {
-  lectureProgress_upsert(
-    data: {
-      userId_expr: "auth.uid",
-      lectureId: $lectureId,
-      lastWatchedSecond: $lastWatchedSecond,
-      completedAt: $completedAt
-    }
-  )
+query GetUserEnrollmentForCourse($courseId: UUID!) @auth(level: USER) {
+  enrollments(where: { userId: { eq_expr: "auth.uid" }, courseId: { eq: $courseId }, targetType: { eq: COURSE } }) { id status completedAt }
+}
+
+query GetUserEnrollmentForMission($missionId: UUID!) @auth(level: USER) {
+  enrollments(where: { userId: { eq_expr: "auth.uid" }, missionId: { eq: $missionId }, targetType: { eq: MISSION } }) { id status completedAt }
 }

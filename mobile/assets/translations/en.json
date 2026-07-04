@@ -100,5 +100,47 @@
     "not_found": "Page Not Found",
     "not_found_msg": "The route you requested does not exist.",
     "go_home": "Go to Home"
+  },
+  "courses": {
+    "title": "Courses",
+    "searchHint": "Search for courses, lessons, quizzes...",
+    "categories": {
+      "title": "Categories",
+      "viewAll": "View all",
+      "empty": "No categories found"
+    },
+    "list": {
+      "empty": "No courses found",
+      "lessonsCount": "{count} Lessons"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "errors": {
+      "unexpected": "Unexpected error occurred"
+    },
+    "filterSheet": {
+      "title": "Filter",
+      "courseStatus": "Course status",
+      "sortBy": "Sort by",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low"
+    }
   }
 }

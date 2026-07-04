@@ -1,0 +1,31 @@
+# Redis for the backend/ (Firebase Data Connect) app's BullMQ queues
+# (granular progress tracking + video transcoding).
+#
+# Intentionally SEPARATE from the repo-root docker-compose.yml (which builds the
+# legacy api/ + web/ + Postgres stack) so the two never interfere.
+#
+#   docker compose -f backend/docker-compose.yml up -d      # start
+#   docker compose -f backend/docker-compose.yml ps         # health
+#   docker compose -f backend/docker-compose.yml down       # stop (keep data)
+#   docker compose -f backend/docker-compose.yml down -v    # stop + wipe data
+#
+# No password — matches backend/.env defaults (REDIS_HOST=127.0.0.1,
+# REDIS_PORT=6379, REDIS_PASSWORD empty).
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: lms-backend-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - lms-backend-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  lms-backend-redis-data:
