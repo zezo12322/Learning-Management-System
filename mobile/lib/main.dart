@@ -12,6 +12,7 @@ import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
 import 'package:optimatech_lms/features/home/presentation/views/home_view.dart';
+import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 
 Future<void> main() async {
@@ -67,7 +68,7 @@ class OptimaTechLMS extends StatelessWidget {
           darkTheme: AppTheme.dark,
           // Routing
           onGenerateRoute: generateRoute,
-          initialRoute: CoursesView.routeName,
+          initialRoute: ProfileView.routeName,
         );
       },
     );

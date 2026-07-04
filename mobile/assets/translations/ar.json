@@ -142,5 +142,65 @@
       "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
       "priceHighToLow": "السعر: من الأعلى إلى الأقل"
     }
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "common": {
+      "edit": "تعديل",
+      "view_all": "عرض الكل"
+    },
+    "header": {
+      "role": "طالب",
+      "joined": "انضم في مارس 2024",
+      "stats": {
+        "courses": "الكورسات المسجل بها",
+        "courses_subtitle": "تعلّم نشط",
+        "hours": "ساعات التعلّم",
+        "hours_subtitle": "+12 هذا الأسبوع",
+        "assessments": "التقييمات المكتملة",
+        "assessments_subtitle": "متوسط 85%",
+        "certificates": "الشهادات المكتسبة",
+        "certificates_subtitle": "استمر!"
+      }
+    },
+    "sections": {
+      "user_information": "معلومات المستخدم",
+      "learning_statistics": "إحصائيات التعلّم",
+      "certificates": "الشهادات",
+      "completed_courses": "الكورسات المكتملة",
+      "settings": "الإعدادات"
+    },
+    "info": {
+      "full_name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "location": "الموقع",
+      "birth_date": "تاريخ الميلاد"
+    },
+    "statistics": {
+      "hours": "ساعات التعلّم",
+      "hours_subtitle": "+12 هذا الأسبوع",
+      "courses": "الكورسات المسجل بها",
+      "courses_subtitle": "تعلّم نشط",
+      "certificates": "الشهادات",
+      "certificates_subtitle": "مكتملة",
+      "assessments": "التقييمات",
+      "assessments_subtitle": "متوسط 85%"
+    },
+    "certificates": {
+      "issued_on": "تم الإصدار في {date}",
+      "verified": "موثقة"
+    },
+    "completed_courses": {
+      "completed_on": "اكتمل في {date}",
+      "completed": "مكتمل"
+    },
+    "settings": {
+      "account": "إعدادات الحساب",
+      "notifications": "تفضيلات الإشعارات",
+      "privacy": "الخصوصية والأمان",
+      "help": "المساعدة والدعم",
+      "logout": "تسجيل الخروج"
+    }
   }
 }
