@@ -4,51 +4,97 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-part 'admin_create_course.dart';
+part 'get_quiz_questions.dart';
 
-part 'admin_delete_course.dart';
+part 'start_quiz_attempt.dart';
 
-part 'admin_create_course_section.dart';
+part 'submit_quiz_answer.dart';
 
-part 'admin_create_lecture.dart';
+part 'finish_quiz_attempt_if_open.dart';
 
-part 'instructor_courses.dart';
+part 'get_expired_attempts.dart';
 
-part 'admin_create_session.dart';
+part 'get_user_quiz_attempts.dart';
 
-part 'admin_cancel_session.dart';
+part 'get_quiz_attempt_by_id.dart';
 
-part 'admin_create_subscription_tier.dart';
+part 'get_quiz_question_points.dart';
 
-part 'admin_deprecate_subscription_tier.dart';
+part 'get_attempt_answers_with_correct.dart';
 
-part 'list_subscription_tiers.dart';
+part 'get_quiz_settings.dart';
 
-part 'admin_create_category.dart';
+part 'get_question_options.dart';
 
-part 'list_categories.dart';
+part 'get_option_with_question.dart';
+
+part 'get_active_quiz_session.dart';
+
+part 'admin_get_quiz.dart';
 
 part 'admin_create_quiz.dart';
 
+part 'admin_update_quiz.dart';
+
+part 'admin_delete_quiz.dart';
+
 part 'admin_create_quiz_question.dart';
+
+part 'admin_update_quiz_question.dart';
+
+part 'admin_soft_delete_quiz_question.dart';
+
+part 'admin_update_quiz_question_order.dart';
 
 part 'admin_create_quiz_option.dart';
 
-part 'admin_create_mission.dart';
+part 'admin_update_quiz_option.dart';
 
-part 'admin_create_rubric_criterion.dart';
+part 'admin_delete_quiz_option.dart';
 
-part 'admin_issue_certificate.dart';
+part 'admin_update_quiz_option_order.dart';
+
+part 'get_my_course_access.dart';
+
+part 'get_my_mission_access.dart';
+
+part 'get_question_course.dart';
+
+part 'get_option_course.dart';
+
+part 'get_section_course.dart';
+
+part 'get_micro_lesson_mission.dart';
+
+part 'get_criterion_mission.dart';
+
+part 'get_template_mission.dart';
+
+part 'log_payment.dart';
+
+part 'add_payment_item.dart';
+
+part 'my_payment_history.dart';
 
 part 'get_pending_submissions.dart';
 
-part 'submit_mission.dart';
+part 'admin_add_course_instructor.dart';
 
-part 'grade_submission.dart';
+part 'admin_remove_course_instructor.dart';
 
-part 'add_criterion_score.dart';
+part 'get_course_instructors.dart';
 
-part 'my_submissions.dart';
+part 'upsert_course_rating.dart';
+
+part 'delete_course_rating.dart';
+
+part 'get_my_course_rating.dart';
+
+part 'list_course_ratings.dart';
+
+part 'get_course_ratings_for_summary.dart';
+
+part 'admin_update_course_rating_aggregate.dart';
 
 part 'get_course_sessions.dart';
 
@@ -60,19 +106,73 @@ part 'get_me.dart';
 
 part 'update_my_profile.dart';
 
+part 'admin_create_course.dart';
+
+part 'instructor_delete_course.dart';
+
+part 'super_admin_delete_course.dart';
+
+part 'admin_create_session.dart';
+
+part 'instructor_cancel_session.dart';
+
+part 'super_admin_cancel_session.dart';
+
+part 'admin_create_subscription_tier.dart';
+
+part 'admin_deprecate_subscription_tier.dart';
+
+part 'admin_create_category.dart';
+
+part 'get_user_claims.dart';
+
 part 'my_certificates.dart';
 
 part 'verify_certificate.dart';
 
+part 'list_categories.dart';
+
 part 'list_published_courses.dart';
+
+part 'search_published_courses.dart';
 
 part 'get_course_curriculum.dart';
 
-part 'log_payment.dart';
+part 'get_lecture_content.dart';
 
-part 'add_payment_item.dart';
+part 'get_user_lecture_progress.dart';
 
-part 'my_payment_history.dart';
+part 'get_my_course_progress.dart';
+
+part 'get_course_for_enrollment.dart';
+
+part 'admin_get_course.dart';
+
+part 'admin_list_my_courses.dart';
+
+part 'admin_update_course.dart';
+
+part 'admin_update_course_status.dart';
+
+part 'admin_create_section.dart';
+
+part 'admin_update_section.dart';
+
+part 'admin_soft_delete_section.dart';
+
+part 'admin_update_section_order.dart';
+
+part 'admin_create_lecture_full.dart';
+
+part 'admin_update_lecture.dart';
+
+part 'admin_soft_delete_lecture.dart';
+
+part 'admin_update_lecture_order.dart';
+
+part 'admin_move_lecture_to_section.dart';
+
+part 'admin_soft_delete_lectures_by_section.dart';
 
 part 'enroll_in_course.dart';
 
@@ -80,13 +180,67 @@ part 'enroll_in_mission.dart';
 
 part 'update_lecture_progress.dart';
 
-part 'get_quiz_questions.dart';
+part 'admin_upsert_lecture_progress.dart';
 
-part 'start_quiz_attempt.dart';
+part 'get_lecture_duration.dart';
 
-part 'submit_quiz_answer.dart';
+part 'get_course_completion_status.dart';
 
-part 'finish_quiz_attempt.dart';
+part 'get_course_completion_status_for_user.dart';
+
+part 'get_user_enrollment_for_course_by_user.dart';
+
+part 'update_enrollment_status.dart';
+
+part 'get_user_enrollment_for_course.dart';
+
+part 'get_user_enrollment_for_mission.dart';
+
+part 'get_mission_for_enrollment.dart';
+
+part 'submit_mission.dart';
+
+part 'my_submissions.dart';
+
+part 'grade_submission.dart';
+
+part 'add_criterion_score.dart';
+
+part 'get_submission_for_grading.dart';
+
+part 'get_enrollment_for_user_mission.dart';
+
+part 'admin_create_mission.dart';
+
+part 'admin_update_mission.dart';
+
+part 'admin_soft_delete_mission.dart';
+
+part 'admin_get_mission.dart';
+
+part 'admin_list_my_missions.dart';
+
+part 'admin_create_micro_lesson.dart';
+
+part 'admin_update_micro_lesson.dart';
+
+part 'admin_delete_micro_lesson.dart';
+
+part 'admin_update_micro_lesson_order.dart';
+
+part 'admin_create_mission_template.dart';
+
+part 'admin_delete_mission_template.dart';
+
+part 'get_mission_templates.dart';
+
+part 'admin_create_rubric_criterion.dart';
+
+part 'admin_update_rubric_criterion.dart';
+
+part 'admin_delete_rubric_criterion.dart';
+
+part 'admin_update_rubric_criterion_order.dart';
 
 
 
@@ -264,6 +418,42 @@ part 'finish_quiz_attempt.dart';
       
       case 'ARCHIVED':
         return const Known(CourseStatus.ARCHIVED);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum EnrollmentStatus {
+    
+      ACTIVE,
+    
+      COMPLETED,
+    
+      DROPPED,
+    
+      SUSPENDED,
+    
+  }
+  
+  String enrollmentStatusSerializer(EnumValue<EnrollmentStatus> e) {
+    return e.stringValue;
+  }
+  EnumValue<EnrollmentStatus> enrollmentStatusDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'ACTIVE':
+        return const Known(EnrollmentStatus.ACTIVE);
+      
+      case 'COMPLETED':
+        return const Known(EnrollmentStatus.COMPLETED);
+      
+      case 'DROPPED':
+        return const Known(EnrollmentStatus.DROPPED);
+      
+      case 'SUSPENDED':
+        return const Known(EnrollmentStatus.SUSPENDED);
       
       default:
         return Unknown(data);
@@ -557,63 +747,73 @@ class Unknown extends EnumValue<Never> {
 class DefaultConnector {
   
   
-  AdminCreateCourseVariablesBuilder adminCreateCourse ({required String title, required int price, required String language, required CourseLevel level, required String categoryId, required List<String> tags, }) {
-    return AdminCreateCourseVariablesBuilder(dataConnect, title: title,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
+  GetQuizQuestionsVariablesBuilder getQuizQuestions ({required String lectureId, }) {
+    return GetQuizQuestionsVariablesBuilder(dataConnect, lectureId: lectureId,);
   }
   
   
-  AdminDeleteCourseVariablesBuilder adminDeleteCourse ({required String courseId, }) {
-    return AdminDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, }) {
+    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminCreateCourseSectionVariablesBuilder adminCreateCourseSection ({required String courseId, required String title, required int order, }) {
-    return AdminCreateCourseSectionVariablesBuilder(dataConnect, courseId: courseId,title: title,order: order,);
+  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required String optionId, }) {
+    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,optionId: optionId,);
   }
   
   
-  AdminCreateLectureVariablesBuilder adminCreateLecture ({required String sectionId, required String title, required LectureType type, required int order, }) {
-    return AdminCreateLectureVariablesBuilder(dataConnect, sectionId: sectionId,title: title,type: type,order: order,);
+  FinishQuizAttemptIfOpenVariablesBuilder finishQuizAttemptIfOpen ({required String attemptId, required double score, required bool passed, }) {
+    return FinishQuizAttemptIfOpenVariablesBuilder(dataConnect, attemptId: attemptId,score: score,passed: passed,);
   }
   
   
-  InstructorCoursesVariablesBuilder instructorCourses () {
-    return InstructorCoursesVariablesBuilder(dataConnect, );
+  GetExpiredAttemptsVariablesBuilder getExpiredAttempts () {
+    return GetExpiredAttemptsVariablesBuilder(dataConnect, );
   }
   
   
-  AdminCreateSessionVariablesBuilder adminCreateSession ({required String courseId, required String title, required Timestamp startTime, required Timestamp endTime, required SessionType type, required String locationOrUrl, }) {
-    return AdminCreateSessionVariablesBuilder(dataConnect, courseId: courseId,title: title,startTime: startTime,endTime: endTime,type: type,locationOrUrl: locationOrUrl,);
+  GetUserQuizAttemptsVariablesBuilder getUserQuizAttempts ({required String quizId, }) {
+    return GetUserQuizAttemptsVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminCancelSessionVariablesBuilder adminCancelSession ({required String sessionId, }) {
-    return AdminCancelSessionVariablesBuilder(dataConnect, sessionId: sessionId,);
+  GetQuizAttemptByIdVariablesBuilder getQuizAttemptById ({required String attemptId, }) {
+    return GetQuizAttemptByIdVariablesBuilder(dataConnect, attemptId: attemptId,);
   }
   
   
-  AdminCreateSubscriptionTierVariablesBuilder adminCreateSubscriptionTier ({required String name, required int price, required BillingCycle billingCycle, required List<String> features, }) {
-    return AdminCreateSubscriptionTierVariablesBuilder(dataConnect, name: name,price: price,billingCycle: billingCycle,features: features,);
+  GetQuizQuestionPointsVariablesBuilder getQuizQuestionPoints ({required String quizId, }) {
+    return GetQuizQuestionPointsVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminDeprecateSubscriptionTierVariablesBuilder adminDeprecateSubscriptionTier ({required String tierId, }) {
-    return AdminDeprecateSubscriptionTierVariablesBuilder(dataConnect, tierId: tierId,);
+  GetAttemptAnswersWithCorrectVariablesBuilder getAttemptAnswersWithCorrect ({required String attemptId, }) {
+    return GetAttemptAnswersWithCorrectVariablesBuilder(dataConnect, attemptId: attemptId,);
   }
   
   
-  ListSubscriptionTiersVariablesBuilder listSubscriptionTiers () {
-    return ListSubscriptionTiersVariablesBuilder(dataConnect, );
+  GetQuizSettingsVariablesBuilder getQuizSettings ({required String quizId, }) {
+    return GetQuizSettingsVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminCreateCategoryVariablesBuilder adminCreateCategory ({required String name, }) {
-    return AdminCreateCategoryVariablesBuilder(dataConnect, name: name,);
+  GetQuestionOptionsVariablesBuilder getQuestionOptions ({required String questionId, }) {
+    return GetQuestionOptionsVariablesBuilder(dataConnect, questionId: questionId,);
   }
   
   
-  ListCategoriesVariablesBuilder listCategories () {
-    return ListCategoriesVariablesBuilder(dataConnect, );
+  GetOptionWithQuestionVariablesBuilder getOptionWithQuestion ({required String optionId, }) {
+    return GetOptionWithQuestionVariablesBuilder(dataConnect, optionId: optionId,);
+  }
+  
+  
+  GetActiveQuizSessionVariablesBuilder getActiveQuizSession ({required String attemptId, }) {
+    return GetActiveQuizSessionVariablesBuilder(dataConnect, attemptId: attemptId,);
+  }
+  
+  
+  AdminGetQuizVariablesBuilder adminGetQuiz ({required String quizId, }) {
+    return AdminGetQuizVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
@@ -622,28 +822,108 @@ class DefaultConnector {
   }
   
   
-  AdminCreateQuizQuestionVariablesBuilder adminCreateQuizQuestion ({required String quizId, required String questionText, required int order, required String correctOptionId, }) {
-    return AdminCreateQuizQuestionVariablesBuilder(dataConnect, quizId: quizId,questionText: questionText,order: order,correctOptionId: correctOptionId,);
+  AdminUpdateQuizVariablesBuilder adminUpdateQuiz ({required String quizId, }) {
+    return AdminUpdateQuizVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminCreateQuizOptionVariablesBuilder adminCreateQuizOption ({required String questionId, required String text, required int order, }) {
-    return AdminCreateQuizOptionVariablesBuilder(dataConnect, questionId: questionId,text: text,order: order,);
+  AdminDeleteQuizVariablesBuilder adminDeleteQuiz ({required String quizId, }) {
+    return AdminDeleteQuizVariablesBuilder(dataConnect, quizId: quizId,);
   }
   
   
-  AdminCreateMissionVariablesBuilder adminCreateMission ({required String title, required String scenarioDescription, required int durationMinutes, required String categoryId, required MissionDifficulty difficulty, required List<String> skillsTested, }) {
-    return AdminCreateMissionVariablesBuilder(dataConnect, title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,);
+  AdminCreateQuizQuestionVariablesBuilder adminCreateQuizQuestion ({required String quizId, required String questionText, required int order, required double points, }) {
+    return AdminCreateQuizQuestionVariablesBuilder(dataConnect, quizId: quizId,questionText: questionText,order: order,points: points,);
   }
   
   
-  AdminCreateRubricCriterionVariablesBuilder adminCreateRubricCriterion ({required String missionId, required String criterionName, required double maxPoints, required int order, }) {
-    return AdminCreateRubricCriterionVariablesBuilder(dataConnect, missionId: missionId,criterionName: criterionName,maxPoints: maxPoints,order: order,);
+  AdminUpdateQuizQuestionVariablesBuilder adminUpdateQuizQuestion ({required String questionId, }) {
+    return AdminUpdateQuizQuestionVariablesBuilder(dataConnect, questionId: questionId,);
   }
   
   
-  AdminIssueCertificateVariablesBuilder adminIssueCertificate ({required String userId, required CertificateTarget targetType, required String verificationHash, required String assetUrl, }) {
-    return AdminIssueCertificateVariablesBuilder(dataConnect, userId: userId,targetType: targetType,verificationHash: verificationHash,assetUrl: assetUrl,);
+  AdminSoftDeleteQuizQuestionVariablesBuilder adminSoftDeleteQuizQuestion ({required String questionId, }) {
+    return AdminSoftDeleteQuizQuestionVariablesBuilder(dataConnect, questionId: questionId,);
+  }
+  
+  
+  AdminUpdateQuizQuestionOrderVariablesBuilder adminUpdateQuizQuestionOrder ({required String questionId, required int order, }) {
+    return AdminUpdateQuizQuestionOrderVariablesBuilder(dataConnect, questionId: questionId,order: order,);
+  }
+  
+  
+  AdminCreateQuizOptionVariablesBuilder adminCreateQuizOption ({required String questionId, required String text, required int order, required bool isCorrect, }) {
+    return AdminCreateQuizOptionVariablesBuilder(dataConnect, questionId: questionId,text: text,order: order,isCorrect: isCorrect,);
+  }
+  
+  
+  AdminUpdateQuizOptionVariablesBuilder adminUpdateQuizOption ({required String optionId, }) {
+    return AdminUpdateQuizOptionVariablesBuilder(dataConnect, optionId: optionId,);
+  }
+  
+  
+  AdminDeleteQuizOptionVariablesBuilder adminDeleteQuizOption ({required String optionId, }) {
+    return AdminDeleteQuizOptionVariablesBuilder(dataConnect, optionId: optionId,);
+  }
+  
+  
+  AdminUpdateQuizOptionOrderVariablesBuilder adminUpdateQuizOptionOrder ({required String optionId, required int order, }) {
+    return AdminUpdateQuizOptionOrderVariablesBuilder(dataConnect, optionId: optionId,order: order,);
+  }
+  
+  
+  GetMyCourseAccessVariablesBuilder getMyCourseAccess ({required String courseId, }) {
+    return GetMyCourseAccessVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetMyMissionAccessVariablesBuilder getMyMissionAccess ({required String missionId, }) {
+    return GetMyMissionAccessVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  GetQuestionCourseVariablesBuilder getQuestionCourse ({required String questionId, }) {
+    return GetQuestionCourseVariablesBuilder(dataConnect, questionId: questionId,);
+  }
+  
+  
+  GetOptionCourseVariablesBuilder getOptionCourse ({required String optionId, }) {
+    return GetOptionCourseVariablesBuilder(dataConnect, optionId: optionId,);
+  }
+  
+  
+  GetSectionCourseVariablesBuilder getSectionCourse ({required String sectionId, }) {
+    return GetSectionCourseVariablesBuilder(dataConnect, sectionId: sectionId,);
+  }
+  
+  
+  GetMicroLessonMissionVariablesBuilder getMicroLessonMission ({required String microLessonId, }) {
+    return GetMicroLessonMissionVariablesBuilder(dataConnect, microLessonId: microLessonId,);
+  }
+  
+  
+  GetCriterionMissionVariablesBuilder getCriterionMission ({required String criterionId, }) {
+    return GetCriterionMissionVariablesBuilder(dataConnect, criterionId: criterionId,);
+  }
+  
+  
+  GetTemplateMissionVariablesBuilder getTemplateMission ({required String templateId, }) {
+    return GetTemplateMissionVariablesBuilder(dataConnect, templateId: templateId,);
+  }
+  
+  
+  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, required int amount, required String customerEmailSnapshot, }) {
+    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,amount: amount,customerEmailSnapshot: customerEmailSnapshot,);
+  }
+  
+  
+  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required PaymentItemTarget targetType, required int price, }) {
+    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,targetType: targetType,price: price,);
+  }
+  
+  
+  MyPaymentHistoryVariablesBuilder myPaymentHistory () {
+    return MyPaymentHistoryVariablesBuilder(dataConnect, );
   }
   
   
@@ -652,23 +932,48 @@ class DefaultConnector {
   }
   
   
-  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
-    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
+  AdminAddCourseInstructorVariablesBuilder adminAddCourseInstructor ({required String courseId, required String userId, }) {
+    return AdminAddCourseInstructorVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
   
   
-  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, }) {
-    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,);
+  AdminRemoveCourseInstructorVariablesBuilder adminRemoveCourseInstructor ({required String courseId, required String userId, }) {
+    return AdminRemoveCourseInstructorVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
   
   
-  AddCriterionScoreVariablesBuilder addCriterionScore ({required String submissionId, required String criterionId, required double score, }) {
-    return AddCriterionScoreVariablesBuilder(dataConnect, submissionId: submissionId,criterionId: criterionId,score: score,);
+  GetCourseInstructorsVariablesBuilder getCourseInstructors ({required String courseId, }) {
+    return GetCourseInstructorsVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
   
-  MySubmissionsVariablesBuilder mySubmissions () {
-    return MySubmissionsVariablesBuilder(dataConnect, );
+  UpsertCourseRatingVariablesBuilder upsertCourseRating ({required String courseId, required int rating, }) {
+    return UpsertCourseRatingVariablesBuilder(dataConnect, courseId: courseId,rating: rating,);
+  }
+  
+  
+  DeleteCourseRatingVariablesBuilder deleteCourseRating ({required String courseId, }) {
+    return DeleteCourseRatingVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetMyCourseRatingVariablesBuilder getMyCourseRating ({required String courseId, }) {
+    return GetMyCourseRatingVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  ListCourseRatingsVariablesBuilder listCourseRatings ({required String courseId, }) {
+    return ListCourseRatingsVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetCourseRatingsForSummaryVariablesBuilder getCourseRatingsForSummary ({required String courseId, }) {
+    return GetCourseRatingsForSummaryVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminUpdateCourseRatingAggregateVariablesBuilder adminUpdateCourseRatingAggregate ({required String courseId, required double avgRating, required int ratingCount, }) {
+    return AdminUpdateCourseRatingAggregateVariablesBuilder(dataConnect, courseId: courseId,avgRating: avgRating,ratingCount: ratingCount,);
   }
   
   
@@ -697,6 +1002,56 @@ class DefaultConnector {
   }
   
   
+  AdminCreateCourseVariablesBuilder adminCreateCourse ({required String title, required int price, required String language, required CourseLevel level, required String categoryId, required List<String> tags, }) {
+    return AdminCreateCourseVariablesBuilder(dataConnect, title: title,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
+  }
+  
+  
+  InstructorDeleteCourseVariablesBuilder instructorDeleteCourse ({required String courseId, }) {
+    return InstructorDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  SuperAdminDeleteCourseVariablesBuilder superAdminDeleteCourse ({required String courseId, }) {
+    return SuperAdminDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminCreateSessionVariablesBuilder adminCreateSession ({required String courseId, required String title, required Timestamp startTime, required Timestamp endTime, required SessionType type, required String locationOrUrl, }) {
+    return AdminCreateSessionVariablesBuilder(dataConnect, courseId: courseId,title: title,startTime: startTime,endTime: endTime,type: type,locationOrUrl: locationOrUrl,);
+  }
+  
+  
+  InstructorCancelSessionVariablesBuilder instructorCancelSession ({required String sessionId, }) {
+    return InstructorCancelSessionVariablesBuilder(dataConnect, sessionId: sessionId,);
+  }
+  
+  
+  SuperAdminCancelSessionVariablesBuilder superAdminCancelSession ({required String sessionId, }) {
+    return SuperAdminCancelSessionVariablesBuilder(dataConnect, sessionId: sessionId,);
+  }
+  
+  
+  AdminCreateSubscriptionTierVariablesBuilder adminCreateSubscriptionTier ({required String name, required int price, required BillingCycle billingCycle, required List<String> features, }) {
+    return AdminCreateSubscriptionTierVariablesBuilder(dataConnect, name: name,price: price,billingCycle: billingCycle,features: features,);
+  }
+  
+  
+  AdminDeprecateSubscriptionTierVariablesBuilder adminDeprecateSubscriptionTier ({required String tierId, }) {
+    return AdminDeprecateSubscriptionTierVariablesBuilder(dataConnect, tierId: tierId,);
+  }
+  
+  
+  AdminCreateCategoryVariablesBuilder adminCreateCategory ({required String name, }) {
+    return AdminCreateCategoryVariablesBuilder(dataConnect, name: name,);
+  }
+  
+  
+  GetUserClaimsVariablesBuilder getUserClaims ({required String uid, }) {
+    return GetUserClaimsVariablesBuilder(dataConnect, uid: uid,);
+  }
+  
+  
   MyCertificatesVariablesBuilder myCertificates () {
     return MyCertificatesVariablesBuilder(dataConnect, );
   }
@@ -707,8 +1062,18 @@ class DefaultConnector {
   }
   
   
+  ListCategoriesVariablesBuilder listCategories () {
+    return ListCategoriesVariablesBuilder(dataConnect, );
+  }
+  
+  
   ListPublishedCoursesVariablesBuilder listPublishedCourses () {
     return ListPublishedCoursesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  SearchPublishedCoursesVariablesBuilder searchPublishedCourses ({required String searchQuery, }) {
+    return SearchPublishedCoursesVariablesBuilder(dataConnect, searchQuery: searchQuery,);
   }
   
   
@@ -717,18 +1082,93 @@ class DefaultConnector {
   }
   
   
-  LogPaymentVariablesBuilder logPayment ({required PaymentGateway gateway, required String referenceId, required int amount, }) {
-    return LogPaymentVariablesBuilder(dataConnect, gateway: gateway,referenceId: referenceId,amount: amount,);
+  GetLectureContentVariablesBuilder getLectureContent ({required String lectureId, }) {
+    return GetLectureContentVariablesBuilder(dataConnect, lectureId: lectureId,);
   }
   
   
-  AddPaymentItemVariablesBuilder addPaymentItem ({required String paymentId, required PaymentItemTarget targetType, required int price, }) {
-    return AddPaymentItemVariablesBuilder(dataConnect, paymentId: paymentId,targetType: targetType,price: price,);
+  GetUserLectureProgressVariablesBuilder getUserLectureProgress ({required String lectureId, }) {
+    return GetUserLectureProgressVariablesBuilder(dataConnect, lectureId: lectureId,);
   }
   
   
-  MyPaymentHistoryVariablesBuilder myPaymentHistory () {
-    return MyPaymentHistoryVariablesBuilder(dataConnect, );
+  GetMyCourseProgressVariablesBuilder getMyCourseProgress ({required String courseId, }) {
+    return GetMyCourseProgressVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetCourseForEnrollmentVariablesBuilder getCourseForEnrollment ({required String courseId, }) {
+    return GetCourseForEnrollmentVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminGetCourseVariablesBuilder adminGetCourse ({required String courseId, }) {
+    return AdminGetCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminListMyCoursesVariablesBuilder adminListMyCourses () {
+    return AdminListMyCoursesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  AdminUpdateCourseVariablesBuilder adminUpdateCourse ({required String courseId, }) {
+    return AdminUpdateCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  AdminUpdateCourseStatusVariablesBuilder adminUpdateCourseStatus ({required String courseId, required CourseStatus status, }) {
+    return AdminUpdateCourseStatusVariablesBuilder(dataConnect, courseId: courseId,status: status,);
+  }
+  
+  
+  AdminCreateSectionVariablesBuilder adminCreateSection ({required String courseId, required String title, required int order, }) {
+    return AdminCreateSectionVariablesBuilder(dataConnect, courseId: courseId,title: title,order: order,);
+  }
+  
+  
+  AdminUpdateSectionVariablesBuilder adminUpdateSection ({required String sectionId, required String title, }) {
+    return AdminUpdateSectionVariablesBuilder(dataConnect, sectionId: sectionId,title: title,);
+  }
+  
+  
+  AdminSoftDeleteSectionVariablesBuilder adminSoftDeleteSection ({required String sectionId, }) {
+    return AdminSoftDeleteSectionVariablesBuilder(dataConnect, sectionId: sectionId,);
+  }
+  
+  
+  AdminUpdateSectionOrderVariablesBuilder adminUpdateSectionOrder ({required String sectionId, required int order, }) {
+    return AdminUpdateSectionOrderVariablesBuilder(dataConnect, sectionId: sectionId,order: order,);
+  }
+  
+  
+  AdminCreateLectureFullVariablesBuilder adminCreateLectureFull ({required String sectionId, required String title, required LectureType type, required bool isFreePreview, required int order, }) {
+    return AdminCreateLectureFullVariablesBuilder(dataConnect, sectionId: sectionId,title: title,type: type,isFreePreview: isFreePreview,order: order,);
+  }
+  
+  
+  AdminUpdateLectureVariablesBuilder adminUpdateLecture ({required String lectureId, }) {
+    return AdminUpdateLectureVariablesBuilder(dataConnect, lectureId: lectureId,);
+  }
+  
+  
+  AdminSoftDeleteLectureVariablesBuilder adminSoftDeleteLecture ({required String lectureId, }) {
+    return AdminSoftDeleteLectureVariablesBuilder(dataConnect, lectureId: lectureId,);
+  }
+  
+  
+  AdminUpdateLectureOrderVariablesBuilder adminUpdateLectureOrder ({required String lectureId, required int order, }) {
+    return AdminUpdateLectureOrderVariablesBuilder(dataConnect, lectureId: lectureId,order: order,);
+  }
+  
+  
+  AdminMoveLectureToSectionVariablesBuilder adminMoveLectureToSection ({required String lectureId, required String newSectionId, required int order, }) {
+    return AdminMoveLectureToSectionVariablesBuilder(dataConnect, lectureId: lectureId,newSectionId: newSectionId,order: order,);
+  }
+  
+  
+  AdminSoftDeleteLecturesBySectionVariablesBuilder adminSoftDeleteLecturesBySection ({required String sectionId, }) {
+    return AdminSoftDeleteLecturesBySectionVariablesBuilder(dataConnect, sectionId: sectionId,);
   }
   
   
@@ -747,23 +1187,158 @@ class DefaultConnector {
   }
   
   
-  GetQuizQuestionsVariablesBuilder getQuizQuestions ({required String lectureId, }) {
-    return GetQuizQuestionsVariablesBuilder(dataConnect, lectureId: lectureId,);
+  AdminUpsertLectureProgressVariablesBuilder adminUpsertLectureProgress ({required String userId, required String lectureId, required int lastWatchedSecond, }) {
+    return AdminUpsertLectureProgressVariablesBuilder(dataConnect, userId: userId,lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,);
   }
   
   
-  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, }) {
-    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,);
+  GetLectureDurationVariablesBuilder getLectureDuration ({required String lectureId, }) {
+    return GetLectureDurationVariablesBuilder(dataConnect, lectureId: lectureId,);
   }
   
   
-  SubmitQuizAnswerVariablesBuilder submitQuizAnswer ({required String attemptId, required String questionId, required String optionId, }) {
-    return SubmitQuizAnswerVariablesBuilder(dataConnect, attemptId: attemptId,questionId: questionId,optionId: optionId,);
+  GetCourseCompletionStatusVariablesBuilder getCourseCompletionStatus ({required String courseId, }) {
+    return GetCourseCompletionStatusVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
   
-  FinishQuizAttemptVariablesBuilder finishQuizAttempt ({required String attemptId, required double score, required bool passed, }) {
-    return FinishQuizAttemptVariablesBuilder(dataConnect, attemptId: attemptId,score: score,passed: passed,);
+  GetCourseCompletionStatusForUserVariablesBuilder getCourseCompletionStatusForUser ({required String courseId, required String userId, }) {
+    return GetCourseCompletionStatusForUserVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
+  }
+  
+  
+  GetUserEnrollmentForCourseByUserVariablesBuilder getUserEnrollmentForCourseByUser ({required String courseId, required String userId, }) {
+    return GetUserEnrollmentForCourseByUserVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
+  }
+  
+  
+  UpdateEnrollmentStatusVariablesBuilder updateEnrollmentStatus ({required String enrollmentId, required EnrollmentStatus status, }) {
+    return UpdateEnrollmentStatusVariablesBuilder(dataConnect, enrollmentId: enrollmentId,status: status,);
+  }
+  
+  
+  GetUserEnrollmentForCourseVariablesBuilder getUserEnrollmentForCourse ({required String courseId, }) {
+    return GetUserEnrollmentForCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  }
+  
+  
+  GetUserEnrollmentForMissionVariablesBuilder getUserEnrollmentForMission ({required String missionId, }) {
+    return GetUserEnrollmentForMissionVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  GetMissionForEnrollmentVariablesBuilder getMissionForEnrollment ({required String missionId, }) {
+    return GetMissionForEnrollmentVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
+    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
+  }
+  
+  
+  MySubmissionsVariablesBuilder mySubmissions () {
+    return MySubmissionsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, }) {
+    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,);
+  }
+  
+  
+  AddCriterionScoreVariablesBuilder addCriterionScore ({required String submissionId, required String criterionId, required double score, }) {
+    return AddCriterionScoreVariablesBuilder(dataConnect, submissionId: submissionId,criterionId: criterionId,score: score,);
+  }
+  
+  
+  GetSubmissionForGradingVariablesBuilder getSubmissionForGrading ({required String submissionId, }) {
+    return GetSubmissionForGradingVariablesBuilder(dataConnect, submissionId: submissionId,);
+  }
+  
+  
+  GetEnrollmentForUserMissionVariablesBuilder getEnrollmentForUserMission ({required String userId, required String missionId, }) {
+    return GetEnrollmentForUserMissionVariablesBuilder(dataConnect, userId: userId,missionId: missionId,);
+  }
+  
+  
+  AdminCreateMissionVariablesBuilder adminCreateMission ({required String title, required String scenarioDescription, required int durationMinutes, required String categoryId, required MissionDifficulty difficulty, required List<String> skillsTested, }) {
+    return AdminCreateMissionVariablesBuilder(dataConnect, title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,);
+  }
+  
+  
+  AdminUpdateMissionVariablesBuilder adminUpdateMission ({required String missionId, }) {
+    return AdminUpdateMissionVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  AdminSoftDeleteMissionVariablesBuilder adminSoftDeleteMission ({required String missionId, }) {
+    return AdminSoftDeleteMissionVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  AdminGetMissionVariablesBuilder adminGetMission ({required String missionId, }) {
+    return AdminGetMissionVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  AdminListMyMissionsVariablesBuilder adminListMyMissions () {
+    return AdminListMyMissionsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  AdminCreateMicroLessonVariablesBuilder adminCreateMicroLesson ({required String missionId, required String title, required LectureType type, required int order, }) {
+    return AdminCreateMicroLessonVariablesBuilder(dataConnect, missionId: missionId,title: title,type: type,order: order,);
+  }
+  
+  
+  AdminUpdateMicroLessonVariablesBuilder adminUpdateMicroLesson ({required String microLessonId, }) {
+    return AdminUpdateMicroLessonVariablesBuilder(dataConnect, microLessonId: microLessonId,);
+  }
+  
+  
+  AdminDeleteMicroLessonVariablesBuilder adminDeleteMicroLesson ({required String microLessonId, }) {
+    return AdminDeleteMicroLessonVariablesBuilder(dataConnect, microLessonId: microLessonId,);
+  }
+  
+  
+  AdminUpdateMicroLessonOrderVariablesBuilder adminUpdateMicroLessonOrder ({required String microLessonId, required int order, }) {
+    return AdminUpdateMicroLessonOrderVariablesBuilder(dataConnect, microLessonId: microLessonId,order: order,);
+  }
+  
+  
+  AdminCreateMissionTemplateVariablesBuilder adminCreateMissionTemplate ({required String missionId, required String title, required String fileUrl, required String fileType, }) {
+    return AdminCreateMissionTemplateVariablesBuilder(dataConnect, missionId: missionId,title: title,fileUrl: fileUrl,fileType: fileType,);
+  }
+  
+  
+  AdminDeleteMissionTemplateVariablesBuilder adminDeleteMissionTemplate ({required String templateId, }) {
+    return AdminDeleteMissionTemplateVariablesBuilder(dataConnect, templateId: templateId,);
+  }
+  
+  
+  GetMissionTemplatesVariablesBuilder getMissionTemplates ({required String missionId, }) {
+    return GetMissionTemplatesVariablesBuilder(dataConnect, missionId: missionId,);
+  }
+  
+  
+  AdminCreateRubricCriterionVariablesBuilder adminCreateRubricCriterion ({required String missionId, required String criterionName, required double maxPoints, required int order, }) {
+    return AdminCreateRubricCriterionVariablesBuilder(dataConnect, missionId: missionId,criterionName: criterionName,maxPoints: maxPoints,order: order,);
+  }
+  
+  
+  AdminUpdateRubricCriterionVariablesBuilder adminUpdateRubricCriterion ({required String criterionId, }) {
+    return AdminUpdateRubricCriterionVariablesBuilder(dataConnect, criterionId: criterionId,);
+  }
+  
+  
+  AdminDeleteRubricCriterionVariablesBuilder adminDeleteRubricCriterion ({required String criterionId, }) {
+    return AdminDeleteRubricCriterionVariablesBuilder(dataConnect, criterionId: criterionId,);
+  }
+  
+  
+  AdminUpdateRubricCriterionOrderVariablesBuilder adminUpdateRubricCriterionOrder ({required String criterionId, required int order, }) {
+    return AdminUpdateRubricCriterionOrderVariablesBuilder(dataConnect, criterionId: criterionId,order: order,);
   }
   
 

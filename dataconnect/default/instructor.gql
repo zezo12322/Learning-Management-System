@@ -1,18 +1,21 @@
-# Gets all student submissions pending review and grading
-query GetPendingSubmissions @auth(level: USER) {
-  missionSubmissions(
-    where: { status: { eq: PENDING } }, 
-    orderBy: [{ submittedAt: ASC }]
-  ) {
-    id
-    fileUrl
-    submittedAt
-    attemptNumber 
-    student { name email }
-    mission {
-      title
-      difficulty
-      course { title }
-    }
+# ==========================================
+# INSTRUCTOR MANAGEMENT
+# ==========================================
+
+query GetPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  missionSubmissions(where: { status: { eq: PENDING } }, orderBy: [{ submittedAt: ASC }]) {
+    id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
   }
+}
+
+mutation AdminAddCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructor_insert(data: { courseId: $courseId, userId: $userId })
+}
+
+mutation AdminRemoveCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructor_delete(key: { courseId: $courseId, userId: $userId })
+}
+
+query GetCourseInstructors($courseId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseInstructors(where: { courseId: { eq: $courseId } }) { user { id name email avatar } }
 }
