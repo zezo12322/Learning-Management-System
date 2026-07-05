@@ -82,8 +82,9 @@ export class ProgressController {
     @Param('lectureId') lectureId: string,
     @Body() dto: UpdateProgressDto,
     @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
   ) {
-    return this.progressService.updateProgress(lectureId, dto, token);
+    return this.progressService.updateProgress(lectureId, dto, token, uid);
   }
 
   @Get('lectures/:lectureId/progress')

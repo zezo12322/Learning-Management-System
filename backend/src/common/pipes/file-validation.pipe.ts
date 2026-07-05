@@ -1,8 +1,4 @@
-import {
-  PipeTransform,
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import {
   ALLOWED_TEMPLATE_EXTENSIONS,
   ALLOWED_TEMPLATE_MIME_TYPES,
@@ -24,7 +20,8 @@ export class FileValidationPipe implements PipeTransform {
   private readonly maxSize: number;
 
   constructor(options?: FileValidationOptions) {
-    this.allowedMimeTypes = options?.allowedMimeTypes ?? Object.keys(ALLOWED_TEMPLATE_MIME_TYPES);
+    this.allowedMimeTypes =
+      options?.allowedMimeTypes ?? Object.keys(ALLOWED_TEMPLATE_MIME_TYPES);
     this.maxSize = options?.maxSize ?? FILE_SIZE_LIMITS.TEMPLATE;
   }
 

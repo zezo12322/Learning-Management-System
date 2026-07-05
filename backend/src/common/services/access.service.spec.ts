@@ -20,7 +20,11 @@ describe('AccessService', () => {
 
     it('allows the course author', async () => {
       dc.executeQuery.mockResolvedValue({
-        course: { author: { id: 'u1' }, createdBy: { id: 'x' }, myInstructorLink: [] },
+        course: {
+          author: { id: 'u1' },
+          createdBy: { id: 'x' },
+          myInstructorLink: [],
+        },
       });
       await expect(
         service.assertCourseAccess('c1', 'u1', 'tok', false),
@@ -29,7 +33,11 @@ describe('AccessService', () => {
 
     it('allows an assigned instructor (non-empty instructor link)', async () => {
       dc.executeQuery.mockResolvedValue({
-        course: { author: { id: 'x' }, createdBy: { id: 'y' }, myInstructorLink: [{ user: { id: 'u1' } }] },
+        course: {
+          author: { id: 'x' },
+          createdBy: { id: 'y' },
+          myInstructorLink: [{ user: { id: 'u1' } }],
+        },
       });
       await expect(
         service.assertCourseAccess('c1', 'u1', 'tok', false),
@@ -38,7 +46,11 @@ describe('AccessService', () => {
 
     it('throws 403 for a non-owner', async () => {
       dc.executeQuery.mockResolvedValue({
-        course: { author: { id: 'x' }, createdBy: { id: 'y' }, myInstructorLink: [] },
+        course: {
+          author: { id: 'x' },
+          createdBy: { id: 'y' },
+          myInstructorLink: [],
+        },
       });
       await expect(
         service.assertCourseAccess('c1', 'u1', 'tok', false),
@@ -68,7 +80,11 @@ describe('AccessService', () => {
         mission: {
           author: { id: 'x' },
           createdBy: { id: 'y' },
-          course: { author: { id: 'u1' }, createdBy: { id: 'z' }, myMissionCourseInstructorLink: [] },
+          course: {
+            author: { id: 'u1' },
+            createdBy: { id: 'z' },
+            myMissionCourseInstructorLink: [],
+          },
         },
       });
       await expect(

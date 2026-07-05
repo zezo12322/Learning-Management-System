@@ -2,9 +2,10 @@ part of 'generated.dart';
 
 class EnrollInCourseVariablesBuilder {
   String courseId;
+  String userId;
 
   final FirebaseDataConnect _dataConnect;
-  EnrollInCourseVariablesBuilder(this._dataConnect, {required  this.courseId,});
+  EnrollInCourseVariablesBuilder(this._dataConnect, {required  this.courseId,required  this.userId,});
   Deserializer<EnrollInCourseData> dataDeserializer = (dynamic json)  => EnrollInCourseData.fromJson(jsonDecode(json));
   Serializer<EnrollInCourseVariables> varsSerializer = (EnrollInCourseVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<EnrollInCourseData, EnrollInCourseVariables>> execute() {
@@ -12,7 +13,7 @@ class EnrollInCourseVariablesBuilder {
   }
 
   MutationRef<EnrollInCourseData, EnrollInCourseVariables> ref() {
-    EnrollInCourseVariables vars= EnrollInCourseVariables(courseId: courseId,);
+    EnrollInCourseVariables vars= EnrollInCourseVariables(courseId: courseId,userId: userId,);
     return _dataConnect.mutation("EnrollInCourse", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -88,10 +89,12 @@ class EnrollInCourseData {
 @immutable
 class EnrollInCourseVariables {
   final String courseId;
+  final String userId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   EnrollInCourseVariables.fromJson(Map<String, dynamic> json):
   
-  courseId = nativeFromJson<String>(json['courseId']);
+  courseId = nativeFromJson<String>(json['courseId']),
+  userId = nativeFromJson<String>(json['userId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -102,21 +105,24 @@ class EnrollInCourseVariables {
     }
 
     final EnrollInCourseVariables otherTyped = other as EnrollInCourseVariables;
-    return courseId == otherTyped.courseId;
+    return courseId == otherTyped.courseId && 
+    userId == otherTyped.userId;
     
   }
   @override
-  int get hashCode => courseId.hashCode;
+  int get hashCode => Object.hashAll([courseId.hashCode, userId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['courseId'] = nativeToJson<String>(courseId);
+    json['userId'] = nativeToJson<String>(userId);
     return json;
   }
 
   EnrollInCourseVariables({
     required this.courseId,
+    required this.userId,
   });
 }
 

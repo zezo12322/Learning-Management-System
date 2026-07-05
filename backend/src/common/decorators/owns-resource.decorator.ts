@@ -40,4 +40,4 @@ export const OwnsResource = (type: OwnedResourceType, param?: string) =>
   SetMetadata(OWNS_RESOURCE_KEY, {
     type,
     param: param ?? DEFAULT_PARAM[type],
-  } as OwnsResourceMeta);
+  });

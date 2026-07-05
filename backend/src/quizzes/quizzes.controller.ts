@@ -150,7 +150,9 @@ export class QuizzesController {
   // OPTION MANAGEMENT — Admin or owning Instructor only
   // ==========================================
 
-  @Patch('courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId')
+  @Patch(
+    'courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId',
+  )
   @Roles('admin', 'instructor')
   @OwnsResource('option')
   @UseGuards(ResourceOwnershipGuard)
@@ -162,15 +164,22 @@ export class QuizzesController {
     return this.quizzesService.updateOption(optionId, dto, token);
   }
 
-  @Delete('courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId')
+  @Delete(
+    'courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId',
+  )
   @Roles('admin', 'instructor')
   @OwnsResource('option')
   @UseGuards(ResourceOwnershipGuard)
-  deleteOption(@Param('optionId') optionId: string, @AuthToken() token: string) {
+  deleteOption(
+    @Param('optionId') optionId: string,
+    @AuthToken() token: string,
+  ) {
     return this.quizzesService.deleteOption(optionId, token);
   }
 
-  @Put('courses/:courseId/quizzes/:quizId/questions/:questionId/options/reorder')
+  @Put(
+    'courses/:courseId/quizzes/:quizId/questions/:questionId/options/reorder',
+  )
   @Roles('admin', 'instructor')
   @OwnsResource('question')
   @UseGuards(ResourceOwnershipGuard)
@@ -179,7 +188,11 @@ export class QuizzesController {
     @Body() dto: ReorderDto,
     @AuthToken() token: string,
   ) {
-    return this.quizzesService.reorderOptions(questionId, dto.orderedIds, token);
+    return this.quizzesService.reorderOptions(
+      questionId,
+      dto.orderedIds,
+      token,
+    );
   }
 
   // ==========================================
@@ -188,8 +201,12 @@ export class QuizzesController {
   // ==========================================
 
   @Post('courses/:courseId/quizzes/:quizId/attempts')
-  startAttempt(@Param('quizId') quizId: string, @AuthToken() token: string) {
-    return this.quizzesService.startAttempt(quizId, token);
+  startAttempt(
+    @Param('quizId') quizId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+  ) {
+    return this.quizzesService.startAttempt(quizId, token, uid);
   }
 
   @Post('courses/:courseId/quizzes/:quizId/attempts/:attemptId/answers')

@@ -17,9 +17,9 @@ describe('FirebaseAuthGuard', () => {
   }
 
   it('rejects requests without a bearer token', async () => {
-    await expect(guard.canActivate(createContext({ headers: {} }))).rejects.toBeInstanceOf(
-      UnauthorizedException,
-    );
+    await expect(
+      guard.canActivate(createContext({ headers: {} })),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it('attaches normalized Firebase claims to the request', async () => {
@@ -48,5 +48,28 @@ describe('FirebaseAuthGuard', () => {
       companyId: 'company-1',
     });
     expect(request.userRoles).toEqual(['instructor', 'student']);
+  });
+
+  // Regression: a token carrying only the legacy `admin`/`role` claims (no `roles`
+  // array) must NOT be treated as admin — the `roles` array is the sole source of
+  // truth, so a stale legacy claim left after a demotion cannot re-grant access.
+  it('ignores legacy admin/role claims with no roles array', async () => {
+    const verifyIdToken = jest.fn().mockResolvedValue({
+      uid: 'uid-legacy',
+      email: 'legacy@example.com',
+      role: 'admin',
+      admin: true,
+    });
+    firebaseService.getAuth = () => ({ verifyIdToken }) as any;
+
+    const request: any = { headers: { authorization: 'Bearer test-token' } };
+
+    await expect(guard.canActivate(createContext(request))).resolves.toBe(true);
+    expect(request.user).toMatchObject({
+      roles: ['student'],
+      role: 'student',
+      admin: false,
+    });
+    expect(request.userRoles).toEqual(['student']);
   });
 });

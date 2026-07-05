@@ -32,16 +32,29 @@ const ENTITY_RULES: Record<
     // Private assets (premium video/transcript) store only the storage path and
     // are served via short-lived signed read URLs at request time (H2).
     isPublic: boolean;
-    buildPath: (courseId: string, lectureId: string | undefined, file: string) => string;
-    confirm: { operation: string; idField: 'courseId' | 'lectureId'; urlField: string };
+    buildPath: (
+      courseId: string,
+      lectureId: string | undefined,
+      file: string,
+    ) => string;
+    confirm: {
+      operation: string;
+      idField: 'courseId' | 'lectureId';
+      urlField: string;
+    };
   }
 > = {
   [UploadEntityType.COURSE_THUMBNAIL]: {
     allowedTypes: ALLOWED_IMAGE_MIME_TYPES,
     requiresLecture: false,
     isPublic: true,
-    buildPath: (courseId, _l, file) => CourseStoragePaths.thumbnail(courseId, file),
-    confirm: { operation: 'AdminUpdateCourse', idField: 'courseId', urlField: 'thumbnail' },
+    buildPath: (courseId, _l, file) =>
+      CourseStoragePaths.thumbnail(courseId, file),
+    confirm: {
+      operation: 'AdminUpdateCourse',
+      idField: 'courseId',
+      urlField: 'thumbnail',
+    },
   },
   [UploadEntityType.LECTURE_VIDEO]: {
     allowedTypes: ALLOWED_VIDEO_MIME_TYPES,
@@ -49,7 +62,11 @@ const ENTITY_RULES: Record<
     isPublic: false,
     buildPath: (courseId, lectureId, file) =>
       CourseStoragePaths.lectureVideo(courseId, lectureId!, file),
-    confirm: { operation: 'AdminUpdateLecture', idField: 'lectureId', urlField: 'videoUrl' },
+    confirm: {
+      operation: 'AdminUpdateLecture',
+      idField: 'lectureId',
+      urlField: 'videoUrl',
+    },
   },
   [UploadEntityType.LECTURE_TRANSCRIPT]: {
     allowedTypes: ['application/pdf'],
@@ -57,7 +74,11 @@ const ENTITY_RULES: Record<
     isPublic: false,
     buildPath: (courseId, lectureId, file) =>
       CourseStoragePaths.lectureTranscript(courseId, lectureId!, file),
-    confirm: { operation: 'AdminUpdateLecture', idField: 'lectureId', urlField: 'transcriptUrl' },
+    confirm: {
+      operation: 'AdminUpdateLecture',
+      idField: 'lectureId',
+      urlField: 'transcriptUrl',
+    },
   },
 };
 
@@ -76,7 +97,12 @@ export class UploadsService {
     const rule = ENTITY_RULES[dto.entityType];
 
     // 1) Authorize: caller must own (or admin) the course this upload targets.
-    await this.access.assertCourseAccess(dto.courseId, caller.uid, caller.token, caller.isAdmin);
+    await this.access.assertCourseAccess(
+      dto.courseId,
+      caller.uid,
+      caller.token,
+      caller.isAdmin,
+    );
 
     // 2) Validate shape and content type for this entity.
     if (rule.requiresLecture && !dto.lectureId) {
@@ -92,10 +118,8 @@ export class UploadsService {
     const safeName = `${uuidv4()}-${this.sanitize(dto.filename)}`;
     const storagePath = rule.buildPath(dto.courseId, dto.lectureId, safeName);
 
-    const { uploadUrl, downloadUrl } = await this.firebase.generateSignedUploadUrl(
-      storagePath,
-      dto.contentType,
-    );
+    const { uploadUrl, downloadUrl } =
+      await this.firebase.generateSignedUploadUrl(storagePath, dto.contentType);
     return { uploadUrl, downloadUrl, storagePath };
   }
 
@@ -103,23 +127,35 @@ export class UploadsService {
     const rule = ENTITY_RULES[dto.entityType];
 
     // 1) Authorize against the owning course.
-    await this.access.assertCourseAccess(dto.courseId, caller.uid, caller.token, caller.isAdmin);
+    await this.access.assertCourseAccess(
+      dto.courseId,
+      caller.uid,
+      caller.token,
+      caller.isAdmin,
+    );
 
     // 2) The confirmed path must live under the course prefix we control —
     //    blocks confirming an arbitrary attacker-supplied path.
     const expectedPrefix = `courses/${dto.courseId}/`;
     if (!dto.storagePath.startsWith(expectedPrefix)) {
-      throw new BadRequestException('storagePath does not belong to this course');
+      throw new BadRequestException(
+        'storagePath does not belong to this course',
+      );
     }
 
     // 3) The object must actually exist in Storage.
     if (!(await this.firebase.fileExists(dto.storagePath))) {
-      throw new BadRequestException(`File not found at path: ${dto.storagePath}`);
+      throw new BadRequestException(
+        `File not found at path: ${dto.storagePath}`,
+      );
     }
 
-    const entityId = rule.confirm.idField === 'lectureId' ? dto.lectureId : dto.courseId;
+    const entityId =
+      rule.confirm.idField === 'lectureId' ? dto.lectureId : dto.courseId;
     if (!entityId) {
-      throw new BadRequestException(`Missing ${rule.confirm.idField} for ${dto.entityType}`);
+      throw new BadRequestException(
+        `Missing ${rule.confirm.idField} for ${dto.entityType}`,
+      );
     }
 
     // For lecture-scoped uploads, the lecture must actually belong to the course
@@ -185,7 +221,10 @@ export class UploadsService {
         this.logger.error(
           `Failed to auto-enqueue transcode for lecture ${dto.lectureId}: ${err?.message}`,
         );
-        transcode = { jobId: 'error', status: `enqueue_failed: ${err?.message}` } as any;
+        transcode = {
+          jobId: 'error',
+          status: `enqueue_failed: ${err?.message}`,
+        };
       }
     }
 

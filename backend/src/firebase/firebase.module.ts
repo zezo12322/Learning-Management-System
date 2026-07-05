@@ -7,4 +7,4 @@ import { DataConnectService } from './dataconnect.service';
   providers: [FirebaseService, DataConnectService],
   exports: [FirebaseService, DataConnectService],
 })
-export class FirebaseModule { }
+export class FirebaseModule {}

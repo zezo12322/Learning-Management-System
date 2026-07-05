@@ -32,7 +32,9 @@ export class QuizExpiryTask {
       const data = await this.dc.executeQueryAsAdmin('GetExpiredAttempts');
       inProgress = data?.quizAttempts ?? [];
     } catch (err: any) {
-      this.logger.error(`Expiry sweep failed to load attempts: ${err?.message}`);
+      this.logger.error(
+        `Expiry sweep failed to load attempts: ${err?.message}`,
+      );
       return;
     }
 
@@ -47,7 +49,9 @@ export class QuizExpiryTask {
     let finalized = 0;
     for (const attempt of expired) {
       try {
-        const result = await this.quizzes.autoGrade(attempt.id, { admin: true });
+        const result = await this.quizzes.autoGrade(attempt.id, {
+          admin: true,
+        });
         if (!result?.alreadyFinalized) finalized++;
       } catch (err: any) {
         this.logger.error(

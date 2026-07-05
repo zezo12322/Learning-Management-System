@@ -28,7 +28,8 @@ export class SignedUrlRequestDto {
   // Original filename — sanitized server-side; only a safe display suffix is kept.
   @IsString()
   @Matches(/^[\w.\- ]{1,200}$/, {
-    message: 'filename may only contain letters, numbers, spaces, dots, dashes, underscores',
+    message:
+      'filename may only contain letters, numbers, spaces, dots, dashes, underscores',
   })
   filename: string;
 

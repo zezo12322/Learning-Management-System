@@ -1,23 +1,30 @@
-query GetCourseSessions($courseId: UUID!) @auth(level: USER) {
+# NO_ACCESS: a USER-level version let any user enumerate any course's sessions
+# incl. join URLs (locationOrUrl) with no enrollment check. No backend route
+# consumes the sessions feature yet; when built it must gate on enrollment.
+query GetCourseSessions($courseId: UUID!) @auth(level: NO_ACCESS) {
   sessions(
-    where: { 
+    where: {
       courseId: { eq: $courseId },
-      deletedAt: { eq: null } 
-    }, 
+      deletedAt: { eq: null }
+    },
     orderBy: [{ startTime: ASC }]
   ) {
-    id title startTime endTime type capacity locationOrUrl hostUser { name avatar } 
+    id title startTime endTime type capacity locationOrUrl hostUser { name avatar }
   }
 }
 
+# RBAC hardening: NO_ACCESS. status/method are caller-supplied, so a USER-level
+# version let a student self-mark attendance (e.g. PRESENT) for any session. No
+# backend route consumes this yet; when one is built it must run via the service
+# account after verifying the caller attended (passing the student id explicitly).
 mutation CheckInToSession(
   $sessionId: UUID!,
   $status: AttendanceStatus!,
   $method: AttendanceMethod!
-) @auth(level: USER) {
+) @auth(level: NO_ACCESS) {
   attendance_insert(
     data: {
-      studentId_expr: "auth.uid", 
+      studentId_expr: "auth.uid",
       sessionId: $sessionId,
       status: $status,
       method: $method

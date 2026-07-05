@@ -23,7 +23,11 @@ export class AccessService {
     isAdmin: boolean,
   ): Promise<void> {
     if (isAdmin) return;
-    const data = await this.dc.executeQuery('GetMyCourseAccess', { courseId }, token);
+    const data = await this.dc.executeQuery(
+      'GetMyCourseAccess',
+      { courseId },
+      token,
+    );
     const course = data?.course;
     if (!course) throw new NotFoundException(`Course ${courseId} not found`);
     if (!this.ownsCourse(course, uid)) {
@@ -39,7 +43,11 @@ export class AccessService {
     isAdmin: boolean,
   ): Promise<void> {
     if (isAdmin) return;
-    const data = await this.dc.executeQuery('GetMyMissionAccess', { missionId }, token);
+    const data = await this.dc.executeQuery(
+      'GetMyMissionAccess',
+      { missionId },
+      token,
+    );
     const mission = data?.mission;
     if (!mission) throw new NotFoundException(`Mission ${missionId} not found`);
     const owns =
@@ -60,7 +68,9 @@ export class AccessService {
    * never "deny" — an assigned instructor is not a creator but still has access.
    */
   isCourseCreator(course: any, uid?: string): boolean {
-    return !!uid && (course?.author?.id === uid || course?.createdBy?.id === uid);
+    return (
+      !!uid && (course?.author?.id === uid || course?.createdBy?.id === uid)
+    );
   }
 
   /** Mission counterpart of {@link isCourseCreator} (mission or its course). */
@@ -77,7 +87,8 @@ export class AccessService {
     return (
       course.author?.id === uid ||
       course.createdBy?.id === uid ||
-      (course.myInstructorLink ?? course.myMissionCourseInstructorLink ?? []).length > 0
+      (course.myInstructorLink ?? course.myMissionCourseInstructorLink ?? [])
+        .length > 0
     );
   }
 }

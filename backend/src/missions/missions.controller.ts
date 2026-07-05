@@ -63,7 +63,10 @@ export class MissionsController {
 
   @Delete(':missionId')
   @UseGuards(CourseAccessGuard)
-  softDelete(@Param('missionId') missionId: string, @AuthToken() token: string) {
+  softDelete(
+    @Param('missionId') missionId: string,
+    @AuthToken() token: string,
+  ) {
     return this.missionsService.softDelete(missionId, token);
   }
 }
