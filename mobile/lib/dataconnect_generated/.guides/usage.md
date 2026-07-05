@@ -10,7 +10,7 @@ DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTie
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
 DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
-DefaultConnector.instance.MyCertificates().execute();
+DefaultConnector.instance.LogPayment(logPaymentVariables).execute();
 
 ```
 
