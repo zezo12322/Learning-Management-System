@@ -8,8 +8,8 @@ import 'package:optimatech_lms/core/widgets/app_header/app_header.dart';
 import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
 import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
 import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
-import 'package:optimatech_lms/features/home/presentation/manager/courses_cubit/course_state.dart';
-import 'package:optimatech_lms/features/home/presentation/manager/courses_cubit/courses_cubit.dart';
+import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_course_state.dart';
+import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
@@ -18,7 +18,7 @@ import 'package:optimatech_lms/features/home/presentation/widgets/recommended_co
 
 // ============================================================================
 // HomeBody — Main content area for the Home tab.
-// Uses BlocBuilder to reactively render UI based on CoursesCubit state.
+// Uses BlocBuilder to reactively render UI based on HomeCoursesCubit state.
 // ============================================================================
 
 class HomeBody extends StatelessWidget {
@@ -26,14 +26,14 @@ class HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CoursesCubit, CoursesState>(
+    return BlocBuilder<HomeCoursesCubit, HomeCoursesState>(
       builder: (context, state) {
         return state.when(
           initial: () => const SizedBox.shrink(),
           loading: () => const _HomeShimmerSkeleton(),
           error: (message) => _HomeErrorView(
             message: message,
-            onRetry: () => context.read<CoursesCubit>().fetchHomeCourses(),
+            onRetry: () => context.read<HomeCoursesCubit>().fetchHomeCourses(),
           ),
           success: (continueLearning, popularCourses, recommendedCourses) =>
               _HomeSuccessView(

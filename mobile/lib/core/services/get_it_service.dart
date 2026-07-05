@@ -11,7 +11,7 @@ import 'package:optimatech_lms/features/home/domain/repositories/home_repository
 import 'package:optimatech_lms/features/home/domain/usecases/get_continue_learning_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_popular_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_recommended_courses_use_case.dart';
-import 'package:optimatech_lms/features/home/presentation/manager/courses_cubit/courses_cubit.dart';
+import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -24,13 +24,16 @@ Future<void> setupDependencies() async {
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-        firebaseAuthService: getIt<FirebaseAuthService>(),
-        fireStoreService: getIt<FireStoreService>()),
+      firebaseAuthService: getIt<FirebaseAuthService>(),
+      fireStoreService: getIt<FireStoreService>(),
+    ),
   );
   getIt.registerFactory<LogInCubit>(
-      () => LogInCubit(authRepository: getIt<AuthRepository>()));
+    () => LogInCubit(authRepository: getIt<AuthRepository>()),
+  );
   getIt.registerFactory<SignupCubit>(
-      () => SignupCubit(authRepository: getIt<AuthRepository>()));
+    () => SignupCubit(authRepository: getIt<AuthRepository>()),
+  );
 
   // ========================= Home Feature =========================
   getIt.registerLazySingleton<HomeRemoteDataSource>(
@@ -48,8 +51,8 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<GetRecommendedCoursesUseCase>(
     () => GetRecommendedCoursesUseCase(getIt<HomeRepository>()),
   );
-  getIt.registerFactory<CoursesCubit>(
-    () => CoursesCubit(
+  getIt.registerFactory<HomeCoursesCubit>(
+    () => HomeCoursesCubit(
       getContinueLearningCoursesUseCase:
           getIt<GetContinueLearningCoursesUseCase>(),
       getPopularCoursesUseCase: getIt<GetPopularCoursesUseCase>(),

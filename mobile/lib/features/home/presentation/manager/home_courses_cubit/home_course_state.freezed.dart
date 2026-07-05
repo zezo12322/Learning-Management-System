@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'course_state.dart';
+part of 'home_course_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,7 +15,7 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$CoursesState {
+mixin _$HomeCoursesState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
@@ -81,16 +81,16 @@ mixin _$CoursesState {
 }
 
 /// @nodoc
-abstract class $CoursesStateCopyWith<$Res> {
-  factory $CoursesStateCopyWith(
-          CoursesState value, $Res Function(CoursesState) then) =
-      _$CoursesStateCopyWithImpl<$Res, CoursesState>;
+abstract class $HomeCoursesStateCopyWith<$Res> {
+  factory $HomeCoursesStateCopyWith(
+          HomeCoursesState value, $Res Function(HomeCoursesState) then) =
+      _$HomeCoursesStateCopyWithImpl<$Res, HomeCoursesState>;
 }
 
 /// @nodoc
-class _$CoursesStateCopyWithImpl<$Res, $Val extends CoursesState>
-    implements $CoursesStateCopyWith<$Res> {
-  _$CoursesStateCopyWithImpl(this._value, this._then);
+class _$HomeCoursesStateCopyWithImpl<$Res, $Val extends HomeCoursesState>
+    implements $HomeCoursesStateCopyWith<$Res> {
+  _$HomeCoursesStateCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -107,7 +107,7 @@ abstract class _$$InitialImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$InitialImplCopyWithImpl<$Res>
-    extends _$CoursesStateCopyWithImpl<$Res, _$InitialImpl>
+    extends _$HomeCoursesStateCopyWithImpl<$Res, _$InitialImpl>
     implements _$$InitialImplCopyWith<$Res> {
   __$$InitialImplCopyWithImpl(
       _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
@@ -121,7 +121,7 @@ class _$InitialImpl implements _Initial {
 
   @override
   String toString() {
-    return 'CoursesState.initial()';
+    return 'HomeCoursesState.initial()';
   }
 
   @override
@@ -220,7 +220,7 @@ class _$InitialImpl implements _Initial {
   }
 }
 
-abstract class _Initial implements CoursesState {
+abstract class _Initial implements HomeCoursesState {
   const factory _Initial() = _$InitialImpl;
 }
 
@@ -233,7 +233,7 @@ abstract class _$$LoadingImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$LoadingImplCopyWithImpl<$Res>
-    extends _$CoursesStateCopyWithImpl<$Res, _$LoadingImpl>
+    extends _$HomeCoursesStateCopyWithImpl<$Res, _$LoadingImpl>
     implements _$$LoadingImplCopyWith<$Res> {
   __$$LoadingImplCopyWithImpl(
       _$LoadingImpl _value, $Res Function(_$LoadingImpl) _then)
@@ -247,7 +247,7 @@ class _$LoadingImpl implements _Loading {
 
   @override
   String toString() {
-    return 'CoursesState.loading()';
+    return 'HomeCoursesState.loading()';
   }
 
   @override
@@ -346,7 +346,7 @@ class _$LoadingImpl implements _Loading {
   }
 }
 
-abstract class _Loading implements CoursesState {
+abstract class _Loading implements HomeCoursesState {
   const factory _Loading() = _$LoadingImpl;
 }
 
@@ -364,7 +364,7 @@ abstract class _$$SuccessImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$SuccessImplCopyWithImpl<$Res>
-    extends _$CoursesStateCopyWithImpl<$Res, _$SuccessImpl>
+    extends _$HomeCoursesStateCopyWithImpl<$Res, _$SuccessImpl>
     implements _$$SuccessImplCopyWith<$Res> {
   __$$SuccessImplCopyWithImpl(
       _$SuccessImpl _value, $Res Function(_$SuccessImpl) _then)
@@ -425,7 +425,7 @@ class _$SuccessImpl implements _Success {
 
   @override
   String toString() {
-    return 'CoursesState.success(continueLearning: $continueLearning, popularCourses: $popularCourses, recommendedCourses: $recommendedCourses)';
+    return 'HomeCoursesState.success(continueLearning: $continueLearning, popularCourses: $popularCourses, recommendedCourses: $recommendedCourses)';
   }
 
   @override
@@ -541,7 +541,7 @@ class _$SuccessImpl implements _Success {
   }
 }
 
-abstract class _Success implements CoursesState {
+abstract class _Success implements HomeCoursesState {
   const factory _Success(
       {required final StudentProgressEntity? continueLearning,
       required final List<CourseEntity> popularCourses,
@@ -566,7 +566,7 @@ abstract class _$$ErrorImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$ErrorImplCopyWithImpl<$Res>
-    extends _$CoursesStateCopyWithImpl<$Res, _$ErrorImpl>
+    extends _$HomeCoursesStateCopyWithImpl<$Res, _$ErrorImpl>
     implements _$$ErrorImplCopyWith<$Res> {
   __$$ErrorImplCopyWithImpl(
       _$ErrorImpl _value, $Res Function(_$ErrorImpl) _then)
@@ -596,7 +596,7 @@ class _$ErrorImpl implements _Error {
 
   @override
   String toString() {
-    return 'CoursesState.error(message: $message)';
+    return 'HomeCoursesState.error(message: $message)';
   }
 
   @override
@@ -703,7 +703,7 @@ class _$ErrorImpl implements _Error {
   }
 }
 
-abstract class _Error implements CoursesState {
+abstract class _Error implements HomeCoursesState {
   const factory _Error({required final String message}) = _$ErrorImpl;
 
   String get message;
