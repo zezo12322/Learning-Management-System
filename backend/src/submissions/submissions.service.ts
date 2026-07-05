@@ -24,8 +24,15 @@ export class SubmissionsService {
 
   // ----- Student -----
 
-  async submit(missionId: string, dto: CreateSubmissionDto, authToken: string) {
-    // Must be actively enrolled in the mission to submit.
+  async submit(
+    missionId: string,
+    dto: CreateSubmissionDto,
+    authToken: string,
+    uid: string,
+  ) {
+    // Must be actively enrolled in the mission to submit. This is now the sole
+    // gate: SubmitMission is NO_ACCESS (backend-only), so a direct client SDK
+    // call can no longer bypass this check.
     const enrollmentData = await this.dc.executeQuery(
       'GetUserEnrollmentForMission',
       { missionId },
@@ -37,9 +44,10 @@ export class SubmissionsService {
       );
     }
 
+    // Runs via the service account; the student id is passed explicitly.
     return this.dc.executeMutation(
       'SubmitMission',
-      { missionId, fileUrl: dto.fileUrl },
+      { missionId, fileUrl: dto.fileUrl, studentId: uid },
       authToken,
     );
   }
@@ -51,8 +59,15 @@ export class SubmissionsService {
 
   // ----- Instructor -----
 
-  async pending(authToken: string) {
-    const data = await this.dc.executeQuery('GetPendingSubmissions', {}, authToken);
+  async pending(authToken: string, isAdmin: boolean) {
+    // Admins get the platform-wide queue; instructors are restricted to
+    // submissions for missions they own (object-level authorization). The
+    // Data Connect @auth on GetPendingSubmissions now also rejects non-admins,
+    // so this routing is defence-in-depth rather than the sole gate.
+    const operation = isAdmin
+      ? 'GetPendingSubmissions'
+      : 'GetMyPendingSubmissions';
+    const data = await this.dc.executeQuery(operation, {}, authToken);
     return data?.missionSubmissions ?? [];
   }
 
@@ -116,10 +131,12 @@ export class SubmissionsService {
       );
     }
 
-    // Mark graded (sets grader, status=GRADED, feedback, updatedAt).
+    // Mark graded (sets grader, status=GRADED, feedback, updatedAt). Runs via the
+    // service account (NO_ACCESS in the connector), so the grader identity is
+    // passed explicitly rather than derived from auth.uid.
     await this.dc.executeMutation(
       'GradeSubmission',
-      { submissionId, feedback: dto.feedback ?? null },
+      { submissionId, feedback: dto.feedback ?? null, graderId: uid },
       authToken,
     );
 

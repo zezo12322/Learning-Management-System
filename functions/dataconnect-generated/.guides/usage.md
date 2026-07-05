@@ -14,14 +14,11 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors, upsertCourseRating, deleteCourseRating, getMyCourseRating, listCourseRatings, getCourseRatingsForSummary, adminUpdateCourseRatingAggregate } from '@dataconnect/functions-generated';
+import { instructorDeleteCourse, superAdminDeleteCourse, adminCreateSession, instructorCancelSession, superAdminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, getUserClaims, myCertificates } from '@dataconnect/functions-generated';
 
 
-// Operation GetPendingSubmissions: 
-const { data } = await GetPendingSubmissions(dataConnect);
-
-// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
-const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
+// Operation InstructorDeleteCourse:  For variables, look at type InstructorDeleteCourseVars in ../index.d.ts
+const { data } = await InstructorDeleteCourse(dataConnect, instructorDeleteCourseVars);
 
 // Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
 const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
@@ -46,6 +43,9 @@ const { data } = await GetCourseRatingsForSummary(dataConnect, getCourseRatingsF
 
 // Operation AdminUpdateCourseRatingAggregate:  For variables, look at type AdminUpdateCourseRatingAggregateVars in ../index.d.ts
 const { data } = await AdminUpdateCourseRatingAggregate(dataConnect, adminUpdateCourseRatingAggregateVars);
+
+// Operation MyCertificates: 
+const { data } = await MyCertificates(dataConnect);
 
 
 ```

@@ -8,13 +8,14 @@ class AdminCreateMissionVariablesBuilder {
   MissionDifficulty difficulty;
   List<String> skillsTested;
   Optional<String> _courseId = Optional.optional(nativeFromJson, nativeToJson);
+  String authorId;
 
   final FirebaseDataConnect _dataConnect;  AdminCreateMissionVariablesBuilder courseId(String? t) {
    _courseId.value = t;
    return this;
   }
 
-  AdminCreateMissionVariablesBuilder(this._dataConnect, {required  this.title,required  this.scenarioDescription,required  this.durationMinutes,required  this.categoryId,required  this.difficulty,required  this.skillsTested,});
+  AdminCreateMissionVariablesBuilder(this._dataConnect, {required  this.title,required  this.scenarioDescription,required  this.durationMinutes,required  this.categoryId,required  this.difficulty,required  this.skillsTested,required  this.authorId,});
   Deserializer<AdminCreateMissionData> dataDeserializer = (dynamic json)  => AdminCreateMissionData.fromJson(jsonDecode(json));
   Serializer<AdminCreateMissionVariables> varsSerializer = (AdminCreateMissionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<AdminCreateMissionData, AdminCreateMissionVariables>> execute() {
@@ -22,7 +23,7 @@ class AdminCreateMissionVariablesBuilder {
   }
 
   MutationRef<AdminCreateMissionData, AdminCreateMissionVariables> ref() {
-    AdminCreateMissionVariables vars= AdminCreateMissionVariables(title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,courseId: _courseId,);
+    AdminCreateMissionVariables vars= AdminCreateMissionVariables(title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,courseId: _courseId,authorId: authorId,);
     return _dataConnect.mutation("AdminCreateMission", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -104,6 +105,7 @@ class AdminCreateMissionVariables {
   final MissionDifficulty difficulty;
   final List<String> skillsTested;
   late final Optional<String>courseId;
+  final String authorId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateMissionVariables.fromJson(Map<String, dynamic> json):
   
@@ -114,7 +116,8 @@ class AdminCreateMissionVariables {
   difficulty = MissionDifficulty.values.byName(json['difficulty']),
   skillsTested = (json['skillsTested'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
-        .toList() {
+        .toList(),
+  authorId = nativeFromJson<String>(json['authorId']) {
   
   
   
@@ -125,6 +128,7 @@ class AdminCreateMissionVariables {
   
     courseId = Optional.optional(nativeFromJson, nativeToJson);
     courseId.value = json['courseId'] == null ? null : nativeFromJson<String>(json['courseId']);
+  
   
   }
   @override
@@ -143,11 +147,12 @@ class AdminCreateMissionVariables {
     categoryId == otherTyped.categoryId && 
     difficulty == otherTyped.difficulty && 
     skillsTested == otherTyped.skillsTested && 
-    courseId == otherTyped.courseId;
+    courseId == otherTyped.courseId && 
+    authorId == otherTyped.authorId;
     
   }
   @override
-  int get hashCode => Object.hashAll([title.hashCode, scenarioDescription.hashCode, durationMinutes.hashCode, categoryId.hashCode, difficulty.hashCode, skillsTested.hashCode, courseId.hashCode]);
+  int get hashCode => Object.hashAll([title.hashCode, scenarioDescription.hashCode, durationMinutes.hashCode, categoryId.hashCode, difficulty.hashCode, skillsTested.hashCode, courseId.hashCode, authorId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -163,6 +168,7 @@ class AdminCreateMissionVariables {
     if(courseId.state == OptionalState.set) {
       json['courseId'] = courseId.toJson();
     }
+    json['authorId'] = nativeToJson<String>(authorId);
     return json;
   }
 
@@ -174,6 +180,7 @@ class AdminCreateMissionVariables {
     required this.difficulty,
     required this.skillsTested,
     required this.courseId,
+    required this.authorId,
   });
 }
 

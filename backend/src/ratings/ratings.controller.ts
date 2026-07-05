@@ -15,6 +15,7 @@ import {
 } from './dto/rating.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 /**
  * Course ratings & reviews.
@@ -56,13 +57,18 @@ export class RatingsController {
     @Param('courseId') courseId: string,
     @Body() dto: UpsertCourseRatingDto,
     @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
   ) {
-    return this.ratingsService.upsertRating(courseId, dto, token);
+    return this.ratingsService.upsertRating(courseId, dto, token, uid);
   }
 
   @Delete('me')
   @UseGuards(FirebaseAuthGuard)
-  remove(@Param('courseId') courseId: string, @AuthToken() token: string) {
-    return this.ratingsService.deleteRating(courseId, token);
+  remove(
+    @Param('courseId') courseId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+  ) {
+    return this.ratingsService.deleteRating(courseId, token, uid);
   }
 }

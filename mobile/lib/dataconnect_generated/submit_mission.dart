@@ -3,9 +3,10 @@ part of 'generated.dart';
 class SubmitMissionVariablesBuilder {
   String missionId;
   String fileUrl;
+  String studentId;
 
   final FirebaseDataConnect _dataConnect;
-  SubmitMissionVariablesBuilder(this._dataConnect, {required  this.missionId,required  this.fileUrl,});
+  SubmitMissionVariablesBuilder(this._dataConnect, {required  this.missionId,required  this.fileUrl,required  this.studentId,});
   Deserializer<SubmitMissionData> dataDeserializer = (dynamic json)  => SubmitMissionData.fromJson(jsonDecode(json));
   Serializer<SubmitMissionVariables> varsSerializer = (SubmitMissionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<SubmitMissionData, SubmitMissionVariables>> execute() {
@@ -13,7 +14,7 @@ class SubmitMissionVariablesBuilder {
   }
 
   MutationRef<SubmitMissionData, SubmitMissionVariables> ref() {
-    SubmitMissionVariables vars= SubmitMissionVariables(missionId: missionId,fileUrl: fileUrl,);
+    SubmitMissionVariables vars= SubmitMissionVariables(missionId: missionId,fileUrl: fileUrl,studentId: studentId,);
     return _dataConnect.mutation("SubmitMission", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -90,11 +91,13 @@ class SubmitMissionData {
 class SubmitMissionVariables {
   final String missionId;
   final String fileUrl;
+  final String studentId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   SubmitMissionVariables.fromJson(Map<String, dynamic> json):
   
   missionId = nativeFromJson<String>(json['missionId']),
-  fileUrl = nativeFromJson<String>(json['fileUrl']);
+  fileUrl = nativeFromJson<String>(json['fileUrl']),
+  studentId = nativeFromJson<String>(json['studentId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -106,23 +109,26 @@ class SubmitMissionVariables {
 
     final SubmitMissionVariables otherTyped = other as SubmitMissionVariables;
     return missionId == otherTyped.missionId && 
-    fileUrl == otherTyped.fileUrl;
+    fileUrl == otherTyped.fileUrl && 
+    studentId == otherTyped.studentId;
     
   }
   @override
-  int get hashCode => Object.hashAll([missionId.hashCode, fileUrl.hashCode]);
+  int get hashCode => Object.hashAll([missionId.hashCode, fileUrl.hashCode, studentId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['missionId'] = nativeToJson<String>(missionId);
     json['fileUrl'] = nativeToJson<String>(fileUrl);
+    json['studentId'] = nativeToJson<String>(studentId);
     return json;
   }
 
   SubmitMissionVariables({
     required this.missionId,
     required this.fileUrl,
+    required this.studentId,
   });
 }
 

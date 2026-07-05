@@ -2,9 +2,10 @@ part of 'generated.dart';
 
 class StartQuizAttemptVariablesBuilder {
   String quizId;
+  String userId;
 
   final FirebaseDataConnect _dataConnect;
-  StartQuizAttemptVariablesBuilder(this._dataConnect, {required  this.quizId,});
+  StartQuizAttemptVariablesBuilder(this._dataConnect, {required  this.quizId,required  this.userId,});
   Deserializer<StartQuizAttemptData> dataDeserializer = (dynamic json)  => StartQuizAttemptData.fromJson(jsonDecode(json));
   Serializer<StartQuizAttemptVariables> varsSerializer = (StartQuizAttemptVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<StartQuizAttemptData, StartQuizAttemptVariables>> execute() {
@@ -12,7 +13,7 @@ class StartQuizAttemptVariablesBuilder {
   }
 
   MutationRef<StartQuizAttemptData, StartQuizAttemptVariables> ref() {
-    StartQuizAttemptVariables vars= StartQuizAttemptVariables(quizId: quizId,);
+    StartQuizAttemptVariables vars= StartQuizAttemptVariables(quizId: quizId,userId: userId,);
     return _dataConnect.mutation("StartQuizAttempt", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -88,10 +89,12 @@ class StartQuizAttemptData {
 @immutable
 class StartQuizAttemptVariables {
   final String quizId;
+  final String userId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   StartQuizAttemptVariables.fromJson(Map<String, dynamic> json):
   
-  quizId = nativeFromJson<String>(json['quizId']);
+  quizId = nativeFromJson<String>(json['quizId']),
+  userId = nativeFromJson<String>(json['userId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -102,21 +105,24 @@ class StartQuizAttemptVariables {
     }
 
     final StartQuizAttemptVariables otherTyped = other as StartQuizAttemptVariables;
-    return quizId == otherTyped.quizId;
+    return quizId == otherTyped.quizId && 
+    userId == otherTyped.userId;
     
   }
   @override
-  int get hashCode => quizId.hashCode;
+  int get hashCode => Object.hashAll([quizId.hashCode, userId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['quizId'] = nativeToJson<String>(quizId);
+    json['userId'] = nativeToJson<String>(userId);
     return json;
   }
 
   StartQuizAttemptVariables({
     required this.quizId,
+    required this.userId,
   });
 }
 

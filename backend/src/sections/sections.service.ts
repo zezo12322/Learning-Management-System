@@ -45,7 +45,11 @@ export class SectionsService {
 
     // 2. Soft-delete the section itself (H4) — preserves FK integrity with the
     //    now soft-deleted child lectures and their progress rows.
-    await this.dc.executeMutation('AdminSoftDeleteSection', { sectionId }, authToken);
+    await this.dc.executeMutation(
+      'AdminSoftDeleteSection',
+      { sectionId },
+      authToken,
+    );
 
     // 3. Re-normalize the order of the remaining sections in the course
     const course = await this.dc.executeQuery(
@@ -56,18 +60,34 @@ export class SectionsService {
     const remaining = (course?.course?.adminSections ?? [])
       .filter((s: any) => s.id !== sectionId)
       .map((s: any) => s.id);
-    await this.ordering.applyOrder(remaining, 'AdminUpdateSectionOrder', 'sectionId', authToken);
+    await this.ordering.applyOrder(
+      remaining,
+      'AdminUpdateSectionOrder',
+      'sectionId',
+      authToken,
+    );
 
     return { success: true };
   }
 
   async reorder(courseId: string, orderedIds: string[], authToken: string) {
     // Validate every id belongs to this course before reordering.
-    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
-    const validIds = (course?.course?.adminSections ?? []).map((s: any) => s.id);
+    const course = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
+    const validIds = (course?.course?.adminSections ?? []).map(
+      (s: any) => s.id,
+    );
     assertReorderMembership(orderedIds, validIds, 'section');
 
-    await this.ordering.applyOrder(orderedIds, 'AdminUpdateSectionOrder', 'sectionId', authToken);
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateSectionOrder',
+      'sectionId',
+      authToken,
+    );
     return { success: true, order: orderedIds };
   }
 }

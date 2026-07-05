@@ -152,9 +152,10 @@ export class StreamingService {
       ? this.safeRel(req.variant)
       : this.basename(this.masterFor(hlsDir));
     const playlistPath = `${hlsDir}/${relPlaylist}`;
-    const playlistDirRel = this.dirname(relPlaylist) === relPlaylist
-      ? ''
-      : this.dirname(relPlaylist);
+    const playlistDirRel =
+      this.dirname(relPlaylist) === relPlaylist
+        ? ''
+        : this.dirname(relPlaylist);
 
     let raw: string;
     try {

@@ -1,34 +1,17 @@
 # ==========================================
 # 1. COURSE CREATION & MANAGEMENT
+#
+# NOTE: AdminCreateCourse moved to courses.gql and is now @auth(level: NO_ACCESS)
+# (backend-service-account only, author passed explicitly) — see the RBAC
+# hardening note there. Duplicating the operation name here would break the
+# connector build.
+#
+# InstructorDeleteCourse / SuperAdminDeleteCourse are left as-is: the former is
+# owner-scoped (authorId == auth.uid), the latter is admin-only — neither allows
+# a cross-tenant write.
 # ==========================================
 
-mutation AdminCreateCourse(
-  $title: String!, 
-  $description: String, 
-  $price: Int!,
-  $language: String!, 
-  $level: CourseLevel!, 
-  $categoryId: UUID!,
-  $tags: [String!]!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
-  course_insert(
-    data: {
-      title: $title, 
-      description: $description, 
-      price: $price,
-      language: $language, 
-      level: $level, 
-      categoryId: $categoryId,
-      tags: $tags, 
-      authorId_expr: "auth.uid",    
-      createdById_expr: "auth.uid", 
-      status: DRAFT
-    }
-  )
-}
-
-mutation InstructorDeleteCourse($courseId: UUID!) 
+mutation InstructorDeleteCourse($courseId: UUID!)
 @auth(expr: "auth.token.roles != null && 'instructor' in auth.token.roles") {
   course_updateMany(
     where: {
@@ -57,6 +40,10 @@ mutation SuperAdminDeleteCourse($courseId: UUID!)
 # 2. SESSION & LIVE CLASS SCHEDULING
 # ==========================================
 
+# RBAC hardening: NO_ACCESS. Role alone (admin|instructor) with a $courseId and
+# no ownership check let any instructor create a session on ANY course
+# (cross-tenant write). No backend route consumes this yet; when built it must run
+# via the service account after CourseAccessGuard verifies course ownership.
 mutation AdminCreateSession(
   $courseId: UUID!,
   $title: String!,
@@ -65,8 +52,8 @@ mutation AdminCreateSession(
   $endTime: Timestamp!,
   $type: SessionType!,
   $locationOrUrl: String!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   session_insert(
     data: {
       courseId: $courseId,

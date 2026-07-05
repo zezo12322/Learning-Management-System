@@ -3,7 +3,7 @@ import { DataConnectService } from '../firebase/dataconnect.service';
 
 /**
  * CompletionTriggerService (KAN-116)
- * 
+ *
  * Automatically updates enrollment status based on learning progress:
  * - After quiz pass → marks quiz lecture as completed
  * - After lecture completion → checks if all course lectures are done
@@ -20,7 +20,10 @@ export class CompletionService {
    * Trigger 1 & 2: Check if all lectures in a course are completed.
    * If so, mark the enrollment as COMPLETED.
    */
-  async checkCourseCompletion(courseId: string, authToken: string): Promise<void> {
+  async checkCourseCompletion(
+    courseId: string,
+    authToken: string,
+  ): Promise<void> {
     try {
       // Get completion status
       const data = await this.dc.executeQuery(
@@ -150,20 +153,26 @@ export class CompletionService {
     lectureId: string,
     courseId: string,
     authToken: string,
+    userId: string,
   ): Promise<void> {
     try {
-      // Mark the quiz lecture as completed
+      // Mark the quiz lecture as completed. UpdateLectureProgress is NO_ACCESS
+      // (backend-only) and runs via the service account, so the owner is passed
+      // explicitly.
       await this.dc.executeMutation(
         'UpdateLectureProgress',
         {
           lectureId,
           lastWatchedSecond: 0,
           completedAt: new Date().toISOString(),
+          userId,
         },
         authToken,
       );
 
-      this.logger.log(`Quiz lecture ${lectureId} marked as completed after passing`);
+      this.logger.log(
+        `Quiz lecture ${lectureId} marked as completed after passing`,
+      );
 
       // Then check course completion
       await this.checkCourseCompletion(courseId, authToken);

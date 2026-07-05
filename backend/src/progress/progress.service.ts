@@ -14,15 +14,20 @@ export class ProgressService {
     lectureId: string,
     dto: UpdateProgressDto,
     authToken: string,
+    uid: string,
   ) {
     const completedAt = dto.completed ? new Date().toISOString() : null;
 
+    // UpdateLectureProgress is NO_ACCESS (backend-only) and runs via the service
+    // account, so the progress owner is passed explicitly rather than derived
+    // from auth.uid. This prevents a client from faking lecture completion.
     await this.dc.executeMutation(
       'UpdateLectureProgress',
       {
         lectureId,
         lastWatchedSecond: dto.lastWatchedSecond,
         completedAt,
+        userId: uid,
       },
       authToken,
     );
@@ -50,7 +55,12 @@ export class ProgressService {
       { lectureId },
       authToken,
     );
-    return data?.lectureProgresses?.[0] ?? { lastWatchedSecond: 0, completedAt: null };
+    return (
+      data?.lectureProgresses?.[0] ?? {
+        lastWatchedSecond: 0,
+        completedAt: null,
+      }
+    );
   }
 
   async getCourseProgress(courseId: string, authToken: string) {
@@ -79,16 +89,20 @@ export class ProgressService {
         sectionTitle: section.title,
         totalLectures: sectionTotal,
         completedLectures: sectionCompleted,
-        percentage: sectionTotal > 0 ? Math.round((sectionCompleted / sectionTotal) * 100) : 0,
+        percentage:
+          sectionTotal > 0
+            ? Math.round((sectionCompleted / sectionTotal) * 100)
+            : 0,
       };
     });
 
     return {
       totalLectures,
       completedLectures,
-      overallPercentage: totalLectures > 0
-        ? Math.round((completedLectures / totalLectures) * 100)
-        : 0,
+      overallPercentage:
+        totalLectures > 0
+          ? Math.round((completedLectures / totalLectures) * 100)
+          : 0,
       sections: sectionProgress,
     };
   }

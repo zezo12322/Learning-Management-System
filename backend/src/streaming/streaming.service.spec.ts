@@ -16,8 +16,7 @@ describe('StreamingService', () => {
   let svc: StreamingService;
 
   const config = {
-    get: (k: string, d?: any) =>
-      k === 'STREAM_KEY_SECRET' ? 'secret' : d,
+    get: (k: string, d?: any) => (k === 'STREAM_KEY_SECRET' ? 'secret' : d),
   } as any;
 
   /** Make GetLectureContent return a given lecture; default = free preview. */
@@ -35,9 +34,7 @@ describe('StreamingService', () => {
     dc = { executeQuery: jest.fn(), executeMutation: jest.fn() };
     firebase = {
       downloadFile: jest.fn(),
-      generateSignedReadUrl: jest.fn(
-        async (p: string) => `signed(${p})`,
-      ),
+      generateSignedReadUrl: jest.fn(async (p: string) => `signed(${p})`),
       fileExists: jest.fn(),
     };
     access = { assertCourseAccess: jest.fn() };
@@ -85,7 +82,11 @@ describe('StreamingService', () => {
       // The raw segment names must not leak through.
       expect(out).not.toMatch(/^seg_000\.ts$/m);
       expect(keyTokens.sign).toHaveBeenCalledWith(
-        expect.objectContaining({ uid: 'u1', lectureId: 'L1', keyRel: 'enc.key' }),
+        expect.objectContaining({
+          uid: 'u1',
+          lectureId: 'L1',
+          keyRel: 'enc.key',
+        }),
       );
     });
 
@@ -93,7 +94,11 @@ describe('StreamingService', () => {
       dc.executeQuery.mockResolvedValue(lecture());
       firebase.downloadFile.mockResolvedValue(
         Buffer.from(
-          ['#EXTM3U', '#EXT-X-STREAM-INF:BANDWIDTH=800000', '720p/index.m3u8'].join('\n'),
+          [
+            '#EXTM3U',
+            '#EXT-X-STREAM-INF:BANDWIDTH=800000',
+            '720p/index.m3u8',
+          ].join('\n'),
         ),
       );
 
@@ -124,7 +129,9 @@ describe('StreamingService', () => {
       });
 
       // Loads the variant playlist, signs its segment under the 720p subdir.
-      expect(firebase.downloadFile).toHaveBeenCalledWith(`${HLS_DIR}/720p/index.m3u8`);
+      expect(firebase.downloadFile).toHaveBeenCalledWith(
+        `${HLS_DIR}/720p/index.m3u8`,
+      );
       expect(firebase.generateSignedReadUrl).toHaveBeenCalledWith(
         `${HLS_DIR}/720p/seg_000.ts`,
         360,
@@ -154,7 +161,12 @@ describe('StreamingService', () => {
       access.assertCourseAccess.mockRejectedValue(new ForbiddenException());
 
       await expect(
-        svc.getManifest({ lectureId: 'L1', uid: 'u1', token: 't', isAdmin: false }),
+        svc.getManifest({
+          lectureId: 'L1',
+          uid: 'u1',
+          token: 't',
+          isAdmin: false,
+        }),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
@@ -169,21 +181,34 @@ describe('StreamingService', () => {
       firebase.downloadFile.mockResolvedValue(Buffer.from('#EXTM3U'));
 
       await expect(
-        svc.getManifest({ lectureId: 'L1', uid: 'u1', token: 't', isAdmin: false }),
+        svc.getManifest({
+          lectureId: 'L1',
+          uid: 'u1',
+          token: 't',
+          isAdmin: false,
+        }),
       ).resolves.toContain('#EXTM3U');
     });
   });
 
   describe('getKey', () => {
     it('rejects a key token minted for a different user', async () => {
-      keyTokens.verify.mockReturnValue({ uid: 'attacker', lectureId: 'L1', keyRel: 'enc.key' });
+      keyTokens.verify.mockReturnValue({
+        uid: 'attacker',
+        lectureId: 'L1',
+        keyRel: 'enc.key',
+      });
       await expect(
         svc.getKey('L1', 'u1', 't', false, 'KT'),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('returns the raw key bytes for a valid, matching token', async () => {
-      keyTokens.verify.mockReturnValue({ uid: 'u1', lectureId: 'L1', keyRel: 'enc.key' });
+      keyTokens.verify.mockReturnValue({
+        uid: 'u1',
+        lectureId: 'L1',
+        keyRel: 'enc.key',
+      });
       dc.executeQuery.mockResolvedValue(lecture());
       const keyBytes = Buffer.alloc(16, 7);
       firebase.downloadFile.mockResolvedValue(keyBytes);

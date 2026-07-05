@@ -33,7 +33,11 @@ export class RubricService {
     );
   }
 
-  async update(criterionId: string, dto: UpdateCriterionDto, authToken: string) {
+  async update(
+    criterionId: string,
+    dto: UpdateCriterionDto,
+    authToken: string,
+  ) {
     return this.dc.executeMutation(
       'AdminUpdateRubricCriterion',
       { criterionId, ...dto },
@@ -69,7 +73,11 @@ export class RubricService {
 
   async reorder(missionId: string, orderedIds: string[], authToken: string) {
     // Validate every id belongs to this mission before reordering.
-    const mission = await this.dc.executeQuery('AdminGetMission', { missionId }, authToken);
+    const mission = await this.dc.executeQuery(
+      'AdminGetMission',
+      { missionId },
+      authToken,
+    );
     const validIds = (mission?.mission?.criteria ?? []).map((c: any) => c.id);
     assertReorderMembership(orderedIds, validIds, 'criterion');
 

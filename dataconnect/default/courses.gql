@@ -14,10 +14,10 @@ query ListCategories @auth(level: PUBLIC, insecureReason: "Categories are public
 # Lists all published courses available for public discovery
 query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
   courses(
-    where: { 
+    where: {
       status: { eq: PUBLISHED },
-      deletedAt: { eq: null } 
-    }, 
+      deletedAt: { eq: null }
+    },
     orderBy: [{ createdAt: DESC }]
   ) {
     id
@@ -28,7 +28,7 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
     tags
     avgRating
     ratingCount
-    category { name } 
+    category { name }
     author { name avatar }
   }
 }
@@ -36,11 +36,11 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
 # Searches published courses strictly by their title
 query SearchPublishedCourses($searchQuery: String!) @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
   courses(
-    where: { 
+    where: {
       status: { eq: PUBLISHED },
       deletedAt: { eq: null },
       title: { contains: $searchQuery }
-    }, 
+    },
     orderBy: [{ createdAt: DESC }]
   ) {
     id
@@ -49,13 +49,16 @@ query SearchPublishedCourses($searchQuery: String!) @auth(level: PUBLIC, insecur
     level
     thumbnail
     tags
-    category { name } 
+    category { name }
     author { name avatar }
   }
 }
 
-# Retrieves full curriculum details for a specific course
-query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
+# Retrieves full curriculum details for a specific course. NO_ACCESS: it returns
+# every lecture's `content`, so a USER-level version leaked paid READING content
+# to any authenticated user. Backend-only; CatalogService strips `content` from
+# non-free-preview lectures for callers who aren't the owner/admin or an active enrollee.
+query GetCourseCurriculum($courseId: UUID!) @auth(level: NO_ACCESS) {
   course(id: $courseId) {
     id
     title
@@ -68,13 +71,13 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
       id
       title
       publishedLectures: courseLectures_on_section(
-        where: { deletedAt: { eq: null } }, 
+        where: { deletedAt: { eq: null } },
         orderBy: [{ order: ASC }]
       ) {
         id
         title
         type
-        content 
+        content
         duration
         isFreePreview
       }
@@ -82,8 +85,11 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
   }
 }
 
-# Retrieves a specific lecture's content for playback
-query GetLectureContent($lectureId: UUID!) @auth(level: USER) {
+# Retrieves a specific lecture's content for playback. NO_ACCESS: returns raw
+# `content` / storage paths for any lecture, so a USER-level version let a client
+# read gated content without enrollment. Backend-only; LecturesService.getContent
+# enforces free-preview / owner / active-enrollee before returning signed URLs.
+query GetLectureContent($lectureId: UUID!) @auth(level: NO_ACCESS) {
   courseLecture(id: $lectureId) {
     id
     title
@@ -151,11 +157,25 @@ query GetCourseForEnrollment($courseId: UUID!) @auth(level: USER) {
 
 # ==========================================
 # ADMIN / INSTRUCTOR — COURSE MANAGEMENT
+#
+# NOTE (RBAC hardening): the privileged authoring MUTATIONS below are
+# @auth(level: NO_ACCESS). They are NOT callable with an end-user token (and so
+# not reachable from the generated web/mobile client SDKs). They run ONLY via the
+# backend's service-account `:executeGraphql` path (see ADMIN_OPERATIONS +
+# DataConnectService auto-routing), AFTER the NestJS CourseAccessGuard /
+# ResourceOwnershipGuard have verified the caller owns the target course. This
+# closes the gap where role alone ('admin' | 'instructor') let any instructor
+# edit/delete ANY course by calling the connector directly.
+#
+# The read queries here remain role-gated; they expose data cross-instructor and
+# are a lower-severity follow-up to owner-scope.
 # ==========================================
 
-# Retrieves full course details for authoring purposes (includes drafts)
-query AdminGetCourse($courseId: UUID!) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# Retrieves full course details for authoring purposes (includes drafts).
+# NO_ACCESS: exposes any course's full draft content, so it is backend-only
+# (run via the service account after CourseAccessGuard / ResourceOwnershipGuard).
+query AdminGetCourse($courseId: UUID!)
+@auth(level: NO_ACCESS) {
   course(id: $courseId) {
     id title description price status language level thumbnail tags deletedAt createdAt updatedAt
     category { id name }
@@ -179,8 +199,9 @@ query AdminGetCourse($courseId: UUID!)
   }
 }
 
-# Lists all courses authored by the authenticated user
-query AdminListMyCourses 
+# Lists all courses authored by the authenticated user. Self-scoped by auth.uid,
+# so it is safe to leave callable with the user's own token.
+query AdminListMyCourses
 @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
   courses(
     where: {
@@ -193,11 +214,40 @@ query AdminListMyCourses
   }
 }
 
+# Creates a course. Runs via the service account (no auth.uid), so the author is
+# passed explicitly as $authorId (the backend-verified caller uid).
+mutation AdminCreateCourse(
+  $title: String!,
+  $description: String,
+  $price: Int!,
+  $language: String!,
+  $level: CourseLevel!,
+  $categoryId: UUID!,
+  $tags: [String!]!,
+  $authorId: String!
+)
+@auth(level: NO_ACCESS) {
+  course_insert(
+    data: {
+      title: $title,
+      description: $description,
+      price: $price,
+      language: $language,
+      level: $level,
+      categoryId: $categoryId,
+      tags: $tags,
+      authorId: $authorId,
+      createdById: $authorId,
+      status: DRAFT
+    }
+  )
+}
+
 # Updates course metadata
 mutation AdminUpdateCourse(
   $courseId: UUID!, $title: String, $description: String, $price: Int, $language: String, $level: CourseLevel, $categoryId: UUID, $tags: [String!], $thumbnail: String
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   course_update(
     id: $courseId,
     data: {
@@ -209,12 +259,25 @@ mutation AdminUpdateCourse(
 # Transitions course status (DRAFT -> PUBLISHED -> ARCHIVED)
 mutation AdminUpdateCourseStatus(
   $courseId: UUID!, $status: CourseStatus!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   course_update(
     id: $courseId,
     data: {
       status: $status, updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Soft-deletes (archives) a course. Backend-only (NO_ACCESS), run via the service
+# account after CourseAccessGuard verifies ownership. Replaces a stale call to a
+# non-existent "AdminDeleteCourse" operation.
+mutation AdminSoftDeleteCourse($courseId: UUID!)
+@auth(level: NO_ACCESS) {
+  course_update(
+    id: $courseId,
+    data: {
+      deletedAt_expr: "request.time", status: ARCHIVED, updatedAt_expr: "request.time"
     }
   )
 }
@@ -225,27 +288,27 @@ mutation AdminUpdateCourseStatus(
 
 mutation AdminCreateSection(
   $courseId: UUID!, $title: String!, $order: Int!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseSection_insert(data: { courseId: $courseId, title: $title, order: $order })
 }
 
 mutation AdminUpdateSection(
   $sectionId: UUID!, $title: String!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseSection_update(id: $sectionId, data: { title: $title, updatedAt_expr: "request.time" })
 }
 
-mutation AdminSoftDeleteSection($sectionId: UUID!) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminSoftDeleteSection($sectionId: UUID!)
+@auth(level: NO_ACCESS) {
   courseSection_update(id: $sectionId, data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" })
 }
 
 mutation AdminUpdateSectionOrder(
   $sectionId: UUID!, $order: Int!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseSection_update(id: $sectionId, data: { order: $order, updatedAt_expr: "request.time" })
 }
 
@@ -255,8 +318,8 @@ mutation AdminUpdateSectionOrder(
 
 mutation AdminCreateLectureFull(
   $sectionId: UUID!, $title: String!, $type: LectureType!, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean!, $order: Int!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseLecture_insert(
     data: {
       sectionId: $sectionId, title: $title, type: $type, videoUrl: $videoUrl, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, order: $order
@@ -266,8 +329,8 @@ mutation AdminCreateLectureFull(
 
 mutation AdminUpdateLecture(
   $lectureId: UUID!, $title: String, $type: LectureType, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseLecture_update(
     id: $lectureId,
     data: {
@@ -276,27 +339,27 @@ mutation AdminUpdateLecture(
   )
 }
 
-mutation AdminSoftDeleteLecture($lectureId: UUID!) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminSoftDeleteLecture($lectureId: UUID!)
+@auth(level: NO_ACCESS) {
   courseLecture_update(id: $lectureId, data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" })
 }
 
 mutation AdminUpdateLectureOrder(
   $lectureId: UUID!, $order: Int!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseLecture_update(id: $lectureId, data: { order: $order, updatedAt_expr: "request.time" })
 }
 
 mutation AdminMoveLectureToSection(
   $lectureId: UUID!, $newSectionId: UUID!, $order: Int!
-) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+)
+@auth(level: NO_ACCESS) {
   courseLecture_update(id: $lectureId, data: { sectionId: $newSectionId, order: $order, updatedAt_expr: "request.time" })
 }
 
-mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) 
-@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!)
+@auth(level: NO_ACCESS) {
   courseLecture_updateMany(
     where: { sectionId: { eq: $sectionId }, deletedAt: { eq: null } },
     data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" }

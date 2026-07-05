@@ -47,7 +47,8 @@ export const MissionStoragePaths = {
 
 export const ALLOWED_TEMPLATE_MIME_TYPES: Record<string, string> = {
   'application/pdf': '.pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    '.docx',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
 };
 
@@ -70,9 +71,9 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 // ==========================================
 
 export const FILE_SIZE_LIMITS = {
-  TEMPLATE: 50 * 1024 * 1024,     // 50MB
-  VIDEO: 500 * 1024 * 1024,       // 500MB
-  THUMBNAIL: 5 * 1024 * 1024,     // 5MB
-  TRANSCRIPT: 10 * 1024 * 1024,   // 10MB
+  TEMPLATE: 50 * 1024 * 1024, // 50MB
+  VIDEO: 500 * 1024 * 1024, // 500MB
+  THUMBNAIL: 5 * 1024 * 1024, // 5MB
+  TRANSCRIPT: 10 * 1024 * 1024, // 10MB
   MICRO_LESSON: 100 * 1024 * 1024, // 100MB
 } as const;
