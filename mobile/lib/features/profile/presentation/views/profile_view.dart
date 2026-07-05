@@ -25,7 +25,7 @@ class ProfileView extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsetsDirectional.only(end: 12),
+            padding: EdgeInsetsDirectional.only(end: 12.w),
             child: IconButton(
                 onPressed: (){},
                 icon: Icon(
