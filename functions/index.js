@@ -271,12 +271,13 @@ exports.changeUserRole = functions
       });
 
       const userRecord = await admin.auth().getUser(targetUid);
-      const currentClaims = userRecord.customClaims || {};
-
-      const newClaims = {
-        ...currentClaims,
-        roles: [newRole]
-      };
+      // Strip legacy single-role claims (`role`/`admin`) so a demotion cannot
+      // leave a stale value that the NestJS guards would still honor. The `roles`
+      // array is the single source of truth across Data Connect and the backend.
+      const newClaims = Object.assign({}, userRecord.customClaims);
+      delete newClaims.role;
+      delete newClaims.admin;
+      newClaims.roles = [newRole];
       await admin.auth().setCustomUserClaims(targetUid, newClaims);
 
       console.log(`🎉 [SUCCESS] Role fully synchronized across Database and Token.`);

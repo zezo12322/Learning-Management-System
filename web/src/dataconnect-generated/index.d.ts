@@ -151,6 +151,7 @@ export interface AdminCreateCourseVariables {
   level: CourseLevel;
   categoryId: UUIDString;
   tags: string[];
+  authorId: string;
 }
 
 export interface AdminCreateLectureFullData {
@@ -206,6 +207,7 @@ export interface AdminCreateMissionVariables {
   difficulty: MissionDifficulty;
   skillsTested: string[];
   courseId?: UUIDString | null;
+  authorId: string;
 }
 
 export interface AdminCreateQuizData {
@@ -542,6 +544,14 @@ export interface AdminRemoveCourseInstructorVariables {
   userId: string;
 }
 
+export interface AdminSoftDeleteCourseData {
+  course_update?: Course_Key | null;
+}
+
+export interface AdminSoftDeleteCourseVariables {
+  courseId: UUIDString;
+}
+
 export interface AdminSoftDeleteLectureData {
   courseLecture_update?: CourseLecture_Key | null;
 }
@@ -840,6 +850,7 @@ export interface DeleteCourseRatingData {
 
 export interface DeleteCourseRatingVariables {
   courseId: UUIDString;
+  userId: string;
 }
 
 export interface EnrollInCourseData {
@@ -848,6 +859,7 @@ export interface EnrollInCourseData {
 
 export interface EnrollInCourseVariables {
   courseId: UUIDString;
+  userId: string;
 }
 
 export interface EnrollInMissionData {
@@ -856,6 +868,7 @@ export interface EnrollInMissionData {
 
 export interface EnrollInMissionVariables {
   missionId: UUIDString;
+  userId: string;
 }
 
 export interface Enrollment_Key {
@@ -1273,6 +1286,26 @@ export interface GetMyMissionAccessVariables {
   missionId: UUIDString;
 }
 
+export interface GetMyPendingSubmissionsData {
+  missionSubmissions: ({
+    id: UUIDString;
+    fileUrl: string;
+    submittedAt: TimestampString;
+    attemptNumber: number;
+    student: {
+      name: string;
+      email: string;
+    };
+    mission: {
+      title: string;
+      difficulty: MissionDifficulty;
+      course?: {
+        title: string;
+      };
+    };
+  } & MissionSubmission_Key)[];
+}
+
 export interface GetOptionCourseData {
   quizOption?: {
     question: {
@@ -1606,6 +1639,7 @@ export interface GradeSubmissionData {
 export interface GradeSubmissionVariables {
   submissionId: UUIDString;
   feedback?: string | null;
+  graderId: string;
 }
 
 export interface InstructorCancelSessionData {
@@ -1869,6 +1903,7 @@ export interface StartQuizAttemptData {
 
 export interface StartQuizAttemptVariables {
   quizId: UUIDString;
+  userId: string;
 }
 
 export interface SubmitMissionData {
@@ -1878,6 +1913,7 @@ export interface SubmitMissionData {
 export interface SubmitMissionVariables {
   missionId: UUIDString;
   fileUrl: string;
+  studentId: string;
 }
 
 export interface SubmitQuizAnswerData {
@@ -1939,6 +1975,7 @@ export interface UpdateLectureProgressVariables {
   lectureId: UUIDString;
   lastWatchedSecond: number;
   completedAt?: TimestampString | null;
+  userId: string;
 }
 
 export interface UpdateMyProfileData {
@@ -1960,6 +1997,7 @@ export interface UpsertCourseRatingVariables {
   courseId: UUIDString;
   rating: number;
   review?: string | null;
+  userId: string;
 }
 
 export interface UserRole_Key {
@@ -1999,18 +2037,6 @@ export interface VerifyCertificateData {
 export interface VerifyCertificateVariables {
   hash: string;
 }
-
-interface AdminCreateCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateCourseVariables): MutationRef<AdminCreateCourseData, AdminCreateCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateCourseVariables): MutationRef<AdminCreateCourseData, AdminCreateCourseVariables>;
-  operationName: string;
-}
-export const adminCreateCourseRef: AdminCreateCourseRef;
-
-export function adminCreateCourse(vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
-export function adminCreateCourse(dc: DataConnect, vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
 
 interface InstructorDeleteCourseRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2264,6 +2290,18 @@ export const adminListMyCoursesRef: AdminListMyCoursesRef;
 export function adminListMyCourses(options?: ExecuteQueryOptions): QueryPromise<AdminListMyCoursesData, undefined>;
 export function adminListMyCourses(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<AdminListMyCoursesData, undefined>;
 
+interface AdminCreateCourseRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateCourseVariables): MutationRef<AdminCreateCourseData, AdminCreateCourseVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateCourseVariables): MutationRef<AdminCreateCourseData, AdminCreateCourseVariables>;
+  operationName: string;
+}
+export const adminCreateCourseRef: AdminCreateCourseRef;
+
+export function adminCreateCourse(vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
+export function adminCreateCourse(dc: DataConnect, vars: AdminCreateCourseVariables): MutationPromise<AdminCreateCourseData, AdminCreateCourseVariables>;
+
 interface AdminUpdateCourseRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: AdminUpdateCourseVariables): MutationRef<AdminUpdateCourseData, AdminUpdateCourseVariables>;
@@ -2287,6 +2325,18 @@ export const adminUpdateCourseStatusRef: AdminUpdateCourseStatusRef;
 
 export function adminUpdateCourseStatus(vars: AdminUpdateCourseStatusVariables): MutationPromise<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
 export function adminUpdateCourseStatus(dc: DataConnect, vars: AdminUpdateCourseStatusVariables): MutationPromise<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
+
+interface AdminSoftDeleteCourseRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminSoftDeleteCourseVariables): MutationRef<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminSoftDeleteCourseVariables): MutationRef<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
+  operationName: string;
+}
+export const adminSoftDeleteCourseRef: AdminSoftDeleteCourseRef;
+
+export function adminSoftDeleteCourse(vars: AdminSoftDeleteCourseVariables): MutationPromise<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
+export function adminSoftDeleteCourse(dc: DataConnect, vars: AdminSoftDeleteCourseVariables): MutationPromise<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
 
 interface AdminCreateSectionRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2455,6 +2505,18 @@ export const getPendingSubmissionsRef: GetPendingSubmissionsRef;
 
 export function getPendingSubmissions(options?: ExecuteQueryOptions): QueryPromise<GetPendingSubmissionsData, undefined>;
 export function getPendingSubmissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetPendingSubmissionsData, undefined>;
+
+interface GetMyPendingSubmissionsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetMyPendingSubmissionsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<GetMyPendingSubmissionsData, undefined>;
+  operationName: string;
+}
+export const getMyPendingSubmissionsRef: GetMyPendingSubmissionsRef;
+
+export function getMyPendingSubmissions(options?: ExecuteQueryOptions): QueryPromise<GetMyPendingSubmissionsData, undefined>;
+export function getMyPendingSubmissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetMyPendingSubmissionsData, undefined>;
 
 interface AdminAddCourseInstructorRef {
   /* Allow users to create refs without passing in DataConnect */

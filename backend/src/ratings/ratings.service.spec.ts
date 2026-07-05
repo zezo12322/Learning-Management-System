@@ -1,15 +1,26 @@
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { RatingsService } from './ratings.service';
 
-function makeDc(queryMap: Record<string, any>, mutationMap: Record<string, any> = {}) {
+function makeDc(
+  queryMap: Record<string, any>,
+  mutationMap: Record<string, any> = {},
+) {
   return {
     executeQuery: jest.fn((op: string) => Promise.resolve(queryMap[op])),
-    executeMutation: jest.fn((op: string) => Promise.resolve(mutationMap[op] ?? {})),
+    executeMutation: jest.fn((op: string) =>
+      Promise.resolve(mutationMap[op] ?? {}),
+    ),
     executeMutationAsAdmin: jest.fn(() => Promise.resolve({})),
   };
 }
 
-const publishedCourse = { course: { id: 'c1', status: 'PUBLISHED', deletedAt: null } };
+const publishedCourse = {
+  course: { id: 'c1', status: 'PUBLISHED', deletedAt: null },
+};
 const activeEnrollment = { enrollments: [{ id: 'e1', status: 'ACTIVE' }] };
 
 // A rateable course the user is enrolled in, plus two existing ratings so the
@@ -45,7 +56,11 @@ describe('RatingsService', () => {
     });
 
     it('ignores out-of-range values defensively', () => {
-      const summary = svc.summarize([{ rating: 0 }, { rating: 6 }, { rating: 3 }]);
+      const summary = svc.summarize([
+        { rating: 0 },
+        { rating: 6 },
+        { rating: 3 },
+      ]);
       expect(summary.count).toBe(1);
       expect(summary.average).toBe(3);
     });
@@ -55,10 +70,10 @@ describe('RatingsService', () => {
     it('upserts when the course is published and the user is enrolled', async () => {
       const dc = makeDc({ ...rateableCtx });
       const svc = new RatingsService(dc as any);
-      await svc.upsertRating('c1', { rating: 5, review: 'Great' }, 'tok');
+      await svc.upsertRating('c1', { rating: 5, review: 'Great' }, 'tok', 'u1');
       expect(dc.executeMutation).toHaveBeenCalledWith(
         'UpsertCourseRating',
-        { courseId: 'c1', rating: 5, review: 'Great' },
+        { courseId: 'c1', rating: 5, review: 'Great', userId: 'u1' },
         'tok',
       );
     });
@@ -66,10 +81,10 @@ describe('RatingsService', () => {
     it('passes null review when omitted', async () => {
       const dc = makeDc({ ...rateableCtx });
       const svc = new RatingsService(dc as any);
-      await svc.upsertRating('c1', { rating: 4 }, 'tok');
+      await svc.upsertRating('c1', { rating: 4 }, 'tok', 'u1');
       expect(dc.executeMutation).toHaveBeenCalledWith(
         'UpsertCourseRating',
-        { courseId: 'c1', rating: 4, review: null },
+        { courseId: 'c1', rating: 4, review: null, userId: 'u1' },
         'tok',
       );
     });
@@ -77,7 +92,7 @@ describe('RatingsService', () => {
     it('recomputes and writes the denormalised course aggregate after writing', async () => {
       const dc = makeDc({ ...rateableCtx });
       const svc = new RatingsService(dc as any);
-      await svc.upsertRating('c1', { rating: 5 }, 'tok');
+      await svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1');
       // Existing ratings [5,4] -> avg 4.5, count 2.
       expect(dc.executeMutationAsAdmin).toHaveBeenCalledWith(
         'AdminUpdateCourseRatingAggregate',
@@ -89,26 +104,30 @@ describe('RatingsService', () => {
       const dc = makeDc({ ...rateableCtx });
       dc.executeMutationAsAdmin.mockRejectedValueOnce(new Error('boom'));
       const svc = new RatingsService(dc as any);
-      await expect(svc.upsertRating('c1', { rating: 5 }, 'tok')).resolves.toBeDefined();
+      await expect(
+        svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1'),
+      ).resolves.toBeDefined();
     });
 
     it('rejects when the course does not exist', async () => {
       const dc = makeDc({ GetCourseForEnrollment: { course: null } });
       const svc = new RatingsService(dc as any);
-      await expect(svc.upsertRating('c1', { rating: 5 }, 'tok')).rejects.toBeInstanceOf(
-        NotFoundException,
-      );
+      await expect(
+        svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1'),
+      ).rejects.toBeInstanceOf(NotFoundException);
       expect(dc.executeMutation).not.toHaveBeenCalled();
     });
 
     it('rejects when the course is not published', async () => {
       const dc = makeDc({
-        GetCourseForEnrollment: { course: { id: 'c1', status: 'DRAFT', deletedAt: null } },
+        GetCourseForEnrollment: {
+          course: { id: 'c1', status: 'DRAFT', deletedAt: null },
+        },
       });
       const svc = new RatingsService(dc as any);
-      await expect(svc.upsertRating('c1', { rating: 5 }, 'tok')).rejects.toBeInstanceOf(
-        BadRequestException,
-      );
+      await expect(
+        svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1'),
+      ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('rejects when the user is not enrolled', async () => {
@@ -117,21 +136,23 @@ describe('RatingsService', () => {
         GetUserEnrollmentForCourse: { enrollments: [] },
       });
       const svc = new RatingsService(dc as any);
-      await expect(svc.upsertRating('c1', { rating: 5 }, 'tok')).rejects.toBeInstanceOf(
-        ForbiddenException,
-      );
+      await expect(
+        svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1'),
+      ).rejects.toBeInstanceOf(ForbiddenException);
       expect(dc.executeMutation).not.toHaveBeenCalled();
     });
 
     it('rejects when the enrollment was dropped', async () => {
       const dc = makeDc({
         GetCourseForEnrollment: publishedCourse,
-        GetUserEnrollmentForCourse: { enrollments: [{ id: 'e1', status: 'DROPPED' }] },
+        GetUserEnrollmentForCourse: {
+          enrollments: [{ id: 'e1', status: 'DROPPED' }],
+        },
       });
       const svc = new RatingsService(dc as any);
-      await expect(svc.upsertRating('c1', { rating: 5 }, 'tok')).rejects.toBeInstanceOf(
-        ForbiddenException,
-      );
+      await expect(
+        svc.upsertRating('c1', { rating: 5 }, 'tok', 'u1'),
+      ).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 
@@ -172,11 +193,15 @@ describe('RatingsService', () => {
 
   describe('getMyRating', () => {
     it('returns the first rating row or null', async () => {
-      const dc = makeDc({ GetMyCourseRating: { courseRatings: [{ rating: 3 }] } });
+      const dc = makeDc({
+        GetMyCourseRating: { courseRatings: [{ rating: 3 }] },
+      });
       const svc = new RatingsService(dc as any);
       expect(await svc.getMyRating('c1', 'tok')).toEqual({ rating: 3 });
 
-      const empty = new RatingsService(makeDc({ GetMyCourseRating: { courseRatings: [] } }) as any);
+      const empty = new RatingsService(
+        makeDc({ GetMyCourseRating: { courseRatings: [] } }) as any,
+      );
       expect(await empty.getMyRating('c1', 'tok')).toBeNull();
     });
   });

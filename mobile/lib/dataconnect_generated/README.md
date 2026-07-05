@@ -708,6 +708,47 @@ ref.subscribe(...);
 ```
 
 
+### GetMyPendingSubmissions
+#### Required Arguments
+```dart
+// No required arguments
+DefaultConnector.instance.getMyPendingSubmissions().execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<GetMyPendingSubmissionsData, void>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await DefaultConnector.instance.getMyPendingSubmissions();
+GetMyPendingSubmissionsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = DefaultConnector.instance.getMyPendingSubmissions().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### GetCourseInstructors
 #### Required Arguments
 ```dart
@@ -2577,96 +2618,6 @@ ref.subscribe(...);
 
 ## Mutations
 
-### AdminCreateCourse
-#### Required Arguments
-```dart
-String title = ...;
-int price = ...;
-String language = ...;
-CourseLevel level = ...;
-String categoryId = ...;
-String tags = ...;
-DefaultConnector.instance.adminCreateCourse(
-  title: title,
-  price: price,
-  language: language,
-  level: level,
-  categoryId: categoryId,
-  tags: tags,
-).execute();
-```
-
-#### Optional Arguments
-We return a builder for each query. For AdminCreateCourse, we created `AdminCreateCourseBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class AdminCreateCourseVariablesBuilder {
-  ...
-   AdminCreateCourseVariablesBuilder description(String? t) {
-   _description.value = t;
-   return this;
-  }
-
-  ...
-}
-DefaultConnector.instance.adminCreateCourse(
-  title: title,
-  price: price,
-  language: language,
-  level: level,
-  categoryId: categoryId,
-  tags: tags,
-)
-.description(description)
-.execute();
-```
-
-#### Return Type
-`execute()` returns a `OperationResult<AdminCreateCourseData, AdminCreateCourseVariables>`
-```dart
-/// Result of an Operation Request (query/mutation).
-class OperationResult<Data, Variables> {
-  OperationResult(this.dataConnect, this.data, this.ref);
-  Data data;
-  OperationRef<Data, Variables> ref;
-  FirebaseDataConnect dataConnect;
-}
-
-final result = await DefaultConnector.instance.adminCreateCourse(
-  title: title,
-  price: price,
-  language: language,
-  level: level,
-  categoryId: categoryId,
-  tags: tags,
-);
-AdminCreateCourseData data = result.data;
-final ref = result.ref;
-```
-
-#### Getting the Ref
-Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
-An example of how to use the `Ref` object is shown below:
-```dart
-String title = ...;
-int price = ...;
-String language = ...;
-CourseLevel level = ...;
-String categoryId = ...;
-String tags = ...;
-
-final ref = DefaultConnector.instance.adminCreateCourse(
-  title: title,
-  price: price,
-  language: language,
-  level: level,
-  categoryId: categoryId,
-  tags: tags,
-).ref();
-ref.execute();
-```
-
-
 ### InstructorDeleteCourse
 #### Required Arguments
 ```dart
@@ -3084,6 +3035,102 @@ ref.execute();
 ```
 
 
+### AdminCreateCourse
+#### Required Arguments
+```dart
+String title = ...;
+int price = ...;
+String language = ...;
+CourseLevel level = ...;
+String categoryId = ...;
+String tags = ...;
+String authorId = ...;
+DefaultConnector.instance.adminCreateCourse(
+  title: title,
+  price: price,
+  language: language,
+  level: level,
+  categoryId: categoryId,
+  tags: tags,
+  authorId: authorId,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For AdminCreateCourse, we created `AdminCreateCourseBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class AdminCreateCourseVariablesBuilder {
+  ...
+   AdminCreateCourseVariablesBuilder description(String? t) {
+   _description.value = t;
+   return this;
+  }
+
+  ...
+}
+DefaultConnector.instance.adminCreateCourse(
+  title: title,
+  price: price,
+  language: language,
+  level: level,
+  categoryId: categoryId,
+  tags: tags,
+  authorId: authorId,
+)
+.description(description)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<AdminCreateCourseData, AdminCreateCourseVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.adminCreateCourse(
+  title: title,
+  price: price,
+  language: language,
+  level: level,
+  categoryId: categoryId,
+  tags: tags,
+  authorId: authorId,
+);
+AdminCreateCourseData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String title = ...;
+int price = ...;
+String language = ...;
+CourseLevel level = ...;
+String categoryId = ...;
+String tags = ...;
+String authorId = ...;
+
+final ref = DefaultConnector.instance.adminCreateCourse(
+  title: title,
+  price: price,
+  language: language,
+  level: level,
+  categoryId: categoryId,
+  tags: tags,
+  authorId: authorId,
+).ref();
+ref.execute();
+```
+
+
 ### AdminUpdateCourse
 #### Required Arguments
 ```dart
@@ -3221,6 +3268,48 @@ CourseStatus status = ...;
 final ref = DefaultConnector.instance.adminUpdateCourseStatus(
   courseId: courseId,
   status: status,
+).ref();
+ref.execute();
+```
+
+
+### AdminSoftDeleteCourse
+#### Required Arguments
+```dart
+String courseId = ...;
+DefaultConnector.instance.adminSoftDeleteCourse(
+  courseId: courseId,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await DefaultConnector.instance.adminSoftDeleteCourse(
+  courseId: courseId,
+);
+AdminSoftDeleteCourseData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String courseId = ...;
+
+final ref = DefaultConnector.instance.adminSoftDeleteCourse(
+  courseId: courseId,
 ).ref();
 ref.execute();
 ```
@@ -4044,8 +4133,10 @@ ref.execute();
 #### Required Arguments
 ```dart
 String courseId = ...;
+String userId = ...;
 DefaultConnector.instance.enrollInCourse(
   courseId: courseId,
+  userId: userId,
 ).execute();
 ```
 
@@ -4064,6 +4155,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.enrollInCourse(
   courseId: courseId,
+  userId: userId,
 );
 EnrollInCourseData data = result.data;
 final ref = result.ref;
@@ -4074,9 +4166,11 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String courseId = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.enrollInCourse(
   courseId: courseId,
+  userId: userId,
 ).ref();
 ref.execute();
 ```
@@ -4086,8 +4180,10 @@ ref.execute();
 #### Required Arguments
 ```dart
 String missionId = ...;
+String userId = ...;
 DefaultConnector.instance.enrollInMission(
   missionId: missionId,
+  userId: userId,
 ).execute();
 ```
 
@@ -4106,6 +4202,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.enrollInMission(
   missionId: missionId,
+  userId: userId,
 );
 EnrollInMissionData data = result.data;
 final ref = result.ref;
@@ -4116,9 +4213,11 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String missionId = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.enrollInMission(
   missionId: missionId,
+  userId: userId,
 ).ref();
 ref.execute();
 ```
@@ -4129,9 +4228,11 @@ ref.execute();
 ```dart
 String lectureId = ...;
 int lastWatchedSecond = ...;
+String userId = ...;
 DefaultConnector.instance.updateLectureProgress(
   lectureId: lectureId,
   lastWatchedSecond: lastWatchedSecond,
+  userId: userId,
 ).execute();
 ```
 
@@ -4151,6 +4252,7 @@ class UpdateLectureProgressVariablesBuilder {
 DefaultConnector.instance.updateLectureProgress(
   lectureId: lectureId,
   lastWatchedSecond: lastWatchedSecond,
+  userId: userId,
 )
 .completedAt(completedAt)
 .execute();
@@ -4170,6 +4272,7 @@ class OperationResult<Data, Variables> {
 final result = await DefaultConnector.instance.updateLectureProgress(
   lectureId: lectureId,
   lastWatchedSecond: lastWatchedSecond,
+  userId: userId,
 );
 UpdateLectureProgressData data = result.data;
 final ref = result.ref;
@@ -4181,10 +4284,12 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 String lectureId = ...;
 int lastWatchedSecond = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.updateLectureProgress(
   lectureId: lectureId,
   lastWatchedSecond: lastWatchedSecond,
+  userId: userId,
 ).ref();
 ref.execute();
 ```
@@ -4333,9 +4438,11 @@ ref.execute();
 ```dart
 String missionId = ...;
 String fileUrl = ...;
+String studentId = ...;
 DefaultConnector.instance.submitMission(
   missionId: missionId,
   fileUrl: fileUrl,
+  studentId: studentId,
 ).execute();
 ```
 
@@ -4355,6 +4462,7 @@ class OperationResult<Data, Variables> {
 final result = await DefaultConnector.instance.submitMission(
   missionId: missionId,
   fileUrl: fileUrl,
+  studentId: studentId,
 );
 SubmitMissionData data = result.data;
 final ref = result.ref;
@@ -4366,10 +4474,12 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 String missionId = ...;
 String fileUrl = ...;
+String studentId = ...;
 
 final ref = DefaultConnector.instance.submitMission(
   missionId: missionId,
   fileUrl: fileUrl,
+  studentId: studentId,
 ).ref();
 ref.execute();
 ```
@@ -4379,8 +4489,10 @@ ref.execute();
 #### Required Arguments
 ```dart
 String submissionId = ...;
+String graderId = ...;
 DefaultConnector.instance.gradeSubmission(
   submissionId: submissionId,
+  graderId: graderId,
 ).execute();
 ```
 
@@ -4399,6 +4511,7 @@ class GradeSubmissionVariablesBuilder {
 }
 DefaultConnector.instance.gradeSubmission(
   submissionId: submissionId,
+  graderId: graderId,
 )
 .feedback(feedback)
 .execute();
@@ -4417,6 +4530,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.gradeSubmission(
   submissionId: submissionId,
+  graderId: graderId,
 );
 GradeSubmissionData data = result.data;
 final ref = result.ref;
@@ -4427,9 +4541,11 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String submissionId = ...;
+String graderId = ...;
 
 final ref = DefaultConnector.instance.gradeSubmission(
   submissionId: submissionId,
+  graderId: graderId,
 ).ref();
 ref.execute();
 ```
@@ -4496,6 +4612,7 @@ int durationMinutes = ...;
 String categoryId = ...;
 MissionDifficulty difficulty = ...;
 String skillsTested = ...;
+String authorId = ...;
 DefaultConnector.instance.adminCreateMission(
   title: title,
   scenarioDescription: scenarioDescription,
@@ -4503,6 +4620,7 @@ DefaultConnector.instance.adminCreateMission(
   categoryId: categoryId,
   difficulty: difficulty,
   skillsTested: skillsTested,
+  authorId: authorId,
 ).execute();
 ```
 
@@ -4526,6 +4644,7 @@ DefaultConnector.instance.adminCreateMission(
   categoryId: categoryId,
   difficulty: difficulty,
   skillsTested: skillsTested,
+  authorId: authorId,
 )
 .courseId(courseId)
 .execute();
@@ -4549,6 +4668,7 @@ final result = await DefaultConnector.instance.adminCreateMission(
   categoryId: categoryId,
   difficulty: difficulty,
   skillsTested: skillsTested,
+  authorId: authorId,
 );
 AdminCreateMissionData data = result.data;
 final ref = result.ref;
@@ -4564,6 +4684,7 @@ int durationMinutes = ...;
 String categoryId = ...;
 MissionDifficulty difficulty = ...;
 String skillsTested = ...;
+String authorId = ...;
 
 final ref = DefaultConnector.instance.adminCreateMission(
   title: title,
@@ -4572,6 +4693,7 @@ final ref = DefaultConnector.instance.adminCreateMission(
   categoryId: categoryId,
   difficulty: difficulty,
   skillsTested: skillsTested,
+  authorId: authorId,
 ).ref();
 ref.execute();
 ```
@@ -5306,8 +5428,10 @@ ref.execute();
 #### Required Arguments
 ```dart
 String quizId = ...;
+String userId = ...;
 DefaultConnector.instance.startQuizAttempt(
   quizId: quizId,
+  userId: userId,
 ).execute();
 ```
 
@@ -5326,6 +5450,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.startQuizAttempt(
   quizId: quizId,
+  userId: userId,
 );
 StartQuizAttemptData data = result.data;
 final ref = result.ref;
@@ -5336,9 +5461,11 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String quizId = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.startQuizAttempt(
   quizId: quizId,
+  userId: userId,
 ).ref();
 ref.execute();
 ```
@@ -6085,9 +6212,11 @@ ref.execute();
 ```dart
 String courseId = ...;
 int rating = ...;
+String userId = ...;
 DefaultConnector.instance.upsertCourseRating(
   courseId: courseId,
   rating: rating,
+  userId: userId,
 ).execute();
 ```
 
@@ -6107,6 +6236,7 @@ class UpsertCourseRatingVariablesBuilder {
 DefaultConnector.instance.upsertCourseRating(
   courseId: courseId,
   rating: rating,
+  userId: userId,
 )
 .review(review)
 .execute();
@@ -6126,6 +6256,7 @@ class OperationResult<Data, Variables> {
 final result = await DefaultConnector.instance.upsertCourseRating(
   courseId: courseId,
   rating: rating,
+  userId: userId,
 );
 UpsertCourseRatingData data = result.data;
 final ref = result.ref;
@@ -6137,10 +6268,12 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 String courseId = ...;
 int rating = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.upsertCourseRating(
   courseId: courseId,
   rating: rating,
+  userId: userId,
 ).ref();
 ref.execute();
 ```
@@ -6150,8 +6283,10 @@ ref.execute();
 #### Required Arguments
 ```dart
 String courseId = ...;
+String userId = ...;
 DefaultConnector.instance.deleteCourseRating(
   courseId: courseId,
+  userId: userId,
 ).execute();
 ```
 
@@ -6170,6 +6305,7 @@ class OperationResult<Data, Variables> {
 
 final result = await DefaultConnector.instance.deleteCourseRating(
   courseId: courseId,
+  userId: userId,
 );
 DeleteCourseRatingData data = result.data;
 final ref = result.ref;
@@ -6180,9 +6316,11 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 String courseId = ...;
+String userId = ...;
 
 final ref = DefaultConnector.instance.deleteCourseRating(
   courseId: courseId,
+  userId: userId,
 ).ref();
 ref.execute();
 ```

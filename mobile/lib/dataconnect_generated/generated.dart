@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
-part 'admin_create_course.dart';
-
 part 'instructor_delete_course.dart';
 
 part 'super_admin_delete_course.dart';
@@ -48,9 +46,13 @@ part 'admin_get_course.dart';
 
 part 'admin_list_my_courses.dart';
 
+part 'admin_create_course.dart';
+
 part 'admin_update_course.dart';
 
 part 'admin_update_course_status.dart';
+
+part 'admin_soft_delete_course.dart';
 
 part 'admin_create_section.dart';
 
@@ -79,6 +81,8 @@ part 'add_payment_item.dart';
 part 'my_payment_history.dart';
 
 part 'get_pending_submissions.dart';
+
+part 'get_my_pending_submissions.dart';
 
 part 'admin_add_course_instructor.dart';
 
@@ -747,11 +751,6 @@ class Unknown extends EnumValue<Never> {
 class DefaultConnector {
   
   
-  AdminCreateCourseVariablesBuilder adminCreateCourse ({required String title, required int price, required String language, required CourseLevel level, required String categoryId, required List<String> tags, }) {
-    return AdminCreateCourseVariablesBuilder(dataConnect, title: title,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
-  }
-  
-  
   InstructorDeleteCourseVariablesBuilder instructorDeleteCourse ({required String courseId, }) {
     return InstructorDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
   }
@@ -857,6 +856,11 @@ class DefaultConnector {
   }
   
   
+  AdminCreateCourseVariablesBuilder adminCreateCourse ({required String title, required int price, required String language, required CourseLevel level, required String categoryId, required List<String> tags, required String authorId, }) {
+    return AdminCreateCourseVariablesBuilder(dataConnect, title: title,price: price,language: language,level: level,categoryId: categoryId,tags: tags,authorId: authorId,);
+  }
+  
+  
   AdminUpdateCourseVariablesBuilder adminUpdateCourse ({required String courseId, }) {
     return AdminUpdateCourseVariablesBuilder(dataConnect, courseId: courseId,);
   }
@@ -864,6 +868,11 @@ class DefaultConnector {
   
   AdminUpdateCourseStatusVariablesBuilder adminUpdateCourseStatus ({required String courseId, required CourseStatus status, }) {
     return AdminUpdateCourseStatusVariablesBuilder(dataConnect, courseId: courseId,status: status,);
+  }
+  
+  
+  AdminSoftDeleteCourseVariablesBuilder adminSoftDeleteCourse ({required String courseId, }) {
+    return AdminSoftDeleteCourseVariablesBuilder(dataConnect, courseId: courseId,);
   }
   
   
@@ -937,6 +946,11 @@ class DefaultConnector {
   }
   
   
+  GetMyPendingSubmissionsVariablesBuilder getMyPendingSubmissions () {
+    return GetMyPendingSubmissionsVariablesBuilder(dataConnect, );
+  }
+  
+  
   AdminAddCourseInstructorVariablesBuilder adminAddCourseInstructor ({required String courseId, required String userId, }) {
     return AdminAddCourseInstructorVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
@@ -952,18 +966,18 @@ class DefaultConnector {
   }
   
   
-  EnrollInCourseVariablesBuilder enrollInCourse ({required String courseId, }) {
-    return EnrollInCourseVariablesBuilder(dataConnect, courseId: courseId,);
+  EnrollInCourseVariablesBuilder enrollInCourse ({required String courseId, required String userId, }) {
+    return EnrollInCourseVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
   
   
-  EnrollInMissionVariablesBuilder enrollInMission ({required String missionId, }) {
-    return EnrollInMissionVariablesBuilder(dataConnect, missionId: missionId,);
+  EnrollInMissionVariablesBuilder enrollInMission ({required String missionId, required String userId, }) {
+    return EnrollInMissionVariablesBuilder(dataConnect, missionId: missionId,userId: userId,);
   }
   
   
-  UpdateLectureProgressVariablesBuilder updateLectureProgress ({required String lectureId, required int lastWatchedSecond, }) {
-    return UpdateLectureProgressVariablesBuilder(dataConnect, lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,);
+  UpdateLectureProgressVariablesBuilder updateLectureProgress ({required String lectureId, required int lastWatchedSecond, required String userId, }) {
+    return UpdateLectureProgressVariablesBuilder(dataConnect, lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,userId: userId,);
   }
   
   
@@ -1012,8 +1026,8 @@ class DefaultConnector {
   }
   
   
-  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, }) {
-    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,);
+  SubmitMissionVariablesBuilder submitMission ({required String missionId, required String fileUrl, required String studentId, }) {
+    return SubmitMissionVariablesBuilder(dataConnect, missionId: missionId,fileUrl: fileUrl,studentId: studentId,);
   }
   
   
@@ -1022,8 +1036,8 @@ class DefaultConnector {
   }
   
   
-  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, }) {
-    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,);
+  GradeSubmissionVariablesBuilder gradeSubmission ({required String submissionId, required String graderId, }) {
+    return GradeSubmissionVariablesBuilder(dataConnect, submissionId: submissionId,graderId: graderId,);
   }
   
   
@@ -1042,8 +1056,8 @@ class DefaultConnector {
   }
   
   
-  AdminCreateMissionVariablesBuilder adminCreateMission ({required String title, required String scenarioDescription, required int durationMinutes, required String categoryId, required MissionDifficulty difficulty, required List<String> skillsTested, }) {
-    return AdminCreateMissionVariablesBuilder(dataConnect, title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,);
+  AdminCreateMissionVariablesBuilder adminCreateMission ({required String title, required String scenarioDescription, required int durationMinutes, required String categoryId, required MissionDifficulty difficulty, required List<String> skillsTested, required String authorId, }) {
+    return AdminCreateMissionVariablesBuilder(dataConnect, title: title,scenarioDescription: scenarioDescription,durationMinutes: durationMinutes,categoryId: categoryId,difficulty: difficulty,skillsTested: skillsTested,authorId: authorId,);
   }
   
   
@@ -1127,8 +1141,8 @@ class DefaultConnector {
   }
   
   
-  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, }) {
-    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,);
+  StartQuizAttemptVariablesBuilder startQuizAttempt ({required String quizId, required String userId, }) {
+    return StartQuizAttemptVariablesBuilder(dataConnect, quizId: quizId,userId: userId,);
   }
   
   
@@ -1247,13 +1261,13 @@ class DefaultConnector {
   }
   
   
-  UpsertCourseRatingVariablesBuilder upsertCourseRating ({required String courseId, required int rating, }) {
-    return UpsertCourseRatingVariablesBuilder(dataConnect, courseId: courseId,rating: rating,);
+  UpsertCourseRatingVariablesBuilder upsertCourseRating ({required String courseId, required int rating, required String userId, }) {
+    return UpsertCourseRatingVariablesBuilder(dataConnect, courseId: courseId,rating: rating,userId: userId,);
   }
   
   
-  DeleteCourseRatingVariablesBuilder deleteCourseRating ({required String courseId, }) {
-    return DeleteCourseRatingVariablesBuilder(dataConnect, courseId: courseId,);
+  DeleteCourseRatingVariablesBuilder deleteCourseRating ({required String courseId, required String userId, }) {
+    return DeleteCourseRatingVariablesBuilder(dataConnect, courseId: courseId,userId: userId,);
   }
   
   

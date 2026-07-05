@@ -2,20 +2,29 @@
 # STUDENT — ENROLLMENT
 # ==========================================
 
-mutation EnrollInCourse($courseId: UUID!) @auth(level: USER) {
-  enrollment_insert(data: { userId_expr: "auth.uid", targetType: COURSE, courseId: $courseId, status: ACTIVE })
+# RBAC hardening: NO_ACCESS. A USER-level version let a client self-insert an
+# ACTIVE enrollment directly, bypassing EnrollmentService's checks (course must be
+# PUBLISHED / exists / dedup) — so a user could enroll into an unpublished draft
+# and unlock its gated content. Backend-only now; the enrollee is passed explicitly.
+mutation EnrollInCourse($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  enrollment_insert(data: { userId: $userId, targetType: COURSE, courseId: $courseId, status: ACTIVE })
 }
 
-mutation EnrollInMission($missionId: UUID!) @auth(level: USER) {
-  enrollment_insert(data: { userId_expr: "auth.uid", targetType: MISSION, missionId: $missionId, status: ACTIVE })
+mutation EnrollInMission($missionId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  enrollment_insert(data: { userId: $userId, targetType: MISSION, missionId: $missionId, status: ACTIVE })
 }
 
 # ==========================================
 # STUDENT — PROGRESS TRACKING
 # ==========================================
 
-mutation UpdateLectureProgress($lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp) @auth(level: USER) {
-  lectureProgress_upsert(data: { userId_expr: "auth.uid", lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
+# RBAC hardening: NO_ACCESS. completedAt is caller-supplied and the completion
+# cascade trusts these rows, so a USER-level version let a student fake lecture
+# completion (directly, via the SDK) and then have the backend mark the course
+# COMPLETED. Backend-only now; the progress owner is passed explicitly. (The
+# high-frequency heartbeat path already uses the NO_ACCESS AdminUpsertLectureProgress.)
+mutation UpdateLectureProgress($lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp, $userId: String!) @auth(level: NO_ACCESS) {
+  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
 }
 
 mutation AdminUpsertLectureProgress($userId: String!, $lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp) @auth(level: NO_ACCESS) {
@@ -50,7 +59,11 @@ query GetUserEnrollmentForCourseByUser($courseId: UUID!, $userId: String!) @auth
   enrollments(where: { userId: { eq: $userId }, courseId: { eq: $courseId }, targetType: { eq: COURSE } }) { id status completedAt }
 }
 
-mutation UpdateEnrollmentStatus($enrollmentId: UUID!, $status: EnrollmentStatus!, $completedAt: Timestamp) @auth(level: USER) {
+# RBAC hardening: NO_ACCESS. status/completedAt are caller-supplied, so a USER-level
+# version let a student self-mark their own enrollment COMPLETED (forging course/
+# mission completion). Backend-only: EnrollmentService resolves the caller's own
+# enrollment first, CompletionService drives legitimate COMPLETED transitions.
+mutation UpdateEnrollmentStatus($enrollmentId: UUID!, $status: EnrollmentStatus!, $completedAt: Timestamp) @auth(level: NO_ACCESS) {
   enrollment_updateMany(
     where: { id: { eq: $enrollmentId }, userId: { eq_expr: "auth.uid" } },
     data: { status: $status, completedAt: $completedAt }

@@ -6,8 +6,12 @@ query GetMissionForEnrollment($missionId: UUID!) @auth(level: USER) {
   mission(id: $missionId) { id deletedAt }
 }
 
-mutation SubmitMission($missionId: UUID!, $fileUrl: String!) @auth(level: USER) {
-  missionSubmission_insert(data: { missionId: $missionId, studentId_expr: "auth.uid", fileUrl: $fileUrl, status: PENDING })
+# RBAC hardening: NO_ACCESS. A USER-level version let a student submit to any
+# mission bypassing the active-enrollment check (enforced only in the service).
+# Backend-only: SubmissionsService verifies enrollment, then passes the student
+# id explicitly (no auth.uid under the service account).
+mutation SubmitMission($missionId: UUID!, $fileUrl: String!, $studentId: String!) @auth(level: NO_ACCESS) {
+  missionSubmission_insert(data: { missionId: $missionId, studentId: $studentId, fileUrl: $fileUrl, status: PENDING })
 }
 
 query MySubmissions @auth(level: USER) {
@@ -18,41 +22,59 @@ query MySubmissions @auth(level: USER) {
 
 # ==========================================
 # INSTRUCTOR — GRADING
+#
+# NOTE (RBAC hardening): GradeSubmission / AddCriterionScore are NO_ACCESS — run
+# only via the backend service account after SubmissionsService verifies the
+# grader owns the mission (assertMissionAccess). The grader identity is passed
+# explicitly as $graderId (no auth.uid under the service account). The read
+# queries stay role-gated (lower-severity cross-instructor read, follow-up).
 # ==========================================
 
-mutation GradeSubmission($submissionId: UUID!, $feedback: String) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
-  missionSubmission_update(id: $submissionId, data: { graderId_expr: "auth.uid", status: GRADED, feedback: $feedback, updatedAt_expr: "request.time" })
+mutation GradeSubmission($submissionId: UUID!, $feedback: String, $graderId: String!) @auth(level: NO_ACCESS) {
+  missionSubmission_update(id: $submissionId, data: { graderId: $graderId, status: GRADED, feedback: $feedback, updatedAt_expr: "request.time" })
 }
 
-mutation AddCriterionScore($submissionId: UUID!, $criterionId: UUID!, $score: Float!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AddCriterionScore($submissionId: UUID!, $criterionId: UUID!, $score: Float!) @auth(level: NO_ACCESS) {
   missionSubmissionScore_upsert(data: { submissionId: $submissionId, criterionId: $criterionId, score: $score })
 }
 
-query GetSubmissionForGrading($submissionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# NO_ACCESS: resolves any submission (incl. student id) — backend-only, read via
+# the service account; SubmissionsService then authorizes with assertMissionAccess.
+query GetSubmissionForGrading($submissionId: UUID!) @auth(level: NO_ACCESS) {
   missionSubmission(id: $submissionId) { id status attemptNumber mission { id } student { id } }
 }
 
-query GetEnrollmentForUserMission($userId: String!, $missionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# NO_ACCESS: role alone let any instructor read any user's mission-enrollment
+# status. Backend-only; used by CompletionService after ownership is verified.
+query GetEnrollmentForUserMission($userId: String!, $missionId: UUID!) @auth(level: NO_ACCESS) {
   enrollments(where: { userId: { eq: $userId }, missionId: { eq: $missionId }, targetType: { eq: MISSION } }) { id status completedAt }
 }
 
 # ==========================================
 # ADMIN / INSTRUCTOR — MISSION MANAGEMENT
+#
+# NOTE (RBAC hardening): the authoring mutations below are NO_ACCESS — run only
+# via the backend service account after CourseAccessGuard / ResourceOwnershipGuard
+# verify ownership. AdminCreateMission passes the author explicitly as $authorId.
+# AdminGetMission / AdminListMyMissions remain role-gated (AdminListMyMissions is
+# self-scoped by auth.uid and therefore safe to leave client-callable).
 # ==========================================
 
-mutation AdminCreateMission($title: String!, $scenarioDescription: String!, $durationMinutes: Int!, $categoryId: UUID!, $difficulty: MissionDifficulty!, $skillsTested: [String!]!, $courseId: UUID) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
-  mission_insert(data: { title: $title, scenarioDescription: $scenarioDescription, durationMinutes: $durationMinutes, categoryId: $categoryId, difficulty: $difficulty, skillsTested: $skillsTested, courseId: $courseId, authorId_expr: "auth.uid", createdById_expr: "auth.uid" })
+mutation AdminCreateMission($title: String!, $scenarioDescription: String!, $durationMinutes: Int!, $categoryId: UUID!, $difficulty: MissionDifficulty!, $skillsTested: [String!]!, $courseId: UUID, $authorId: String!) @auth(level: NO_ACCESS) {
+  mission_insert(data: { title: $title, scenarioDescription: $scenarioDescription, durationMinutes: $durationMinutes, categoryId: $categoryId, difficulty: $difficulty, skillsTested: $skillsTested, courseId: $courseId, authorId: $authorId, createdById: $authorId })
 }
 
-mutation AdminUpdateMission($missionId: UUID!, $title: String, $scenarioDescription: String, $durationMinutes: Int, $categoryId: UUID, $difficulty: MissionDifficulty, $skillsTested: [String!], $courseId: UUID) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateMission($missionId: UUID!, $title: String, $scenarioDescription: String, $durationMinutes: Int, $categoryId: UUID, $difficulty: MissionDifficulty, $skillsTested: [String!], $courseId: UUID) @auth(level: NO_ACCESS) {
   mission_update(id: $missionId, data: { title: $title, scenarioDescription: $scenarioDescription, durationMinutes: $durationMinutes, categoryId: $categoryId, difficulty: $difficulty, skillsTested: $skillsTested, courseId: $courseId, updatedAt_expr: "request.time" })
 }
 
-mutation AdminSoftDeleteMission($missionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminSoftDeleteMission($missionId: UUID!) @auth(level: NO_ACCESS) {
   mission_update(id: $missionId, data: { deletedAt_expr: "request.time" })
 }
 
-query AdminGetMission($missionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# NO_ACCESS: exposes any mission's full authoring detail — backend-only, read
+# via the service account after CourseAccessGuard / ResourceOwnershipGuard.
+query AdminGetMission($missionId: UUID!) @auth(level: NO_ACCESS) {
   mission(id: $missionId) { id title scenarioDescription durationMinutes difficulty skillsTested deletedAt createdAt updatedAt category { id name } course { id title } author { id name email avatar } createdBy { id name } microLessons: missionMicroLessons_on_mission(orderBy: [{ order: ASC }]) { id title type assetUrl content durationSeconds order } templates: missionTemplates_on_mission { id title fileUrl fileType } criteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order } }
 }
 
@@ -64,19 +86,19 @@ query AdminListMyMissions @auth(expr: "auth.token.roles != null && ('admin' in a
 # ADMIN / INSTRUCTOR — MICRO-LESSON MANAGEMENT
 # ==========================================
 
-mutation AdminCreateMicroLesson($missionId: UUID!, $title: String!, $type: LectureType!, $assetUrl: String, $content: String, $durationSeconds: Int, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateMicroLesson($missionId: UUID!, $title: String!, $type: LectureType!, $assetUrl: String, $content: String, $durationSeconds: Int, $order: Int!) @auth(level: NO_ACCESS) {
   missionMicroLesson_insert(data: { missionId: $missionId, title: $title, type: $type, assetUrl: $assetUrl, content: $content, durationSeconds: $durationSeconds, order: $order })
 }
 
-mutation AdminUpdateMicroLesson($microLessonId: UUID!, $title: String, $type: LectureType, $assetUrl: String, $content: String, $durationSeconds: Int) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateMicroLesson($microLessonId: UUID!, $title: String, $type: LectureType, $assetUrl: String, $content: String, $durationSeconds: Int) @auth(level: NO_ACCESS) {
   missionMicroLesson_update(id: $microLessonId, data: { title: $title, type: $type, assetUrl: $assetUrl, content: $content, durationSeconds: $durationSeconds })
 }
 
-mutation AdminDeleteMicroLesson($microLessonId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminDeleteMicroLesson($microLessonId: UUID!) @auth(level: NO_ACCESS) {
   missionMicroLesson_delete(id: $microLessonId)
 }
 
-mutation AdminUpdateMicroLessonOrder($microLessonId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateMicroLessonOrder($microLessonId: UUID!, $order: Int!) @auth(level: NO_ACCESS) {
   missionMicroLesson_update(id: $microLessonId, data: { order: $order })
 }
 
@@ -84,15 +106,21 @@ mutation AdminUpdateMicroLessonOrder($microLessonId: UUID!, $order: Int!) @auth(
 # ADMIN / INSTRUCTOR — TEMPLATE MANAGEMENT
 # ==========================================
 
-mutation AdminCreateMissionTemplate($missionId: UUID!, $title: String!, $fileUrl: String!, $fileType: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateMissionTemplate($missionId: UUID!, $title: String!, $fileUrl: String!, $fileType: String!) @auth(level: NO_ACCESS) {
   missionTemplate_insert(data: { missionId: $missionId, title: $title, fileUrl: $fileUrl, fileType: $fileType })
 }
 
-mutation AdminDeleteMissionTemplate($templateId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminDeleteMissionTemplate($templateId: UUID!) @auth(level: NO_ACCESS) {
   missionTemplate_delete(id: $templateId)
 }
 
-query GetMissionTemplates($missionId: UUID!) @auth(level: USER) {
+# RBAC hardening: NO_ACCESS. A USER-level version let any authenticated user list
+# ANY mission's templates (title + internal storage path) directly via the client
+# SDK, bypassing the enrollment/ownership gate that only lived in TemplatesService
+# — the same class of leak already closed for GetLectureContent / GetQuizQuestions.
+# Backend-only now: TemplatesService.findAll authorizes (owner/admin or active
+# enrollee) BEFORE running this via the service account.
+query GetMissionTemplates($missionId: UUID!) @auth(level: NO_ACCESS) {
   missionTemplates(where: { missionId: { eq: $missionId } }) { id title fileUrl fileType }
 }
 
@@ -100,18 +128,18 @@ query GetMissionTemplates($missionId: UUID!) @auth(level: USER) {
 # ADMIN / INSTRUCTOR — RUBRIC MANAGEMENT
 # ==========================================
 
-mutation AdminCreateRubricCriterion($missionId: UUID!, $criterionName: String!, $description: String, $maxPoints: Float!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateRubricCriterion($missionId: UUID!, $criterionName: String!, $description: String, $maxPoints: Float!, $order: Int!) @auth(level: NO_ACCESS) {
   rubricCriterion_insert(data: { missionId: $missionId, criterionName: $criterionName, description: $description, maxPoints: $maxPoints, order: $order })
 }
 
-mutation AdminUpdateRubricCriterion($criterionId: UUID!, $criterionName: String, $description: String, $maxPoints: Float) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateRubricCriterion($criterionId: UUID!, $criterionName: String, $description: String, $maxPoints: Float) @auth(level: NO_ACCESS) {
   rubricCriterion_update(id: $criterionId, data: { criterionName: $criterionName, description: $description, maxPoints: $maxPoints })
 }
 
-mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(level: NO_ACCESS) {
   rubricCriterion_delete(id: $criterionId)
 }
 
-mutation AdminUpdateRubricCriterionOrder($criterionId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateRubricCriterionOrder($criterionId: UUID!, $order: Int!) @auth(level: NO_ACCESS) {
   rubricCriterion_update(id: $criterionId, data: { order: $order })
 }

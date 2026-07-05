@@ -56,35 +56,69 @@ export class ResourceOwnershipGuard implements CanActivate {
     (id: string, token: string) => Promise<ResolvedOwner | null>
   > = {
     quiz: async (id, token) => {
-      const d = await this.dc.executeQuery('GetQuizSettings', { quizId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetQuizSettings',
+        { quizId: id },
+        token,
+      );
       return this.toCourse(d?.courseQuiz?.lecture?.section?.course);
     },
     question: async (id, token) => {
-      const d = await this.dc.executeQuery('GetQuestionCourse', { questionId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetQuestionCourse',
+        { questionId: id },
+        token,
+      );
       return this.toCourse(d?.quizQuestion?.quiz?.lecture?.section?.course);
     },
     option: async (id, token) => {
-      const d = await this.dc.executeQuery('GetOptionCourse', { optionId: id }, token);
-      return this.toCourse(d?.quizOption?.question?.quiz?.lecture?.section?.course);
+      const d = await this.dc.executeQuery(
+        'GetOptionCourse',
+        { optionId: id },
+        token,
+      );
+      return this.toCourse(
+        d?.quizOption?.question?.quiz?.lecture?.section?.course,
+      );
     },
     lecture: async (id, token) => {
-      const d = await this.dc.executeQuery('GetLectureContent', { lectureId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetLectureContent',
+        { lectureId: id },
+        token,
+      );
       return this.toCourse(d?.courseLecture?.section?.course);
     },
     section: async (id, token) => {
-      const d = await this.dc.executeQuery('GetSectionCourse', { sectionId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetSectionCourse',
+        { sectionId: id },
+        token,
+      );
       return this.toCourse(d?.courseSection?.course);
     },
     microLesson: async (id, token) => {
-      const d = await this.dc.executeQuery('GetMicroLessonMission', { microLessonId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetMicroLessonMission',
+        { microLessonId: id },
+        token,
+      );
       return this.toMission(d?.missionMicroLesson?.mission);
     },
     criterion: async (id, token) => {
-      const d = await this.dc.executeQuery('GetCriterionMission', { criterionId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetCriterionMission',
+        { criterionId: id },
+        token,
+      );
       return this.toMission(d?.rubricCriterion?.mission);
     },
     template: async (id, token) => {
-      const d = await this.dc.executeQuery('GetTemplateMission', { templateId: id }, token);
+      const d = await this.dc.executeQuery(
+        'GetTemplateMission',
+        { templateId: id },
+        token,
+      );
       return this.toMission(d?.missionTemplate?.mission);
     },
   };
@@ -94,27 +128,31 @@ export class ResourceOwnershipGuard implements CanActivate {
   }
 
   private toMission(mission: any): ResolvedOwner | null {
-    return mission?.id ? { kind: 'mission', id: mission.id, node: mission } : null;
+    return mission?.id
+      ? { kind: 'mission', id: mission.id, node: mission }
+      : null;
   }
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const meta = this.reflector.getAllAndOverride<OwnsResourceMeta>(OWNS_RESOURCE_KEY, [
-      ctx.getHandler(),
-      ctx.getClass(),
-    ]);
+    const meta = this.reflector.getAllAndOverride<OwnsResourceMeta>(
+      OWNS_RESOURCE_KEY,
+      [ctx.getHandler(), ctx.getClass()],
+    );
     if (!meta) return true;
 
     const request = ctx.switchToHttp().getRequest();
     if ((request.userRoles ?? []).includes('admin')) return true;
 
     const leafId = request.params?.[meta.param];
-    if (!leafId) throw new ForbiddenException(`Missing ${meta.param} on this route`);
+    if (!leafId)
+      throw new ForbiddenException(`Missing ${meta.param} on this route`);
 
     const uid: string | undefined = request.user?.uid;
     const token = this.dc.extractToken(request);
 
     const resolved = await this.resolvers[meta.type](leafId, token);
-    if (!resolved) throw new NotFoundException(`${meta.type} ${leafId} not found`);
+    if (!resolved)
+      throw new NotFoundException(`${meta.type} ${leafId} not found`);
 
     // Fast path: the leaf query carries author/createdBy, so a creator is
     // authorized from this single query. A non-creator (incl. an assigned

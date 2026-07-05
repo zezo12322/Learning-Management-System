@@ -16,20 +16,15 @@ function normalizeRoles(request: any): AppRole[] {
   const user = request.user ?? {};
   const roles = new Set<string>();
 
+  // Source of truth is the `roles` array only; legacy `role`/`admin` claims are
+  // deliberately ignored (see FirebaseAuthGuard). In practice FirebaseAuthGuard
+  // always pre-populates request.userRoles, so this fallback is defense-in-depth.
   if (Array.isArray(user.roles)) {
     for (const role of user.roles) {
       if (typeof role === 'string' && role.trim()) {
         roles.add(role.trim().toLowerCase());
       }
     }
-  }
-
-  if (typeof user.role === 'string' && user.role.trim()) {
-    roles.add(user.role.trim().toLowerCase());
-  }
-
-  if (user.admin === true) {
-    roles.add('admin');
   }
 
   roles.add('student');
@@ -44,9 +39,9 @@ function normalizeRoles(request: any): AppRole[] {
 }
 
 /**
- * Authorizes a request by the caller's global role list, carried in Firebase
- * custom claims and normalized onto `request.userRoles` by FirebaseAuthGuard.
- * The guard also tolerates legacy single-role claims for backwards compatibility.
+ * Authorizes a request by the caller's global role list, carried in the Firebase
+ * `roles` custom claim and normalized onto `request.userRoles` by FirebaseAuthGuard.
+ * Legacy single-role (`role`/`admin`) claims are NOT honored — see FirebaseAuthGuard.
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -66,7 +61,9 @@ export class RolesGuard implements CanActivate {
     }
 
     if (!required.some((role) => roles.includes(role))) {
-      throw new ForbiddenException(`Requires one of roles: ${required.join(', ')}`);
+      throw new ForbiddenException(
+        `Requires one of roles: ${required.join(', ')}`,
+      );
     }
 
     return true;

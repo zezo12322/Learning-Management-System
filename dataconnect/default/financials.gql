@@ -1,10 +1,14 @@
+# RBAC hardening: NO_ACCESS. Payment records must be trustworthy — a USER-level
+# insert let a client fabricate its own payment rows. When a real payment flow is
+# built it must be driven by the gateway webhook via the backend service account,
+# never inserted directly by a client.
 mutation LogPayment(
-  $gateway: PaymentGateway!, 
+  $gateway: PaymentGateway!,
   $referenceId: String!,
   $amount: Int!,
   $currency: String = "EGP",
   $customerEmailSnapshot: String!
-) @auth(level: USER) { 
+) @auth(level: NO_ACCESS) {
   payment_insert(
     data: {
       userId_expr: "auth.uid",
@@ -18,14 +22,16 @@ mutation LogPayment(
   )
 }
 
+# NO_ACCESS: $paymentId was not owner-scoped, so a USER-level version was an IDOR
+# (add line items to another user's payment). Backend/gateway-only, like LogPayment.
 mutation AddPaymentItem(
   $paymentId: UUID!,
   $targetType: PaymentItemTarget!,
   $courseId: UUID,
   $missionId: UUID,
   $subscriptionTierId: UUID,
-  $price: Int! 
-) @auth(level: USER) {
+  $price: Int!
+) @auth(level: NO_ACCESS) {
   paymentItem_insert(
     data: {
       paymentId: $paymentId,

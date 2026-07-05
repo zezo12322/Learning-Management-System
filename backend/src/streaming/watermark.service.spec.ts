@@ -4,7 +4,11 @@ import { WatermarkService } from './watermark.service';
 const configWith = (over: Record<string, string> = {}) =>
   ({
     get: (k: string, d?: any) =>
-      ({ STREAM_KEY_SECRET: 'wm-secret', STREAM_URL_TTL_MINUTES: '10', ...over }[k] ?? d),
+      ({
+        STREAM_KEY_SECRET: 'wm-secret',
+        STREAM_URL_TTL_MINUTES: '10',
+        ...over,
+      })[k] ?? d,
   }) as any;
 
 describe('WatermarkService', () => {
@@ -21,7 +25,9 @@ describe('WatermarkService', () => {
     expect(p.lectureId).toBe('L1');
     expect(p.text).toContain('a@b.com');
     expect(p.sessionId).toBeTruthy();
-    expect(new Date(p.expiresAt).getTime()).toBeGreaterThan(new Date(p.issuedAt).getTime());
+    expect(new Date(p.expiresAt).getTime()).toBeGreaterThan(
+      new Date(p.issuedAt).getTime(),
+    );
 
     // The signature must match the documented signing scheme so a leaked frame
     // can be verified server-side.

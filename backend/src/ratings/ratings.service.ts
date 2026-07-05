@@ -40,23 +40,27 @@ export class RatingsService {
     courseId: string,
     dto: UpsertCourseRatingDto,
     authToken: string,
+    uid: string,
   ) {
     await this.assertCourseIsRateable(courseId, authToken);
     await this.assertEnrolled(courseId, authToken);
 
+    // UpsertCourseRating is NO_ACCESS (backend-only), so the rater is passed
+    // explicitly; a direct client call can no longer skip the enrollment gate
+    // above or the aggregate recompute below.
     const result = await this.dc.executeMutation(
       'UpsertCourseRating',
-      { courseId, rating: dto.rating, review: dto.review ?? null },
+      { courseId, rating: dto.rating, review: dto.review ?? null, userId: uid },
       authToken,
     );
     await this.recomputeCourseAggregate(courseId);
     return result;
   }
 
-  async deleteRating(courseId: string, authToken: string) {
+  async deleteRating(courseId: string, authToken: string, uid: string) {
     const result = await this.dc.executeMutation(
       'DeleteCourseRating',
-      { courseId },
+      { courseId, userId: uid },
       authToken,
     );
     await this.recomputeCourseAggregate(courseId);
@@ -76,7 +80,10 @@ export class RatingsService {
     courseId: string,
     pagination: { limit?: number; offset?: number } = {},
   ) {
-    const limit = Math.min(pagination.limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+    const limit = Math.min(
+      pagination.limit ?? DEFAULT_PAGE_SIZE,
+      MAX_PAGE_SIZE,
+    );
     const offset = Math.max(pagination.offset ?? 0, 0);
     // PUBLIC operation — no end-user token needed.
     const data = await this.dc.executeQuery(
