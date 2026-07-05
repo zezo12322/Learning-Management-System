@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gap/gap.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
-import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
-import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
-import 'package:optimatech_lms/core/widgets/app_header/app_header.dart';
+import 'package:optimatech_lms/features/home/presentation/manager/courses_cubit/courses_cubit.dart';
+import 'package:optimatech_lms/features/home/presentation/views/home_body.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/glass_bottom_navbar.dart';
-import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
-import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
-import 'package:optimatech_lms/features/home/presentation/widgets/popular_courses_section.dart';
-import 'package:optimatech_lms/features/home/presentation/widgets/recommended_courses_section.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
 import 'package:optimatech_lms/features/wishlist/presentation/views/wishlist_view.dart';
+
+// ============================================================================
+// HomeView — Root widget for the Home screen.
+// Provides CoursesCubit via BlocProvider using getIt, and triggers a concurrent
+// data fetch immediately via the cascade operator.
+// ============================================================================
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -24,8 +25,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  final TextEditingController _searchController = TextEditingController();
-
   int currentScreen = 0;
   late List<AnimationController> iconControllers;
 
@@ -44,14 +43,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    // controller.dispose();
     for (var c in iconControllers) {
       c.dispose();
     }
     super.dispose();
   }
 
-  // Function to handle tab selection in the bottom navigation bar
+  // Handles bottom navigation tab selection and icon animations
   void onTabTapped(int index) {
     if (index == currentScreen) return;
     setState(() => currentScreen = index);
@@ -65,70 +63,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Build body depending on the current selected tab.
+    // Build the body widget depending on the currently selected tab
     Widget bodyWidget;
     if (currentScreen == 0) {
-      bodyWidget = SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ------------- App Header -------------
-                    AppHeader(
-                      onNotificationTap: () {},
-                      userName: 'Leonel Messi',
-                      notificationCount: 10,
-                    ),
-                    Gap(20.h),
-
-                    // ------------- Home Search Bar -------------
-                    AppSearchField(
-                      searchController: _searchController,
-                      hintText: 'Search for courses, lessons, quizzes...',
-                      prefixIcon: Icons.search_rounded,
-                      suffixIcon: Icons.filter_list_rounded,
-                      onSearch: () {},
-                      onFilter: () {},
-                      onClear: () {},
-                    ),
-                    Gap(24.h),
-
-                    // ------------- Continue Learning Section -------------
-                    HomeSectionHeader(
-                      title: 'Continue Learning',
-                      onViewAllTap: () {},
-                    ),
-                    Gap(14.h),
-                    ContinueLearningCard(
-                      title: 'UI/UX Design Principles',
-                      image: 'assets/images/course_thumbnail.png',
-                      progress: 0.65,
-                      lessonsCompleted: 12,
-                      totalLessons: 20,
-                      timeLeft: '4h 30m left',
-                      onTap: () {},
-                      onPlayTap: () {},
-                    ),
-                    // ------------- Popular Courses Section -------------
-                    Gap(28.h),
-                    const PopularCoursesSection(),
-                    Gap(28.h),
-                    // ------------- Assignments Section -------------
-                    const AssignmentsSection(),
-                    Gap(28.h),
-                    // ------------- Recommended Courses Section -------------
-                    const RecommendedCoursesSection(),
-                    Gap(24.h),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      bodyWidget = BlocProvider<CoursesCubit>(
+        create: (context) => getIt<CoursesCubit>()..fetchHomeCourses(),
+        child: const HomeBody(),
       );
     } else if (currentScreen == 1) {
       bodyWidget = const CoursesView();
