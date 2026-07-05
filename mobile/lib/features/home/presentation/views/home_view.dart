@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
-import 'package:optimatech_lms/features/home/presentation/manager/courses_cubit/courses_cubit.dart';
+import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
 import 'package:optimatech_lms/features/home/presentation/views/home_body.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/glass_bottom_navbar.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
@@ -11,7 +11,7 @@ import 'package:optimatech_lms/features/wishlist/presentation/views/wishlist_vie
 
 // ============================================================================
 // HomeView — Root widget for the Home screen.
-// Provides CoursesCubit via BlocProvider using getIt, and triggers a concurrent
+// Provides HomeCoursesCubit via BlocProvider using getIt, and triggers a concurrent
 // data fetch immediately via the cascade operator.
 // ============================================================================
 
@@ -66,8 +66,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     // Build the body widget depending on the currently selected tab
     Widget bodyWidget;
     if (currentScreen == 0) {
-      bodyWidget = BlocProvider<CoursesCubit>(
-        create: (context) => getIt<CoursesCubit>()..fetchHomeCourses(),
+      bodyWidget = BlocProvider<HomeCoursesCubit>(
+        create: (context) => getIt<HomeCoursesCubit>()..fetchHomeCourses(),
         child: const HomeBody(),
       );
     } else if (currentScreen == 1) {
