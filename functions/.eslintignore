@@ -1,0 +1,6 @@
+# Generated Data Connect SDKs
+dataconnect-generated/
+dataconnect-admin-generated/
+# One-off operational tooling — not deployed with the functions runtime, and uses
+# modern JS syntax the runtime lint config (ecmaVersion 2018) doesn't parse.
+scripts/

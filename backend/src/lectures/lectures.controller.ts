@@ -11,7 +11,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
-import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
+import {
+  CreateLectureDto,
+  UpdateLectureDto,
+  MoveLectureDto,
+} from './dto/lecture.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -61,7 +65,12 @@ export class LecturesController {
     @Param('lectureId') lectureId: string,
     @AuthToken() token: string,
   ) {
-    return this.lecturesService.softDelete(courseId, sectionId, lectureId, token);
+    return this.lecturesService.softDelete(
+      courseId,
+      sectionId,
+      lectureId,
+      token,
+    );
   }
 
   @Put('courses/:courseId/sections/:sectionId/lectures/reorder')
@@ -74,7 +83,12 @@ export class LecturesController {
     @Body() dto: ReorderDto,
     @AuthToken() token: string,
   ) {
-    return this.lecturesService.reorder(courseId, sectionId, dto.orderedIds, token);
+    return this.lecturesService.reorder(
+      courseId,
+      sectionId,
+      dto.orderedIds,
+      token,
+    );
   }
 
   @Patch('courses/:courseId/lectures/:lectureId/move')

@@ -2,10 +2,15 @@ import { BadRequestException } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CourseStatus } from './dto/course.dto';
 
-function makeDc(queryMap: Record<string, any>, mutationMap: Record<string, any> = {}) {
+function makeDc(
+  queryMap: Record<string, any>,
+  mutationMap: Record<string, any> = {},
+) {
   return {
     executeQuery: jest.fn((op: string) => Promise.resolve(queryMap[op])),
-    executeMutation: jest.fn((op: string) => Promise.resolve(mutationMap[op] ?? {})),
+    executeMutation: jest.fn((op: string) =>
+      Promise.resolve(mutationMap[op] ?? {}),
+    ),
   };
 }
 
@@ -20,7 +25,9 @@ describe('CoursesService.updateStatus (publish gating)', () => {
 
   it('blocks publishing when a section has no lectures', async () => {
     const dc = makeDc({
-      AdminGetCourse: { course: { adminSections: [{ title: 'Intro', adminLectures: [] }] } },
+      AdminGetCourse: {
+        course: { adminSections: [{ title: 'Intro', adminLectures: [] }] },
+      },
     });
     const svc = new CoursesService(dc as any);
     await expect(
@@ -30,7 +37,13 @@ describe('CoursesService.updateStatus (publish gating)', () => {
 
   it('publishes when every section has at least one lecture', async () => {
     const dc = makeDc(
-      { AdminGetCourse: { course: { adminSections: [{ title: 'Intro', adminLectures: [{ id: 'L1' }] }] } } },
+      {
+        AdminGetCourse: {
+          course: {
+            adminSections: [{ title: 'Intro', adminLectures: [{ id: 'L1' }] }],
+          },
+        },
+      },
       { AdminUpdateCourseStatus: { ok: true } },
     );
     const svc = new CoursesService(dc as any);

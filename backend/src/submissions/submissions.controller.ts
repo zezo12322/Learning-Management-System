@@ -27,8 +27,9 @@ export class SubmissionsController {
     @Param('missionId') missionId: string,
     @Body() dto: CreateSubmissionDto,
     @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
   ) {
-    return this.submissionsService.submit(missionId, dto, token);
+    return this.submissionsService.submit(missionId, dto, token, uid);
   }
 
   @Get('me/submissions')
@@ -40,8 +41,9 @@ export class SubmissionsController {
 
   @Get('submissions/pending')
   @Roles('admin', 'instructor')
-  pending(@AuthToken() token: string) {
-    return this.submissionsService.pending(token);
+  pending(@AuthToken() token: string, @Req() req: any) {
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.submissionsService.pending(token, isAdmin);
   }
 
   @Post('submissions/:submissionId/grade')
@@ -54,6 +56,12 @@ export class SubmissionsController {
     @Req() req: any,
   ) {
     const isAdmin = (req.userRoles ?? []).includes('admin');
-    return this.submissionsService.grade(submissionId, dto, token, uid, isAdmin);
+    return this.submissionsService.grade(
+      submissionId,
+      dto,
+      token,
+      uid,
+      isAdmin,
+    );
   }
 }

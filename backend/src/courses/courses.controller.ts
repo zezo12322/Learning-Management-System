@@ -11,27 +11,29 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto } from './dto/course.dto';
+import {
+  CreateCourseDto,
+  UpdateCourseDto,
+  UpdateCourseStatusDto,
+} from './dto/course.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('courses')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) { }
+  constructor(private readonly coursesService: CoursesService) {}
 
   // ==========================================
   // PUBLIC / STUDENT ROUTES
   // ==========================================
 
   @Get('search')
-  search(
-    @Query('q') searchQuery: string,
-    @AuthToken() token: string,
-  ) {
+  search(@Query('q') searchQuery: string, @AuthToken() token: string) {
     if (!searchQuery) {
       throw new BadRequestException('Search query (q) is required');
     }
@@ -49,8 +51,12 @@ export class CoursesController {
 
   @Post()
   @Roles('admin', 'instructor')
-  create(@Body() dto: CreateCourseDto, @AuthToken() token: string) {
-    return this.coursesService.create(dto, token);
+  create(
+    @Body() dto: CreateCourseDto,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+  ) {
+    return this.coursesService.create(dto, token, uid);
   }
 
   @Get()
@@ -124,7 +130,10 @@ export class CoursesController {
   @Get(':courseId/instructors')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  getInstructors(@Param('courseId') courseId: string, @AuthToken() token: string) {
+  getInstructors(
+    @Param('courseId') courseId: string,
+    @AuthToken() token: string,
+  ) {
     return this.coursesService.getInstructors(courseId, token);
   }
 }

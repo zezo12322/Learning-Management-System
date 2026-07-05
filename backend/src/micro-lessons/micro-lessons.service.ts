@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { OrderingService } from '../common/services/ordering.service';
-import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
+import {
+  CreateMicroLessonDto,
+  UpdateMicroLessonDto,
+} from './dto/micro-lesson.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
@@ -13,7 +16,11 @@ export class MicroLessonsService {
     private readonly ordering: OrderingService,
   ) {}
 
-  async create(missionId: string, dto: CreateMicroLessonDto, authToken: string) {
+  async create(
+    missionId: string,
+    dto: CreateMicroLessonDto,
+    authToken: string,
+  ) {
     // Fetch existing micro-lessons to auto-calculate order
     const mission = await this.dc.executeQuery(
       'AdminGetMission',
@@ -37,7 +44,11 @@ export class MicroLessonsService {
     );
   }
 
-  async update(microLessonId: string, dto: UpdateMicroLessonDto, authToken: string) {
+  async update(
+    microLessonId: string,
+    dto: UpdateMicroLessonDto,
+    authToken: string,
+  ) {
     return this.dc.executeMutation(
       'AdminUpdateMicroLesson',
       { microLessonId, ...dto },
@@ -79,8 +90,14 @@ export class MicroLessonsService {
 
   async reorder(missionId: string, orderedIds: string[], authToken: string) {
     // Validate every id belongs to this mission before reordering.
-    const mission = await this.dc.executeQuery('AdminGetMission', { missionId }, authToken);
-    const validIds = (mission?.mission?.microLessons ?? []).map((m: any) => m.id);
+    const mission = await this.dc.executeQuery(
+      'AdminGetMission',
+      { missionId },
+      authToken,
+    );
+    const validIds = (mission?.mission?.microLessons ?? []).map(
+      (m: any) => m.id,
+    );
     assertReorderMembership(orderedIds, validIds, 'micro-lesson');
 
     await this.ordering.applyOrder(

@@ -2,7 +2,10 @@
 # STUDENT — QUIZ TAKING
 # ==========================================
 
-query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
+# NO_ACCESS: student-safe quiz view (no answer key), but a USER-level version let
+# a client read any quiz's questions without enrolling. Backend-only; QuizzesService
+# gates access (owner/admin or active enrollee) before returning it.
+query GetQuizQuestions($lectureId: UUID!) @auth(level: NO_ACCESS) {
   courseQuizs(where: { lectureId: { eq: $lectureId } }) {
     id passingScore maxAttempts timeLimitMinutes
     takeQuestions: quizQuestions_on_quiz(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) {
@@ -11,17 +14,27 @@ query GetQuizQuestions($lectureId: UUID!) @auth(level: USER) {
   }
 }
 
-mutation StartQuizAttempt($quizId: UUID!) @auth(level: USER) {
-  quizAttempt_insert(data: { userId_expr: "auth.uid", quizId: $quizId })
+# RBAC hardening: the quiz-taking write path is NO_ACCESS — not callable with an
+# end-user token / client SDK. QuizzesService runs these via the service account
+# AFTER enforcing enrollment, attempt limits, attempt ownership (assertOwnsAttempt),
+# and computing the real score. Previously these were @auth(level: USER), letting
+# a student StartQuizAttempt + FinishQuizAttemptIfOpen(score:100, passed:true)
+# directly to self-award a passing grade, or SubmitQuizAnswer into another user's
+# attempt (attemptId was not scoped to auth.uid).
+mutation StartQuizAttempt($quizId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
+  quizAttempt_insert(data: { userId: $userId, quizId: $quizId })
 }
 
-mutation SubmitQuizAnswer($attemptId: UUID!, $questionId: UUID!, $optionId: UUID!) @auth(level: USER) {
+mutation SubmitQuizAnswer($attemptId: UUID!, $questionId: UUID!, $optionId: UUID!) @auth(level: NO_ACCESS) {
   quizAttemptAnswer_upsert(data: { attemptId: $attemptId, questionId: $questionId, selectedOptionId: $optionId })
 }
 
-mutation FinishQuizAttemptIfOpen($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: USER) {
+# The attempt-ownership check now lives entirely in QuizzesService (assertOwnsAttempt),
+# which runs before every finish/timeout path; the auth.uid where-filter is dropped
+# since the op is backend-only and the attemptId uniquely identifies the row.
+mutation FinishQuizAttemptIfOpen($attemptId: UUID!, $score: Float!, $passed: Boolean!) @auth(level: NO_ACCESS) {
   quizAttempt_updateMany(
-    where: { id: { eq: $attemptId }, completedAt: { eq: null }, userId: { eq_expr: "auth.uid" } },
+    where: { id: { eq: $attemptId }, completedAt: { eq: null } },
     data: { score: $score, passed: $passed, completedAt_expr: "request.time" }
   )
 }
@@ -36,7 +49,9 @@ query GetUserQuizAttempts($quizId: UUID!) @auth(level: USER) {
   }
 }
 
-query GetQuizAttemptById($attemptId: UUID!) @auth(level: USER) {
+# NO_ACCESS: attemptId is not owner-scoped, so a USER-level version is an IDOR
+# (read any user's attempt/score). Backend-only; QuizzesService calls assertOwnsAttempt.
+query GetQuizAttemptById($attemptId: UUID!) @auth(level: NO_ACCESS) {
   quizAttempt(id: $attemptId) { id completedAt startedAt score passed user { id } quiz { id passingScore maxAttempts timeLimitMinutes } }
 }
 
@@ -44,7 +59,9 @@ query GetQuizQuestionPoints($quizId: UUID!) @auth(level: USER) {
   quizQuestions(where: { quizId: { eq: $quizId }, deletedAt: { eq: null } }) { id points }
 }
 
-query GetAttemptAnswersWithCorrect($attemptId: UUID!) @auth(level: USER) {
+# NO_ACCESS: backend-only (used by autoGrade). USER-level would leak another
+# user's submitted answers + per-option correctness by attemptId.
+query GetAttemptAnswersWithCorrect($attemptId: UUID!) @auth(level: NO_ACCESS) {
   quizAttemptAnswers(where: { attemptId: { eq: $attemptId } }) { question { id points } selectedOption { id isCorrect } }
 }
 
@@ -52,7 +69,10 @@ query GetQuizSettings($quizId: UUID!) @auth(level: USER) {
   courseQuiz(id: $quizId) { id passingScore maxAttempts timeLimitMinutes lecture { id type section { course { id author { id } createdBy { id } } } } }
 }
 
-query GetQuestionOptions($questionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# Answer key for a question (includes isCorrect). Locked to NO_ACCESS: only the
+# backend service account reads it (after ResourceOwnershipGuard), so an
+# instructor can't pull another instructor's answer keys via the client SDK.
+query GetQuestionOptions($questionId: UUID!) @auth(level: NO_ACCESS) {
   quizOptions(where: { questionId: { eq: $questionId } }, orderBy: [{ order: ASC }]) { id text order isCorrect }
 }
 
@@ -60,58 +80,64 @@ query GetOptionWithQuestion($optionId: UUID!) @auth(level: USER) {
   quizOption(id: $optionId) { id question { id quiz { id } } }
 }
 
-query GetActiveQuizSession($attemptId: UUID!) @auth(level: USER) {
+# NO_ACCESS: backend-only (heartbeat). QuizzesService calls assertOwnsAttempt.
+query GetActiveQuizSession($attemptId: UUID!) @auth(level: NO_ACCESS) {
   quizAttempt(id: $attemptId) { id startedAt completedAt user { id } quiz { timeLimitMinutes passingScore } }
 }
 
 # ==========================================
 # ADMIN / INSTRUCTOR — QUIZ BUILDER
+#
+# NOTE (RBAC hardening): these are @auth(level: NO_ACCESS) — not callable with an
+# end-user token / client SDK. They run only via the backend service account
+# after the NestJS ResourceOwnershipGuard has verified the caller owns the quiz's
+# course. Previously role alone let any instructor edit ANY quiz by id.
 # ==========================================
 
-query AdminGetQuiz($quizId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+query AdminGetQuiz($quizId: UUID!) @auth(level: NO_ACCESS) {
   courseQuiz(id: $quizId) { id passingScore maxAttempts timeLimitMinutes createdAt updatedAt lecture { id title section { course { id } } } adminQuestions: quizQuestions_on_quiz(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) { id questionText order points explanation adminOptions: quizOptions_on_question(orderBy: [{ order: ASC }]) { id text order isCorrect } } }
 }
 
-mutation AdminCreateQuiz($lectureId: UUID!, $passingScore: Float!, $maxAttempts: Int!, $timeLimitMinutes: Int) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateQuiz($lectureId: UUID!, $passingScore: Float!, $maxAttempts: Int!, $timeLimitMinutes: Int) @auth(level: NO_ACCESS) {
   courseQuiz_insert(data: { lectureId: $lectureId, passingScore: $passingScore, maxAttempts: $maxAttempts, timeLimitMinutes: $timeLimitMinutes })
 }
 
-mutation AdminUpdateQuiz($quizId: UUID!, $passingScore: Float, $maxAttempts: Int, $timeLimitMinutes: Int) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateQuiz($quizId: UUID!, $passingScore: Float, $maxAttempts: Int, $timeLimitMinutes: Int) @auth(level: NO_ACCESS) {
   courseQuiz_update(id: $quizId, data: { passingScore: $passingScore, maxAttempts: $maxAttempts, timeLimitMinutes: $timeLimitMinutes, updatedAt_expr: "request.time" })
 }
 
-mutation AdminDeleteQuiz($quizId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminDeleteQuiz($quizId: UUID!) @auth(level: NO_ACCESS) {
   courseQuiz_delete(id: $quizId)
 }
 
-mutation AdminCreateQuizQuestion($quizId: UUID!, $questionText: String!, $order: Int!, $points: Float!, $explanation: String) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateQuizQuestion($quizId: UUID!, $questionText: String!, $order: Int!, $points: Float!, $explanation: String) @auth(level: NO_ACCESS) {
   quizQuestion_insert(data: { quizId: $quizId, questionText: $questionText, order: $order, points: $points, explanation: $explanation })
 }
 
-mutation AdminUpdateQuizQuestion($questionId: UUID!, $questionText: String, $points: Float, $explanation: String) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateQuizQuestion($questionId: UUID!, $questionText: String, $points: Float, $explanation: String) @auth(level: NO_ACCESS) {
   quizQuestion_update(id: $questionId, data: { questionText: $questionText, points: $points, explanation: $explanation })
 }
 
-mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminSoftDeleteQuizQuestion($questionId: UUID!) @auth(level: NO_ACCESS) {
   quizQuestion_update(id: $questionId, data: { deletedAt_expr: "request.time" })
 }
 
-mutation AdminUpdateQuizQuestionOrder($questionId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateQuizQuestionOrder($questionId: UUID!, $order: Int!) @auth(level: NO_ACCESS) {
   quizQuestion_update(id: $questionId, data: { order: $order })
 }
 
-mutation AdminCreateQuizOption($questionId: UUID!, $text: String!, $order: Int!, $isCorrect: Boolean!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminCreateQuizOption($questionId: UUID!, $text: String!, $order: Int!, $isCorrect: Boolean!) @auth(level: NO_ACCESS) {
   quizOption_insert(data: { questionId: $questionId, text: $text, order: $order, isCorrect: $isCorrect })
 }
 
-mutation AdminUpdateQuizOption($optionId: UUID!, $text: String, $isCorrect: Boolean) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateQuizOption($optionId: UUID!, $text: String, $isCorrect: Boolean) @auth(level: NO_ACCESS) {
   quizOption_update(id: $optionId, data: { text: $text, isCorrect: $isCorrect })
 }
 
-mutation AdminDeleteQuizOption($optionId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminDeleteQuizOption($optionId: UUID!) @auth(level: NO_ACCESS) {
   quizOption_delete(id: $optionId)
 }
 
-mutation AdminUpdateQuizOptionOrder($optionId: UUID!, $order: Int!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminUpdateQuizOptionOrder($optionId: UUID!, $order: Int!) @auth(level: NO_ACCESS) {
   quizOption_update(id: $optionId, data: { order: $order })
 }

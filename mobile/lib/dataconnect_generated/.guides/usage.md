@@ -1,7 +1,6 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
 DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
 DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
 DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
@@ -11,6 +10,7 @@ DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTie
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
 DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
+DefaultConnector.instance.MyCertificates().execute();
 
 ```
 

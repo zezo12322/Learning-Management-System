@@ -9,7 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from './firebase.service';
 import { extractBearerToken } from '../common/decorators/auth-token.decorator';
-import { ADMIN_OPERATIONS } from './admin-operations';
+import { ADMIN_OPERATIONS, FORCE_ADMIN_OPERATIONS } from './admin-operations';
 
 /**
  * Service for executing GraphQL operations against Firebase Data Connect.
@@ -29,15 +29,29 @@ export class DataConnectService {
     private readonly configService: ConfigService,
     private readonly firebaseService: FirebaseService,
   ) {
-    const projectId = this.configService.get<string>('FIREBASE_PROJECT_ID', 'learning-management-syst-3cc3a');
-    const location = this.configService.get<string>('FDC_LOCATION', 'europe-west8');
-    const serviceId = this.configService.get<string>('FDC_SERVICE_ID', 'learning-management-syst-3cc3a-service');
-    const connectorId = this.configService.get<string>('FDC_CONNECTOR_ID', 'default');
+    const projectId = this.configService.get<string>(
+      'FIREBASE_PROJECT_ID',
+      'learning-management-syst-3cc3a',
+    );
+    const location = this.configService.get<string>(
+      'FDC_LOCATION',
+      'europe-west8',
+    );
+    const serviceId = this.configService.get<string>(
+      'FDC_SERVICE_ID',
+      'learning-management-syst-3cc3a-service',
+    );
+    const connectorId = this.configService.get<string>(
+      'FDC_CONNECTOR_ID',
+      'default',
+    );
 
     this.serviceBaseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
     this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
     this.apiKey = this.configService.get<string>('FIREBASE_API_KEY', '');
-    this.timeoutMs = Number(this.configService.get<string>('FDC_TIMEOUT_MS', '15000'));
+    this.timeoutMs = Number(
+      this.configService.get<string>('FDC_TIMEOUT_MS', '15000'),
+    );
 
     if (!this.apiKey) {
       this.logger.warn(
@@ -65,7 +79,12 @@ export class DataConnectService {
     variables?: Record<string, any>,
     authToken?: string,
   ): Promise<T> {
-    return this.execute<T>('executeMutation', operationName, variables, authToken);
+    return this.execute<T>(
+      'executeMutation',
+      operationName,
+      variables,
+      authToken,
+    );
   }
 
   /**
@@ -78,7 +97,13 @@ export class DataConnectService {
     operationName: string,
     variables?: Record<string, any>,
   ): Promise<T> {
-    return this.execute<T>('executeQuery', operationName, variables, undefined, true);
+    return this.execute<T>(
+      'executeQuery',
+      operationName,
+      variables,
+      undefined,
+      true,
+    );
   }
 
   /** Mutation counterpart of {@link executeQueryAsAdmin}. */
@@ -86,7 +111,13 @@ export class DataConnectService {
     operationName: string,
     variables?: Record<string, any>,
   ): Promise<T> {
-    return this.execute<T>('executeMutation', operationName, variables, undefined, true);
+    return this.execute<T>(
+      'executeMutation',
+      operationName,
+      variables,
+      undefined,
+      true,
+    );
   }
 
   /**
@@ -102,7 +133,21 @@ export class DataConnectService {
     // Admin operations must bypass @auth, which the connector endpoints can't do.
     // Route registered ones to the service-level :executeGraphql admin endpoint;
     // anything else falls through to the connector path unchanged.
-    if (useAdmin && ADMIN_OPERATIONS[operationName]) {
+    //
+    // FORCE_ADMIN_OPERATIONS are privileged authoring ops that are @auth(level:
+    // NO_ACCESS) in the connector (so the client SDK can't call them). Services
+    // still invoke them via the ordinary executeQuery/executeMutation with a user
+    // token AFTER the NestJS ownership guards pass; we auto-route them to the
+    // admin path here so they actually execute. A forced op MUST have a body in
+    // ADMIN_OPERATIONS — fail loudly rather than silently hit the connector (which
+    // would reject it) if that invariant is ever broken.
+    const forceAdmin = FORCE_ADMIN_OPERATIONS.has(operationName);
+    if (forceAdmin && !ADMIN_OPERATIONS[operationName]) {
+      throw new Error(
+        `Operation "${operationName}" is force-admin but missing from ADMIN_OPERATIONS`,
+      );
+    }
+    if ((useAdmin || forceAdmin) && ADMIN_OPERATIONS[operationName]) {
       return this.executeAdminGraphql<T>(operationName, variables);
     }
 
@@ -214,12 +259,18 @@ export class DataConnectService {
       response = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ query, operationName, variables: variables ?? {} }),
+        body: JSON.stringify({
+          query,
+          operationName,
+          variables: variables ?? {},
+        }),
         signal: AbortSignal.timeout(this.timeoutMs),
       });
     } catch (err: any) {
       if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
-        this.logger.error(`FDC admin executeGraphql timed out for ${operationName}`);
+        this.logger.error(
+          `FDC admin executeGraphql timed out for ${operationName}`,
+        );
         throw new GatewayTimeoutException(
           `Data Connect admin operation "${operationName}" timed out`,
         );
@@ -305,4 +356,3 @@ export class DataConnectService {
     return extractBearerToken(request);
   }
 }
-

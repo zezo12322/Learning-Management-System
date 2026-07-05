@@ -2,20 +2,54 @@
 # INSTRUCTOR MANAGEMENT
 # ==========================================
 
-query GetPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# Platform-wide pending queue — ADMIN oversight only. Instructors must use the
+# owner-scoped GetMyPendingSubmissions below, otherwise one instructor can read
+# every other instructor's students' submissions (name/email/fileUrl).
+query GetPendingSubmissions @auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   missionSubmissions(where: { status: { eq: PENDING } }, orderBy: [{ submittedAt: ASC }]) {
     id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
   }
 }
 
-mutation AdminAddCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# Instructor-scoped pending queue: only submissions whose owning mission the
+# caller owns — mission author/creator, or the owning course's author/creator/
+# assigned instructor. This is the object-level authorization that the broad
+# query above lacks.
+query GetMyPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  missionSubmissions(
+    where: {
+      status: { eq: PENDING },
+      mission: {
+        _or: [
+          { authorId: { eq_expr: "auth.uid" } },
+          { createdById: { eq_expr: "auth.uid" } },
+          { course: { _or: [
+            { authorId: { eq_expr: "auth.uid" } },
+            { createdById: { eq_expr: "auth.uid" } },
+            { courseInstructors_on_course: { exist: { userId: { eq_expr: "auth.uid" } } } }
+          ] } }
+        ]
+      }
+    },
+    orderBy: [{ submittedAt: ASC }]
+  ) {
+    id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
+  }
+}
+
+# RBAC hardening: NO_ACCESS — run only via the backend service account after
+# CourseAccessGuard verifies the caller owns the course. Role alone previously
+# let any instructor grant/revoke instructors on ANY course by id.
+mutation AdminAddCourseInstructor($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
   courseInstructor_insert(data: { courseId: $courseId, userId: $userId })
 }
 
-mutation AdminRemoveCourseInstructor($courseId: UUID!, $userId: String!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+mutation AdminRemoveCourseInstructor($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
   courseInstructor_delete(key: { courseId: $courseId, userId: $userId })
 }
 
-query GetCourseInstructors($courseId: UUID!) @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+# NO_ACCESS: lists any course's instructors — backend-only, read via the service
+# account after CourseAccessGuard verifies the caller owns the course.
+query GetCourseInstructors($courseId: UUID!) @auth(level: NO_ACCESS) {
   courseInstructors(where: { courseId: { eq: $courseId } }) { user { id name email avatar } }
 }

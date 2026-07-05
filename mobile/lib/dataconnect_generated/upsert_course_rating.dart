@@ -4,13 +4,14 @@ class UpsertCourseRatingVariablesBuilder {
   String courseId;
   int rating;
   Optional<String> _review = Optional.optional(nativeFromJson, nativeToJson);
+  String userId;
 
   final FirebaseDataConnect _dataConnect;  UpsertCourseRatingVariablesBuilder review(String? t) {
    _review.value = t;
    return this;
   }
 
-  UpsertCourseRatingVariablesBuilder(this._dataConnect, {required  this.courseId,required  this.rating,});
+  UpsertCourseRatingVariablesBuilder(this._dataConnect, {required  this.courseId,required  this.rating,required  this.userId,});
   Deserializer<UpsertCourseRatingData> dataDeserializer = (dynamic json)  => UpsertCourseRatingData.fromJson(jsonDecode(json));
   Serializer<UpsertCourseRatingVariables> varsSerializer = (UpsertCourseRatingVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<UpsertCourseRatingData, UpsertCourseRatingVariables>> execute() {
@@ -18,7 +19,7 @@ class UpsertCourseRatingVariablesBuilder {
   }
 
   MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables> ref() {
-    UpsertCourseRatingVariables vars= UpsertCourseRatingVariables(courseId: courseId,rating: rating,review: _review,);
+    UpsertCourseRatingVariables vars= UpsertCourseRatingVariables(courseId: courseId,rating: rating,review: _review,userId: userId,);
     return _dataConnect.mutation("UpsertCourseRating", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -101,17 +102,20 @@ class UpsertCourseRatingVariables {
   final String courseId;
   final int rating;
   late final Optional<String>review;
+  final String userId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   UpsertCourseRatingVariables.fromJson(Map<String, dynamic> json):
   
   courseId = nativeFromJson<String>(json['courseId']),
-  rating = nativeFromJson<int>(json['rating']) {
+  rating = nativeFromJson<int>(json['rating']),
+  userId = nativeFromJson<String>(json['userId']) {
   
   
   
   
     review = Optional.optional(nativeFromJson, nativeToJson);
     review.value = json['review'] == null ? null : nativeFromJson<String>(json['review']);
+  
   
   }
   @override
@@ -126,11 +130,12 @@ class UpsertCourseRatingVariables {
     final UpsertCourseRatingVariables otherTyped = other as UpsertCourseRatingVariables;
     return courseId == otherTyped.courseId && 
     rating == otherTyped.rating && 
-    review == otherTyped.review;
+    review == otherTyped.review && 
+    userId == otherTyped.userId;
     
   }
   @override
-  int get hashCode => Object.hashAll([courseId.hashCode, rating.hashCode, review.hashCode]);
+  int get hashCode => Object.hashAll([courseId.hashCode, rating.hashCode, review.hashCode, userId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -140,6 +145,7 @@ class UpsertCourseRatingVariables {
     if(review.state == OptionalState.set) {
       json['review'] = review.toJson();
     }
+    json['userId'] = nativeToJson<String>(userId);
     return json;
   }
 
@@ -147,6 +153,7 @@ class UpsertCourseRatingVariables {
     required this.courseId,
     required this.rating,
     required this.review,
+    required this.userId,
   });
 }
 

@@ -8,13 +8,14 @@ class AdminCreateCourseVariablesBuilder {
   CourseLevel level;
   String categoryId;
   List<String> tags;
+  String authorId;
 
   final FirebaseDataConnect _dataConnect;  AdminCreateCourseVariablesBuilder description(String? t) {
    _description.value = t;
    return this;
   }
 
-  AdminCreateCourseVariablesBuilder(this._dataConnect, {required  this.title,required  this.price,required  this.language,required  this.level,required  this.categoryId,required  this.tags,});
+  AdminCreateCourseVariablesBuilder(this._dataConnect, {required  this.title,required  this.price,required  this.language,required  this.level,required  this.categoryId,required  this.tags,required  this.authorId,});
   Deserializer<AdminCreateCourseData> dataDeserializer = (dynamic json)  => AdminCreateCourseData.fromJson(jsonDecode(json));
   Serializer<AdminCreateCourseVariables> varsSerializer = (AdminCreateCourseVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<AdminCreateCourseData, AdminCreateCourseVariables>> execute() {
@@ -22,7 +23,7 @@ class AdminCreateCourseVariablesBuilder {
   }
 
   MutationRef<AdminCreateCourseData, AdminCreateCourseVariables> ref() {
-    AdminCreateCourseVariables vars= AdminCreateCourseVariables(title: title,description: _description,price: price,language: language,level: level,categoryId: categoryId,tags: tags,);
+    AdminCreateCourseVariables vars= AdminCreateCourseVariables(title: title,description: _description,price: price,language: language,level: level,categoryId: categoryId,tags: tags,authorId: authorId,);
     return _dataConnect.mutation("AdminCreateCourse", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -104,6 +105,7 @@ class AdminCreateCourseVariables {
   final CourseLevel level;
   final String categoryId;
   final List<String> tags;
+  final String authorId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateCourseVariables.fromJson(Map<String, dynamic> json):
   
@@ -114,12 +116,14 @@ class AdminCreateCourseVariables {
   categoryId = nativeFromJson<String>(json['categoryId']),
   tags = (json['tags'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
-        .toList() {
+        .toList(),
+  authorId = nativeFromJson<String>(json['authorId']) {
   
   
   
     description = Optional.optional(nativeFromJson, nativeToJson);
     description.value = json['description'] == null ? null : nativeFromJson<String>(json['description']);
+  
   
   
   
@@ -143,11 +147,12 @@ class AdminCreateCourseVariables {
     language == otherTyped.language && 
     level == otherTyped.level && 
     categoryId == otherTyped.categoryId && 
-    tags == otherTyped.tags;
+    tags == otherTyped.tags && 
+    authorId == otherTyped.authorId;
     
   }
   @override
-  int get hashCode => Object.hashAll([title.hashCode, description.hashCode, price.hashCode, language.hashCode, level.hashCode, categoryId.hashCode, tags.hashCode]);
+  int get hashCode => Object.hashAll([title.hashCode, description.hashCode, price.hashCode, language.hashCode, level.hashCode, categoryId.hashCode, tags.hashCode, authorId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -163,6 +168,7 @@ class AdminCreateCourseVariables {
     ;
     json['categoryId'] = nativeToJson<String>(categoryId);
     json['tags'] = tags.map((e) => nativeToJson<String>(e)).toList();
+    json['authorId'] = nativeToJson<String>(authorId);
     return json;
   }
 
@@ -174,6 +180,7 @@ class AdminCreateCourseVariables {
     required this.level,
     required this.categoryId,
     required this.tags,
+    required this.authorId,
   });
 }
 
