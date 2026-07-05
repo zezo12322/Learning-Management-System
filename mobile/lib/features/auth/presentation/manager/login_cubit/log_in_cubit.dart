@@ -9,6 +9,7 @@ class LogInCubit extends Cubit<LogInState> {
 
   void toggleRememberMe(bool value){
     emit(state.copyWith(rememberMe: value));
+    _authRepository.setRememberMeState(value);
   }
 
   void emailChanged(){
