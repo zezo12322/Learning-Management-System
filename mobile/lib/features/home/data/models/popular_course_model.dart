@@ -1,19 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
 
-class PopularCourseModel {
+class PopularCourseModel extends CourseEntity {
   const PopularCourseModel({
-    required this.title,
-    required this.studentCount,
-    required this.rating,
-    required this.headerColor,
-    required this.icon,
-    required this.image,
+    required super.id,
+    required super.title,
+    required super.rating,
+    required super.image,
   });
 
-  final String title;
-  final String studentCount;
-  final double rating;
-  final Color headerColor;
-  final IconData icon;
-  final String image;
+  factory PopularCourseModel.fromDataConnect(Map<String, dynamic> json) {
+    return PopularCourseModel(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      image: json['thumbnail'] as String? ?? '',
+    );
+  }
 }
