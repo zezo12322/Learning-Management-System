@@ -46,7 +46,7 @@ class ContinueLearningCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _CourseThumbnail(),
+                  _CourseThumbnail(image: image),
                   Gap(14.w),
                   Expanded(
                     child: Column(
@@ -165,9 +165,22 @@ class ContinueLearningCard extends StatelessWidget {
 }
 
 class _CourseThumbnail extends StatelessWidget {
+  const _CourseThumbnail({required this.image});
+
+  final String image;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final ImageProvider imageProvider;
+    if (image.isNotEmpty && image.startsWith('http')) {
+      imageProvider = NetworkImage(image);
+    } else if (image.isNotEmpty) {
+      imageProvider = AssetImage(image);
+    } else {
+      imageProvider = const AssetImage('assets/images/student_illustrator.png');
+    }
 
     return Container(
       width: 88.w,
@@ -175,10 +188,8 @@ class _CourseThumbnail extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
-        image: const DecorationImage(
-          image: NetworkImage(
-            'https://imgs.search.brave.com/wedomm6qA0X0lfUy6EQ1A-qYXNCcWvMXpjtpugyjKp8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9saWZl/aW5kdWVzc2VsZG9y/Zi5jb20vd3AtY29u/dGVudC91cGxvYWRz/LzIwMjAvMDMvVW5p/dmVyc2l0eS1Db3Vy/c2VzLUZyZWUtT25s/aW5lLndlYnA',
-          ),
+        image: DecorationImage(
+          image: imageProvider,
           fit: BoxFit.cover,
         ),
       ),

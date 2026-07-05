@@ -127,9 +127,17 @@ class CourseHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageProvider = courseImage.startsWith('http')
-        ? NetworkImage(courseImage)
-        : AssetImage(courseImage) as ImageProvider;
+    final String imagePath = courseImage.trim();
+    final ImageProvider imageProvider;
+
+    if (imagePath.isNotEmpty && imagePath.startsWith('http')) {
+      imageProvider = NetworkImage(imagePath);
+    } else if (imagePath.isNotEmpty) {
+      imageProvider = AssetImage(imagePath);
+    } else {
+      imageProvider = const AssetImage('assets/images/student_illustrator.png');
+    }
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
