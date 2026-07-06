@@ -184,6 +184,10 @@
       "priceHighToLow": "Price: High to Low"
     }
   },
+  "wishlist": {
+    "title": "Wishlist"
+
+  },
   "profile": {
     "title": "My Profile",
     "common": {
