@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:optimatech_lms/core/services/fire_store_service.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
+import 'package:optimatech_lms/features/auth/data/datasources/auth_local_data_sources.dart';
 import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
@@ -42,6 +43,18 @@ Future<void> setupDependencies() async {
       fireStoreService: getIt<FireStoreService>(),
     ),
   );
+  final sharedPreferences = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  getIt.registerLazySingleton<FirebaseAuthService>(() => FirebaseAuthService(),);
+  getIt.registerLazySingleton<FireStoreService>(() => FireStoreService(),);
+  getIt.registerLazySingleton<AuthLocalDataSources>(() => AuthLocalDataSourcesImpl(sharedPreferences: getIt<SharedPreferences>()),);
+  getIt.registerLazySingleton<AuthRepository>(() =>
+      AuthRepositoryImpl(
+        firebaseAuthService: getIt<FirebaseAuthService>(),
+        fireStoreService: getIt<FireStoreService>(),
+        authLocalDataSources: getIt<AuthLocalDataSources>()),
+      );
 
   getIt.registerFactory<LogInCubit>(
     () => LogInCubit(authRepository: getIt<AuthRepository>()),
@@ -89,8 +102,6 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<CategoriesCubit>(
       () => CategoriesCubit(repository: getIt<CategoriesRepository>()));
 
-  final sharedPreferences = await SharedPreferences.getInstance();
-  getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   getIt.registerLazySingleton<ThemeLocalDataSource>(
       () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()));

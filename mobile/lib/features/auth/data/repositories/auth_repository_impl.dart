@@ -5,6 +5,7 @@ import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:optimatech_lms/core/error/failures.dart';
 import 'package:optimatech_lms/core/services/fire_store_service.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
+import 'package:optimatech_lms/features/auth/data/datasources/auth_local_data_sources.dart';
 import 'package:optimatech_lms/features/auth/data/models/user_model.dart';
 import 'package:optimatech_lms/features/auth/domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -12,8 +13,9 @@ import '../../domain/repositories/auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuthService firebaseAuthService;
   final FireStoreService fireStoreService;
+  final AuthLocalDataSources authLocalDataSources;
 
-  AuthRepositoryImpl({required this.firebaseAuthService, required this.fireStoreService});
+  AuthRepositoryImpl({required this.firebaseAuthService, required this.fireStoreService, required this.authLocalDataSources});
   @override
   Future<Either<Failure, UserEntity>> loginWithEmailPassword({required String email, required String password}) async{
     try{
@@ -68,5 +70,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }catch (e){
       return left(ServerFailure('auth.error.genericError'.tr()));
     }
+  }
+
+  @override
+  Future<bool> getRememberMeState() {
+    return authLocalDataSources.getRememberMeState();
+  }
+
+  @override
+  Future<void> setRememberMeState(bool isChecked) async{
+    await authLocalDataSources.setRememberMeState(isChecked);
   }
 }

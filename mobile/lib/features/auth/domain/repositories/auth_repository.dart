@@ -11,4 +11,7 @@ abstract class AuthRepository {
   });
   Future<Either<Failure, UserEntity>> loginWithEmailPassword({required String email, required String password});
   Future<Either<Failure, UserEntity>> loginWithGoogle();
+
+  Future<void> setRememberMeState(bool isChecked);
+  Future<bool> getRememberMeState();
 }

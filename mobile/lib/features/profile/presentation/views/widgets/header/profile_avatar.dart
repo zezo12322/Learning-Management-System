@@ -39,7 +39,7 @@ class ProfileAvatar extends StatelessWidget {
             width: 14.w,
             height: 14.w,
             decoration: BoxDecoration(
-              color: AppColors.success,
+              color: AppColors.success, // todo theme extension
               shape: BoxShape.circle,
               border: Border.all(
                 color: context.theme.colorScheme.surface,
