@@ -92,4 +92,4 @@ import { RatingsModule } from './ratings/ratings.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

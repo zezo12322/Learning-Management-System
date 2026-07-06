@@ -21,7 +21,7 @@ import { DataConnectService } from '../firebase/dataconnect.service';
 export class EnrollmentService {
   constructor(private readonly dc: DataConnectService) {}
 
-  async enrollInCourse(courseId: string, authToken: string) {
+  async enrollInCourse(courseId: string, authToken: string, uid: string) {
     const courseData = await this.dc.executeQuery(
       'GetCourseForEnrollment',
       { courseId },
@@ -53,10 +53,16 @@ export class EnrollmentService {
       return { id: existing.id, status: 'ACTIVE', reactivated: true };
     }
 
-    return this.dc.executeMutation('EnrollInCourse', { courseId }, authToken);
+    // EnrollInCourse is NO_ACCESS (backend-only), so the checks above are the sole
+    // gate; the enrollee is passed explicitly rather than derived from auth.uid.
+    return this.dc.executeMutation(
+      'EnrollInCourse',
+      { courseId, userId: uid },
+      authToken,
+    );
   }
 
-  async enrollInMission(missionId: string, authToken: string) {
+  async enrollInMission(missionId: string, authToken: string, uid: string) {
     const missionData = await this.dc.executeQuery(
       'GetMissionForEnrollment',
       { missionId },
@@ -85,7 +91,11 @@ export class EnrollmentService {
       return { id: existing.id, status: 'ACTIVE', reactivated: true };
     }
 
-    return this.dc.executeMutation('EnrollInMission', { missionId }, authToken);
+    return this.dc.executeMutation(
+      'EnrollInMission',
+      { missionId, userId: uid },
+      authToken,
+    );
   }
 
   async getCourseEnrollment(courseId: string, authToken: string) {

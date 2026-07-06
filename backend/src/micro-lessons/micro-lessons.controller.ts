@@ -9,7 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MicroLessonsService } from './micro-lessons.service';
-import { CreateMicroLessonDto, UpdateMicroLessonDto } from './dto/micro-lesson.dto';
+import {
+  CreateMicroLessonDto,
+  UpdateMicroLessonDto,
+} from './dto/micro-lesson.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';

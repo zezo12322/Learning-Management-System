@@ -19,8 +19,15 @@ export class MissionsService {
     // If the mission is attached to a course, the caller must own that course
     // (route-based guards can't check a body field).
     if (dto.courseId) {
-      await this.access.assertCourseAccess(dto.courseId, uid, authToken, isAdmin);
+      await this.access.assertCourseAccess(
+        dto.courseId,
+        uid,
+        authToken,
+        isAdmin,
+      );
     }
+    // AdminCreateMission runs via the service account (NO_ACCESS in the
+    // connector) and carries no auth.uid; pass the author explicitly.
     return this.dc.executeMutation(
       'AdminCreateMission',
       {
@@ -31,6 +38,7 @@ export class MissionsService {
         difficulty: dto.difficulty,
         skillsTested: dto.skillsTested,
         courseId: dto.courseId ?? null,
+        authorId: uid,
       },
       authToken,
     );
@@ -49,7 +57,11 @@ export class MissionsService {
   }
 
   async findMyList(authToken: string) {
-    const data = await this.dc.executeQuery('AdminListMyMissions', {}, authToken);
+    const data = await this.dc.executeQuery(
+      'AdminListMyMissions',
+      {},
+      authToken,
+    );
     return data?.missions ?? [];
   }
 
@@ -64,7 +76,12 @@ export class MissionsService {
     // that target course too — not just the mission (M5). Route guards only
     // checked mission ownership.
     if (dto.courseId) {
-      await this.access.assertCourseAccess(dto.courseId, uid, authToken, isAdmin);
+      await this.access.assertCourseAccess(
+        dto.courseId,
+        uid,
+        authToken,
+        isAdmin,
+      );
     }
     return this.dc.executeMutation(
       'AdminUpdateMission',

@@ -11,10 +11,7 @@ import ffprobeStatic from 'ffprobe-static';
 import { FirebaseService } from '../firebase/firebase.service';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CourseStoragePaths } from '../common/constants/storage-paths';
-import {
-  VIDEO_TRANSCODE_QUEUE,
-  PackageHlsJob,
-} from './transcoding.queue';
+import { VIDEO_TRANSCODE_QUEUE, PackageHlsJob } from './transcoding.queue';
 
 const HLS_SEGMENT_SECONDS = 6;
 
@@ -55,7 +52,9 @@ export class TranscodingProcessor extends WorkerHost {
       throw new Error('ffmpeg-static binary path could not be resolved');
     }
 
-    const workDir = await fs.mkdtemp(path.join(os.tmpdir(), `hls-${lectureId}-`));
+    const workDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), `hls-${lectureId}-`),
+    );
     const srcFile = path.join(workDir, 'source.mp4');
     const outDir = path.join(workDir, 'hls');
     await fs.mkdir(outDir);
@@ -80,7 +79,14 @@ export class TranscodingProcessor extends WorkerHost {
       );
 
       // 4. Run FFmpeg → AES-128 HLS.
-      await this.runFfmpeg(ffmpegPath, srcFile, outDir, keyInfoPath, duration, job);
+      await this.runFfmpeg(
+        ffmpegPath,
+        srcFile,
+        outDir,
+        keyInfoPath,
+        duration,
+        job,
+      );
 
       // 5. Upload every produced artefact to the private HLS dir.
       const hlsDir = CourseStoragePaths.lectureHlsDir(courseId, lectureId);
@@ -110,16 +116,21 @@ export class TranscodingProcessor extends WorkerHost {
       );
     } finally {
       // Always clean up the scratch dir, even on failure.
-      await fs.rm(workDir, { recursive: true, force: true }).catch(() => undefined);
+      await fs
+        .rm(workDir, { recursive: true, force: true })
+        .catch(() => undefined);
     }
   }
 
   /** Resolve media duration (whole seconds) via ffprobe. */
   private async probeDuration(file: string): Promise<number> {
     const out = await this.run(ffprobeStatic.path, [
-      '-v', 'error',
-      '-show_entries', 'format=duration',
-      '-of', 'default=noprint_wrappers=1:nokey=1',
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
       file,
     ]);
     const seconds = parseFloat(out.trim());
@@ -136,14 +147,28 @@ export class TranscodingProcessor extends WorkerHost {
   ): Promise<void> {
     const args = [
       '-y',
-      '-i', srcFile,
-      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '22',
-      '-c:a', 'aac', '-b:a', '128k',
-      '-hls_time', String(HLS_SEGMENT_SECONDS),
-      '-hls_playlist_type', 'vod',
-      '-hls_key_info_file', keyInfoPath,
-      '-hls_segment_filename', path.join(outDir, 'seg_%03d.ts'),
-      '-f', 'hls',
+      '-i',
+      srcFile,
+      '-c:v',
+      'libx264',
+      '-preset',
+      'veryfast',
+      '-crf',
+      '22',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      '-hls_time',
+      String(HLS_SEGMENT_SECONDS),
+      '-hls_playlist_type',
+      'vod',
+      '-hls_key_info_file',
+      keyInfoPath,
+      '-hls_segment_filename',
+      path.join(outDir, 'seg_%03d.ts'),
+      '-f',
+      'hls',
       path.join(outDir, 'master.m3u8'),
     ];
 
@@ -179,7 +204,10 @@ export class TranscodingProcessor extends WorkerHost {
       child.on('error', reject);
       child.on('close', (code) => {
         if (code === 0) resolve(stdout);
-        else reject(new Error(`${path.basename(bin)} exited ${code}: ${stderrTail}`));
+        else
+          reject(
+            new Error(`${path.basename(bin)} exited ${code}: ${stderrTail}`),
+          );
       });
     });
   }

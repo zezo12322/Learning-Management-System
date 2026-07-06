@@ -2,7 +2,9 @@ import { UnauthorizedException } from '@nestjs/common';
 import { KeyTokenService } from './key-token.service';
 
 const configWith = (secret: string) =>
-  ({ get: (k: string, d?: any) => (k === 'STREAM_KEY_SECRET' ? secret : d) }) as any;
+  ({
+    get: (k: string, d?: any) => (k === 'STREAM_KEY_SECRET' ? secret : d),
+  }) as any;
 
 describe('KeyTokenService', () => {
   let svc: KeyTokenService;
@@ -27,7 +29,10 @@ describe('KeyTokenService', () => {
   });
 
   it('rejects an expired token', () => {
-    const token = svc.sign({ ...claims(), exp: Math.floor(Date.now() / 1000) - 1 });
+    const token = svc.sign({
+      ...claims(),
+      exp: Math.floor(Date.now() / 1000) - 1,
+    });
     expect(() => svc.verify(token)).toThrow(UnauthorizedException);
   });
 

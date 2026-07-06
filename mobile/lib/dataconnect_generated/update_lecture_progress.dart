@@ -4,13 +4,14 @@ class UpdateLectureProgressVariablesBuilder {
   String lectureId;
   int lastWatchedSecond;
   Optional<Timestamp> _completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
+  String userId;
 
   final FirebaseDataConnect _dataConnect;  UpdateLectureProgressVariablesBuilder completedAt(Timestamp? t) {
    _completedAt.value = t;
    return this;
   }
 
-  UpdateLectureProgressVariablesBuilder(this._dataConnect, {required  this.lectureId,required  this.lastWatchedSecond,});
+  UpdateLectureProgressVariablesBuilder(this._dataConnect, {required  this.lectureId,required  this.lastWatchedSecond,required  this.userId,});
   Deserializer<UpdateLectureProgressData> dataDeserializer = (dynamic json)  => UpdateLectureProgressData.fromJson(jsonDecode(json));
   Serializer<UpdateLectureProgressVariables> varsSerializer = (UpdateLectureProgressVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<UpdateLectureProgressData, UpdateLectureProgressVariables>> execute() {
@@ -18,7 +19,7 @@ class UpdateLectureProgressVariablesBuilder {
   }
 
   MutationRef<UpdateLectureProgressData, UpdateLectureProgressVariables> ref() {
-    UpdateLectureProgressVariables vars= UpdateLectureProgressVariables(lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,completedAt: _completedAt,);
+    UpdateLectureProgressVariables vars= UpdateLectureProgressVariables(lectureId: lectureId,lastWatchedSecond: lastWatchedSecond,completedAt: _completedAt,userId: userId,);
     return _dataConnect.mutation("UpdateLectureProgress", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -101,17 +102,20 @@ class UpdateLectureProgressVariables {
   final String lectureId;
   final int lastWatchedSecond;
   late final Optional<Timestamp>completedAt;
+  final String userId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   UpdateLectureProgressVariables.fromJson(Map<String, dynamic> json):
   
   lectureId = nativeFromJson<String>(json['lectureId']),
-  lastWatchedSecond = nativeFromJson<int>(json['lastWatchedSecond']) {
+  lastWatchedSecond = nativeFromJson<int>(json['lastWatchedSecond']),
+  userId = nativeFromJson<String>(json['userId']) {
   
   
   
   
     completedAt = Optional.optional((json) => json['completedAt'] = Timestamp.fromJson(json['completedAt']), defaultSerializer);
     completedAt.value = json['completedAt'] == null ? null : Timestamp.fromJson(json['completedAt']);
+  
   
   }
   @override
@@ -126,11 +130,12 @@ class UpdateLectureProgressVariables {
     final UpdateLectureProgressVariables otherTyped = other as UpdateLectureProgressVariables;
     return lectureId == otherTyped.lectureId && 
     lastWatchedSecond == otherTyped.lastWatchedSecond && 
-    completedAt == otherTyped.completedAt;
+    completedAt == otherTyped.completedAt && 
+    userId == otherTyped.userId;
     
   }
   @override
-  int get hashCode => Object.hashAll([lectureId.hashCode, lastWatchedSecond.hashCode, completedAt.hashCode]);
+  int get hashCode => Object.hashAll([lectureId.hashCode, lastWatchedSecond.hashCode, completedAt.hashCode, userId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -140,6 +145,7 @@ class UpdateLectureProgressVariables {
     if(completedAt.state == OptionalState.set) {
       json['completedAt'] = completedAt.toJson();
     }
+    json['userId'] = nativeToJson<String>(userId);
     return json;
   }
 
@@ -147,6 +153,7 @@ class UpdateLectureProgressVariables {
     required this.lectureId,
     required this.lastWatchedSecond,
     required this.completedAt,
+    required this.userId,
   });
 }
 

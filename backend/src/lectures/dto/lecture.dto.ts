@@ -1,4 +1,11 @@
-import { IsString, IsEnum, IsOptional, IsInt, IsBoolean, Min } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  Min,
+} from 'class-validator';
 import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 
 export enum LectureType {

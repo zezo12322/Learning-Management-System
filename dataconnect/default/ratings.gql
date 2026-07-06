@@ -6,10 +6,15 @@
 # (user, course) on CourseRating makes this idempotent: re-rating overwrites the
 # previous value instead of inserting a duplicate. createdAt keeps its original
 # value on update (upsert only writes the supplied fields); updatedAt is bumped.
-mutation UpsertCourseRating($courseId: UUID!, $rating: Int!, $review: String) @auth(level: USER) {
+# RBAC hardening: NO_ACCESS. RatingsService gates rating on enrollment + course
+# state and recomputes the denormalised aggregate after each write; a USER-level
+# version let a client rate a course it never enrolled in and desync avgRating/
+# ratingCount by skipping the recompute. Backend-only now; the rater is passed
+# explicitly as $userId.
+mutation UpsertCourseRating($courseId: UUID!, $rating: Int!, $review: String, $userId: String!) @auth(level: NO_ACCESS) {
   courseRating_upsert(
     data: {
-      userId_expr: "auth.uid"
+      userId: $userId
       courseId: $courseId
       rating: $rating
       review: $review
@@ -20,9 +25,11 @@ mutation UpsertCourseRating($courseId: UUID!, $rating: Int!, $review: String) @a
 
 # Remove the current user's own rating. Scoped to auth.uid so a user can only
 # ever delete their own row, regardless of the courseId supplied.
-mutation DeleteCourseRating($courseId: UUID!) @auth(level: USER) {
+# NO_ACCESS (see UpsertCourseRating): backend-only so the aggregate recompute is
+# never skipped. Owner passed explicitly; still scoped to the caller's own row.
+mutation DeleteCourseRating($courseId: UUID!, $userId: String!) @auth(level: NO_ACCESS) {
   courseRating_deleteMany(
-    where: { userId: { eq_expr: "auth.uid" }, courseId: { eq: $courseId } }
+    where: { userId: { eq: $userId }, courseId: { eq: $courseId } }
   )
 }
 

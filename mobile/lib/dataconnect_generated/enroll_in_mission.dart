@@ -2,9 +2,10 @@ part of 'generated.dart';
 
 class EnrollInMissionVariablesBuilder {
   String missionId;
+  String userId;
 
   final FirebaseDataConnect _dataConnect;
-  EnrollInMissionVariablesBuilder(this._dataConnect, {required  this.missionId,});
+  EnrollInMissionVariablesBuilder(this._dataConnect, {required  this.missionId,required  this.userId,});
   Deserializer<EnrollInMissionData> dataDeserializer = (dynamic json)  => EnrollInMissionData.fromJson(jsonDecode(json));
   Serializer<EnrollInMissionVariables> varsSerializer = (EnrollInMissionVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<EnrollInMissionData, EnrollInMissionVariables>> execute() {
@@ -12,7 +13,7 @@ class EnrollInMissionVariablesBuilder {
   }
 
   MutationRef<EnrollInMissionData, EnrollInMissionVariables> ref() {
-    EnrollInMissionVariables vars= EnrollInMissionVariables(missionId: missionId,);
+    EnrollInMissionVariables vars= EnrollInMissionVariables(missionId: missionId,userId: userId,);
     return _dataConnect.mutation("EnrollInMission", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -88,10 +89,12 @@ class EnrollInMissionData {
 @immutable
 class EnrollInMissionVariables {
   final String missionId;
+  final String userId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   EnrollInMissionVariables.fromJson(Map<String, dynamic> json):
   
-  missionId = nativeFromJson<String>(json['missionId']);
+  missionId = nativeFromJson<String>(json['missionId']),
+  userId = nativeFromJson<String>(json['userId']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -102,21 +105,24 @@ class EnrollInMissionVariables {
     }
 
     final EnrollInMissionVariables otherTyped = other as EnrollInMissionVariables;
-    return missionId == otherTyped.missionId;
+    return missionId == otherTyped.missionId && 
+    userId == otherTyped.userId;
     
   }
   @override
-  int get hashCode => missionId.hashCode;
+  int get hashCode => Object.hashAll([missionId.hashCode, userId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['missionId'] = nativeToJson<String>(missionId);
+    json['userId'] = nativeToJson<String>(userId);
     return json;
   }
 
   EnrollInMissionVariables({
     required this.missionId,
+    required this.userId,
   });
 }
 

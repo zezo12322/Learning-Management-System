@@ -31,7 +31,9 @@ export class WatermarkService {
 
   constructor(config: ConfigService) {
     this.secret = config.get<string>('STREAM_KEY_SECRET', '');
-    this.ttlMinutes = Number(config.get<string>('STREAM_URL_TTL_MINUTES', '360'));
+    this.ttlMinutes = Number(
+      config.get<string>('STREAM_URL_TTL_MINUTES', '360'),
+    );
     if (!this.secret) {
       this.logger.error(
         'STREAM_KEY_SECRET is not set — watermark payloads cannot be signed.',
@@ -39,7 +41,11 @@ export class WatermarkService {
     }
   }
 
-  issue(uid: string, email: string | null, lectureId: string): WatermarkPayload {
+  issue(
+    uid: string,
+    email: string | null,
+    lectureId: string,
+  ): WatermarkPayload {
     const sessionId = randomUUID();
     const issuedAtMs = Date.now();
     const issuedAt = new Date(issuedAtMs).toISOString();

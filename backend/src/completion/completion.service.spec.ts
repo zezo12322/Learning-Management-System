@@ -1,9 +1,14 @@
 import { CompletionService } from './completion.service';
 
-function makeDc(queryMap: Record<string, any>, mutationMap: Record<string, any> = {}) {
+function makeDc(
+  queryMap: Record<string, any>,
+  mutationMap: Record<string, any> = {},
+) {
   return {
     executeQuery: jest.fn((op: string) => Promise.resolve(queryMap[op])),
-    executeMutation: jest.fn((op: string) => Promise.resolve(mutationMap[op] ?? {})),
+    executeMutation: jest.fn((op: string) =>
+      Promise.resolve(mutationMap[op] ?? {}),
+    ),
   };
 }
 
@@ -19,7 +24,9 @@ describe('CompletionService', () => {
     it('marks the enrollment COMPLETED when every lecture is done', async () => {
       const dc = makeDc({
         GetCourseCompletionStatus: { sections: [lecturesCompleted(2, 2)] },
-        GetUserEnrollmentForCourse: { enrollments: [{ id: 'e1', status: 'ACTIVE' }] },
+        GetUserEnrollmentForCourse: {
+          enrollments: [{ id: 'e1', status: 'ACTIVE' }],
+        },
       });
       const svc = new CompletionService(dc as any);
       await svc.checkCourseCompletion('c1', 'tok');
@@ -40,7 +47,9 @@ describe('CompletionService', () => {
     });
 
     it('does nothing for a course with zero lectures', async () => {
-      const dc = makeDc({ GetCourseCompletionStatus: { sections: [lecturesCompleted(0, 0)] } });
+      const dc = makeDc({
+        GetCourseCompletionStatus: { sections: [lecturesCompleted(0, 0)] },
+      });
       const svc = new CompletionService(dc as any);
       await svc.checkCourseCompletion('c1', 'tok');
       expect(dc.executeMutation).not.toHaveBeenCalled();
@@ -50,7 +59,9 @@ describe('CompletionService', () => {
   describe('markMissionEnrollmentCompleted', () => {
     it("completes the student's mission enrollment (looked up by student uid)", async () => {
       const dc = makeDc({
-        GetEnrollmentForUserMission: { enrollments: [{ id: 'e9', status: 'ACTIVE' }] },
+        GetEnrollmentForUserMission: {
+          enrollments: [{ id: 'e9', status: 'ACTIVE' }],
+        },
       });
       const svc = new CompletionService(dc as any);
       await svc.markMissionEnrollmentCompleted('m1', 'stu1', 'tok');
@@ -68,7 +79,9 @@ describe('CompletionService', () => {
 
     it('is a no-op when already completed', async () => {
       const dc = makeDc({
-        GetEnrollmentForUserMission: { enrollments: [{ id: 'e9', status: 'COMPLETED' }] },
+        GetEnrollmentForUserMission: {
+          enrollments: [{ id: 'e9', status: 'COMPLETED' }],
+        },
       });
       const svc = new CompletionService(dc as any);
       await svc.markMissionEnrollmentCompleted('m1', 'stu1', 'tok');
