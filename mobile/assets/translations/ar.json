@@ -14,6 +14,11 @@
     "close": "إغلاق",
     "yes": "نعم",
     "no": "لا",
+    "error_widget": {
+      "title": "حدث خطأ ما",
+      "default_message": "يرجى المحاولة مره اخرى",
+      "retry_button": "إعادة المحاولة"
+    },
     "dialog": {
       "error_title": "خطأ",
       "success_title": "نجح",
@@ -102,7 +107,35 @@
     }
   },
   "home": {
-    "welcome": "أهلاً بك"
+    "welcome": "أهلاً بعودتك",
+    "continue_learning": "أكمل التعلّم",
+    "popular_courses": "الكورسات الشائعة",
+    "recommended_courses": "كورسات مقترحة لك",
+    "assignments_missions": "التكليفات / المهام",
+    "view_all": "عرض الكل",
+    "in_progress": "قيد التقدم",
+    "students": "طالب",
+    "lessons": "دروس",
+    "of_lessons": "{completed} من {total} دروس",
+    "min_left": "متبقي {time}",
+    "error_title": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "assignments": {
+      "available": "متاحة",
+      "submitted": "تم التسليم",
+      "graded": "تم التقييم",
+      "empty": "لا توجد تكليفات",
+      "available_desc": "مفتوحة للتسليم",
+      "submitted_desc": "بانتظار المراجعة",
+      "graded_desc": "عرض الملاحظات",
+      "empty_desc": "أنت منجز كل شيء"
+    }
+  },
+  "nav_bar": {
+    "home": "الرئيسية",
+    "courses": "الكورسات",
+    "wishlist": "المفضلة",
+    "profile": "الملف الشخصي"
   },
   "navigation": {
     "not_found": "الصفحة غير موجودة",

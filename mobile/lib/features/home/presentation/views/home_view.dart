@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -81,29 +82,29 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBody: true,
       body: bodyWidget,
       bottomNavigationBar: GlassBottomNavBar(
         currentIndex: currentScreen,
         onTap: onTabTapped,
         items: [
           BottomNavItemData(
-            label: 'Home',
+            label: 'nav_bar.home'.tr(),
             icon: const Icon(CupertinoIcons.home),
             filledIcon: const Icon(CupertinoIcons.house_fill),
           ),
           BottomNavItemData(
-            label: 'Courses',
+            label: 'nav_bar.courses'.tr(),
             icon: const Icon(CupertinoIcons.book_fill),
             filledIcon: const Icon(CupertinoIcons.book_fill),
           ),
           BottomNavItemData(
-            label: 'wishlist',
+            label: 'nav_bar.wishlist'.tr(),
             icon: const Icon(CupertinoIcons.heart),
             filledIcon: const Icon(CupertinoIcons.heart_fill),
           ),
           BottomNavItemData(
-            label: 'Profile',
+            label: 'nav_bar.profile'.tr(),
             icon: const Icon(CupertinoIcons.person_alt_circle),
             filledIcon: const Icon(Icons.person),
           ),

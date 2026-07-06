@@ -73,10 +73,6 @@ class CourseBody extends StatelessWidget {
                   //context.read<CoursesCubit>().applyFilter(result);
                 }
               },
-              hintText: 'Search courses...',
-              prefixIcon: Icons.search,
-              suffixIcon: Icons.filter_list,
-              onClear: () {},
             ),
           ),
           Gap(16.h),
