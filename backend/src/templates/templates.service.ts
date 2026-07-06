@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
-import { MissionStoragePaths, ALLOWED_TEMPLATE_MIME_TYPES } from '../common/constants/storage-paths';
+import { AccessService } from '../common/services/access.service';
+import {
+  MissionStoragePaths,
+  ALLOWED_TEMPLATE_MIME_TYPES,
+} from '../common/constants/storage-paths';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -9,6 +13,7 @@ export class TemplatesService {
   constructor(
     private readonly dc: DataConnectService,
     private readonly firebase: FirebaseService,
+    private readonly access: AccessService,
   ) {}
 
   async upload(
@@ -20,7 +25,11 @@ export class TemplatesService {
     const templateId = uuidv4();
     const ext = ALLOWED_TEMPLATE_MIME_TYPES[file.mimetype] ?? '.bin';
     const filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}${ext}`;
-    const storagePath = MissionStoragePaths.template(missionId, templateId, filename);
+    const storagePath = MissionStoragePaths.template(
+      missionId,
+      templateId,
+      filename,
+    );
 
     // Upload privately (H2); persist the storage PATH, not a public URL.
     const storedPath = await this.firebase.uploadFile(
@@ -56,7 +65,31 @@ export class TemplatesService {
     );
   }
 
-  async findAll(missionId: string, authToken: string) {
+  async findAll(
+    missionId: string,
+    authToken: string,
+    uid: string | undefined,
+    isAdmin: boolean,
+  ) {
+    // Access gate: without this, any authenticated user could list (and obtain
+    // signed download URLs for) any mission's templates by id. Allow the mission
+    // owner/admin (assigned instructor included) or an actively-enrolled student,
+    // mirroring the lecture/quiz content gating.
+    try {
+      await this.access.assertMissionAccess(missionId, uid, authToken, isAdmin);
+    } catch {
+      const enrollmentData = await this.dc.executeQuery(
+        'GetUserEnrollmentForMission',
+        { missionId },
+        authToken,
+      );
+      if (enrollmentData?.enrollments?.[0]?.status !== 'ACTIVE') {
+        throw new ForbiddenException(
+          'You must have access to this mission to view its templates',
+        );
+      }
+    }
+
     const data = await this.dc.executeQuery(
       'GetMissionTemplates',
       { missionId },

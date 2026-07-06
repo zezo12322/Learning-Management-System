@@ -176,14 +176,22 @@ export class QuizzesService {
   }
 
   async getQuiz(quizId: string, authToken: string) {
-    const data = await this.dc.executeQuery('AdminGetQuiz', { quizId }, authToken);
+    const data = await this.dc.executeQuery(
+      'AdminGetQuiz',
+      { quizId },
+      authToken,
+    );
     if (!data?.courseQuiz) {
       throw new NotFoundException(`Quiz ${quizId} not found`);
     }
     return data.courseQuiz;
   }
 
-  async createQuestion(quizId: string, dto: CreateQuestionDto, authToken: string) {
+  async createQuestion(
+    quizId: string,
+    dto: CreateQuestionDto,
+    authToken: string,
+  ) {
     // Validate at least one correct option
     const correctCount = dto.options.filter((o) => o.isCorrect).length;
     if (correctCount === 0) {
@@ -228,7 +236,11 @@ export class QuizzesService {
     return questionResult;
   }
 
-  async updateQuestion(questionId: string, dto: UpdateQuestionDto, authToken: string) {
+  async updateQuestion(
+    questionId: string,
+    dto: UpdateQuestionDto,
+    authToken: string,
+  ) {
     const { options, ...questionFields } = dto;
 
     // Update the question's own fields
@@ -308,7 +320,11 @@ export class QuizzesService {
     return { success: true };
   }
 
-  async softDeleteQuestion(quizId: string, questionId: string, authToken: string) {
+  async softDeleteQuestion(
+    quizId: string,
+    questionId: string,
+    authToken: string,
+  ) {
     await this.dc.executeMutation(
       'AdminSoftDeleteQuizQuestion',
       { questionId },
@@ -330,7 +346,11 @@ export class QuizzesService {
     return { success: true };
   }
 
-  async reorderQuestions(quizId: string, orderedIds: string[], authToken: string) {
+  async reorderQuestions(
+    quizId: string,
+    orderedIds: string[],
+    authToken: string,
+  ) {
     // Validate every id belongs to this quiz before reordering.
     const quiz = await this.getQuiz(quizId, authToken);
     const validIds = (quiz.adminQuestions ?? []).map((q: any) => q.id);
@@ -346,7 +366,11 @@ export class QuizzesService {
   }
 
   // Option management
-  async updateOption(optionId: string, dto: UpdateQuizOptionDto, authToken: string) {
+  async updateOption(
+    optionId: string,
+    dto: UpdateQuizOptionDto,
+    authToken: string,
+  ) {
     return this.dc.executeMutation(
       'AdminUpdateQuizOption',
       { optionId, ...dto },
@@ -355,10 +379,18 @@ export class QuizzesService {
   }
 
   async deleteOption(optionId: string, authToken: string) {
-    return this.dc.executeMutation('AdminDeleteQuizOption', { optionId }, authToken);
+    return this.dc.executeMutation(
+      'AdminDeleteQuizOption',
+      { optionId },
+      authToken,
+    );
   }
 
-  async reorderOptions(questionId: string, orderedIds: string[], authToken: string) {
+  async reorderOptions(
+    questionId: string,
+    orderedIds: string[],
+    authToken: string,
+  ) {
     // Validate every id belongs to this question before reordering.
     const existing = await this.dc.executeQuery(
       'GetQuestionOptions',
@@ -381,7 +413,7 @@ export class QuizzesService {
   // QUIZ TAKING (KAN-78, KAN-79, KAN-80)
   // ==========================================
 
-  async startAttempt(quizId: string, authToken: string) {
+  async startAttempt(quizId: string, authToken: string, callerUid: string) {
     // Fetch quiz settings (maxAttempts) and the owning course
     const settingsData = await this.dc.executeQuery(
       'GetQuizSettings',
@@ -432,7 +464,14 @@ export class QuizzesService {
       );
     }
 
-    return this.dc.executeMutation('StartQuizAttempt', { quizId }, authToken);
+    // Runs via the service account (NO_ACCESS in the connector); the attempt owner
+    // is passed explicitly rather than derived from auth.uid. Enrollment + max-attempt
+    // limits were enforced above and are now the sole gate on starting an attempt.
+    return this.dc.executeMutation(
+      'StartQuizAttempt',
+      { quizId, userId: callerUid },
+      authToken,
+    );
   }
 
   async submitAnswer(
@@ -463,7 +502,10 @@ export class QuizzesService {
       const elapsed = (Date.now() - startTime) / 1000 / 60;
       if (elapsed > attempt.quiz.timeLimitMinutes) {
         // Auto-finish with whatever answers exist
-        const result = await this.autoGrade(attemptId, { token: authToken });
+        const result = await this.autoGrade(attemptId, {
+          token: authToken,
+          uid: callerUid,
+        });
         throw new GoneException({
           message: 'Session timed out. Attempt auto-graded.',
           ...result,
@@ -489,7 +531,7 @@ export class QuizzesService {
     }
     if (attempt.quiz?.id && option.question?.quiz?.id !== attempt.quiz.id) {
       throw new BadRequestException(
-        'Question does not belong to this attempt\'s quiz',
+        "Question does not belong to this attempt's quiz",
       );
     }
 
@@ -504,7 +546,11 @@ export class QuizzesService {
     );
   }
 
-  async finishAttempt(attemptId: string, authToken: string, callerUid?: string) {
+  async finishAttempt(
+    attemptId: string,
+    authToken: string,
+    callerUid?: string,
+  ) {
     // Validate attempt is still active
     const attemptData = await this.dc.executeQuery(
       'GetQuizAttemptById',
@@ -521,7 +567,7 @@ export class QuizzesService {
       throw new BadRequestException('This attempt is already completed');
     }
 
-    return this.autoGrade(attemptId, { token: authToken });
+    return this.autoGrade(attemptId, { token: authToken, uid: callerUid });
   }
 
   /**
@@ -534,18 +580,29 @@ export class QuizzesService {
    * The KAN-116 completion/certificate trigger only runs on the user path,
    * since those mutations are scoped to the student's auth.uid.
    */
-  async autoGrade(attemptId: string, ctx: { token?: string; admin?: boolean }) {
-    const query = <T = any>(op: string, vars?: Record<string, any>): Promise<T> =>
+  async autoGrade(
+    attemptId: string,
+    ctx: { token?: string; admin?: boolean; uid?: string },
+  ) {
+    const query = <T = any>(
+      op: string,
+      vars?: Record<string, any>,
+    ): Promise<T> =>
       ctx.admin
         ? this.dc.executeQueryAsAdmin<T>(op, vars)
         : this.dc.executeQuery<T>(op, vars, ctx.token);
-    const mutate = <T = any>(op: string, vars?: Record<string, any>): Promise<T> =>
+    const mutate = <T = any>(
+      op: string,
+      vars?: Record<string, any>,
+    ): Promise<T> =>
       ctx.admin
         ? this.dc.executeMutationAsAdmin<T>(op, vars)
         : this.dc.executeMutation<T>(op, vars, ctx.token);
 
     // Get all answers with correct flags
-    const answersData = await query('GetAttemptAnswersWithCorrect', { attemptId });
+    const answersData = await query('GetAttemptAnswersWithCorrect', {
+      attemptId,
+    });
     const answers = answersData?.quizAttemptAnswers ?? [];
 
     // Get attempt details for passing score and the owning quiz id
@@ -621,11 +678,12 @@ export class QuizzesService {
           const settings = await query('GetQuizSettings', { quizId });
           const lectureId = settings?.courseQuiz?.lecture?.id;
           const courseId = settings?.courseQuiz?.lecture?.section?.course?.id;
-          if (lectureId && courseId) {
+          if (lectureId && courseId && ctx.uid) {
             await this.completionService.onQuizPassed(
               lectureId,
               courseId,
               ctx.token,
+              ctx.uid,
             );
           }
         } catch {

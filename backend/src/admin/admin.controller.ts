@@ -10,8 +10,9 @@ import { SetRoleDto } from './dto/set-role.dto';
  * Firebase custom claims, which RolesGuard reads on subsequent requests.
  *
  * Bootstrapping the FIRST admin (chicken-and-egg) is done out-of-band with a
- * one-off script using the Admin SDK, e.g.:
- *   admin.auth().setCustomUserClaims('<uid>', { role: 'admin', admin: true })
+ * one-off script using the Admin SDK. Write the `roles` array — the single
+ * source of truth read by both Data Connect and the NestJS guards:
+ *   admin.auth().setCustomUserClaims('<uid>', { roles: ['admin'] })
  */
 @Controller('admin/users')
 @UseGuards(FirebaseAuthGuard, RolesGuard)

@@ -5,6 +5,7 @@ import {
   Delete,
   Body,
   Param,
+  Req,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -18,6 +19,7 @@ import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guar
 import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
 import { CreateTemplateDto } from './dto/template.dto';
 
@@ -40,8 +42,14 @@ export class TemplatesController {
   }
 
   @Get()
-  findAll(@Param('missionId') missionId: string, @AuthToken() token: string) {
-    return this.templatesService.findAll(missionId, token);
+  findAll(
+    @Param('missionId') missionId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+    @Req() req: any,
+  ) {
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.templatesService.findAll(missionId, token, uid, isAdmin);
   }
 
   @Delete(':templateId')

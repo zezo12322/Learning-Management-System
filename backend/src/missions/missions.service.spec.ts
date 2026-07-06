@@ -4,7 +4,9 @@ import { MissionsService } from './missions.service';
 function makeDc(mutationMap: Record<string, any> = {}) {
   return {
     executeQuery: jest.fn(),
-    executeMutation: jest.fn((op: string) => Promise.resolve(mutationMap[op] ?? {})),
+    executeMutation: jest.fn((op: string) =>
+      Promise.resolve(mutationMap[op] ?? {}),
+    ),
   };
 }
 
@@ -19,9 +21,23 @@ describe('MissionsService', () => {
     it('checks ownership of the linked course before creating', async () => {
       const dc = makeDc();
       const svc = new MissionsService(dc as any, access as any);
-      await svc.create({ title: 'M', courseId: 'c1' } as any, 'tok', 'u1', false);
-      expect(access.assertCourseAccess).toHaveBeenCalledWith('c1', 'u1', 'tok', false);
-      expect(dc.executeMutation).toHaveBeenCalledWith('AdminCreateMission', expect.any(Object), 'tok');
+      await svc.create(
+        { title: 'M', courseId: 'c1' } as any,
+        'tok',
+        'u1',
+        false,
+      );
+      expect(access.assertCourseAccess).toHaveBeenCalledWith(
+        'c1',
+        'u1',
+        'tok',
+        false,
+      );
+      expect(dc.executeMutation).toHaveBeenCalledWith(
+        'AdminCreateMission',
+        expect.any(Object),
+        'tok',
+      );
     });
 
     it('skips the course check for a standalone mission', async () => {
@@ -46,9 +62,13 @@ describe('MissionsService', () => {
     it('does not require a course check when courseId is absent', async () => {
       const dc = makeDc();
       const svc = new MissionsService(dc as any, access as any);
-      await svc.update('m1', { title: 'renamed' } as any, 'tok', 'u1', false);
+      await svc.update('m1', { title: 'renamed' }, 'tok', 'u1', false);
       expect(access.assertCourseAccess).not.toHaveBeenCalled();
-      expect(dc.executeMutation).toHaveBeenCalledWith('AdminUpdateMission', expect.any(Object), 'tok');
+      expect(dc.executeMutation).toHaveBeenCalledWith(
+        'AdminUpdateMission',
+        expect.any(Object),
+        'tok',
+      );
     });
   });
 });

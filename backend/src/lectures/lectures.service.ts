@@ -8,7 +8,12 @@ import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
 import { OrderingService } from '../common/services/ordering.service';
 import { AccessService } from '../common/services/access.service';
-import { CreateLectureDto, UpdateLectureDto, MoveLectureDto, LectureType } from './dto/lecture.dto';
+import {
+  CreateLectureDto,
+  UpdateLectureDto,
+  MoveLectureDto,
+  LectureType,
+} from './dto/lecture.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
 
 @Injectable()
@@ -46,11 +51,20 @@ export class LecturesService {
     }
   }
 
-  async create(courseId: string, sectionId: string, dto: CreateLectureDto, authToken: string) {
+  async create(
+    courseId: string,
+    sectionId: string,
+    dto: CreateLectureDto,
+    authToken: string,
+  ) {
     this.validateTypeContent(dto.type, dto.videoUrl, dto.content);
 
     // Fetch existing lectures to auto-calculate order
-    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
+    const course = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
     const section = (course?.course?.adminSections ?? []).find(
       (s: any) => s.id === sectionId,
     );
@@ -96,7 +110,8 @@ export class LecturesService {
       if (!current) {
         throw new NotFoundException(`Lecture ${lectureId} not found`);
       }
-      const videoUrl = dto.videoUrl !== undefined ? dto.videoUrl : current.videoUrl;
+      const videoUrl =
+        dto.videoUrl !== undefined ? dto.videoUrl : current.videoUrl;
       const content = dto.content !== undefined ? dto.content : current.content;
       this.validateTypeContent(dto.type, videoUrl, content);
     }
@@ -120,14 +135,23 @@ export class LecturesService {
     );
 
     // Re-normalize the order of the remaining (non-deleted) lectures in the section
-    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
+    const course = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
     const section = (course?.course?.adminSections ?? []).find(
       (s: any) => s.id === sectionId,
     );
     const remaining = (section?.adminLectures ?? [])
       .filter((l: any) => l.id !== lectureId)
       .map((l: any) => l.id);
-    await this.ordering.applyOrder(remaining, 'AdminUpdateLectureOrder', 'lectureId', authToken);
+    await this.ordering.applyOrder(
+      remaining,
+      'AdminUpdateLectureOrder',
+      'lectureId',
+      authToken,
+    );
 
     return { success: true };
   }
@@ -139,14 +163,23 @@ export class LecturesService {
     authToken: string,
   ) {
     // Validate every id belongs to this section before reordering.
-    const course = await this.dc.executeQuery('AdminGetCourse', { courseId }, authToken);
+    const course = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
     const section = (course?.course?.adminSections ?? []).find(
       (s: any) => s.id === sectionId,
     );
     const validIds = (section?.adminLectures ?? []).map((l: any) => l.id);
     assertReorderMembership(orderedIds, validIds, 'lecture');
 
-    await this.ordering.applyOrder(orderedIds, 'AdminUpdateLectureOrder', 'lectureId', authToken);
+    await this.ordering.applyOrder(
+      orderedIds,
+      'AdminUpdateLectureOrder',
+      'lectureId',
+      authToken,
+    );
     return { success: true, order: orderedIds };
   }
 
@@ -154,7 +187,11 @@ export class LecturesService {
     // The caller's ownership of the lecture is verified by the guard; here we
     // ensure the target section is in the SAME course, so a lecture can't be
     // moved into another course's section.
-    const lec = await this.dc.executeQuery('GetLectureContent', { lectureId }, authToken);
+    const lec = await this.dc.executeQuery(
+      'GetLectureContent',
+      { lectureId },
+      authToken,
+    );
     const sourceCourseId = lec?.courseLecture?.section?.course?.id;
     if (!sourceCourseId) {
       throw new NotFoundException(`Lecture ${lectureId} not found`);

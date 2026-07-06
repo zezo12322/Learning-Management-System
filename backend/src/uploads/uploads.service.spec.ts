@@ -12,23 +12,37 @@ describe('UploadsService', () => {
 
   beforeEach(() => {
     firebase = {
-      generateSignedUploadUrl: jest.fn().mockResolvedValue({ uploadUrl: 'PUT', downloadUrl: 'GET' }),
+      generateSignedUploadUrl: jest
+        .fn()
+        .mockResolvedValue({ uploadUrl: 'PUT', downloadUrl: 'GET' }),
       generateSignedReadUrl: jest.fn().mockResolvedValue('signed-read'),
       makeFilePublic: jest.fn().mockResolvedValue('https://public/url'),
       fileExists: jest.fn().mockResolvedValue(true),
       getBucket: jest.fn().mockReturnValue({ name: 'bucket' }),
     };
-    dc = { executeQuery: jest.fn(), executeMutation: jest.fn().mockResolvedValue({}) };
+    dc = {
+      executeQuery: jest.fn(),
+      executeMutation: jest.fn().mockResolvedValue({}),
+    };
     access = { assertCourseAccess: jest.fn().mockResolvedValue(undefined) };
-    transcoding = { enqueue: jest.fn().mockResolvedValue({ jobId: 'transcode-L1', status: 'queued' }) };
-    svc = new UploadsService(firebase, dc as any, access as any, transcoding as any);
+    transcoding = {
+      enqueue: jest
+        .fn()
+        .mockResolvedValue({ jobId: 'transcode-L1', status: 'queued' }),
+    };
+    svc = new UploadsService(firebase, dc, access as any, transcoding as any);
   });
 
   describe('generateSignedUrl', () => {
     it('requires a lectureId for lecture-scoped uploads', async () => {
       await expect(
         svc.generateSignedUrl(
-          { entityType: UploadEntityType.LECTURE_VIDEO, courseId: 'c1', filename: 'a.mp4', contentType: 'video/mp4' } as any,
+          {
+            entityType: UploadEntityType.LECTURE_VIDEO,
+            courseId: 'c1',
+            filename: 'a.mp4',
+            contentType: 'video/mp4',
+          } as any,
           caller,
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -37,7 +51,12 @@ describe('UploadsService', () => {
     it('rejects a disallowed content type', async () => {
       await expect(
         svc.generateSignedUrl(
-          { entityType: UploadEntityType.COURSE_THUMBNAIL, courseId: 'c1', filename: 'a.exe', contentType: 'application/x-msdownload' } as any,
+          {
+            entityType: UploadEntityType.COURSE_THUMBNAIL,
+            courseId: 'c1',
+            filename: 'a.exe',
+            contentType: 'application/x-msdownload',
+          } as any,
           caller,
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -45,12 +64,22 @@ describe('UploadsService', () => {
 
     it('returns a signed URL with a server-derived path for a valid request', async () => {
       const res = await svc.generateSignedUrl(
-        { entityType: UploadEntityType.COURSE_THUMBNAIL, courseId: 'c1', filename: 'pic.png', contentType: 'image/png' } as any,
+        {
+          entityType: UploadEntityType.COURSE_THUMBNAIL,
+          courseId: 'c1',
+          filename: 'pic.png',
+          contentType: 'image/png',
+        },
         caller,
       );
       expect(res.uploadUrl).toBe('PUT');
       expect(res.storagePath).toContain('courses/c1/thumbnail/');
-      expect(access.assertCourseAccess).toHaveBeenCalledWith('c1', 'u1', 'tok', false);
+      expect(access.assertCourseAccess).toHaveBeenCalledWith(
+        'c1',
+        'u1',
+        'tok',
+        false,
+      );
     });
   });
 
@@ -63,13 +92,19 @@ describe('UploadsService', () => {
     } as any;
 
     it('rejects when the lecture belongs to a different course', async () => {
-      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'OTHER' } } } });
-      await expect(svc.confirmUpload(dto, caller)).rejects.toBeInstanceOf(BadRequestException);
+      dc.executeQuery.mockResolvedValue({
+        courseLecture: { section: { course: { id: 'OTHER' } } },
+      });
+      await expect(svc.confirmUpload(dto, caller)).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
       expect(dc.executeMutation).not.toHaveBeenCalled();
     });
 
     it('persists the storage PATH (private) when the lecture matches the course', async () => {
-      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
+      dc.executeQuery.mockResolvedValue({
+        courseLecture: { section: { course: { id: 'c1' } } },
+      });
       const res = await svc.confirmUpload(dto, caller);
       expect(dc.executeMutation).toHaveBeenCalledWith(
         'AdminUpdateLecture',
@@ -81,14 +116,26 @@ describe('UploadsService', () => {
     });
 
     it('auto-enqueues secure-HLS transcode for a confirmed lecture video', async () => {
-      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
+      dc.executeQuery.mockResolvedValue({
+        courseLecture: { section: { course: { id: 'c1' } } },
+      });
       const res = await svc.confirmUpload(dto, caller);
-      expect(transcoding.enqueue).toHaveBeenCalledWith('c1', 'L1', dto.storagePath, 'u1');
-      expect(res.transcode).toEqual({ jobId: 'transcode-L1', status: 'queued' });
+      expect(transcoding.enqueue).toHaveBeenCalledWith(
+        'c1',
+        'L1',
+        dto.storagePath,
+        'u1',
+      );
+      expect(res.transcode).toEqual({
+        jobId: 'transcode-L1',
+        status: 'queued',
+      });
     });
 
     it('does not fail the upload when transcode enqueue throws', async () => {
-      dc.executeQuery.mockResolvedValue({ courseLecture: { section: { course: { id: 'c1' } } } });
+      dc.executeQuery.mockResolvedValue({
+        courseLecture: { section: { course: { id: 'c1' } } },
+      });
       transcoding.enqueue.mockRejectedValueOnce(new Error('redis down'));
       const res = await svc.confirmUpload(dto, caller);
       // The upload still succeeds; the enqueue failure is surfaced, not thrown.
@@ -108,7 +155,10 @@ describe('UploadsService', () => {
 
     it('rejects a storagePath outside the course prefix', async () => {
       await expect(
-        svc.confirmUpload({ ...dto, storagePath: 'courses/EVIL/x.mp4' }, caller),
+        svc.confirmUpload(
+          { ...dto, storagePath: 'courses/EVIL/x.mp4' },
+          caller,
+        ),
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
@@ -119,7 +169,9 @@ describe('UploadsService', () => {
         storagePath: 'courses/c1/thumbnail/x.png',
       } as any;
       await svc.confirmUpload(thumbDto, caller);
-      expect(firebase.makeFilePublic).toHaveBeenCalledWith('courses/c1/thumbnail/x.png');
+      expect(firebase.makeFilePublic).toHaveBeenCalledWith(
+        'courses/c1/thumbnail/x.png',
+      );
       expect(dc.executeMutation).toHaveBeenCalledWith(
         'AdminUpdateCourse',
         { courseId: 'c1', thumbnail: 'https://public/url' },

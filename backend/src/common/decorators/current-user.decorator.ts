@@ -3,7 +3,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 /**
  * Parameter decorator that extracts the decoded Firebase user from request.
  * Usage: @CurrentUser() user: DecodedIdToken
- * 
+ *
  * Requires FirebaseAuthGuard to be applied on the route or controller.
  */
 export const CurrentUser = createParamDecorator(

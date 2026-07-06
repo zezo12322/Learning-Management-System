@@ -11,12 +11,23 @@ type FirebaseClaims = {
   uid: string;
   email?: string;
   roles?: string[];
+  // Legacy single-role claims. Deliberately NOT read for authorization anymore:
+  // the `roles` array is the single source of truth (see normalizeRoles). Kept in
+  // the type only because older tokens may still carry them until they refresh.
   role?: string;
   admin?: boolean;
   companyId?: string | null;
   [key: string]: unknown;
 };
 
+/**
+ * Roles are derived SOLELY from the `roles` array claim — the single source of
+ * truth that Data Connect `@auth(expr:)` rules also read (`auth.token.roles`).
+ * The legacy `role` (string) and `admin` (bool) claims are intentionally ignored:
+ * honoring them let a stale legacy claim (which the Functions role path never
+ * cleared) keep granting admin after a demotion, so the two enforcement layers
+ * disagreed. Every authenticated principal is at least a `student`.
+ */
 function normalizeRoles(claims: FirebaseClaims): string[] {
   const roles = new Set<string>();
 
@@ -28,16 +39,15 @@ function normalizeRoles(claims: FirebaseClaims): string[] {
     }
   }
 
-  if (typeof claims.role === 'string' && claims.role.trim()) {
-    roles.add(claims.role.trim().toLowerCase());
-  }
-
-  if (claims.admin === true) {
-    roles.add('admin');
-  }
-
   roles.add('student');
   return Array.from(roles);
+}
+
+/** Highest-privilege role, for the display-only `request.user.role` field. */
+function primaryRole(roles: string[]): string {
+  if (roles.includes('admin')) return 'admin';
+  if (roles.includes('instructor')) return 'instructor';
+  return 'student';
 }
 
 /**
@@ -53,7 +63,9 @@ export class FirebaseAuthGuard implements CanActivate {
     const idToken = extractBearerToken(request);
 
     if (!idToken) {
-      throw new UnauthorizedException('Missing or invalid Authorization header');
+      throw new UnauthorizedException(
+        'Missing or invalid Authorization header',
+      );
     }
 
     try {
@@ -62,11 +74,14 @@ export class FirebaseAuthGuard implements CanActivate {
         .verifyIdToken(idToken)) as FirebaseClaims;
       const roles = normalizeRoles(decodedToken);
 
+      // Spread the raw token first, then OVERRIDE role/admin from the normalized
+      // roles array so any stale legacy `role`/`admin` claim on the token cannot
+      // leak through into the request context.
       request.user = {
         ...decodedToken,
         roles,
-        role: decodedToken.role ?? roles[0],
-        admin: decodedToken.admin === true || roles.includes('admin'),
+        role: primaryRole(roles),
+        admin: roles.includes('admin'),
       };
       request.userRoles = roles;
 

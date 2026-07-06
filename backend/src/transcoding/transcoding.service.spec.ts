@@ -8,7 +8,10 @@ describe('TranscodingService', () => {
   const valid = 'courses/c1/lectures/L1/video/x.mp4';
 
   beforeEach(() => {
-    queue = { getJob: jest.fn().mockResolvedValue(null), add: jest.fn().mockResolvedValue({}) };
+    queue = {
+      getJob: jest.fn().mockResolvedValue(null),
+      add: jest.fn().mockResolvedValue({}),
+    };
     svc = new TranscodingService(queue as any);
   });
 
@@ -22,7 +25,12 @@ describe('TranscodingService', () => {
 
     it('rejects a sourcePath containing traversal', async () => {
       await expect(
-        svc.enqueue('c1', 'L1', 'courses/c1/lectures/L1/video/../../x.mp4', 'u1'),
+        svc.enqueue(
+          'c1',
+          'L1',
+          'courses/c1/lectures/L1/video/../../x.mp4',
+          'u1',
+        ),
       ).rejects.toBeInstanceOf(BadRequestException);
       expect(queue.add).not.toHaveBeenCalled();
     });
@@ -41,7 +49,9 @@ describe('TranscodingService', () => {
     });
 
     it('does not re-queue when a job is already active/waiting', async () => {
-      queue.getJob.mockResolvedValue({ getState: jest.fn().mockResolvedValue('active') });
+      queue.getJob.mockResolvedValue({
+        getState: jest.fn().mockResolvedValue('active'),
+      });
       const res = await svc.enqueue('c1', 'L1', valid, 'u1');
       expect(queue.add).not.toHaveBeenCalled();
       expect(res).toEqual({ jobId: 'transcode-L1', status: 'active' });
@@ -62,7 +72,9 @@ describe('TranscodingService', () => {
   describe('getStatus', () => {
     it('throws when no job exists for the lecture', async () => {
       queue.getJob.mockResolvedValue(null);
-      await expect(svc.getStatus('L1')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(svc.getStatus('L1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
 
     it('reports state and progress for an existing job', async () => {

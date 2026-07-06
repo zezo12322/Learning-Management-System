@@ -1,10 +1,20 @@
-import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
-import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto, CourseStatus } from './dto/course.dto';
+import {
+  CreateCourseDto,
+  UpdateCourseDto,
+  UpdateCourseStatusDto,
+  CourseStatus,
+} from './dto/course.dto';
 
 @Injectable()
 export class CoursesService {
-  constructor(private readonly dc: DataConnectService) { }
+  constructor(private readonly dc: DataConnectService) {}
 
   // ==========================================
   // PUBLIC / STUDENT QUERIES
@@ -20,11 +30,7 @@ export class CoursesService {
   }
 
   async getCategories(authToken: string) {
-    const data = await this.dc.executeQuery(
-      'ListCategories',
-      {},
-      authToken,
-    );
+    const data = await this.dc.executeQuery('ListCategories', {}, authToken);
     return data?.categories ?? [];
   }
 
@@ -32,7 +38,10 @@ export class CoursesService {
   // ADMIN / INSTRUCTOR MANAGEMENT
   // ==========================================
 
-  async create(dto: CreateCourseDto, authToken: string) {
+  async create(dto: CreateCourseDto, authToken: string, uid: string) {
+    // AdminCreateCourse now runs via the service account (NO_ACCESS in the
+    // connector), which carries no auth.uid — so the author is passed explicitly
+    // as the backend-verified caller uid.
     return this.dc.executeMutation(
       'AdminCreateCourse',
       {
@@ -43,6 +52,7 @@ export class CoursesService {
         level: dto.level,
         categoryId: dto.categoryId,
         tags: dto.tags,
+        authorId: uid,
       },
       authToken,
     );
@@ -61,7 +71,11 @@ export class CoursesService {
   }
 
   async findMyList(authToken: string) {
-    const data = await this.dc.executeQuery('AdminListMyCourses', {}, authToken);
+    const data = await this.dc.executeQuery(
+      'AdminListMyCourses',
+      {},
+      authToken,
+    );
     return data?.courses ?? [];
   }
 
@@ -73,14 +87,20 @@ export class CoursesService {
     );
   }
 
-  async updateStatus(courseId: string, dto: UpdateCourseStatusDto, authToken: string) {
+  async updateStatus(
+    courseId: string,
+    dto: UpdateCourseStatusDto,
+    authToken: string,
+  ) {
     // If publishing, validate course has content
     if (dto.status === CourseStatus.PUBLISHED) {
       const course = await this.findOne(courseId, authToken);
       const sections = course.adminSections ?? [];
 
       if (sections.length === 0) {
-        throw new BadRequestException('Cannot publish: course must have at least one section');
+        throw new BadRequestException(
+          'Cannot publish: course must have at least one section',
+        );
       }
 
       const emptySections = sections.filter(
@@ -101,7 +121,11 @@ export class CoursesService {
   }
 
   async softDelete(courseId: string, authToken: string) {
-    return this.dc.executeMutation('AdminDeleteCourse', { courseId }, authToken);
+    return this.dc.executeMutation(
+      'AdminSoftDeleteCourse',
+      { courseId },
+      authToken,
+    );
   }
 
   // ==========================================

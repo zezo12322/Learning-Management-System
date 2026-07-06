@@ -9,7 +9,9 @@ jest.mock('firebase-admin/app', () => ({
   cert: jest.fn(() => ({})),
 }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn(() => ({})) }));
-jest.mock('firebase-admin/storage', () => ({ getStorage: jest.fn(() => ({})) }));
+jest.mock('firebase-admin/storage', () => ({
+  getStorage: jest.fn(() => ({})),
+}));
 
 describe('FirebaseService', () => {
   let service: FirebaseService;

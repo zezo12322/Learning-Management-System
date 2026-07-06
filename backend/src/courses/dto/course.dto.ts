@@ -1,4 +1,11 @@
-import { IsString, IsInt, IsEnum, IsOptional, IsArray, Min } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsEnum,
+  IsOptional,
+  IsArray,
+  Min,
+} from 'class-validator';
 import { IsFlexUUID } from '../../common/validators/is-flex-uuid.validator';
 
 export enum CourseLevel {
