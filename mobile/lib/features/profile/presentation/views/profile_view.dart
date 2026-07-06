@@ -27,12 +27,12 @@ class ProfileView extends StatelessWidget {
           Padding(
             padding: EdgeInsetsDirectional.only(end: 12.w),
             child: IconButton(
-                onPressed: (){},
-                icon: Icon(
-                  Icons.settings_outlined,
-                  size: 26.sp,
-                  color: context.theme.colorScheme.primary,
-                ),
+              onPressed: () {},
+              icon: Icon(
+                Icons.settings_outlined,
+                size: 26.sp,
+                color: context.theme.colorScheme.primary,
+              ),
             ),
           ),
         ],

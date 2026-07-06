@@ -61,16 +61,22 @@ class CourseBody extends StatelessWidget {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w,),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+            ),
             child: AppSearchField(
               searchController: null,
-              onSearch: (){},
-              onFilter: () async{
+              onSearch: () {},
+              onFilter: () async {
                 final result = await showCoursesFilterBottomSheet(context);
                 if (result != null && context.mounted) {
                   //context.read<CoursesCubit>().applyFilter(result);
                 }
               },
+              hintText: 'Search courses...',
+              prefixIcon: Icons.search,
+              suffixIcon: Icons.filter_list,
+              onClear: () {},
             ),
           ),
           Gap(16.h),
@@ -79,12 +85,15 @@ class CourseBody extends StatelessWidget {
             builder: (context, index) {
               return CoursesCategorySection(
                 selectedIndex: index,
-                onSelected: (i) => context.read<CoursesCubit>().selectCategory(i),
+                onSelected: (i) =>
+                    context.read<CoursesCubit>().selectCategory(i),
               );
             },
           ),
           Gap(8.h),
-          const Expanded(child: CoursesList(),),
+          const Expanded(
+            child: CoursesList(),
+          ),
         ],
       ),
     );
