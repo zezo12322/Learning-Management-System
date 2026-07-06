@@ -1,9 +1,45 @@
+# ==========================================
+# PUBLIC / STUDENT QUERIES
+# ==========================================
+
+# Retrieves all platform categories (e.g., for dropdowns and filtering)
+query ListCategories @auth(level: PUBLIC, insecureReason: "Categories are public taxonomy data.") {
+  categories(orderBy: [{ name: ASC }]) {
+    id
+    name
+    description
+  }
+}
+
 # Lists all published courses available for public discovery
 query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
   courses(
     where: { 
       status: { eq: PUBLISHED },
       deletedAt: { eq: null } 
+    }, 
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    title
+    price
+    level
+    thumbnail
+    tags
+    avgRating
+    ratingCount
+    category { name } 
+    author { name avatar }
+  }
+}
+
+# Searches published courses strictly by their title
+query SearchPublishedCourses($searchQuery: String!) @auth(level: PUBLIC, insecureReason: "Safe for public course discovery.") {
+  courses(
+    where: { 
+      status: { eq: PUBLISHED },
+      deletedAt: { eq: null },
+      title: { contains: $searchQuery }
     }, 
     orderBy: [{ createdAt: DESC }]
   ) {
@@ -25,10 +61,13 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
     title
     description
     language
-    courseSections_on_course(orderBy: [{ order: ASC }]) {
+    publishedSections: courseSections_on_course(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
       id
       title
-      courseLectures_on_section(
+      publishedLectures: courseLectures_on_section(
         where: { deletedAt: { eq: null } }, 
         orderBy: [{ order: ASC }]
       ) {
@@ -41,4 +80,225 @@ query GetCourseCurriculum($courseId: UUID!) @auth(level: USER) {
       }
     }
   }
+}
+
+# Retrieves a specific lecture's content for playback
+query GetLectureContent($lectureId: UUID!) @auth(level: USER) {
+  courseLecture(id: $lectureId) {
+    id
+    title
+    type
+    videoUrl
+    content
+    duration
+    transcriptUrl
+    isFreePreview
+    section {
+      course {
+        id
+        author { id }
+        createdBy { id }
+      }
+    }
+  }
+}
+
+# Retrieves the authenticated user's progress for a specific lecture
+query GetUserLectureProgress($lectureId: UUID!) @auth(level: USER) {
+  lectureProgresses(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      lectureId: { eq: $lectureId }
+    }
+  ) {
+    lastWatchedSecond
+    completedAt
+  }
+}
+
+# Retrieves all lecture progress for a user within a specific course
+query GetMyCourseProgress($courseId: UUID!) @auth(level: USER) {
+  sections: courseSections(
+    where: { courseId: { eq: $courseId }, deletedAt: { eq: null } },
+    orderBy: [{ order: ASC }]
+  ) {
+    id
+    title
+    progressLectures: courseLectures_on_section(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
+      id
+      title
+      userProgress: lectureProgresses_on_lecture(
+        where: { userId: { eq_expr: "auth.uid" } }
+      ) {
+        completedAt
+      }
+    }
+  }
+}
+
+# Minimal course facts for enrollment eligibility checks
+query GetCourseForEnrollment($courseId: UUID!) @auth(level: USER) {
+  course(id: $courseId) {
+    id
+    status
+    price
+    deletedAt
+  }
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — COURSE MANAGEMENT
+# ==========================================
+
+# Retrieves full course details for authoring purposes (includes drafts)
+query AdminGetCourse($courseId: UUID!) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  course(id: $courseId) {
+    id title description price status language level thumbnail tags deletedAt createdAt updatedAt
+    category { id name }
+    author { id name email avatar }
+    createdBy { id name }
+    instructors: courseInstructors_on_course {
+      user { id name email avatar }
+    }
+    adminSections: courseSections_on_course(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
+      id title order
+      adminLectures: courseLectures_on_section(
+        where: { deletedAt: { eq: null } },
+        orderBy: [{ order: ASC }]
+      ) {
+        id title type videoUrl content duration transcriptUrl isFreePreview order
+      }
+    }
+  }
+}
+
+# Lists all courses authored by the authenticated user
+query AdminListMyCourses 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courses(
+    where: {
+      authorId: { eq_expr: "auth.uid" },
+      deletedAt: { eq: null }
+    },
+    orderBy: [{ updatedAt: DESC }]
+  ) {
+    id title status level thumbnail price updatedAt category { name }
+  }
+}
+
+# Updates course metadata
+mutation AdminUpdateCourse(
+  $courseId: UUID!, $title: String, $description: String, $price: Int, $language: String, $level: CourseLevel, $categoryId: UUID, $tags: [String!], $thumbnail: String
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  course_update(
+    id: $courseId,
+    data: {
+      title: $title, description: $description, price: $price, language: $language, level: $level, categoryId: $categoryId, tags: $tags, thumbnail: $thumbnail, updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# Transitions course status (DRAFT -> PUBLISHED -> ARCHIVED)
+mutation AdminUpdateCourseStatus(
+  $courseId: UUID!, $status: CourseStatus!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  course_update(
+    id: $courseId,
+    data: {
+      status: $status, updatedAt_expr: "request.time"
+    }
+  )
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — SECTION MANAGEMENT
+# ==========================================
+
+mutation AdminCreateSection(
+  $courseId: UUID!, $title: String!, $order: Int!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseSection_insert(data: { courseId: $courseId, title: $title, order: $order })
+}
+
+mutation AdminUpdateSection(
+  $sectionId: UUID!, $title: String!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseSection_update(id: $sectionId, data: { title: $title, updatedAt_expr: "request.time" })
+}
+
+mutation AdminSoftDeleteSection($sectionId: UUID!) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseSection_update(id: $sectionId, data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" })
+}
+
+mutation AdminUpdateSectionOrder(
+  $sectionId: UUID!, $order: Int!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseSection_update(id: $sectionId, data: { order: $order, updatedAt_expr: "request.time" })
+}
+
+# ==========================================
+# ADMIN / INSTRUCTOR — LECTURE MANAGEMENT
+# ==========================================
+
+mutation AdminCreateLectureFull(
+  $sectionId: UUID!, $title: String!, $type: LectureType!, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean!, $order: Int!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_insert(
+    data: {
+      sectionId: $sectionId, title: $title, type: $type, videoUrl: $videoUrl, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, order: $order
+    }
+  )
+}
+
+mutation AdminUpdateLecture(
+  $lectureId: UUID!, $title: String, $type: LectureType, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_update(
+    id: $lectureId,
+    data: {
+      title: $title, type: $type, videoUrl: $videoUrl, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, updatedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation AdminSoftDeleteLecture($lectureId: UUID!) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_update(id: $lectureId, data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" })
+}
+
+mutation AdminUpdateLectureOrder(
+  $lectureId: UUID!, $order: Int!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_update(id: $lectureId, data: { order: $order, updatedAt_expr: "request.time" })
+}
+
+mutation AdminMoveLectureToSection(
+  $lectureId: UUID!, $newSectionId: UUID!, $order: Int!
+) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_update(id: $lectureId, data: { sectionId: $newSectionId, order: $order, updatedAt_expr: "request.time" })
+}
+
+mutation AdminSoftDeleteLecturesBySection($sectionId: UUID!) 
+@auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
+  courseLecture_updateMany(
+    where: { sectionId: { eq: $sectionId }, deletedAt: { eq: null } },
+    data: { deletedAt_expr: "request.time", updatedAt_expr: "request.time" }
+  )
 }

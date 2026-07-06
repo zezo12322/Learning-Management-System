@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.AdminCreateCourse(adminCreateCourseVariables).execute();
-DefaultConnector.instance.AdminDeleteCourse(adminDeleteCourseVariables).execute();
-DefaultConnector.instance.AdminCreateCourseSection(adminCreateCourseSectionVariables).execute();
-DefaultConnector.instance.AdminCreateLecture(adminCreateLectureVariables).execute();
-DefaultConnector.instance.InstructorCourses().execute();
-DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
-DefaultConnector.instance.AdminCancelSession(adminCancelSessionVariables).execute();
-DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
-DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
-DefaultConnector.instance.ListSubscriptionTiers().execute();
+DefaultConnector.instance.GetQuizQuestions(getQuizQuestionsVariables).execute();
+DefaultConnector.instance.StartQuizAttempt(startQuizAttemptVariables).execute();
+DefaultConnector.instance.SubmitQuizAnswer(submitQuizAnswerVariables).execute();
+DefaultConnector.instance.FinishQuizAttemptIfOpen(finishQuizAttemptIfOpenVariables).execute();
+DefaultConnector.instance.GetExpiredAttempts().execute();
+DefaultConnector.instance.GetUserQuizAttempts(getUserQuizAttemptsVariables).execute();
+DefaultConnector.instance.GetQuizAttemptById(getQuizAttemptByIdVariables).execute();
+DefaultConnector.instance.GetQuizQuestionPoints(getQuizQuestionPointsVariables).execute();
+DefaultConnector.instance.GetAttemptAnswersWithCorrect(getAttemptAnswersWithCorrectVariables).execute();
+DefaultConnector.instance.GetQuizSettings(getQuizSettingsVariables).execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.UpdateLectureProgress({ ... })
-.completedAt(...)
+await DefaultConnector.instance.AdminUpdateRubricCriterion({ ... })
+.criterionName(...)
 .execute();
 ```
 

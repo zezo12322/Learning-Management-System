@@ -15,7 +15,7 @@ class SignUpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(),
+      appBar: const CustomAppBar(),
       extendBodyBehindAppBar: true,
       body: Center(
         child: SingleChildScrollView(

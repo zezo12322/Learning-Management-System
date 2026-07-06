@@ -1,4 +1,3 @@
-# Upserts the authenticated user's core details
 mutation SyncUser(
   $email: String!, 
   $name: String!, 
@@ -15,21 +14,12 @@ mutation SyncUser(
   )
 }
 
-# Retrieves all associated data for the currently authenticated user
 query GetMe @auth(level: USER) {
   user(id_expr: "auth.uid") {
-    id
-    email
-    name
-    avatar
-    createdAt
-    lastLogin
-    profile_on_user { bio company phone syncedPreferences }
-    userRoles_on_user { role { name } }
+    id email name avatar createdAt lastLogin profile_on_user { bio company phone syncedPreferences } userRoles_on_user { role { name } }
   }
 }
 
-# Updates the extended profile information of the authenticated user
 mutation UpdateMyProfile($bio: String, $company: String, $phone: String, $preferences: Any) @auth(level: USER) {
   profile_upsert(
     data: {

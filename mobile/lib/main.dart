@@ -11,6 +11,7 @@ import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
+import 'features/profile/presentation/manager/theme/theme_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding
@@ -38,8 +39,10 @@ Future<void> main() async {
       ],
       path: AppConstants.translationsPath,
       fallbackLocale: const Locale('en'),
-      startLocale: const Locale('en'),
-      child: const OptimaTechLMS(),
+      child: BlocProvider(
+        create: (context) => getIt<ThemeCubit>()..loadTheme(),
+        child: const OptimaTechLMS(),
+      ),
     ),
   );
 }
@@ -54,19 +57,23 @@ class OptimaTechLMS extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // Localization
-          locale: context.locale,
-          supportedLocales: context.supportedLocales,
-          localizationsDelegates: context.localizationDelegates,
-          // Theme
-          themeMode: ThemeMode.dark,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          // Routing
-          onGenerateRoute: generateRoute,
-          initialRoute: SplashView.routeName,
+        return BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              // Localization
+              locale: context.locale,
+              supportedLocales: context.supportedLocales,
+              localizationsDelegates: context.localizationDelegates,
+              // Theme
+              themeMode: themeMode,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              // Routing
+              onGenerateRoute: generateRoute,
+              initialRoute: SplashView.routeName,
+            );
+          },
         );
       },
     );

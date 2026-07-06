@@ -4,7 +4,6 @@ import 'package:optimatech_lms/features/home/data/models/recommended_course_mode
 import 'package:optimatech_lms/features/home/data/models/student_progress_model.dart';
 
 abstract class HomeRemoteDataSource {
-  // Fetches the student's progress for the course they are currently learning.
   Future<StudentProgressModel?> getContinueLearningCourses();
   Future<List<PopularCourseModel>> getPopularCourses();
   Future<List<RecommendedCourseModel>> getRecommendedCourses();
@@ -33,20 +32,21 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
         );
       }
 
-      final totalLessons = curriculum.courseSections_on_course.fold<int>(
+      final totalLessons = curriculum.publishedSections.fold<int>(
         0,
-        (sum, section) => sum + section.courseLectures_on_section.length,
+        (sum, section) => sum + section.publishedLectures.length,
       );
-      final totalDurationMinutes =
-          curriculum.courseSections_on_course.fold<int>(
+
+      final totalDurationMinutes = curriculum.publishedSections.fold<int>(
         0,
         (sum, section) =>
             sum +
-            section.courseLectures_on_section.fold<int>(
+            section.publishedLectures.fold<int>(
               0,
               (lectureSum, lecture) => lectureSum + (lecture.duration ?? 0),
             ),
       );
+
       final timeLeft =
           totalDurationMinutes > 0 ? '$totalDurationMinutes min' : '0 min';
 
@@ -63,33 +63,33 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
 
   @override
   Future<List<PopularCourseModel>> getPopularCourses() async {
-    final response =
-        await DefaultConnector.instance.listPublishedCourses().execute();
-    final data = response.data;
-    if (data.courses.isEmpty) {
+    try {
+      final response =
+          await DefaultConnector.instance.listPublishedCourses().execute();
+      final data = response.data;
+      if (data.courses.isEmpty) return [];
+
+      return data.courses
+          .map((e) => PopularCourseModel.fromDataConnect(e.toJson()))
+          .toList();
+    } catch (_) {
       return [];
     }
-
-    return data.courses
-        .map(
-          (e) => PopularCourseModel.fromDataConnect(e.toJson()),
-        )
-        .toList();
   }
 
   @override
   Future<List<RecommendedCourseModel>> getRecommendedCourses() async {
-    final response =
-        await DefaultConnector.instance.listPublishedCourses().execute();
-    final data = response.data;
-    if (data.courses.isEmpty) {
+    try {
+      final response =
+          await DefaultConnector.instance.listPublishedCourses().execute();
+      final data = response.data;
+      if (data.courses.isEmpty) return [];
+
+      return data.courses
+          .map((e) => RecommendedCourseModel.fromDataConnect(e.toJson()))
+          .toList();
+    } catch (_) {
       return [];
     }
-
-    return data.courses
-        .map(
-          (e) => RecommendedCourseModel.fromDataConnect(e.toJson()),
-        )
-        .toList();
   }
 }
