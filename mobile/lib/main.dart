@@ -14,7 +14,8 @@ import 'package:optimatech_lms/features/splash/presentation/views/splash_view.da
 import 'features/profile/presentation/manager/theme/theme_cubit.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure Flutter bindings are initialized (required for async operations in main)
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -59,19 +60,19 @@ class OptimaTechLMS extends StatelessWidget {
         return BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, themeMode) {
             return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            // Localization
-            locale: context.locale,
-            supportedLocales: context.supportedLocales,
-            localizationsDelegates: context.localizationDelegates,
-            // Theme
-            themeMode: themeMode,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            // Routing
-            onGenerateRoute: generateRoute,
-            initialRoute: SplashView.routeName,
-          );
+              debugShowCheckedModeBanner: false,
+              // Localization
+              locale: context.locale,
+              supportedLocales: context.supportedLocales,
+              localizationsDelegates: context.localizationDelegates,
+              // Theme
+              themeMode: themeMode,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              // Routing
+              onGenerateRoute: generateRoute,
+              initialRoute: SplashView.routeName,
+            );
           },
         );
       },

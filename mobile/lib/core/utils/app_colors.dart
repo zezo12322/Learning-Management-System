@@ -15,6 +15,7 @@ abstract class AppColors {
   static const Color textPrimary = Color(0xff0F172A);
   static const Color textSecondary = Color(0xff64748B);
   static const Color border = Color(0xffE2E8F0);
+
   // =========================
   // Dark Theme
   // =========================
@@ -33,6 +34,8 @@ abstract class AppColors {
   // Common
   // =========================
   static const Color placeholder = Color(0xff6B7280);
+  static const Color whiteColor = Color(0xffFFFFFF);
+  static const Color greyColor = Color(0xff9E9E9E);
   static const Color disablePlaceholder = Color(0xff9CA3AF);
-
+  static const Color blackColor = Color(0xff000000);
 }
