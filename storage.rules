@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// Secure-by-default Storage rules for the LMS.
+//
+// The backend is the ONLY path to bucket content:
+//   - It uploads/reads via the Admin SDK, which bypasses these rules entirely.
+//   - Clients receive short-lived V4 *signed URLs* (also independent of these
+//     rules) for the specific objects they're allowed to read.
+//
+// Therefore every direct client SDK request is denied. This is what prevents
+// learners from constructing a stable download URL for a lecture video, HLS
+// segment, or the AES-128 content key. Public assets (e.g. course thumbnails)
+// are served via their public GCS URL, which likewise does not consult rules.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

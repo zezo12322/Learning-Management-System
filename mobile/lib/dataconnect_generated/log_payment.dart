@@ -5,13 +5,14 @@ class LogPaymentVariablesBuilder {
   String referenceId;
   int amount;
   Optional<String> _currency = Optional.optional(nativeFromJson, nativeToJson);
+  String customerEmailSnapshot;
 
   final FirebaseDataConnect _dataConnect;  LogPaymentVariablesBuilder currency(String? t) {
    _currency.value = t;
    return this;
   }
 
-  LogPaymentVariablesBuilder(this._dataConnect, {required  this.gateway,required  this.referenceId,required  this.amount,});
+  LogPaymentVariablesBuilder(this._dataConnect, {required  this.gateway,required  this.referenceId,required  this.amount,required  this.customerEmailSnapshot,});
   Deserializer<LogPaymentData> dataDeserializer = (dynamic json)  => LogPaymentData.fromJson(jsonDecode(json));
   Serializer<LogPaymentVariables> varsSerializer = (LogPaymentVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<LogPaymentData, LogPaymentVariables>> execute() {
@@ -19,7 +20,7 @@ class LogPaymentVariablesBuilder {
   }
 
   MutationRef<LogPaymentData, LogPaymentVariables> ref() {
-    LogPaymentVariables vars= LogPaymentVariables(gateway: gateway,referenceId: referenceId,amount: amount,currency: _currency,);
+    LogPaymentVariables vars= LogPaymentVariables(gateway: gateway,referenceId: referenceId,amount: amount,currency: _currency,customerEmailSnapshot: customerEmailSnapshot,);
     return _dataConnect.mutation("LogPayment", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -98,12 +99,14 @@ class LogPaymentVariables {
   final String referenceId;
   final int amount;
   late final Optional<String>currency;
+  final String customerEmailSnapshot;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   LogPaymentVariables.fromJson(Map<String, dynamic> json):
   
   gateway = PaymentGateway.values.byName(json['gateway']),
   referenceId = nativeFromJson<String>(json['referenceId']),
-  amount = nativeFromJson<int>(json['amount']) {
+  amount = nativeFromJson<int>(json['amount']),
+  customerEmailSnapshot = nativeFromJson<String>(json['customerEmailSnapshot']) {
   
   
   
@@ -111,6 +114,7 @@ class LogPaymentVariables {
   
     currency = Optional.optional(nativeFromJson, nativeToJson);
     currency.value = json['currency'] == null ? null : nativeFromJson<String>(json['currency']);
+  
   
   }
   @override
@@ -126,11 +130,12 @@ class LogPaymentVariables {
     return gateway == otherTyped.gateway && 
     referenceId == otherTyped.referenceId && 
     amount == otherTyped.amount && 
-    currency == otherTyped.currency;
+    currency == otherTyped.currency && 
+    customerEmailSnapshot == otherTyped.customerEmailSnapshot;
     
   }
   @override
-  int get hashCode => Object.hashAll([gateway.hashCode, referenceId.hashCode, amount.hashCode, currency.hashCode]);
+  int get hashCode => Object.hashAll([gateway.hashCode, referenceId.hashCode, amount.hashCode, currency.hashCode, customerEmailSnapshot.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -143,6 +148,7 @@ class LogPaymentVariables {
     if(currency.state == OptionalState.set) {
       json['currency'] = currency.toJson();
     }
+    json['customerEmailSnapshot'] = nativeToJson<String>(customerEmailSnapshot);
     return json;
   }
 
@@ -151,6 +157,7 @@ class LogPaymentVariables {
     required this.referenceId,
     required this.amount,
     required this.currency,
+    required this.customerEmailSnapshot,
   });
 }
 

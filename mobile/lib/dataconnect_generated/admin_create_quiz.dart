@@ -4,8 +4,13 @@ class AdminCreateQuizVariablesBuilder {
   String lectureId;
   double passingScore;
   int maxAttempts;
+  Optional<int> _timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
 
-  final FirebaseDataConnect _dataConnect;
+  final FirebaseDataConnect _dataConnect;  AdminCreateQuizVariablesBuilder timeLimitMinutes(int? t) {
+   _timeLimitMinutes.value = t;
+   return this;
+  }
+
   AdminCreateQuizVariablesBuilder(this._dataConnect, {required  this.lectureId,required  this.passingScore,required  this.maxAttempts,});
   Deserializer<AdminCreateQuizData> dataDeserializer = (dynamic json)  => AdminCreateQuizData.fromJson(jsonDecode(json));
   Serializer<AdminCreateQuizVariables> varsSerializer = (AdminCreateQuizVariables vars) => jsonEncode(vars.toJson());
@@ -14,7 +19,7 @@ class AdminCreateQuizVariablesBuilder {
   }
 
   MutationRef<AdminCreateQuizData, AdminCreateQuizVariables> ref() {
-    AdminCreateQuizVariables vars= AdminCreateQuizVariables(lectureId: lectureId,passingScore: passingScore,maxAttempts: maxAttempts,);
+    AdminCreateQuizVariables vars= AdminCreateQuizVariables(lectureId: lectureId,passingScore: passingScore,maxAttempts: maxAttempts,timeLimitMinutes: _timeLimitMinutes,);
     return _dataConnect.mutation("AdminCreateQuiz", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -92,12 +97,22 @@ class AdminCreateQuizVariables {
   final String lectureId;
   final double passingScore;
   final int maxAttempts;
+  late final Optional<int>timeLimitMinutes;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   AdminCreateQuizVariables.fromJson(Map<String, dynamic> json):
   
   lectureId = nativeFromJson<String>(json['lectureId']),
   passingScore = nativeFromJson<double>(json['passingScore']),
-  maxAttempts = nativeFromJson<int>(json['maxAttempts']);
+  maxAttempts = nativeFromJson<int>(json['maxAttempts']) {
+  
+  
+  
+  
+  
+    timeLimitMinutes = Optional.optional(nativeFromJson, nativeToJson);
+    timeLimitMinutes.value = json['timeLimitMinutes'] == null ? null : nativeFromJson<int>(json['timeLimitMinutes']);
+  
+  }
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -110,11 +125,12 @@ class AdminCreateQuizVariables {
     final AdminCreateQuizVariables otherTyped = other as AdminCreateQuizVariables;
     return lectureId == otherTyped.lectureId && 
     passingScore == otherTyped.passingScore && 
-    maxAttempts == otherTyped.maxAttempts;
+    maxAttempts == otherTyped.maxAttempts && 
+    timeLimitMinutes == otherTyped.timeLimitMinutes;
     
   }
   @override
-  int get hashCode => Object.hashAll([lectureId.hashCode, passingScore.hashCode, maxAttempts.hashCode]);
+  int get hashCode => Object.hashAll([lectureId.hashCode, passingScore.hashCode, maxAttempts.hashCode, timeLimitMinutes.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -122,6 +138,9 @@ class AdminCreateQuizVariables {
     json['lectureId'] = nativeToJson<String>(lectureId);
     json['passingScore'] = nativeToJson<double>(passingScore);
     json['maxAttempts'] = nativeToJson<int>(maxAttempts);
+    if(timeLimitMinutes.state == OptionalState.set) {
+      json['timeLimitMinutes'] = timeLimitMinutes.toJson();
+    }
     return json;
   }
 
@@ -129,6 +148,7 @@ class AdminCreateQuizVariables {
     required this.lectureId,
     required this.passingScore,
     required this.maxAttempts,
+    required this.timeLimitMinutes,
   });
 }
 

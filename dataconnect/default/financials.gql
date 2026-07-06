@@ -1,13 +1,14 @@
-# Logs a pending payment transaction
 mutation LogPayment(
   $gateway: PaymentGateway!, 
   $referenceId: String!,
   $amount: Int!,
-  $currency: String = "EGP"
+  $currency: String = "EGP",
+  $customerEmailSnapshot: String!
 ) @auth(level: USER) { 
   payment_insert(
     data: {
       userId_expr: "auth.uid",
+      customerEmailSnapshot: $customerEmailSnapshot,
       gateway: $gateway,
       status: PENDING,
       referenceId: $referenceId,
@@ -17,7 +18,6 @@ mutation LogPayment(
   )
 }
 
-# Associates purchased items with a specific payment record
 mutation AddPaymentItem(
   $paymentId: UUID!,
   $targetType: PaymentItemTarget!,
@@ -38,22 +38,8 @@ mutation AddPaymentItem(
   )
 }
 
-# Retrieves the authenticated user's payment history
 query MyPaymentHistory @auth(level: USER) {
   payments(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ createdAt: DESC }]) {
-    id
-    gateway
-    status
-    amount
-    currency
-    referenceId
-    createdAt
-    paymentItems_on_payment { 
-      targetType
-      priceAtPurchase
-      course { title }
-      mission { title }
-      subscriptionTier { name }
-    }
+    id customerEmailSnapshot gateway status amount currency referenceId createdAt paymentItems_on_payment { targetType priceAtPurchase course { title } mission { title } subscriptionTier { name } }
   }
 }

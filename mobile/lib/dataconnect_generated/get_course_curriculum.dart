@@ -23,15 +23,15 @@ class GetCourseCurriculumCourse {
   final String title;
   final String? description;
   final String language;
-  final List<GetCourseCurriculumCourseCourseSectionsOnCourse> courseSections_on_course;
+  final List<GetCourseCurriculumCoursePublishedSections> publishedSections;
   GetCourseCurriculumCourse.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   title = nativeFromJson<String>(json['title']),
   description = json['description'] == null ? null : nativeFromJson<String>(json['description']),
   language = nativeFromJson<String>(json['language']),
-  courseSections_on_course = (json['courseSections_on_course'] as List<dynamic>)
-        .map((e) => GetCourseCurriculumCourseCourseSectionsOnCourse.fromJson(e))
+  publishedSections = (json['publishedSections'] as List<dynamic>)
+        .map((e) => GetCourseCurriculumCoursePublishedSections.fromJson(e))
         .toList();
   @override
   bool operator ==(Object other) {
@@ -47,11 +47,11 @@ class GetCourseCurriculumCourse {
     title == otherTyped.title && 
     description == otherTyped.description && 
     language == otherTyped.language && 
-    courseSections_on_course == otherTyped.courseSections_on_course;
+    publishedSections == otherTyped.publishedSections;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, description.hashCode, language.hashCode, courseSections_on_course.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, description.hashCode, language.hashCode, publishedSections.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -62,7 +62,7 @@ class GetCourseCurriculumCourse {
       json['description'] = nativeToJson<String?>(description);
     }
     json['language'] = nativeToJson<String>(language);
-    json['courseSections_on_course'] = courseSections_on_course.map((e) => e.toJson()).toList();
+    json['publishedSections'] = publishedSections.map((e) => e.toJson()).toList();
     return json;
   }
 
@@ -71,21 +71,21 @@ class GetCourseCurriculumCourse {
     required this.title,
     this.description,
     required this.language,
-    required this.courseSections_on_course,
+    required this.publishedSections,
   });
 }
 
 @immutable
-class GetCourseCurriculumCourseCourseSectionsOnCourse {
+class GetCourseCurriculumCoursePublishedSections {
   final String id;
   final String title;
-  final List<GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection> courseLectures_on_section;
-  GetCourseCurriculumCourseCourseSectionsOnCourse.fromJson(dynamic json):
+  final List<GetCourseCurriculumCoursePublishedSectionsPublishedLectures> publishedLectures;
+  GetCourseCurriculumCoursePublishedSections.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   title = nativeFromJson<String>(json['title']),
-  courseLectures_on_section = (json['courseLectures_on_section'] as List<dynamic>)
-        .map((e) => GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection.fromJson(e))
+  publishedLectures = (json['publishedLectures'] as List<dynamic>)
+        .map((e) => GetCourseCurriculumCoursePublishedSectionsPublishedLectures.fromJson(e))
         .toList();
   @override
   bool operator ==(Object other) {
@@ -96,40 +96,40 @@ class GetCourseCurriculumCourseCourseSectionsOnCourse {
       return false;
     }
 
-    final GetCourseCurriculumCourseCourseSectionsOnCourse otherTyped = other as GetCourseCurriculumCourseCourseSectionsOnCourse;
+    final GetCourseCurriculumCoursePublishedSections otherTyped = other as GetCourseCurriculumCoursePublishedSections;
     return id == otherTyped.id && 
     title == otherTyped.title && 
-    courseLectures_on_section == otherTyped.courseLectures_on_section;
+    publishedLectures == otherTyped.publishedLectures;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, courseLectures_on_section.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, title.hashCode, publishedLectures.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['title'] = nativeToJson<String>(title);
-    json['courseLectures_on_section'] = courseLectures_on_section.map((e) => e.toJson()).toList();
+    json['publishedLectures'] = publishedLectures.map((e) => e.toJson()).toList();
     return json;
   }
 
-  GetCourseCurriculumCourseCourseSectionsOnCourse({
+  GetCourseCurriculumCoursePublishedSections({
     required this.id,
     required this.title,
-    required this.courseLectures_on_section,
+    required this.publishedLectures,
   });
 }
 
 @immutable
-class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
+class GetCourseCurriculumCoursePublishedSectionsPublishedLectures {
   final String id;
   final String title;
   final EnumValue<LectureType> type;
   final String? content;
   final int? duration;
   final bool isFreePreview;
-  GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection.fromJson(dynamic json):
+  GetCourseCurriculumCoursePublishedSectionsPublishedLectures.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   title = nativeFromJson<String>(json['title']),
@@ -146,7 +146,7 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
       return false;
     }
 
-    final GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection otherTyped = other as GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection;
+    final GetCourseCurriculumCoursePublishedSectionsPublishedLectures otherTyped = other as GetCourseCurriculumCoursePublishedSectionsPublishedLectures;
     return id == otherTyped.id && 
     title == otherTyped.title && 
     type == otherTyped.type && 
@@ -176,7 +176,7 @@ class GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection {
     return json;
   }
 
-  GetCourseCurriculumCourseCourseSectionsOnCourseCourseLecturesOnSection({
+  GetCourseCurriculumCoursePublishedSectionsPublishedLectures({
     required this.id,
     required this.title,
     required this.type,

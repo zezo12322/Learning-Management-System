@@ -6,6 +6,7 @@ pglite-debug.log
 /.firebase
 /dataconnect/.dataconnect
 **/dataconnect-admin-generated/
+learning-management-syst-3cc3a-firebase-adminsdk-fbsvc-c8e63b4d9f.json
 
 # AI / Agents
 /.agents
@@ -25,6 +26,10 @@ web/.turbo/
 coverage/
 .eslintcache
 *.tsbuildinfo
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.* 
 
 # Flutter / Mobile
 mobile/.dart_tool/

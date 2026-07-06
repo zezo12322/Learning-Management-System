@@ -13,7 +13,15 @@
     "search": "بحث",
     "close": "إغلاق",
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "dialog": {
+      "error_title": "خطأ",
+      "success_title": "نجح",
+      "warning_title": "تحذير",
+      "ok": "حسناً",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء"
+    }
   },
   "errors": {
     "network": "لا يوجد اتصال بالإنترنت. تحقق من الشبكة.",
@@ -100,5 +108,113 @@
     "not_found": "الصفحة غير موجودة",
     "not_found_msg": "المسار الذي طلبته غير موجود.",
     "go_home": "الذهاب للرئيسية"
+  },
+  "courses": {
+    "title": "الكورسات",
+    "searchHint": "ابحث عن كورسات أو دروس أو اختبارات...",
+    "categories": {
+      "title": "التصنيفات",
+      "viewAll": "عرض الكل",
+      "empty": "لا توجد تصنيفات"
+    },
+    "list": {
+      "empty": "لا توجد كورسات",
+      "lessonsCount": "{count} درس"
+    },
+    "filters": {
+      "all": "الكل",
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "status": {
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "errors": {
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "filterSheet": {
+      "title": "تصفية",
+      "courseStatus": "حالة الكورس",
+      "sortBy": "الترتيب حسب",
+      "reset": "إعادة تعيين",
+      "apply": "تطبيق"
+    },
+    "sort": {
+      "newest": "الأحدث",
+      "oldest": "الأقدم",
+      "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
+      "priceHighToLow": "السعر: من الأعلى إلى الأقل"
+    }
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "common": {
+      "edit": "تعديل",
+      "view_all": "عرض الكل"
+    },
+    "header": {
+      "role": "طالب",
+      "joined": "انضم في مارس 2024",
+      "stats": {
+        "courses": "الكورسات المسجل بها",
+        "courses_subtitle": "تعلّم نشط",
+        "hours": "ساعات التعلّم",
+        "hours_subtitle": "+12 هذا الأسبوع",
+        "assessments": "التقييمات المكتملة",
+        "assessments_subtitle": "متوسط 85%",
+        "certificates": "الشهادات المكتسبة",
+        "certificates_subtitle": "استمر!"
+      }
+    },
+    "sections": {
+      "user_information": "معلومات المستخدم",
+      "learning_statistics": "إحصائيات التعلّم",
+      "certificates": "الشهادات",
+      "completed_courses": "الكورسات المكتملة",
+      "settings": "الإعدادات"
+    },
+    "info": {
+      "full_name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "location": "الموقع",
+      "birth_date": "تاريخ الميلاد"
+    },
+    "statistics": {
+      "hours": "ساعات التعلّم",
+      "hours_subtitle": "+12 هذا الأسبوع",
+      "courses": "الكورسات المسجل بها",
+      "courses_subtitle": "تعلّم نشط",
+      "certificates": "الشهادات",
+      "certificates_subtitle": "مكتملة",
+      "assessments": "التقييمات",
+      "assessments_subtitle": "متوسط 85%"
+    },
+    "certificates": {
+      "issued_on": "تم الإصدار في {date}",
+      "verified": "موثقة"
+    },
+    "completed_courses": {
+      "completed_on": "اكتمل في {date}",
+      "completed": "مكتمل"
+    },
+    "settings": {
+      "account": "إعدادات الحساب",
+      "notifications": "تفضيلات الإشعارات",
+      "privacy": "الخصوصية والأمان",
+      "help": "المساعدة والدعم",
+      "logout": "تسجيل الخروج",
+      "logout_dialog": "تسجيل الخروج؟",
+      "log_out_confirmation": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+      "language": "اللغة",
+      "select_language": "اختر اللغة",
+      "change_Theme": " تغيير المظهر",
+      "select_theme": "اختر المظهر"
+    }
   }
 }
