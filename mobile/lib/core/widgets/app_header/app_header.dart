@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -34,7 +35,7 @@ class AppHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome back, 👋',
+                '${'home.welcome'.tr()}, 👋',
                 style: TextStyles.bodySmall.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

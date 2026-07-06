@@ -31,18 +31,6 @@ import 'package:optimatech_lms/features/home/presentation/manager/home_courses_c
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
   // ========================= Auth Feature =========================
-  getIt.registerLazySingleton<FirebaseAuthService>(
-    () => FirebaseAuthService(),
-  );
-  getIt.registerLazySingleton<FireStoreService>(
-    () => FireStoreService(),
-  );
-  getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      firebaseAuthService: getIt<FirebaseAuthService>(),
-      fireStoreService: getIt<FireStoreService>(),
-    ),
-  );
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 

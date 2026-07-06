@@ -1,0 +1,60 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
+import 'package:optimatech_lms/features/home/presentation/widgets/popular_course_card.dart';
+import '../../domain/entities/course_entity.dart';
+
+// Color palette for popular course card headers (cycles through these)
+const _popularCardColors = [
+  AppColors.primary,
+  AppColors.secondary,
+  AppColors.warning,
+  AppColors.darkPrimary,
+];
+
+// Icon palette for popular course card headers (cycles through these)
+const _popularCardIcons = [
+  Icons.palette_outlined,
+  Icons.lightbulb_outline_rounded,
+  Icons.code_rounded,
+  Icons.bar_chart_rounded,
+];
+
+// ------------- Popular Courses Section Builder (horizontal scroll) --------
+Widget buildPopularCoursesSection(List<CourseEntity> courses) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      HomeSectionHeader(
+        title: 'home.popular_courses'.tr(),
+        onViewAllTap: () {},
+      ),
+      Gap(14.h),
+      SizedBox(
+        height: 210.h,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          itemCount: courses.length,
+          separatorBuilder: (_, __) => Gap(12.w),
+          itemBuilder: (context, index) {
+            final course = courses[index];
+            return PopularCourseCard(
+              title: course.title,
+              studentCount: '${(index + 1) * 5}.${index}K ${'home.students'.tr()}',
+              rating: course.rating,
+              headerColor:
+              _popularCardColors[index % _popularCardColors.length],
+              icon: _popularCardIcons[index % _popularCardIcons.length],
+              image: course.image,
+              onTap: () {},
+            );
+          },
+        ),
+      ),
+    ],
+  );
+}

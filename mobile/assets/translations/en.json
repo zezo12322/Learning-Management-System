@@ -14,6 +14,11 @@
     "close": "Close",
     "yes": "Yes",
     "no": "No",
+    "error_widget": {
+      "title": "Something went wrong",
+      "default_message": "Please try again",
+      "retry_button": "Retry"
+    },
     "dialog": {
       "error_title": "Error",
       "success_title": "Success",
@@ -102,7 +107,35 @@
     }
   },
   "home": {
-    "welcome": "Welcome back"
+    "welcome": "Welcome back",
+    "continue_learning": "Continue Learning",
+    "popular_courses": "Popular Courses",
+    "recommended_courses": "Recommended Courses",
+    "assignments_missions": "Assignments / Missions",
+    "view_all": "View all",
+    "in_progress": "In Progress",
+    "students": "students",
+    "lessons": "lessons",
+    "of_lessons": "{completed} of {total} lessons",
+    "min_left": "{time} left",
+    "error_title": "Something went wrong",
+    "retry": "Try Again",
+    "assignments": {
+      "available": "Available",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "empty": "No Assignments",
+      "available_desc": "Open for submission",
+      "submitted_desc": "Awaiting review",
+      "graded_desc": "View feedback",
+      "empty_desc": "You are all caught up"
+    }
+  },
+  "nav_bar": {
+    "home": "Home",
+    "courses": "Courses",
+    "wishlist": "Wishlist",
+    "profile": "Profile"
   },
   "navigation": {
     "not_found": "Page Not Found",

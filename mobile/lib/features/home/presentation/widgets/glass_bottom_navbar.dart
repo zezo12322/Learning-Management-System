@@ -51,10 +51,10 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
-    final verticalPadding = 12.0 + bottomInset;
+    //final verticalPadding = 12.0 + bottomInset;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 25, vertical: verticalPadding),
+      padding: EdgeInsets.symmetric(horizontal: 25, vertical: bottomInset),
       child: Material(
         elevation: 10,
         shadowColor: context.theme.shadowColor.withValues(alpha: 0.25),

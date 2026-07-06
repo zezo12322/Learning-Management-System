@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -8,46 +9,47 @@ import 'package:optimatech_lms/features/home/presentation/widgets/home_section_h
 
 class AssignmentsSection extends StatelessWidget {
   const AssignmentsSection({super.key});
-  // TODO: List of assignments (hardcoded for now, can be replaced with dynamic data later)
-  static const _assignments = [
-    AssignmentModel(
-      count: 5,
-      status: 'Available',
-      description: 'Open for submission',
-      icon: Icons.description_outlined,
-      iconColor: AppColors.primary,
-    ),
-    AssignmentModel(
-      count: 3,
-      status: 'Submitted',
-      description: 'Awaiting review',
-      icon: Icons.send_outlined,
-      iconColor: AppColors.secondary,
-    ),
-    AssignmentModel(
-      count: 2,
-      status: 'Graded',
-      description: 'View feedback',
-      icon: Icons.check_circle_outline_rounded,
-      iconColor: AppColors.success,
-    ),
-    AssignmentModel(
-      count: 0,
-      status: 'No Assignments',
-      description: 'You are all caught up',
-      icon: Icons.inbox_outlined,
-      iconColor: AppColors.textSecondary,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    // TODO: List of assignments (hardcoded for now, can be replaced with dynamic data later)
+    final assignments = [
+      AssignmentModel(
+        count: 5,
+        status: 'home.assignments.available'.tr(),
+        description: 'home.assignments.available_desc'.tr(),
+        icon: Icons.description_outlined,
+        iconColor: Theme.of(context).colorScheme.primary,
+      ),
+      AssignmentModel(
+        count: 3,
+        status: 'home.assignments.available'.tr(),
+        description: 'home.assignments.available_desc'.tr(),
+        icon: Icons.send_outlined,
+        iconColor: Theme.of(context).colorScheme.secondary,
+      ),
+      AssignmentModel(
+        count: 2,
+        status: 'home.assignments.graded'.tr(),
+        description: 'home.assignments.graded_desc'.tr(),
+        icon: Icons.check_circle_outline_rounded,
+        iconColor: AppColors.success,
+      ),
+      AssignmentModel(
+        count: 0,
+        status: 'home.assignments.empty'.tr(),
+        description: 'home.assignments.empty_desc'.tr(),
+        icon: Icons.inbox_outlined,
+        iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ------------- Assignments / Missions Header -------------
         HomeSectionHeader(
-          title: 'Assignments / Missions',
+          title: 'home.assignments_missions'.tr(),
           onViewAllTap: () {},
         ),
         Gap(14.h),
@@ -56,10 +58,10 @@ class AssignmentsSection extends StatelessWidget {
           height: 168.h,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: _assignments.length,
+            itemCount: assignments.length,
             separatorBuilder: (_, __) => Gap(12.w),
             itemBuilder: (context, index) {
-              final assignment = _assignments[index];
+              final assignment = assignments[index];
               return AssignmentCard(
                 count: assignment.count,
                 status: assignment.status,
