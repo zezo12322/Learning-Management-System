@@ -14,38 +14,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { listCategories, listPublishedCourses, searchPublishedCourses, getCourseCurriculum, getLectureContent, getUserLectureProgress, getMyCourseProgress, getCourseForEnrollment, adminGetCourse, adminListMyCourses } from '@dataconnect/functions-generated';
+import { instructorDeleteCourse, superAdminDeleteCourse, adminCreateSession, instructorCancelSession, superAdminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, myCertificates, verifyCertificate } from '@dataconnect/functions-generated';
 
 
-// Operation ListCategories: 
-const { data } = await ListCategories(dataConnect);
+// Operation InstructorDeleteCourse:  For variables, look at type InstructorDeleteCourseVars in ../index.d.ts
+const { data } = await InstructorDeleteCourse(dataConnect, instructorDeleteCourseVars);
 
-// Operation ListPublishedCourses: 
-const { data } = await ListPublishedCourses(dataConnect);
+// Operation SuperAdminDeleteCourse:  For variables, look at type SuperAdminDeleteCourseVars in ../index.d.ts
+const { data } = await SuperAdminDeleteCourse(dataConnect, superAdminDeleteCourseVars);
 
-// Operation SearchPublishedCourses:  For variables, look at type SearchPublishedCoursesVars in ../index.d.ts
-const { data } = await SearchPublishedCourses(dataConnect, searchPublishedCoursesVars);
+// Operation AdminCreateSession:  For variables, look at type AdminCreateSessionVars in ../index.d.ts
+const { data } = await AdminCreateSession(dataConnect, adminCreateSessionVars);
 
-// Operation GetCourseCurriculum:  For variables, look at type GetCourseCurriculumVars in ../index.d.ts
-const { data } = await GetCourseCurriculum(dataConnect, getCourseCurriculumVars);
+// Operation InstructorCancelSession:  For variables, look at type InstructorCancelSessionVars in ../index.d.ts
+const { data } = await InstructorCancelSession(dataConnect, instructorCancelSessionVars);
 
-// Operation GetLectureContent:  For variables, look at type GetLectureContentVars in ../index.d.ts
-const { data } = await GetLectureContent(dataConnect, getLectureContentVars);
+// Operation SuperAdminCancelSession:  For variables, look at type SuperAdminCancelSessionVars in ../index.d.ts
+const { data } = await SuperAdminCancelSession(dataConnect, superAdminCancelSessionVars);
 
-// Operation GetUserLectureProgress:  For variables, look at type GetUserLectureProgressVars in ../index.d.ts
-const { data } = await GetUserLectureProgress(dataConnect, getUserLectureProgressVars);
+// Operation AdminCreateSubscriptionTier:  For variables, look at type AdminCreateSubscriptionTierVars in ../index.d.ts
+const { data } = await AdminCreateSubscriptionTier(dataConnect, adminCreateSubscriptionTierVars);
 
-// Operation GetMyCourseProgress:  For variables, look at type GetMyCourseProgressVars in ../index.d.ts
-const { data } = await GetMyCourseProgress(dataConnect, getMyCourseProgressVars);
+// Operation AdminDeprecateSubscriptionTier:  For variables, look at type AdminDeprecateSubscriptionTierVars in ../index.d.ts
+const { data } = await AdminDeprecateSubscriptionTier(dataConnect, adminDeprecateSubscriptionTierVars);
 
-// Operation GetCourseForEnrollment:  For variables, look at type GetCourseForEnrollmentVars in ../index.d.ts
-const { data } = await GetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars);
+// Operation AdminCreateCategory:  For variables, look at type AdminCreateCategoryVars in ../index.d.ts
+const { data } = await AdminCreateCategory(dataConnect, adminCreateCategoryVars);
 
-// Operation AdminGetCourse:  For variables, look at type AdminGetCourseVars in ../index.d.ts
-const { data } = await AdminGetCourse(dataConnect, adminGetCourseVars);
+// Operation MyCertificates: 
+const { data } = await MyCertificates(dataConnect);
 
-// Operation AdminListMyCourses: 
-const { data } = await AdminListMyCourses(dataConnect);
+// Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
+const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
 
 
 ```

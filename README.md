@@ -4,13 +4,15 @@
 
 ## 🏗️ هيكل المشروع (Monorepo)
 
+المشروع عبارة عن نظام متكامل (Modular Monolith) يتكون من الطبقات التالية:
+
 ```
 lms/
 ├── mobile/          # Flutter (iOS + Android)
 ├── web/             # Next.js (Web Platform)
-├── api/             # NestJS (Backend API)
-├── ai/              # Python FastAPI (AI Services) - قادم
-├── dataconnect/     # Firebase Data Connect (GraphQL Schema)
+├── backend/         # NestJS (Backend API - 21 Modules)
+├── functions/       # Firebase Cloud Functions (Auth triggers, Admin Tasks)
+├── dataconnect/     # Firebase Data Connect (PostgreSQL Schema & GraphQL)
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
@@ -21,8 +23,8 @@ lms/
 ### المتطلبات
 - Docker Desktop
 - Flutter SDK 3.x
-- Node.js 20+
-- pnpm
+- Node.js 20+ / 22+
+- npm / pnpm
 
 ### الخطوات
 
@@ -32,14 +34,14 @@ cp .env.example .env
 # عدّل .env وأضف قيمك الحقيقية
 ```
 
-#### 2. تشغيل قواعد البيانات
+#### 2. تشغيل قواعد البيانات والخدمات (PostgreSQL + Redis)
 ```bash
 docker compose up -d postgres redis
 ```
 
 #### 3. تشغيل الـ API
 ```bash
-cd api && npm install && npm run start:dev
+cd backend && npm install && npm run start:dev
 ```
 
 #### 4. تشغيل الـ Web
@@ -59,11 +61,36 @@ docker compose up -d
 docker compose --profile tools up -d
 ```
 
+## 🛠️ البنية التحتية والخدمات الخلفية (Backend & Firebase)
+
+لقد تم بناء الخدمات الخلفية بشكل قوي لتكون قابلة للتوسع وآمنة:
+
+### 1. `backend/` (NestJS API)
+يحتوي الباك إند على **21 Feature Module** مقسمة كالتالي:
+- **Identity & Access**: `AdminModule`, `UsersModule`
+- **Course Content**: `CoursesModule`, `SectionsModule`, `LecturesModule`
+- **Assessment**: `QuizzesModule` (مع auto-grading عبر cron jobs), `MissionsModule`, `RubricModule`, `TemplatesModule`, `SubmissionsModule`
+- **Engagement**: `EnrollmentModule`, `CatalogModule`, `RatingsModule`, `ProgressModule` (يعمل عبر `BullMQ`), `CompletionModule`
+- **Media Pipeline**: `UploadsModule` (Signed URLs), `TranscodingModule` (تحويل الفيديوهات إلى AES-128 HLS عبر `BullMQ`), `StreamingModule` (تأمين بث الفيديو مع Watermarking).
+
+### 2. `functions/` (Firebase Cloud Functions)
+دوال تعمل بدون خوادم (Serverless) مكتوبة بـ Node.js لمعالجة مهام محددة:
+- `syncClaims`: تعمل تلقائياً عند تسجيل مستخدم جديد (OAuth) لإنشاء سجل في PostgreSQL وإضافة الصلاحيات (Roles) للـ Token.
+- `registerStudent`: واجهة برمجة (Callable) لتسجيل الطلاب بشكل آمن وتشفير بياناتهم الحساسة (مثل National ID) باستخدام AES-256-GCM.
+- `changeUserRole`: واجهة للمشرف لتغيير صلاحيات المستخدمين (RBAC).
+- `cleanupUserData`: تعمل عند حذف المستخدم لمسح بياناته بشكل تسلسلي من قاعدة البيانات وStorage.
+
+### 3. `dataconnect/` (Firebase Data Connect & PostgreSQL)
+تعتمد المنصة على **Firebase Data Connect** للتعامل مع قاعدة بيانات **PostgreSQL** عن طريق **GraphQL**.
+- يحتوي النظام على 26 جدول (Schema) تغطي المستخدمين، الدورات، الاختبارات، المدفوعات، والاشتراكات.
+- عمليات الـ API (Queries & Mutations) مقسمة في مجلد `dataconnect/default/` (مثل `courses.gql`, `missions.gql`, `users.gql`).
+- يتم استدعاء هذه العمليات من NestJS Backend بصفة مشرف (Admin)، أو مباشرة من الواجهات الأمامية وفقاً للصلاحيات.
+
 ## 🔥 إعداد Firebase
 
 1. اذهب إلى [Firebase Console](https://console.firebase.google.com/)
 2. أنشئ مشروع جديد باسم `optimatech-lms`
-3. فعّل: **Authentication** (Email/Password + Google) + **Firestore** + **Storage** + **Cloud Messaging** + **Data Connect** (PostgreSQL)
+3. فعّل: **Authentication** (Email/Password + Google) + **Storage** + **Data Connect** (PostgreSQL)
 4. للـ Flutter:
    ```bash
    cd mobile
@@ -75,50 +102,6 @@ docker compose --profile tools up -d
    ```bash
    firebase deploy --only dataconnect
    ```
-
-## 💾 قاعدة البيانات (Firebase Data Connect)
-
-تعتمد المنصة على **Firebase Data Connect** للتعامل مع قاعدة بيانات **PostgreSQL** عن طريق **GraphQL**. 
-تُوفر هذه التقنية طرقًا مرنة وآمنة للوصول إلى البيانات من الواجهات الأمامية والخلفية عن طريق توليد حزم وتوابع جاهزة (Generated SDKs).
-
-### 1. أين تكتب الجداول والعمليات؟
-- **هيكل الجداول (Schema):** يتم تعريف كل جداول التطبيق في `dataconnect/schema/schema.gql`.
-- **العمليات (Queries & Mutations):** تُكتب في ملفات `dataconnect/default/*.gql` (مثل `users.gql`, `courses.gql`).
-
-### 2. أين تتولد الأكواد (Generated SDKs)؟
-كلما أضفت استعلاماً (Query) أو تعديلاً (Mutation)، يُصدر Firebase Data Connect أكواداً جاهزة في مسارات مشروعك:
-- **للويب (Next.js):** `web/src/dataconnect-generated/`
-- **للموبايل (Flutter):** `mobile/lib/dataconnect_generated/`
-- **للباك إند (NestJS):** `api/src/dataconnect-admin-generated/`
-
-### 3. كيف تستخدم قاعدة البيانات في الكود؟
-
-#### 👉 من الواجهة الأمامية (Web & Mobile)
-لجلب البيانات أو تعديلها (وفقاً لصلاحيات المستخدم)، استخدم الدوال التي تم توليدها تلقائياً مباشرةً.
-**مثال في Web (Next.js):**
-```typescript
-import { executeCoursesQuery } from '@/dataconnect-generated';
-
-const courses = await executeCoursesQuery();
-```
-
-#### 👉 من الباك إند (NestJS API)
-لإجراء العمليات التي تتطلب صلاحيات مشرف (Admin)، أو لإخفاء منطق أعمال معقد، يتم استخدام دوال الـ Admin المولدة في NestJS Backend.
-**مثال في NestJS:**
-- قم بكتابة المسارات `controllers` والمنطق `services` كالمعتاد.
-- استدعِ دوال Data Connect من داخل הـ Service:
-```typescript
-import { Injectable } from '@nestjs/common';
-import { createAdminUser } from '../dataconnect-admin-generated';
-
-@Injectable()
-export class UsersService {
-  async createUser(data: any) {
-    // يمكنك إضافة أي منطق خاص بالخادم هنا
-    return await createAdminUser(data);
-  }
-}
-```
 
 ## 🌐 URLs المحلية
 
@@ -132,14 +115,11 @@ export class UsersService {
 
 ## 📊 Stack التقني
 
-| الطبقة | التقنية |
-|--------|---------|
-| Mobile | Flutter + Firebase |
-| Web | Next.js 14 + TypeScript + Tailwind |
-| API | NestJS |
-| Database | PostgreSQL + Redis + Firebase Data Connect (GraphQL) |
-| Auth | JWT + Firebase Auth + Google OAuth |
-| AI (V2) | Python + FastAPI |
-
----
-*KAN-8 — إعداد بيئة التطوير (Flutter + Firebase)*
+| الطبقة (Layer) | الإطار الأساسي (Framework) | أهم المكتبات والتقنيات (Key Libraries) |
+|--------|---------|-------------------------|
+| **Mobile App** | Flutter (Dart 3.x) | `flutter_bloc` (State), `dio` + `retrofit` (Networking), `hive` (Local Storage), `skeletonizer` |
+| **Web Platform** | Next.js 14.1 (React 18) | `zustand` (State), `react-query` (Data Fetching), `tailwind` + `radix-ui` (UI), `next-auth` |
+| **Backend API** | NestJS 11 (TypeScript) | `bullmq` (Background Jobs), `ffmpeg` (Video HLS Transcoding), Firebase Admin SDK |
+| **Cloud Functions** | Node.js 22 (CommonJS) | `firebase-functions`, `@upstash/ratelimit` (Redis), `zod` (Validation) |
+| **Database** | PostgreSQL | Firebase Data Connect (GraphQL), Redis (for BullMQ & Rate Limiting) |
+| **Auth & Storage** | Firebase | Firebase Auth (ID Tokens/Custom Claims), Firebase Storage (AES-128 HLS) |
