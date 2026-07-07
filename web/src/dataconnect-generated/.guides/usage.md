@@ -12,28 +12,28 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetMyCourseAccess, useGetMyMissionAccess, useGetQuestionCourse, useGetOptionCourse, useGetSectionCourse, useGetMicroLessonMission, useGetCriterionMission, useGetTemplateMission, useGetCourseSessions, useCheckInToSession } from '@dataconnect/generated/react';
+import { useMyCertificates, useVerifyCertificate, useLogPayment, useAddPaymentItem, useMyPaymentHistory, useGetPendingSubmissions, useGetMyPendingSubmissions, useAdminAddCourseInstructor, useAdminRemoveCourseInstructor, useGetCourseInstructors } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
-const { data, isPending, isSuccess, isError, error } = useGetMyCourseAccess(getMyCourseAccessVars);
+const { data, isPending, isSuccess, isError, error } = useMyCertificates();
 
-const { data, isPending, isSuccess, isError, error } = useGetMyMissionAccess(getMyMissionAccessVars);
+const { data, isPending, isSuccess, isError, error } = useVerifyCertificate(verifyCertificateVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetQuestionCourse(getQuestionCourseVars);
+const { data, isPending, isSuccess, isError, error } = useLogPayment(logPaymentVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetOptionCourse(getOptionCourseVars);
+const { data, isPending, isSuccess, isError, error } = useAddPaymentItem(addPaymentItemVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetSectionCourse(getSectionCourseVars);
+const { data, isPending, isSuccess, isError, error } = useMyPaymentHistory();
 
-const { data, isPending, isSuccess, isError, error } = useGetMicroLessonMission(getMicroLessonMissionVars);
+const { data, isPending, isSuccess, isError, error } = useGetPendingSubmissions();
 
-const { data, isPending, isSuccess, isError, error } = useGetCriterionMission(getCriterionMissionVars);
+const { data, isPending, isSuccess, isError, error } = useGetMyPendingSubmissions();
 
-const { data, isPending, isSuccess, isError, error } = useGetTemplateMission(getTemplateMissionVars);
+const { data, isPending, isSuccess, isError, error } = useAdminAddCourseInstructor(adminAddCourseInstructorVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetCourseSessions(getCourseSessionsVars);
+const { data, isPending, isSuccess, isError, error } = useAdminRemoveCourseInstructor(adminRemoveCourseInstructorVars);
 
-const { data, isPending, isSuccess, isError, error } = useCheckInToSession(checkInToSessionVars);
+const { data, isPending, isSuccess, isError, error } = useGetCourseInstructors(getCourseInstructorsVars);
 
 ```
 
@@ -72,38 +72,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getMyCourseAccess, getMyMissionAccess, getQuestionCourse, getOptionCourse, getSectionCourse, getMicroLessonMission, getCriterionMission, getTemplateMission, getCourseSessions, checkInToSession } from '@dataconnect/generated';
+import { myCertificates, verifyCertificate, logPayment, addPaymentItem, myPaymentHistory, getPendingSubmissions, getMyPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors } from '@dataconnect/generated';
 
 
-// Operation GetMyCourseAccess:  For variables, look at type GetMyCourseAccessVars in ../index.d.ts
-const { data } = await GetMyCourseAccess(dataConnect, getMyCourseAccessVars);
+// Operation MyCertificates: 
+const { data } = await MyCertificates(dataConnect);
 
-// Operation GetMyMissionAccess:  For variables, look at type GetMyMissionAccessVars in ../index.d.ts
-const { data } = await GetMyMissionAccess(dataConnect, getMyMissionAccessVars);
+// Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
+const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
 
-// Operation GetQuestionCourse:  For variables, look at type GetQuestionCourseVars in ../index.d.ts
-const { data } = await GetQuestionCourse(dataConnect, getQuestionCourseVars);
+// Operation LogPayment:  For variables, look at type LogPaymentVars in ../index.d.ts
+const { data } = await LogPayment(dataConnect, logPaymentVars);
 
-// Operation GetOptionCourse:  For variables, look at type GetOptionCourseVars in ../index.d.ts
-const { data } = await GetOptionCourse(dataConnect, getOptionCourseVars);
+// Operation AddPaymentItem:  For variables, look at type AddPaymentItemVars in ../index.d.ts
+const { data } = await AddPaymentItem(dataConnect, addPaymentItemVars);
 
-// Operation GetSectionCourse:  For variables, look at type GetSectionCourseVars in ../index.d.ts
-const { data } = await GetSectionCourse(dataConnect, getSectionCourseVars);
+// Operation MyPaymentHistory: 
+const { data } = await MyPaymentHistory(dataConnect);
 
-// Operation GetMicroLessonMission:  For variables, look at type GetMicroLessonMissionVars in ../index.d.ts
-const { data } = await GetMicroLessonMission(dataConnect, getMicroLessonMissionVars);
+// Operation GetPendingSubmissions: 
+const { data } = await GetPendingSubmissions(dataConnect);
 
-// Operation GetCriterionMission:  For variables, look at type GetCriterionMissionVars in ../index.d.ts
-const { data } = await GetCriterionMission(dataConnect, getCriterionMissionVars);
+// Operation GetMyPendingSubmissions: 
+const { data } = await GetMyPendingSubmissions(dataConnect);
 
-// Operation GetTemplateMission:  For variables, look at type GetTemplateMissionVars in ../index.d.ts
-const { data } = await GetTemplateMission(dataConnect, getTemplateMissionVars);
+// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
+const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
 
-// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
-const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
+// Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
+const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
 
-// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
-const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
+// Operation GetCourseInstructors:  For variables, look at type GetCourseInstructorsVars in ../index.d.ts
+const { data } = await GetCourseInstructors(dataConnect, getCourseInstructorsVars);
 
 
 ```
