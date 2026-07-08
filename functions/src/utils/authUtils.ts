@@ -2,30 +2,28 @@
  * @fileoverview Authentication utilities for Cloud Functions.
  */
 
-const { HttpsError } = require("firebase-functions/v2/https");
-const { logger } = require("firebase-functions");
+import { HttpsError, CallableRequest } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions";
 
 /**
  * Ensures the caller has the required role(s) to execute a function.
- * It checks the decoded Firebase Auth Token (`context.auth.token.roles`).
+ * It checks the decoded Firebase Auth Token (`request.auth.token.roles`).
  *
- * @param {Object} context - The context object provided by Firebase Callable functions.
+ * @param {CallableRequest} request - The request object provided by Firebase Callable functions.
  * @param {Array<string>} allowedRoles - Array of roles allowed (e.g., ['admin', 'instructor']).
  * @throws {HttpsError} If the user is unauthenticated or unauthorized.
  */
-function requireRole(context, allowedRoles) {
-  if (!context.auth) {
+export function requireRole(request: CallableRequest, allowedRoles: string[]): void {
+  if (!request.auth) {
     throw new HttpsError("unauthenticated", "You must be logged in.");
   }
 
   // Roles are stored as an array in the token's custom claims.
-  const userRoles = context.auth.token.roles || [];
+  const userRoles = (request.auth.token.roles as string[]) || [];
   const hasPermission = allowedRoles.some((role) => userRoles.includes(role));
 
   if (!hasPermission) {
-    logger.warn(`🚨 [RBAC] Access denied for UID: ${context.auth.uid}. Required: ${allowedRoles}`);
+    logger.warn(`🚨 [RBAC] Access denied for UID: ${request.auth.uid}. Required: ${allowedRoles}`);
     throw new HttpsError("permission-denied", "You do not have the required permissions.");
   }
 }
-
-module.exports = {requireRole};

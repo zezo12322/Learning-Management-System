@@ -6,15 +6,15 @@
  * and strict payload validation.
  */
 
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const { defineSecret } = require("firebase-functions/params");
-const { logger } = require("firebase-functions");
-const { admin, adminDC } = require("../config/firebase");
-const RateLimiter = require("../utils/rateLimiter");
-const { requireRole } = require("../utils/authUtils");
-const EncryptionService = require("../utils/encryptionService");
-const { registrationSchema, roleChangeSchema } = require("../schemas/userSchemas");
-const { ROLE_IDS } = require("../constants/roles");
+import { onCall, HttpsError, CallableRequest } from "firebase-functions/v2/https";
+import { defineSecret } from "firebase-functions/params";
+import { logger } from "firebase-functions";
+import { admin, adminDC } from "../config/firebase";
+import { RateLimiter } from "../utils/rateLimiter";
+import { requireRole } from "../utils/authUtils";
+import { EncryptionService } from "../utils/encryptionService";
+import { registrationSchema, roleChangeSchema } from "../schemas/userSchemas";
+import { ROLE_IDS } from "../constants/roles";
 
 // Define Secrets for v2 injection
 const UPSTASH_REDIS_REST_URL = defineSecret("UPSTASH_REDIS_REST_URL");
@@ -22,12 +22,12 @@ const UPSTASH_REDIS_REST_TOKEN = defineSecret("UPSTASH_REDIS_REST_TOKEN");
 const APP_ENCRYPTION_KEY = defineSecret("APP_ENCRYPTION_KEY");
 
 // Import the strongly-typed generated Admin SDK
-const { 
+import { 
   createDefaultUserFn, 
   getTargetUserRolesFn, 
   removeRoleFn, 
   assignNewRoleFn 
-} = require("@dataconnect/admin-generated");
+} from "@dataconnect/admin-generated";
 
 /**
  * CALLABLE: registerStudent
@@ -35,18 +35,18 @@ const {
  * Registers a new student securely. It handles Firebase Auth creation,
  * National ID encryption, and PostgreSQL database insertion all at once.
  */
-exports.registerStudent = onCall(
+export const registerStudent = onCall(
   {
     region: "europe-west3",
     secrets: [UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, APP_ENCRYPTION_KEY],
   },
-  async (request) => {
+  async (request: CallableRequest) => {
     // 1. Rate Limiting Protection (Prevent DDoS/Brute-forcing)
     // In v2, request object encapsulates both data and context.
     const rawIp = request.rawRequest?.ip || "unknown-ip";
     try {
       await RateLimiter.checkLimit(`ip_${rawIp}`, 10, "1 m");
-    } catch (error) {
+    } catch (error: any) {
       if (error.message === "RATE_LIMIT_EXCEEDED") {
         logger.warn(`🚨 [SECURITY] Execution rate exceeded for IP: ${rawIp}`);
         throw new HttpsError("resource-exhausted", "Too many attempts. Please slow down.");
@@ -58,7 +58,7 @@ exports.registerStudent = onCall(
     let validatedData;
     try {
       validatedData = registrationSchema.parse(request.data);
-    } catch (error) {
+    } catch (error: any) {
       logger.warn(`🚨 [VALIDATION FAILED] ${error.errors[0].message}`);
       throw new HttpsError("invalid-argument", error.errors[0].message);
     }
@@ -66,7 +66,7 @@ exports.registerStudent = onCall(
     const {email, password, name, nationalId} = validatedData;
     logger.info(`🚀 [START] Structured registration handling for: ${email}`);
 
-    let uid = null;
+    let uid: string | null = null;
     try {
       // 3. Create user in Firebase Auth
       const userRecord = await admin.auth().createUser({
@@ -80,11 +80,11 @@ exports.registerStudent = onCall(
       // 4. Encrypt sensitive PII using AES-256-GCM
       // In v2, secrets can be accessed via process.env OR through the .value() method of the defined secret.
       const encryptionKey = process.env.APP_ENCRYPTION_KEY || APP_ENCRYPTION_KEY.value();
-      const safeNationalId = EncryptionService.encrypt(nationalId, encryptionKey);
+      const safeNationalId = EncryptionService.encrypt(nationalId, encryptionKey) as string;
 
       // 5. Save everything to PostgreSQL via Data Connect SDK
       try {
-        await createDefaultUserFn(adminDC, { uid, email, name, nid: safeNationalId });
+        await createDefaultUserFn(adminDC, { uid: uid as string, email, name, nid: safeNationalId });
         logger.info(`✅ [DB INSERT] Relational database persistence mapped.`);
       } catch (dbError) {
         logger.error(`❌ [ROLLBACK] Failed to insert relational data for user ${uid}. Cleaning up Firebase Auth...`, dbError);
@@ -99,7 +99,7 @@ exports.registerStudent = onCall(
 
       logger.info(`🎉 [SUCCESS] Pipeline transaction resolved successfully.`);
       return {success: true, uid: uid};
-    } catch (error) {
+    } catch (error: any) {
       // Structured error logging
       logger.error("❌ [API ERROR inside registerStudent]", { error: error.message, stack: error.stack, email });
       if (error.code) {
@@ -116,17 +116,17 @@ exports.registerStudent = onCall(
  * Allows an administrator to promote/demote users (e.g., student -> instructor).
  * This manages both the PostgreSQL `userRole` table and the Firebase Auth Token.
  */
-exports.changeUserRole = onCall(
+export const changeUserRole = onCall(
   {
     region: "europe-west3",
     secrets: [UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN],
   },
-  async (request) => {
+  async (request: CallableRequest) => {
     const callerUid = request.auth?.uid;
     // 1. Rate Limiting Protection per UID
     try {
       await RateLimiter.checkLimit(`uid_${callerUid}`, 20, "1 m");
-    } catch (error) {
+    } catch (error: any) {
       if (error.message === "RATE_LIMIT_EXCEEDED") {
         throw new HttpsError("resource-exhausted", "Too many attempts.");
       }
@@ -140,7 +140,7 @@ exports.changeUserRole = onCall(
     let validatedData;
     try {
       validatedData = roleChangeSchema.parse(request.data);
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpsError("invalid-argument", error.errors[0].message);
     }
 
@@ -181,7 +181,7 @@ exports.changeUserRole = onCall(
 
       logger.info(`🎉 [SUCCESS] Role fully synchronized across Database and Token.`);
       return {success: true, message: `User successfully updated to ${newRole}.`};
-    } catch (error) {
+    } catch (error: any) {
       logger.error("❌ [API ERROR inside changeUserRole]", { error: error.message, stack: error.stack, targetUid, callerUid });
       if (error.code === "auth/user-not-found") {
         throw new HttpsError("not-found", "The requested user does not exist.");

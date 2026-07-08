@@ -4,13 +4,13 @@
  * from reaching the database or causing internal errors.
  */
 
-const {z} = require("zod");
+import { z } from "zod";
 
 /**
  * Schema for validating new student registrations.
  * Enforces strong passwords, valid emails, and exact National ID formatting.
  */
-const registrationSchema = z.object({
+export const registrationSchema = z.object({
   name: z.string()
       .min(2, "Name must be at least 2 characters long.")
       .max(50, "Name cannot exceed 50 characters.")
@@ -34,11 +34,9 @@ const registrationSchema = z.object({
 /**
  * Schema for validating role changes by an admin.
  */
-const roleChangeSchema = z.object({
+export const roleChangeSchema = z.object({
   targetUid: z.string().min(1, "Target UID is required."),
   newRole: z.enum(["student", "instructor", "admin"], {
-    errorMap: () => ({message: "Invalid role specified."}),
+    error: "Invalid role specified.",
   }),
 });
-
-module.exports = {registrationSchema, roleChangeSchema};

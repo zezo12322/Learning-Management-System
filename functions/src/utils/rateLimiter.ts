@@ -5,13 +5,15 @@
  * It uses a sliding window approach for accurate limit tracking.
  */
 
-const {Redis} = require("@upstash/redis");
-const {Ratelimit} = require("@upstash/ratelimit");
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
 // Declare the variables, but do NOT initialize them yet
 // This allows lazy initialization to prevent crashes if Redis isn't immediately available.
-let redisClient = null;
-const limiters = {};
+let redisClient: Redis | null = null;
+const limiters: Record<string, Ratelimit> = {};
+
+type Duration = `${number} ms` | `${number} s` | `${number} m` | `${number} h` | `${number} d`;
 
 /**
  * Retrieves or creates a rate limiter configuration.
@@ -20,7 +22,7 @@ const limiters = {};
  * @param {string} windowString - Time window (e.g., "1 m", "10 s").
  * @return {Ratelimit} The Upstash Ratelimit instance.
  */
-function getLimiter(maxRequests, windowString) {
+function getLimiter(maxRequests: number, windowString: Duration): Ratelimit {
   const key = `${maxRequests}_${windowString}`;
 
   // If this specific limit configuration doesn't exist yet, create it.
@@ -52,7 +54,7 @@ function getLimiter(maxRequests, windowString) {
   return limiters[key];
 }
 
-class RateLimiter {
+export class RateLimiter {
   /**
      * Checks the request against the Redis rate limiter.
      * Throws an error if the rate limit is exceeded.
@@ -61,7 +63,7 @@ class RateLimiter {
      * @param {number} maxRequests - e.g., 10
      * @param {string} windowString - e.g., "1 m"
      */
-  static async checkLimit(identifier, maxRequests, windowString) {
+  static async checkLimit(identifier: string, maxRequests: number, windowString: Duration): Promise<void> {
     const limiter = getLimiter(maxRequests, windowString);
 
     // Check the identifier against Redis
@@ -72,5 +74,3 @@ class RateLimiter {
     }
   }
 }
-
-module.exports = RateLimiter;
