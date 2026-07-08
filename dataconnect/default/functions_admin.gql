@@ -1,0 +1,56 @@
+# Operations used specifically by Firebase Cloud Functions via Admin SDK
+
+query GetUserClaimsFn($uid: String!) @auth(level: NO_ACCESS) {
+  user(id: $uid) {
+    userRoles_on_user {
+      role {
+        name
+      }
+    }
+    profile_on_user {
+      company
+    }
+  }
+}
+
+mutation CreateDefaultUserAndProfileFn($uid: String!, $email: String!, $name: String!) @auth(level: NO_ACCESS) {
+  user_insert(data: { id: $uid, email: $email, name: $name })
+  profile_insert(data: { userId: $uid, bio: "", company: "", phone: "" })
+  userRole_insert(data: { 
+      userId: $uid, 
+      roleId: "00000000-0000-0000-0000-000000000006" 
+  })
+}
+
+mutation DeleteUserRecordFn($uid: String!) @auth(level: NO_ACCESS) {
+  user_delete(id: $uid)
+}
+
+mutation CreateDefaultUserFn($uid: String!, $email: String!, $name: String!, $nid: String!) @auth(level: NO_ACCESS) {
+  user_insert(data: { 
+      id: $uid, 
+      email: $email, 
+      name: $name,
+      encryptedNationalId: $nid
+  })
+  userRole_insert(data: { 
+      userId: $uid, 
+      roleId: "00000000-0000-0000-0000-000000000006" 
+  })
+}
+
+query GetTargetUserRolesFn($uid: String!) @auth(level: NO_ACCESS) {
+  user(id: $uid) {
+    userRoles_on_user {
+      roleId
+    }
+  }
+}
+
+mutation RemoveRoleFn($uid: String!, $roleId: UUID!) @auth(level: NO_ACCESS) {
+  userRole_delete(key: { userId: $uid, roleId: $roleId })
+}
+
+mutation AssignNewRoleFn($uid: String!, $roleId: UUID!) @auth(level: NO_ACCESS) {
+  userRole_insert(data: { userId: $uid, roleId: $roleId })
+}
