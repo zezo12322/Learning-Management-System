@@ -54,6 +54,174 @@ query SearchPublishedCourses($searchQuery: String!) @auth(level: PUBLIC, insecur
   }
 }
 
+# Most popular published courses for discovery carousels ("Popular Courses").
+# Popularity is proxied by the denormalised rating aggregate (ratingCount, then
+# avgRating) — the same cache ListPublishedCourses already exposes — so the list
+# is a single indexed read with no per-course fan-out. $limit is clamped by the
+# service (PopularCoursesService default/max). PUBLIC, like ListPublishedCourses.
+query ListPopularCourses($limit: Int) @auth(level: PUBLIC, insecureReason: "Popular course cards are public discovery data, like the course listing.") {
+  courses(
+    where: {
+      status: { eq: PUBLISHED },
+      deletedAt: { eq: null }
+    },
+    orderBy: [{ ratingCount: DESC }, { avgRating: DESC }, { createdAt: DESC }],
+    limit: $limit
+  ) {
+    id
+    title
+    price
+    level
+    thumbnail
+    tags
+    avgRating
+    ratingCount
+    category { name }
+    author { name avatar }
+  }
+}
+
+# Published courses in the given categories, excluding a set of course ids
+# (the caller's already-enrolled courses). Drives "Recommended Courses": the
+# backend derives $categoryIds from the courses the user is enrolled in and
+# passes their enrolled course ids as $excludeIds so recommendations never repeat
+# what they already own. Ordered by rating so the strongest picks surface first.
+# PUBLIC (course cards are public); the personalization inputs come from a
+# separate USER-scoped read in the backend.
+query ListRecommendedCourses(
+  $categoryIds: [UUID!]!,
+  $excludeIds: [UUID!]!,
+  $limit: Int
+) @auth(level: PUBLIC, insecureReason: "Recommended course cards are public discovery data; personalization inputs are supplied by the backend.") {
+  courses(
+    where: {
+      status: { eq: PUBLISHED },
+      deletedAt: { eq: null },
+      categoryId: { in: $categoryIds },
+      id: { nin: $excludeIds }
+    },
+    orderBy: [{ avgRating: DESC }, { ratingCount: DESC }, { createdAt: DESC }],
+    limit: $limit
+  ) {
+    id
+    title
+    price
+    level
+    thumbnail
+    tags
+    avgRating
+    ratingCount
+    category { name }
+    author { name avatar }
+  }
+}
+
+# Categories of the courses the authenticated user is enrolled in (+ the course
+# ids themselves), used to seed ListRecommendedCourses. Self-scoped by auth.uid,
+# so it is safe as a USER-level read. Only ACTIVE/COMPLETED enrollments count as
+# "interests"; DROPPED/SUSPENDED are excluded.
+query GetMyEnrolledCourseCategories @auth(level: USER) {
+  enrollments(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      targetType: { eq: COURSE },
+      status: { in: [ACTIVE, COMPLETED] }
+    }
+  ) {
+    course {
+      id
+      deletedAt
+      status
+      category { id }
+    }
+  }
+}
+
+# "Continue Learning": every course the authenticated user is enrolled in, with
+# the per-lecture completion flags needed to rank them by progress. Self-scoped
+# by auth.uid (both the enrollment filter and the nested lectureProgresses), so
+# it is safe as a USER-level read. The service counts completed vs. total
+# lectures per course and sorts by completed-lesson count (highest first).
+query GetMyContinueLearning @auth(level: USER) {
+  enrollments(
+    where: {
+      userId: { eq_expr: "auth.uid" },
+      targetType: { eq: COURSE },
+      status: { in: [ACTIVE, COMPLETED] }
+    },
+    orderBy: [{ enrolledAt: DESC }]
+  ) {
+    id
+    status
+    enrolledAt
+    completedAt
+    course {
+      id
+      title
+      thumbnail
+      level
+      price
+      deletedAt
+      category { name }
+      author { name avatar }
+      # Aliases are deliberately unique (cl* = continue-learning) rather than the
+      # progressSections/progressLectures/userProgress names used by
+      # GetMyCourseProgress: with clientCache enabled, Data Connect requires the
+      # same alias on the same type to carry identical arguments across every
+      # operation, so reusing them (with different args) fails schema validation.
+      clSections: courseSections_on_course(
+        where: { deletedAt: { eq: null } }
+      ) {
+        clLectures: courseLectures_on_section(
+          where: { deletedAt: { eq: null } }
+        ) {
+          id
+          clProgress: lectureProgresses_on_lecture(
+            where: { userId: { eq_expr: "auth.uid" } }
+          ) {
+            completedAt
+          }
+        }
+      }
+    }
+  }
+}
+
+# Descriptions of every uploaded VIDEO lecture in a course ("Video Description").
+# NO_ACCESS for the same reason as GetCourseCurriculum: it returns each video's
+# `content` (its description), which may be paid material. Backend-only; run via
+# the service account after CoursesService gates access, which strips the
+# description from non-free-preview videos for callers who aren't the owner/admin
+# or an active enrollee (mirroring the curriculum entitlement).
+query GetCourseVideos($courseId: UUID!) @auth(level: NO_ACCESS) {
+  course(id: $courseId) {
+    id
+    title
+    status
+    deletedAt
+    author { id }
+    createdBy { id }
+    videoSections: courseSections_on_course(
+      where: { deletedAt: { eq: null } },
+      orderBy: [{ order: ASC }]
+    ) {
+      id
+      title
+      videoLectures: courseLectures_on_section(
+        where: { deletedAt: { eq: null }, type: { eq: VIDEO } },
+        orderBy: [{ order: ASC }]
+      ) {
+        id
+        title
+        content
+        duration
+        isFreePreview
+        order
+      }
+    }
+  }
+}
+
 # Retrieves full curriculum details for a specific course. NO_ACCESS: it returns
 # every lecture's `content`, so a USER-level version leaked paid READING content
 # to any authenticated user. Backend-only; CatalogService strips `content` from
