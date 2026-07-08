@@ -10,6 +10,7 @@ import 'package:optimatech_lms/core/services/bloc_observer_service.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/core/utils/app_theme.dart';
 import 'package:optimatech_lms/core/utils/constants.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/views/course_learning_view.dart';
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 import 'features/profile/presentation/manager/theme/theme_cubit.dart';
 
@@ -71,7 +72,7 @@ class OptimaTechLMS extends StatelessWidget {
               darkTheme: AppTheme.dark,
               // Routing
               onGenerateRoute: generateRoute,
-              initialRoute: SplashView.routeName,
+              initialRoute: CourseLearningView.routeName,
             );
           },
         );

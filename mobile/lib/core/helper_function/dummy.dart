@@ -1,8 +1,45 @@
-import 'package:flutter/material.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/course_curriculum_section.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/category_entity.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
-import '../../features/courses/presentation/views/widgets/courses_category_Section.dart';
-import '../utils/app_colors.dart';
+
+final List<CurriculumLessonData> sampleCurriculumLessons = [
+  CurriculumLessonData(
+    order: 1,
+    title: 'Introduction to UX Design',
+    duration: '12 min',
+    status: CurriculumLessonStatus.completed.name,
+  ),
+  CurriculumLessonData(
+    order: 2,
+    title: 'Design Thinking Process',
+    duration: '18 min',
+    status: CurriculumLessonStatus.completed.name,
+  ),
+  CurriculumLessonData(
+    order: 3,
+    title: 'User Research Methods',
+    duration: '15 min',
+    status: CurriculumLessonStatus.current.name,
+  ),
+  CurriculumLessonData(
+    order: 4,
+    title: 'Information Architecture',
+    duration: '20 min',
+    status: CurriculumLessonStatus.locked.name,
+  ),
+  CurriculumLessonData(
+    order: 5,
+    title: 'Wireframing Basics',
+    duration: '22 min',
+    status: CurriculumLessonStatus.locked.name,
+  ),
+  CurriculumLessonData(
+    order: 6,
+    title: 'Prototyping with Figma',
+    duration: '25 min',
+    status: CurriculumLessonStatus.locked.name,
+  ),
+];
 
 CourseEntity get dummySkeletonCourseItem => const CourseEntity(
   id: '_',
