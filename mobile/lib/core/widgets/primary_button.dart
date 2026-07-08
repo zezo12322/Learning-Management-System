@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -28,16 +30,16 @@ class PrimaryButton extends StatelessWidget {
       child: isLoading? Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(
+          SizedBox(
+            width: 24.w,
+            height: 24.h,
+            child: const CircularProgressIndicator(
               strokeWidth: 2.5,
               color: Colors.white,
               backgroundColor: Colors.white10,
             ),
           ),
-          const SizedBox(width: 8,),
+          Gap(8.w,),
           Text('common.loading'.tr()),
         ],
       ) : Text(text),
