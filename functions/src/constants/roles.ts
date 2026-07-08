@@ -6,10 +6,8 @@
  * will need to be updated.
  */
 
-const ROLE_IDS = {
+export const ROLE_IDS: Record<string, string> = {
   "admin": "00000000-0000-0000-0000-000000000004",
   "instructor": "00000000-0000-0000-0000-000000000005",
   "student": "00000000-0000-0000-0000-000000000006",
 };
-
-module.exports = {ROLE_IDS};

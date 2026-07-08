@@ -14,38 +14,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { instructorDeleteCourse, superAdminDeleteCourse, adminCreateSession, instructorCancelSession, superAdminCancelSession, adminCreateSubscriptionTier, adminDeprecateSubscriptionTier, adminCreateCategory, getUserClaims, myCertificates } from '@dataconnect/functions-generated';
+import { upsertCourseRating, deleteCourseRating, getMyCourseRating, listCourseRatings, getCourseRatingsForSummary, adminUpdateCourseRatingAggregate, getCourseSessions, checkInToSession, syncUser, getMe } from '@dataconnect/functions-generated';
 
 
-// Operation InstructorDeleteCourse:  For variables, look at type InstructorDeleteCourseVars in ../index.d.ts
-const { data } = await InstructorDeleteCourse(dataConnect, instructorDeleteCourseVars);
+// Operation UpsertCourseRating:  For variables, look at type UpsertCourseRatingVars in ../index.d.ts
+const { data } = await UpsertCourseRating(dataConnect, upsertCourseRatingVars);
 
-// Operation SuperAdminDeleteCourse:  For variables, look at type SuperAdminDeleteCourseVars in ../index.d.ts
-const { data } = await SuperAdminDeleteCourse(dataConnect, superAdminDeleteCourseVars);
+// Operation DeleteCourseRating:  For variables, look at type DeleteCourseRatingVars in ../index.d.ts
+const { data } = await DeleteCourseRating(dataConnect, deleteCourseRatingVars);
 
-// Operation AdminCreateSession:  For variables, look at type AdminCreateSessionVars in ../index.d.ts
-const { data } = await AdminCreateSession(dataConnect, adminCreateSessionVars);
+// Operation GetMyCourseRating:  For variables, look at type GetMyCourseRatingVars in ../index.d.ts
+const { data } = await GetMyCourseRating(dataConnect, getMyCourseRatingVars);
 
-// Operation InstructorCancelSession:  For variables, look at type InstructorCancelSessionVars in ../index.d.ts
-const { data } = await InstructorCancelSession(dataConnect, instructorCancelSessionVars);
+// Operation ListCourseRatings:  For variables, look at type ListCourseRatingsVars in ../index.d.ts
+const { data } = await ListCourseRatings(dataConnect, listCourseRatingsVars);
 
-// Operation SuperAdminCancelSession:  For variables, look at type SuperAdminCancelSessionVars in ../index.d.ts
-const { data } = await SuperAdminCancelSession(dataConnect, superAdminCancelSessionVars);
+// Operation GetCourseRatingsForSummary:  For variables, look at type GetCourseRatingsForSummaryVars in ../index.d.ts
+const { data } = await GetCourseRatingsForSummary(dataConnect, getCourseRatingsForSummaryVars);
 
-// Operation AdminCreateSubscriptionTier:  For variables, look at type AdminCreateSubscriptionTierVars in ../index.d.ts
-const { data } = await AdminCreateSubscriptionTier(dataConnect, adminCreateSubscriptionTierVars);
+// Operation AdminUpdateCourseRatingAggregate:  For variables, look at type AdminUpdateCourseRatingAggregateVars in ../index.d.ts
+const { data } = await AdminUpdateCourseRatingAggregate(dataConnect, adminUpdateCourseRatingAggregateVars);
 
-// Operation AdminDeprecateSubscriptionTier:  For variables, look at type AdminDeprecateSubscriptionTierVars in ../index.d.ts
-const { data } = await AdminDeprecateSubscriptionTier(dataConnect, adminDeprecateSubscriptionTierVars);
+// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
+const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
 
-// Operation AdminCreateCategory:  For variables, look at type AdminCreateCategoryVars in ../index.d.ts
-const { data } = await AdminCreateCategory(dataConnect, adminCreateCategoryVars);
+// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
+const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
 
-// Operation GetUserClaims:  For variables, look at type GetUserClaimsVars in ../index.d.ts
-const { data } = await GetUserClaims(dataConnect, getUserClaimsVars);
+// Operation SyncUser:  For variables, look at type SyncUserVars in ../index.d.ts
+const { data } = await SyncUser(dataConnect, syncUserVars);
 
-// Operation MyCertificates: 
-const { data } = await MyCertificates(dataConnect);
+// Operation GetMe: 
+const { data } = await GetMe(dataConnect);
 
 
 ```

@@ -6,12 +6,12 @@
  * and an Authentication Tag to prevent tampering.
  */
 
-const crypto = require("crypto");
+import * as crypto from "crypto";
 
 // The algorithm must support authenticated encryption (GCM)
 const ALGORITHM = "aes-256-gcm";
 
-class EncryptionService {
+export class EncryptionService {
   /**
      * Encrypts a plaintext string.
      *
@@ -19,7 +19,7 @@ class EncryptionService {
      * @param {string} secretKey - Your 32-byte hexadecimal secret key
      * @return {string|null} The formatted ciphertext (iv:tag:encrypted)
      */
-  static encrypt(text, secretKey) {
+  static encrypt(text: string | null | undefined, secretKey: string): string | null {
     if (!text) return null;
 
     // 1. Generate a random Initialization Vector for this specific encryption
@@ -47,7 +47,7 @@ class EncryptionService {
      * @param {string} secretKey - Your 32-byte hexadecimal secret key
      * @return {string|null} The decrypted plaintext string
      */
-  static decrypt(hash, secretKey) {
+  static decrypt(hash: string | null | undefined, secretKey: string): string | null {
     if (!hash) return null;
 
     const parts = hash.split(":");
@@ -65,5 +65,3 @@ class EncryptionService {
     return decrypted;
   }
 }
-
-module.exports = EncryptionService;

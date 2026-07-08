@@ -5,15 +5,15 @@
  * events occur (e.g., a user signing up or deleting their account).
  */
 
-const functions = require("firebase-functions/v1");
-const { logger } = require("firebase-functions");
-const { admin, adminDC } = require("../config/firebase");
+import * as functions from "firebase-functions/v1";
+import { logger } from "firebase-functions";
+import { admin, adminDC } from "../config/firebase";
 // Import the strongly-typed generated Admin SDK instead of executing raw queries
-const { 
+import { 
   getUserClaimsFn, 
   createDefaultUserAndProfileFn, 
   deleteUserRecordFn 
-} = require("@dataconnect/admin-generated");
+} from "@dataconnect/admin-generated";
 
 /**
  * TRIGGER: onCreate
@@ -23,7 +23,7 @@ const {
  * and doesn't exist in the database yet, this creates a default 'student'
  * profile for them automatically.
  */
-exports.syncClaims = functions.region("europe-west3").auth.user().onCreate(async (user) => {
+export const syncClaims = functions.region("europe-west3").auth.user().onCreate(async (user) => {
   logger.info(`🚀 [START] syncClaims triggered for UID: ${user.uid}`);
 
   try {
@@ -57,13 +57,16 @@ exports.syncClaims = functions.region("europe-west3").auth.user().onCreate(async
     }
 
     // Normal scenario: Extract roles and sync them to Firebase Auth
-    const roles = userData.userRoles_on_user ? userData.userRoles_on_user.map((ur) => ur.role.name) : [];
+    // Add type safety for mapping
+    const roles: string[] = userData.userRoles_on_user 
+      ? userData.userRoles_on_user.map((ur: any) => ur.role.name) 
+      : [];
     const companyId = userData.profile_on_user ? userData.profile_on_user.company : null;
 
     const claims = {roles, companyId};
     await admin.auth().setCustomUserClaims(user.uid, claims);
     logger.info(`🎉 [SUCCESS] Custom verification claims synced to token.`);
-  } catch (error) {
+  } catch (error: any) {
     // Structured error logging
     logger.error("❌ [CRITICAL ERROR inside syncClaims]", { error: error.message, stack: error.stack, uid: user.uid });
   }
@@ -76,7 +79,7 @@ exports.syncClaims = functions.region("europe-west3").auth.user().onCreate(async
  * this function securely wipes their corresponding PostgreSQL record and
  * purges all their files from Firebase Cloud Storage.
  */
-exports.cleanupUserData = functions.region("europe-west3").auth.user().onDelete(async (user) => {
+export const cleanupUserData = functions.region("europe-west3").auth.user().onDelete(async (user) => {
   logger.info(`🗑️ [START] Purge cascade execution initialized for UID: ${user.uid}`);
 
   try {
@@ -90,7 +93,7 @@ exports.cleanupUserData = functions.region("europe-west3").auth.user().onDelete(
       prefix: `users/${user.uid}/`,
     });
     logger.info(`✅ [SUCCESS] System environment space reclaimed completely.`);
-  } catch (error) {
+  } catch (error: any) {
     logger.error("❌ [CRITICAL ERROR inside cleanupUserData]", { error: error.message, stack: error.stack, uid: user.uid });
   }
 });
