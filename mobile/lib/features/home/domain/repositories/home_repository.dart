@@ -5,6 +5,6 @@ import '../entities/student_progress_entity.dart';
 
 abstract class HomeRepository {
   Future<Either<Failure, StudentProgressEntity?>> getContinueLearningCourses();
-  Future<Either<Failure, List<CourseEntity>>> getPopularCourses();
-  Future<Either<Failure, List<CourseEntity>>> getRecommendedCourses();
+  Future<Either<Failure, List<HomeCourseEntity>>> getPopularCourses();
+  Future<Either<Failure, List<HomeCourseEntity>>> getRecommendedCourses();
 }

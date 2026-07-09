@@ -10,6 +10,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/course_card.dart';
+import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
 
 class CoursesList extends StatelessWidget {
   const CoursesList({super.key,});
@@ -65,8 +66,7 @@ class _CoursesListView extends StatelessWidget {
       itemCount: courses.length,
       itemBuilder: (context, i) {
         final course = courses[i];
-        return CourseCard(
-          item: CourseEntity(
+        final detailedCourse = CourseEntity(
             id: course.id,
             title: course.title,
             price: course.price,
@@ -80,8 +80,18 @@ class _CoursesListView extends StatelessWidget {
             isBookmarked: bookmarkedIds.contains(course.id),
             avgRating: course.avgRating,
             ratingCount: course.ratingCount,
-          ),
-          onTap: () {},
+          );
+        
+        return CourseCard(
+          item: detailedCourse,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CourseDetailsView(course: detailedCourse),
+              ),
+            );
+          },
           onBookmarkTap: () => context.read<CoursesCubit>().toggleBookmark(course.id),
           onMoreTap: () {},
         );

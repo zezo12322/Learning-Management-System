@@ -22,8 +22,8 @@ mixin _$HomeCoursesState {
     required TResult Function() loading,
     required TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)
         success,
     required TResult Function(String message) error,
   }) =>
@@ -34,8 +34,8 @@ mixin _$HomeCoursesState {
     TResult? Function()? loading,
     TResult? Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult? Function(String message)? error,
   }) =>
@@ -46,8 +46,8 @@ mixin _$HomeCoursesState {
     TResult Function()? loading,
     TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -140,8 +140,8 @@ class _$InitialImpl implements _Initial {
     required TResult Function() loading,
     required TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)
         success,
     required TResult Function(String message) error,
   }) {
@@ -155,8 +155,8 @@ class _$InitialImpl implements _Initial {
     TResult? Function()? loading,
     TResult? Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult? Function(String message)? error,
   }) {
@@ -170,8 +170,8 @@ class _$InitialImpl implements _Initial {
     TResult Function()? loading,
     TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -266,8 +266,8 @@ class _$LoadingImpl implements _Loading {
     required TResult Function() loading,
     required TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)
         success,
     required TResult Function(String message) error,
   }) {
@@ -281,8 +281,8 @@ class _$LoadingImpl implements _Loading {
     TResult? Function()? loading,
     TResult? Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult? Function(String message)? error,
   }) {
@@ -296,8 +296,8 @@ class _$LoadingImpl implements _Loading {
     TResult Function()? loading,
     TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -358,8 +358,8 @@ abstract class _$$SuccessImplCopyWith<$Res> {
   @useResult
   $Res call(
       {StudentProgressEntity? continueLearning,
-      List<CourseEntity> popularCourses,
-      List<CourseEntity> recommendedCourses});
+      List<HomeCourseEntity> popularCourses,
+      List<HomeCourseEntity> recommendedCourses});
 }
 
 /// @nodoc
@@ -385,11 +385,11 @@ class __$$SuccessImplCopyWithImpl<$Res>
       popularCourses: null == popularCourses
           ? _value._popularCourses
           : popularCourses // ignore: cast_nullable_to_non_nullable
-              as List<CourseEntity>,
+              as List<HomeCourseEntity>,
       recommendedCourses: null == recommendedCourses
           ? _value._recommendedCourses
           : recommendedCourses // ignore: cast_nullable_to_non_nullable
-              as List<CourseEntity>,
+              as List<HomeCourseEntity>,
     ));
   }
 }
@@ -399,24 +399,24 @@ class __$$SuccessImplCopyWithImpl<$Res>
 class _$SuccessImpl implements _Success {
   const _$SuccessImpl(
       {required this.continueLearning,
-      required final List<CourseEntity> popularCourses,
-      required final List<CourseEntity> recommendedCourses})
+      required final List<HomeCourseEntity> popularCourses,
+      required final List<HomeCourseEntity> recommendedCourses})
       : _popularCourses = popularCourses,
         _recommendedCourses = recommendedCourses;
 
   @override
   final StudentProgressEntity? continueLearning;
-  final List<CourseEntity> _popularCourses;
+  final List<HomeCourseEntity> _popularCourses;
   @override
-  List<CourseEntity> get popularCourses {
+  List<HomeCourseEntity> get popularCourses {
     if (_popularCourses is EqualUnmodifiableListView) return _popularCourses;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_popularCourses);
   }
 
-  final List<CourseEntity> _recommendedCourses;
+  final List<HomeCourseEntity> _recommendedCourses;
   @override
-  List<CourseEntity> get recommendedCourses {
+  List<HomeCourseEntity> get recommendedCourses {
     if (_recommendedCourses is EqualUnmodifiableListView)
       return _recommendedCourses;
     // ignore: implicit_dynamic_type
@@ -461,8 +461,8 @@ class _$SuccessImpl implements _Success {
     required TResult Function() loading,
     required TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)
         success,
     required TResult Function(String message) error,
   }) {
@@ -476,8 +476,8 @@ class _$SuccessImpl implements _Success {
     TResult? Function()? loading,
     TResult? Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult? Function(String message)? error,
   }) {
@@ -491,8 +491,8 @@ class _$SuccessImpl implements _Success {
     TResult Function()? loading,
     TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -543,13 +543,14 @@ class _$SuccessImpl implements _Success {
 
 abstract class _Success implements HomeCoursesState {
   const factory _Success(
-      {required final StudentProgressEntity? continueLearning,
-      required final List<CourseEntity> popularCourses,
-      required final List<CourseEntity> recommendedCourses}) = _$SuccessImpl;
+          {required final StudentProgressEntity? continueLearning,
+          required final List<HomeCourseEntity> popularCourses,
+          required final List<HomeCourseEntity> recommendedCourses}) =
+      _$SuccessImpl;
 
   StudentProgressEntity? get continueLearning;
-  List<CourseEntity> get popularCourses;
-  List<CourseEntity> get recommendedCourses;
+  List<HomeCourseEntity> get popularCourses;
+  List<HomeCourseEntity> get recommendedCourses;
   @JsonKey(ignore: true)
   _$$SuccessImplCopyWith<_$SuccessImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -623,8 +624,8 @@ class _$ErrorImpl implements _Error {
     required TResult Function() loading,
     required TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)
         success,
     required TResult Function(String message) error,
   }) {
@@ -638,8 +639,8 @@ class _$ErrorImpl implements _Error {
     TResult? Function()? loading,
     TResult? Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult? Function(String message)? error,
   }) {
@@ -653,8 +654,8 @@ class _$ErrorImpl implements _Error {
     TResult Function()? loading,
     TResult Function(
             StudentProgressEntity? continueLearning,
-            List<CourseEntity> popularCourses,
-            List<CourseEntity> recommendedCourses)?
+            List<HomeCourseEntity> popularCourses,
+            List<HomeCourseEntity> recommendedCourses)?
         success,
     TResult Function(String message)? error,
     required TResult orElse(),

@@ -12,8 +12,8 @@ class HomeCoursesState with _$HomeCoursesState {
 
   const factory HomeCoursesState.success({
     required StudentProgressEntity? continueLearning,
-    required List<CourseEntity> popularCourses,
-    required List<CourseEntity> recommendedCourses,
+    required List<HomeCourseEntity> popularCourses,
+    required List<HomeCourseEntity> recommendedCourses,
   }) = _Success;
 
   const factory HomeCoursesState.error({

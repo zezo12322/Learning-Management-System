@@ -9,9 +9,9 @@ import '../../domain/entities/course_entity.dart';
 
 // ------------- Continue Learning Section Builder -------------
 Widget buildContinueLearningSection(
-    StudentProgressEntity? progress,
-    CourseEntity? continueCourse,
-    ) {
+  StudentProgressEntity? progress,
+  HomeCourseEntity? continueCourse,
+) {
   final title = continueCourse?.title ?? 'UI/UX Design Principles';
   final image =
       continueCourse?.image ?? 'assets/images/student_illustrator.png';

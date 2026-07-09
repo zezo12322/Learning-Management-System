@@ -59,8 +59,8 @@ class _HomeSuccessView extends StatefulWidget {
   });
 
   final StudentProgressEntity? continueLearning;
-  final List<CourseEntity> popularCourses;
-  final List<CourseEntity> recommendedCourses;
+  final List<HomeCourseEntity> popularCourses;
+  final List<HomeCourseEntity> recommendedCourses;
 
   @override
   State<_HomeSuccessView> createState() => _HomeSuccessViewState();
@@ -77,11 +77,11 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 
   @override
   Widget build(BuildContext context) {
-    final CourseEntity? continueCourse = widget.popularCourses.isNotEmpty
+    final HomeCourseEntity? continueCourse = widget.popularCourses.isNotEmpty
         ? widget.popularCourses.first
         : widget.recommendedCourses.isNotEmpty
-        ? widget.recommendedCourses.first
-        : null;
+            ? widget.recommendedCourses.first
+            : null;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -146,7 +146,8 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 // ============================================================================
 
 class HomeErrorView extends StatelessWidget {
-  const HomeErrorView({super.key,
+  const HomeErrorView({
+    super.key,
     required this.message,
     required this.onRetry,
   });
