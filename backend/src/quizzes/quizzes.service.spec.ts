@@ -338,4 +338,102 @@ describe('QuizzesService', () => {
       ).rejects.toBeInstanceOf(BadRequestException);
     });
   });
+
+  describe('updateQuestion', () => {
+    it('IDOR: rejects an incoming option id that belongs to a different question', async () => {
+      // The question owns opt-A only. A caller who owns this question tries to
+      // rewrite the answer key of opt-FOREIGN (another quiz/course) by passing
+      // its id — the membership check must reject it before any admin mutation.
+      const dc = makeDc({
+        GetQuestionOptions: {
+          quizOptions: [{ id: 'opt-A', text: 'A', isCorrect: true }],
+        },
+      });
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+
+      await expect(
+        svc.updateQuestion(
+          'q1',
+          {
+            options: [
+              { id: 'opt-A', text: 'A', isCorrect: false },
+              { id: 'opt-FOREIGN', text: 'hacked', isCorrect: true },
+            ],
+          } as any,
+          'tok',
+        ),
+      ).rejects.toBeInstanceOf(BadRequestException);
+
+      // No option mutation should have run for the foreign id (or at all).
+      const mutatedOps = dc.executeMutation.mock.calls.map((c: any[]) => c[0]);
+      expect(mutatedOps).not.toContain('AdminUpdateQuizOption');
+      expect(mutatedOps).not.toContain('AdminUpdateQuizOptionOrder');
+    });
+
+    it('rejects an options set with no correct option', async () => {
+      const dc = makeDc({
+        GetQuestionOptions: {
+          quizOptions: [{ id: 'opt-A', text: 'A', isCorrect: true }],
+        },
+      });
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      await expect(
+        svc.updateQuestion(
+          'q1',
+          {
+            options: [
+              { id: 'opt-A', text: 'A', isCorrect: false },
+              { text: 'B', isCorrect: false },
+            ],
+          } as any,
+          'tok',
+        ),
+      ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('updates existing options and inserts new ones when all ids belong to the question', async () => {
+      const dc = makeDc({
+        GetQuestionOptions: {
+          quizOptions: [
+            { id: 'opt-A', text: 'A', isCorrect: true },
+            { id: 'opt-B', text: 'B', isCorrect: false },
+          ],
+        },
+      });
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+
+      const res = await svc.updateQuestion(
+        'q1',
+        {
+          questionText: 'Q?',
+          options: [
+            { id: 'opt-A', text: 'A2', isCorrect: true }, // update
+            { text: 'C', isCorrect: false }, // insert
+          ],
+        } as any,
+        'tok',
+      );
+      expect(res).toEqual({ success: true });
+
+      const mutatedOps = dc.executeMutation.mock.calls.map((c: any[]) => c[0]);
+      expect(mutatedOps).toContain('AdminUpdateQuizOption'); // opt-A updated
+      expect(mutatedOps).toContain('AdminCreateQuizOption'); // opt-C inserted
+      expect(mutatedOps).toContain('AdminDeleteQuizOption'); // opt-B removed
+    });
+  });
 });
