@@ -1,4 +1,5 @@
-import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
+import 'package:optimatech_lms/dataconnect_generated/generated.dart';
+import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 
 class PopularCourseModel extends HomeCourseEntity {
   const PopularCourseModel({
@@ -16,20 +17,25 @@ class PopularCourseModel extends HomeCourseEntity {
     required super.image,
   });
 
-  factory PopularCourseModel.fromDataConnect(Map<String, dynamic> json) {
+  factory PopularCourseModel.fromDataConnect(ListPopularCoursesCourses course) {
     return PopularCourseModel(
-      instructors: List<CourseInstructorEntity>.from(json['instructors'] ?? []),
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      level: json['level'] as String? ?? '',
-      categoryName: json['category']?['name'] as String? ?? '',
-      tags: List<String>.from(json['tags'] ?? const []),
-      ratingCount: json['ratingCount'] as int? ?? 0,
-      courseStatus: json['courseStatus'] as String? ?? '',
-      language: json['language'] as String? ?? '',
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      image: json['thumbnail'] as String? ?? '',
+      instructors: [
+        CourseInstructorEntity(
+          name: course.author.name,
+          avatar: course.author.avatar,
+        ),
+      ],
+      price: course.price.toDouble(),
+      level: course.level.stringValue,
+      categoryName: course.category.name,
+      tags: course.tags,
+      ratingCount: course.ratingCount,
+      courseStatus: 'PUBLISHED',
+      language: 'en',
+      id: course.id,
+      title: course.title,
+      rating: course.avgRating,
+      image: course.thumbnail ?? '',
     );
   }
 }
