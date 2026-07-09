@@ -263,6 +263,20 @@ export class QuizzesService {
         authToken,
       );
       const existing: any[] = existingData?.quizOptions ?? [];
+      const existingIds = new Set<string>(existing.map((e) => e.id as string));
+
+      // Every id-bearing incoming option MUST already belong to this question.
+      // opt.id is fed straight into AdminUpdateQuizOption/…Order, which run via
+      // the service account and bypass @auth — so without this an owner of
+      // question A could rewrite the text/answer-key (isCorrect) or order of an
+      // option belonging to another question/course by passing its id (IDOR).
+      const foreign = options.filter((o) => o.id && !existingIds.has(o.id));
+      if (foreign.length > 0) {
+        throw new BadRequestException(
+          `Cannot update: ${foreign.length} option(s) do not belong to this question`,
+        );
+      }
+
       const incomingIds = new Set(
         options.filter((o) => o.id).map((o) => o.id as string),
       );
