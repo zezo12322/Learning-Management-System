@@ -114,238 +114,6 @@ const dataConnectSettings = {
 };
 exports.dataConnectSettings = dataConnectSettings;
 
-const upsertCourseRatingRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpsertCourseRating', inputVars);
-}
-upsertCourseRatingRef.operationName = 'UpsertCourseRating';
-exports.upsertCourseRatingRef = upsertCourseRatingRef;
-
-exports.upsertCourseRating = function upsertCourseRating(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(upsertCourseRatingRef(dcInstance, inputVars));
-}
-;
-
-const deleteCourseRatingRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'DeleteCourseRating', inputVars);
-}
-deleteCourseRatingRef.operationName = 'DeleteCourseRating';
-exports.deleteCourseRatingRef = deleteCourseRatingRef;
-
-exports.deleteCourseRating = function deleteCourseRating(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(deleteCourseRatingRef(dcInstance, inputVars));
-}
-;
-
-const getMyCourseRatingRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMyCourseRating', inputVars);
-}
-getMyCourseRatingRef.operationName = 'GetMyCourseRating';
-exports.getMyCourseRatingRef = getMyCourseRatingRef;
-
-exports.getMyCourseRating = function getMyCourseRating(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMyCourseRatingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const listCourseRatingsRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'ListCourseRatings', inputVars);
-}
-listCourseRatingsRef.operationName = 'ListCourseRatings';
-exports.listCourseRatingsRef = listCourseRatingsRef;
-
-exports.listCourseRatings = function listCourseRatings(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(listCourseRatingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getCourseRatingsForSummaryRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetCourseRatingsForSummary', inputVars);
-}
-getCourseRatingsForSummaryRef.operationName = 'GetCourseRatingsForSummary';
-exports.getCourseRatingsForSummaryRef = getCourseRatingsForSummaryRef;
-
-exports.getCourseRatingsForSummary = function getCourseRatingsForSummary(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getCourseRatingsForSummaryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const adminUpdateCourseRatingAggregateRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateCourseRatingAggregate', inputVars);
-}
-adminUpdateCourseRatingAggregateRef.operationName = 'AdminUpdateCourseRatingAggregate';
-exports.adminUpdateCourseRatingAggregateRef = adminUpdateCourseRatingAggregateRef;
-
-exports.adminUpdateCourseRatingAggregate = function adminUpdateCourseRatingAggregate(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateCourseRatingAggregateRef(dcInstance, inputVars));
-}
-;
-
-const getCourseSessionsRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetCourseSessions', inputVars);
-}
-getCourseSessionsRef.operationName = 'GetCourseSessions';
-exports.getCourseSessionsRef = getCourseSessionsRef;
-
-exports.getCourseSessions = function getCourseSessions(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getCourseSessionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const checkInToSessionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'CheckInToSession', inputVars);
-}
-checkInToSessionRef.operationName = 'CheckInToSession';
-exports.checkInToSessionRef = checkInToSessionRef;
-
-exports.checkInToSession = function checkInToSession(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(checkInToSessionRef(dcInstance, inputVars));
-}
-;
-
-const syncUserRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'SyncUser', inputVars);
-}
-syncUserRef.operationName = 'SyncUser';
-exports.syncUserRef = syncUserRef;
-
-exports.syncUser = function syncUser(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(syncUserRef(dcInstance, inputVars));
-}
-;
-
-const getMeRef = (dc) => {
-  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMe');
-}
-getMeRef.operationName = 'GetMe';
-exports.getMeRef = getMeRef;
-
-exports.getMe = function getMe(dcOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(getMeRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const updateMyProfileRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpdateMyProfile', inputVars);
-}
-updateMyProfileRef.operationName = 'UpdateMyProfile';
-exports.updateMyProfileRef = updateMyProfileRef;
-
-exports.updateMyProfile = function updateMyProfile(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars);
-  return executeMutation(updateMyProfileRef(dcInstance, inputVars));
-}
-;
-
-const myCertificatesRef = (dc) => {
-  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'MyCertificates');
-}
-myCertificatesRef.operationName = 'MyCertificates';
-exports.myCertificatesRef = myCertificatesRef;
-
-exports.myCertificates = function myCertificates(dcOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(myCertificatesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const verifyCertificateRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'VerifyCertificate', inputVars);
-}
-verifyCertificateRef.operationName = 'VerifyCertificate';
-exports.verifyCertificateRef = verifyCertificateRef;
-
-exports.verifyCertificate = function verifyCertificate(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(verifyCertificateRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const logPaymentRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'LogPayment', inputVars);
-}
-logPaymentRef.operationName = 'LogPayment';
-exports.logPaymentRef = logPaymentRef;
-
-exports.logPayment = function logPayment(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(logPaymentRef(dcInstance, inputVars));
-}
-;
-
-const addPaymentItemRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AddPaymentItem', inputVars);
-}
-addPaymentItemRef.operationName = 'AddPaymentItem';
-exports.addPaymentItemRef = addPaymentItemRef;
-
-exports.addPaymentItem = function addPaymentItem(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(addPaymentItemRef(dcInstance, inputVars));
-}
-;
-
-const myPaymentHistoryRef = (dc) => {
-  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'MyPaymentHistory');
-}
-myPaymentHistoryRef.operationName = 'MyPaymentHistory';
-exports.myPaymentHistoryRef = myPaymentHistoryRef;
-
-exports.myPaymentHistory = function myPaymentHistory(dcOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(myPaymentHistoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
 const getUserClaimsFnRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -516,6 +284,335 @@ exports.getCourseInstructors = function getCourseInstructors(dcOrVars, varsOrOpt
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCourseInstructorsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getMissionForEnrollmentRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMissionForEnrollment', inputVars);
+}
+getMissionForEnrollmentRef.operationName = 'GetMissionForEnrollment';
+exports.getMissionForEnrollmentRef = getMissionForEnrollmentRef;
+
+exports.getMissionForEnrollment = function getMissionForEnrollment(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMissionForEnrollmentRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const submitMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SubmitMission', inputVars);
+}
+submitMissionRef.operationName = 'SubmitMission';
+exports.submitMissionRef = submitMissionRef;
+
+exports.submitMission = function submitMission(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(submitMissionRef(dcInstance, inputVars));
+}
+;
+
+const mySubmissionsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'MySubmissions');
+}
+mySubmissionsRef.operationName = 'MySubmissions';
+exports.mySubmissionsRef = mySubmissionsRef;
+
+exports.mySubmissions = function mySubmissions(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(mySubmissionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const gradeSubmissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'GradeSubmission', inputVars);
+}
+gradeSubmissionRef.operationName = 'GradeSubmission';
+exports.gradeSubmissionRef = gradeSubmissionRef;
+
+exports.gradeSubmission = function gradeSubmission(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(gradeSubmissionRef(dcInstance, inputVars));
+}
+;
+
+const addCriterionScoreRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AddCriterionScore', inputVars);
+}
+addCriterionScoreRef.operationName = 'AddCriterionScore';
+exports.addCriterionScoreRef = addCriterionScoreRef;
+
+exports.addCriterionScore = function addCriterionScore(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(addCriterionScoreRef(dcInstance, inputVars));
+}
+;
+
+const getSubmissionForGradingRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetSubmissionForGrading', inputVars);
+}
+getSubmissionForGradingRef.operationName = 'GetSubmissionForGrading';
+exports.getSubmissionForGradingRef = getSubmissionForGradingRef;
+
+exports.getSubmissionForGrading = function getSubmissionForGrading(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getSubmissionForGradingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getEnrollmentForUserMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetEnrollmentForUserMission', inputVars);
+}
+getEnrollmentForUserMissionRef.operationName = 'GetEnrollmentForUserMission';
+exports.getEnrollmentForUserMissionRef = getEnrollmentForUserMissionRef;
+
+exports.getEnrollmentForUserMission = function getEnrollmentForUserMission(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getEnrollmentForUserMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const adminCreateMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateMission', inputVars);
+}
+adminCreateMissionRef.operationName = 'AdminCreateMission';
+exports.adminCreateMissionRef = adminCreateMissionRef;
+
+exports.adminCreateMission = function adminCreateMission(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateMissionRef(dcInstance, inputVars));
+}
+;
+
+const adminUpdateMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateMission', inputVars);
+}
+adminUpdateMissionRef.operationName = 'AdminUpdateMission';
+exports.adminUpdateMissionRef = adminUpdateMissionRef;
+
+exports.adminUpdateMission = function adminUpdateMission(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateMissionRef(dcInstance, inputVars));
+}
+;
+
+const adminSoftDeleteMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminSoftDeleteMission', inputVars);
+}
+adminSoftDeleteMissionRef.operationName = 'AdminSoftDeleteMission';
+exports.adminSoftDeleteMissionRef = adminSoftDeleteMissionRef;
+
+exports.adminSoftDeleteMission = function adminSoftDeleteMission(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminSoftDeleteMissionRef(dcInstance, inputVars));
+}
+;
+
+const adminGetMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'AdminGetMission', inputVars);
+}
+adminGetMissionRef.operationName = 'AdminGetMission';
+exports.adminGetMissionRef = adminGetMissionRef;
+
+exports.adminGetMission = function adminGetMission(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(adminGetMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const adminListMyMissionsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'AdminListMyMissions');
+}
+adminListMyMissionsRef.operationName = 'AdminListMyMissions';
+exports.adminListMyMissionsRef = adminListMyMissionsRef;
+
+exports.adminListMyMissions = function adminListMyMissions(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(adminListMyMissionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const adminCreateMicroLessonRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateMicroLesson', inputVars);
+}
+adminCreateMicroLessonRef.operationName = 'AdminCreateMicroLesson';
+exports.adminCreateMicroLessonRef = adminCreateMicroLessonRef;
+
+exports.adminCreateMicroLesson = function adminCreateMicroLesson(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateMicroLessonRef(dcInstance, inputVars));
+}
+;
+
+const adminUpdateMicroLessonRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateMicroLesson', inputVars);
+}
+adminUpdateMicroLessonRef.operationName = 'AdminUpdateMicroLesson';
+exports.adminUpdateMicroLessonRef = adminUpdateMicroLessonRef;
+
+exports.adminUpdateMicroLesson = function adminUpdateMicroLesson(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateMicroLessonRef(dcInstance, inputVars));
+}
+;
+
+const adminDeleteMicroLessonRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminDeleteMicroLesson', inputVars);
+}
+adminDeleteMicroLessonRef.operationName = 'AdminDeleteMicroLesson';
+exports.adminDeleteMicroLessonRef = adminDeleteMicroLessonRef;
+
+exports.adminDeleteMicroLesson = function adminDeleteMicroLesson(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminDeleteMicroLessonRef(dcInstance, inputVars));
+}
+;
+
+const adminUpdateMicroLessonOrderRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateMicroLessonOrder', inputVars);
+}
+adminUpdateMicroLessonOrderRef.operationName = 'AdminUpdateMicroLessonOrder';
+exports.adminUpdateMicroLessonOrderRef = adminUpdateMicroLessonOrderRef;
+
+exports.adminUpdateMicroLessonOrder = function adminUpdateMicroLessonOrder(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateMicroLessonOrderRef(dcInstance, inputVars));
+}
+;
+
+const adminCreateMissionTemplateRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateMissionTemplate', inputVars);
+}
+adminCreateMissionTemplateRef.operationName = 'AdminCreateMissionTemplate';
+exports.adminCreateMissionTemplateRef = adminCreateMissionTemplateRef;
+
+exports.adminCreateMissionTemplate = function adminCreateMissionTemplate(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateMissionTemplateRef(dcInstance, inputVars));
+}
+;
+
+const adminDeleteMissionTemplateRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminDeleteMissionTemplate', inputVars);
+}
+adminDeleteMissionTemplateRef.operationName = 'AdminDeleteMissionTemplate';
+exports.adminDeleteMissionTemplateRef = adminDeleteMissionTemplateRef;
+
+exports.adminDeleteMissionTemplate = function adminDeleteMissionTemplate(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminDeleteMissionTemplateRef(dcInstance, inputVars));
+}
+;
+
+const getMissionTemplatesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMissionTemplates', inputVars);
+}
+getMissionTemplatesRef.operationName = 'GetMissionTemplates';
+exports.getMissionTemplatesRef = getMissionTemplatesRef;
+
+exports.getMissionTemplates = function getMissionTemplates(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMissionTemplatesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const adminCreateRubricCriterionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateRubricCriterion', inputVars);
+}
+adminCreateRubricCriterionRef.operationName = 'AdminCreateRubricCriterion';
+exports.adminCreateRubricCriterionRef = adminCreateRubricCriterionRef;
+
+exports.adminCreateRubricCriterion = function adminCreateRubricCriterion(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateRubricCriterionRef(dcInstance, inputVars));
+}
+;
+
+const adminUpdateRubricCriterionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateRubricCriterion', inputVars);
+}
+adminUpdateRubricCriterionRef.operationName = 'AdminUpdateRubricCriterion';
+exports.adminUpdateRubricCriterionRef = adminUpdateRubricCriterionRef;
+
+exports.adminUpdateRubricCriterion = function adminUpdateRubricCriterion(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateRubricCriterionRef(dcInstance, inputVars));
+}
+;
+
+const adminDeleteRubricCriterionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminDeleteRubricCriterion', inputVars);
+}
+adminDeleteRubricCriterionRef.operationName = 'AdminDeleteRubricCriterion';
+exports.adminDeleteRubricCriterionRef = adminDeleteRubricCriterionRef;
+
+exports.adminDeleteRubricCriterion = function adminDeleteRubricCriterion(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminDeleteRubricCriterionRef(dcInstance, inputVars));
+}
+;
+
+const adminUpdateRubricCriterionOrderRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateRubricCriterionOrder', inputVars);
+}
+adminUpdateRubricCriterionOrderRef.operationName = 'AdminUpdateRubricCriterionOrder';
+exports.adminUpdateRubricCriterionOrderRef = adminUpdateRubricCriterionOrderRef;
+
+exports.adminUpdateRubricCriterionOrder = function adminUpdateRubricCriterionOrder(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateRubricCriterionOrderRef(dcInstance, inputVars));
 }
 ;
 
@@ -877,253 +974,6 @@ exports.adminUpdateQuizOptionOrderRef = adminUpdateQuizOptionOrderRef;
 exports.adminUpdateQuizOptionOrder = function adminUpdateQuizOptionOrder(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(adminUpdateQuizOptionOrderRef(dcInstance, inputVars));
-}
-;
-
-const getMyCourseAccessRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMyCourseAccess', inputVars);
-}
-getMyCourseAccessRef.operationName = 'GetMyCourseAccess';
-exports.getMyCourseAccessRef = getMyCourseAccessRef;
-
-exports.getMyCourseAccess = function getMyCourseAccess(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMyCourseAccessRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getMyMissionAccessRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMyMissionAccess', inputVars);
-}
-getMyMissionAccessRef.operationName = 'GetMyMissionAccess';
-exports.getMyMissionAccessRef = getMyMissionAccessRef;
-
-exports.getMyMissionAccess = function getMyMissionAccess(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMyMissionAccessRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getQuestionCourseRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetQuestionCourse', inputVars);
-}
-getQuestionCourseRef.operationName = 'GetQuestionCourse';
-exports.getQuestionCourseRef = getQuestionCourseRef;
-
-exports.getQuestionCourse = function getQuestionCourse(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getQuestionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getOptionCourseRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetOptionCourse', inputVars);
-}
-getOptionCourseRef.operationName = 'GetOptionCourse';
-exports.getOptionCourseRef = getOptionCourseRef;
-
-exports.getOptionCourse = function getOptionCourse(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getOptionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getSectionCourseRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetSectionCourse', inputVars);
-}
-getSectionCourseRef.operationName = 'GetSectionCourse';
-exports.getSectionCourseRef = getSectionCourseRef;
-
-exports.getSectionCourse = function getSectionCourse(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getSectionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getMicroLessonMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMicroLessonMission', inputVars);
-}
-getMicroLessonMissionRef.operationName = 'GetMicroLessonMission';
-exports.getMicroLessonMissionRef = getMicroLessonMissionRef;
-
-exports.getMicroLessonMission = function getMicroLessonMission(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMicroLessonMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getCriterionMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetCriterionMission', inputVars);
-}
-getCriterionMissionRef.operationName = 'GetCriterionMission';
-exports.getCriterionMissionRef = getCriterionMissionRef;
-
-exports.getCriterionMission = function getCriterionMission(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getCriterionMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getTemplateMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetTemplateMission', inputVars);
-}
-getTemplateMissionRef.operationName = 'GetTemplateMission';
-exports.getTemplateMissionRef = getTemplateMissionRef;
-
-exports.getTemplateMission = function getTemplateMission(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getTemplateMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const instructorDeleteCourseRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'InstructorDeleteCourse', inputVars);
-}
-instructorDeleteCourseRef.operationName = 'InstructorDeleteCourse';
-exports.instructorDeleteCourseRef = instructorDeleteCourseRef;
-
-exports.instructorDeleteCourse = function instructorDeleteCourse(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(instructorDeleteCourseRef(dcInstance, inputVars));
-}
-;
-
-const superAdminDeleteCourseRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'SuperAdminDeleteCourse', inputVars);
-}
-superAdminDeleteCourseRef.operationName = 'SuperAdminDeleteCourse';
-exports.superAdminDeleteCourseRef = superAdminDeleteCourseRef;
-
-exports.superAdminDeleteCourse = function superAdminDeleteCourse(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(superAdminDeleteCourseRef(dcInstance, inputVars));
-}
-;
-
-const adminCreateSessionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateSession', inputVars);
-}
-adminCreateSessionRef.operationName = 'AdminCreateSession';
-exports.adminCreateSessionRef = adminCreateSessionRef;
-
-exports.adminCreateSession = function adminCreateSession(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateSessionRef(dcInstance, inputVars));
-}
-;
-
-const instructorCancelSessionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'InstructorCancelSession', inputVars);
-}
-instructorCancelSessionRef.operationName = 'InstructorCancelSession';
-exports.instructorCancelSessionRef = instructorCancelSessionRef;
-
-exports.instructorCancelSession = function instructorCancelSession(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(instructorCancelSessionRef(dcInstance, inputVars));
-}
-;
-
-const superAdminCancelSessionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'SuperAdminCancelSession', inputVars);
-}
-superAdminCancelSessionRef.operationName = 'SuperAdminCancelSession';
-exports.superAdminCancelSessionRef = superAdminCancelSessionRef;
-
-exports.superAdminCancelSession = function superAdminCancelSession(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(superAdminCancelSessionRef(dcInstance, inputVars));
-}
-;
-
-const adminCreateSubscriptionTierRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateSubscriptionTier', inputVars);
-}
-adminCreateSubscriptionTierRef.operationName = 'AdminCreateSubscriptionTier';
-exports.adminCreateSubscriptionTierRef = adminCreateSubscriptionTierRef;
-
-exports.adminCreateSubscriptionTier = function adminCreateSubscriptionTier(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateSubscriptionTierRef(dcInstance, inputVars));
-}
-;
-
-const adminDeprecateSubscriptionTierRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminDeprecateSubscriptionTier', inputVars);
-}
-adminDeprecateSubscriptionTierRef.operationName = 'AdminDeprecateSubscriptionTier';
-exports.adminDeprecateSubscriptionTierRef = adminDeprecateSubscriptionTierRef;
-
-exports.adminDeprecateSubscriptionTier = function adminDeprecateSubscriptionTier(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminDeprecateSubscriptionTierRef(dcInstance, inputVars));
-}
-;
-
-const adminCreateCategoryRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateCategory', inputVars);
-}
-adminCreateCategoryRef.operationName = 'AdminCreateCategory';
-exports.adminCreateCategoryRef = adminCreateCategoryRef;
-
-exports.adminCreateCategory = function adminCreateCategory(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateCategoryRef(dcInstance, inputVars));
-}
-;
-
-const getUserClaimsRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetUserClaims', inputVars);
-}
-getUserClaimsRef.operationName = 'GetUserClaims';
-exports.getUserClaimsRef = getUserClaimsRef;
-
-exports.getUserClaims = function getUserClaims(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getUserClaimsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
@@ -1708,331 +1558,481 @@ exports.getUserEnrollmentForMission = function getUserEnrollmentForMission(dcOrV
 }
 ;
 
-const getMissionForEnrollmentRef = (dcOrVars, vars) => {
+const upsertCourseRatingRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMissionForEnrollment', inputVars);
+  return mutationRef(dcInstance, 'UpsertCourseRating', inputVars);
 }
-getMissionForEnrollmentRef.operationName = 'GetMissionForEnrollment';
-exports.getMissionForEnrollmentRef = getMissionForEnrollmentRef;
+upsertCourseRatingRef.operationName = 'UpsertCourseRating';
+exports.upsertCourseRatingRef = upsertCourseRatingRef;
 
-exports.getMissionForEnrollment = function getMissionForEnrollment(dcOrVars, varsOrOptions, options) {
+exports.upsertCourseRating = function upsertCourseRating(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertCourseRatingRef(dcInstance, inputVars));
+}
+;
+
+const deleteCourseRatingRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteCourseRating', inputVars);
+}
+deleteCourseRatingRef.operationName = 'DeleteCourseRating';
+exports.deleteCourseRatingRef = deleteCourseRatingRef;
+
+exports.deleteCourseRating = function deleteCourseRating(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteCourseRatingRef(dcInstance, inputVars));
+}
+;
+
+const getMyCourseRatingRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMyCourseRating', inputVars);
+}
+getMyCourseRatingRef.operationName = 'GetMyCourseRating';
+exports.getMyCourseRatingRef = getMyCourseRatingRef;
+
+exports.getMyCourseRating = function getMyCourseRating(dcOrVars, varsOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMissionForEnrollmentRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+  return executeQuery(getMyCourseRatingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const submitMissionRef = (dcOrVars, vars) => {
+const listCourseRatingsRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'SubmitMission', inputVars);
+  return queryRef(dcInstance, 'ListCourseRatings', inputVars);
 }
-submitMissionRef.operationName = 'SubmitMission';
-exports.submitMissionRef = submitMissionRef;
+listCourseRatingsRef.operationName = 'ListCourseRatings';
+exports.listCourseRatingsRef = listCourseRatingsRef;
 
-exports.submitMission = function submitMission(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(submitMissionRef(dcInstance, inputVars));
+exports.listCourseRatings = function listCourseRatings(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(listCourseRatingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const mySubmissionsRef = (dc) => {
+const getCourseRatingsForSummaryRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCourseRatingsForSummary', inputVars);
+}
+getCourseRatingsForSummaryRef.operationName = 'GetCourseRatingsForSummary';
+exports.getCourseRatingsForSummaryRef = getCourseRatingsForSummaryRef;
+
+exports.getCourseRatingsForSummary = function getCourseRatingsForSummary(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCourseRatingsForSummaryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const adminUpdateCourseRatingAggregateRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminUpdateCourseRatingAggregate', inputVars);
+}
+adminUpdateCourseRatingAggregateRef.operationName = 'AdminUpdateCourseRatingAggregate';
+exports.adminUpdateCourseRatingAggregateRef = adminUpdateCourseRatingAggregateRef;
+
+exports.adminUpdateCourseRatingAggregate = function adminUpdateCourseRatingAggregate(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminUpdateCourseRatingAggregateRef(dcInstance, inputVars));
+}
+;
+
+const getMyCourseAccessRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMyCourseAccess', inputVars);
+}
+getMyCourseAccessRef.operationName = 'GetMyCourseAccess';
+exports.getMyCourseAccessRef = getMyCourseAccessRef;
+
+exports.getMyCourseAccess = function getMyCourseAccess(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMyCourseAccessRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getMyMissionAccessRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMyMissionAccess', inputVars);
+}
+getMyMissionAccessRef.operationName = 'GetMyMissionAccess';
+exports.getMyMissionAccessRef = getMyMissionAccessRef;
+
+exports.getMyMissionAccess = function getMyMissionAccess(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMyMissionAccessRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getQuestionCourseRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetQuestionCourse', inputVars);
+}
+getQuestionCourseRef.operationName = 'GetQuestionCourse';
+exports.getQuestionCourseRef = getQuestionCourseRef;
+
+exports.getQuestionCourse = function getQuestionCourse(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getQuestionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getOptionCourseRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOptionCourse', inputVars);
+}
+getOptionCourseRef.operationName = 'GetOptionCourse';
+exports.getOptionCourseRef = getOptionCourseRef;
+
+exports.getOptionCourse = function getOptionCourse(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOptionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getSectionCourseRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetSectionCourse', inputVars);
+}
+getSectionCourseRef.operationName = 'GetSectionCourse';
+exports.getSectionCourseRef = getSectionCourseRef;
+
+exports.getSectionCourse = function getSectionCourse(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getSectionCourseRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getMicroLessonMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMicroLessonMission', inputVars);
+}
+getMicroLessonMissionRef.operationName = 'GetMicroLessonMission';
+exports.getMicroLessonMissionRef = getMicroLessonMissionRef;
+
+exports.getMicroLessonMission = function getMicroLessonMission(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMicroLessonMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCriterionMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCriterionMission', inputVars);
+}
+getCriterionMissionRef.operationName = 'GetCriterionMission';
+exports.getCriterionMissionRef = getCriterionMissionRef;
+
+exports.getCriterionMission = function getCriterionMission(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCriterionMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getTemplateMissionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetTemplateMission', inputVars);
+}
+getTemplateMissionRef.operationName = 'GetTemplateMission';
+exports.getTemplateMissionRef = getTemplateMissionRef;
+
+exports.getTemplateMission = function getTemplateMission(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getTemplateMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCourseSessionsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCourseSessions', inputVars);
+}
+getCourseSessionsRef.operationName = 'GetCourseSessions';
+exports.getCourseSessionsRef = getCourseSessionsRef;
+
+exports.getCourseSessions = function getCourseSessions(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCourseSessionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const checkInToSessionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CheckInToSession', inputVars);
+}
+checkInToSessionRef.operationName = 'CheckInToSession';
+exports.checkInToSessionRef = checkInToSessionRef;
+
+exports.checkInToSession = function checkInToSession(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(checkInToSessionRef(dcInstance, inputVars));
+}
+;
+
+const syncUserRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SyncUser', inputVars);
+}
+syncUserRef.operationName = 'SyncUser';
+exports.syncUserRef = syncUserRef;
+
+exports.syncUser = function syncUser(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(syncUserRef(dcInstance, inputVars));
+}
+;
+
+const getMeRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'MySubmissions');
+  return queryRef(dcInstance, 'GetMe');
 }
-mySubmissionsRef.operationName = 'MySubmissions';
-exports.mySubmissionsRef = mySubmissionsRef;
+getMeRef.operationName = 'GetMe';
+exports.getMeRef = getMeRef;
 
-exports.mySubmissions = function mySubmissions(dcOrOptions, options) {
+exports.getMe = function getMe(dcOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(mySubmissionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+  return executeQuery(getMeRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const gradeSubmissionRef = (dcOrVars, vars) => {
+const updateMyProfileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateMyProfile', inputVars);
+}
+updateMyProfileRef.operationName = 'UpdateMyProfile';
+exports.updateMyProfileRef = updateMyProfileRef;
+
+exports.updateMyProfile = function updateMyProfile(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars);
+  return executeMutation(updateMyProfileRef(dcInstance, inputVars));
+}
+;
+
+const instructorDeleteCourseRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'GradeSubmission', inputVars);
+  return mutationRef(dcInstance, 'InstructorDeleteCourse', inputVars);
 }
-gradeSubmissionRef.operationName = 'GradeSubmission';
-exports.gradeSubmissionRef = gradeSubmissionRef;
+instructorDeleteCourseRef.operationName = 'InstructorDeleteCourse';
+exports.instructorDeleteCourseRef = instructorDeleteCourseRef;
 
-exports.gradeSubmission = function gradeSubmission(dcOrVars, vars) {
+exports.instructorDeleteCourse = function instructorDeleteCourse(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(gradeSubmissionRef(dcInstance, inputVars));
+  return executeMutation(instructorDeleteCourseRef(dcInstance, inputVars));
 }
 ;
 
-const addCriterionScoreRef = (dcOrVars, vars) => {
+const superAdminDeleteCourseRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AddCriterionScore', inputVars);
+  return mutationRef(dcInstance, 'SuperAdminDeleteCourse', inputVars);
 }
-addCriterionScoreRef.operationName = 'AddCriterionScore';
-exports.addCriterionScoreRef = addCriterionScoreRef;
+superAdminDeleteCourseRef.operationName = 'SuperAdminDeleteCourse';
+exports.superAdminDeleteCourseRef = superAdminDeleteCourseRef;
 
-exports.addCriterionScore = function addCriterionScore(dcOrVars, vars) {
+exports.superAdminDeleteCourse = function superAdminDeleteCourse(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(addCriterionScoreRef(dcInstance, inputVars));
+  return executeMutation(superAdminDeleteCourseRef(dcInstance, inputVars));
 }
 ;
 
-const getSubmissionForGradingRef = (dcOrVars, vars) => {
+const adminCreateSessionRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetSubmissionForGrading', inputVars);
+  return mutationRef(dcInstance, 'AdminCreateSession', inputVars);
 }
-getSubmissionForGradingRef.operationName = 'GetSubmissionForGrading';
-exports.getSubmissionForGradingRef = getSubmissionForGradingRef;
+adminCreateSessionRef.operationName = 'AdminCreateSession';
+exports.adminCreateSessionRef = adminCreateSessionRef;
 
-exports.getSubmissionForGrading = function getSubmissionForGrading(dcOrVars, varsOrOptions, options) {
+exports.adminCreateSession = function adminCreateSession(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateSessionRef(dcInstance, inputVars));
+}
+;
+
+const instructorCancelSessionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'InstructorCancelSession', inputVars);
+}
+instructorCancelSessionRef.operationName = 'InstructorCancelSession';
+exports.instructorCancelSessionRef = instructorCancelSessionRef;
+
+exports.instructorCancelSession = function instructorCancelSession(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(instructorCancelSessionRef(dcInstance, inputVars));
+}
+;
+
+const superAdminCancelSessionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SuperAdminCancelSession', inputVars);
+}
+superAdminCancelSessionRef.operationName = 'SuperAdminCancelSession';
+exports.superAdminCancelSessionRef = superAdminCancelSessionRef;
+
+exports.superAdminCancelSession = function superAdminCancelSession(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(superAdminCancelSessionRef(dcInstance, inputVars));
+}
+;
+
+const adminCreateSubscriptionTierRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateSubscriptionTier', inputVars);
+}
+adminCreateSubscriptionTierRef.operationName = 'AdminCreateSubscriptionTier';
+exports.adminCreateSubscriptionTierRef = adminCreateSubscriptionTierRef;
+
+exports.adminCreateSubscriptionTier = function adminCreateSubscriptionTier(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateSubscriptionTierRef(dcInstance, inputVars));
+}
+;
+
+const adminDeprecateSubscriptionTierRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminDeprecateSubscriptionTier', inputVars);
+}
+adminDeprecateSubscriptionTierRef.operationName = 'AdminDeprecateSubscriptionTier';
+exports.adminDeprecateSubscriptionTierRef = adminDeprecateSubscriptionTierRef;
+
+exports.adminDeprecateSubscriptionTier = function adminDeprecateSubscriptionTier(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminDeprecateSubscriptionTierRef(dcInstance, inputVars));
+}
+;
+
+const adminCreateCategoryRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AdminCreateCategory', inputVars);
+}
+adminCreateCategoryRef.operationName = 'AdminCreateCategory';
+exports.adminCreateCategoryRef = adminCreateCategoryRef;
+
+exports.adminCreateCategory = function adminCreateCategory(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(adminCreateCategoryRef(dcInstance, inputVars));
+}
+;
+
+const getUserClaimsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserClaims', inputVars);
+}
+getUserClaimsRef.operationName = 'GetUserClaims';
+exports.getUserClaimsRef = getUserClaimsRef;
+
+exports.getUserClaims = function getUserClaims(dcOrVars, varsOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getSubmissionForGradingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+  return executeQuery(getUserClaimsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const getEnrollmentForUserMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetEnrollmentForUserMission', inputVars);
-}
-getEnrollmentForUserMissionRef.operationName = 'GetEnrollmentForUserMission';
-exports.getEnrollmentForUserMissionRef = getEnrollmentForUserMissionRef;
-
-exports.getEnrollmentForUserMission = function getEnrollmentForUserMission(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getEnrollmentForUserMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const adminCreateMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateMission', inputVars);
-}
-adminCreateMissionRef.operationName = 'AdminCreateMission';
-exports.adminCreateMissionRef = adminCreateMissionRef;
-
-exports.adminCreateMission = function adminCreateMission(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateMissionRef(dcInstance, inputVars));
-}
-;
-
-const adminUpdateMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateMission', inputVars);
-}
-adminUpdateMissionRef.operationName = 'AdminUpdateMission';
-exports.adminUpdateMissionRef = adminUpdateMissionRef;
-
-exports.adminUpdateMission = function adminUpdateMission(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateMissionRef(dcInstance, inputVars));
-}
-;
-
-const adminSoftDeleteMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminSoftDeleteMission', inputVars);
-}
-adminSoftDeleteMissionRef.operationName = 'AdminSoftDeleteMission';
-exports.adminSoftDeleteMissionRef = adminSoftDeleteMissionRef;
-
-exports.adminSoftDeleteMission = function adminSoftDeleteMission(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminSoftDeleteMissionRef(dcInstance, inputVars));
-}
-;
-
-const adminGetMissionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'AdminGetMission', inputVars);
-}
-adminGetMissionRef.operationName = 'AdminGetMission';
-exports.adminGetMissionRef = adminGetMissionRef;
-
-exports.adminGetMission = function adminGetMission(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(adminGetMissionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const adminListMyMissionsRef = (dc) => {
+const myCertificatesRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'AdminListMyMissions');
+  return queryRef(dcInstance, 'MyCertificates');
 }
-adminListMyMissionsRef.operationName = 'AdminListMyMissions';
-exports.adminListMyMissionsRef = adminListMyMissionsRef;
+myCertificatesRef.operationName = 'MyCertificates';
+exports.myCertificatesRef = myCertificatesRef;
 
-exports.adminListMyMissions = function adminListMyMissions(dcOrOptions, options) {
+exports.myCertificates = function myCertificates(dcOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(adminListMyMissionsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+  return executeQuery(myCertificatesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const adminCreateMicroLessonRef = (dcOrVars, vars) => {
+const verifyCertificateRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateMicroLesson', inputVars);
+  return queryRef(dcInstance, 'VerifyCertificate', inputVars);
 }
-adminCreateMicroLessonRef.operationName = 'AdminCreateMicroLesson';
-exports.adminCreateMicroLessonRef = adminCreateMicroLessonRef;
+verifyCertificateRef.operationName = 'VerifyCertificate';
+exports.verifyCertificateRef = verifyCertificateRef;
 
-exports.adminCreateMicroLesson = function adminCreateMicroLesson(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateMicroLessonRef(dcInstance, inputVars));
-}
-;
-
-const adminUpdateMicroLessonRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateMicroLesson', inputVars);
-}
-adminUpdateMicroLessonRef.operationName = 'AdminUpdateMicroLesson';
-exports.adminUpdateMicroLessonRef = adminUpdateMicroLessonRef;
-
-exports.adminUpdateMicroLesson = function adminUpdateMicroLesson(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateMicroLessonRef(dcInstance, inputVars));
-}
-;
-
-const adminDeleteMicroLessonRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminDeleteMicroLesson', inputVars);
-}
-adminDeleteMicroLessonRef.operationName = 'AdminDeleteMicroLesson';
-exports.adminDeleteMicroLessonRef = adminDeleteMicroLessonRef;
-
-exports.adminDeleteMicroLesson = function adminDeleteMicroLesson(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminDeleteMicroLessonRef(dcInstance, inputVars));
-}
-;
-
-const adminUpdateMicroLessonOrderRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateMicroLessonOrder', inputVars);
-}
-adminUpdateMicroLessonOrderRef.operationName = 'AdminUpdateMicroLessonOrder';
-exports.adminUpdateMicroLessonOrderRef = adminUpdateMicroLessonOrderRef;
-
-exports.adminUpdateMicroLessonOrder = function adminUpdateMicroLessonOrder(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateMicroLessonOrderRef(dcInstance, inputVars));
-}
-;
-
-const adminCreateMissionTemplateRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateMissionTemplate', inputVars);
-}
-adminCreateMissionTemplateRef.operationName = 'AdminCreateMissionTemplate';
-exports.adminCreateMissionTemplateRef = adminCreateMissionTemplateRef;
-
-exports.adminCreateMissionTemplate = function adminCreateMissionTemplate(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateMissionTemplateRef(dcInstance, inputVars));
-}
-;
-
-const adminDeleteMissionTemplateRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminDeleteMissionTemplate', inputVars);
-}
-adminDeleteMissionTemplateRef.operationName = 'AdminDeleteMissionTemplate';
-exports.adminDeleteMissionTemplateRef = adminDeleteMissionTemplateRef;
-
-exports.adminDeleteMissionTemplate = function adminDeleteMissionTemplate(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminDeleteMissionTemplateRef(dcInstance, inputVars));
-}
-;
-
-const getMissionTemplatesRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetMissionTemplates', inputVars);
-}
-getMissionTemplatesRef.operationName = 'GetMissionTemplates';
-exports.getMissionTemplatesRef = getMissionTemplatesRef;
-
-exports.getMissionTemplates = function getMissionTemplates(dcOrVars, varsOrOptions, options) {
+exports.verifyCertificate = function verifyCertificate(dcOrVars, varsOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
-  return executeQuery(getMissionTemplatesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+  return executeQuery(verifyCertificateRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
-const adminCreateRubricCriterionRef = (dcOrVars, vars) => {
+const logPaymentRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminCreateRubricCriterion', inputVars);
+  return mutationRef(dcInstance, 'LogPayment', inputVars);
 }
-adminCreateRubricCriterionRef.operationName = 'AdminCreateRubricCriterion';
-exports.adminCreateRubricCriterionRef = adminCreateRubricCriterionRef;
+logPaymentRef.operationName = 'LogPayment';
+exports.logPaymentRef = logPaymentRef;
 
-exports.adminCreateRubricCriterion = function adminCreateRubricCriterion(dcOrVars, vars) {
+exports.logPayment = function logPayment(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminCreateRubricCriterionRef(dcInstance, inputVars));
+  return executeMutation(logPaymentRef(dcInstance, inputVars));
 }
 ;
 
-const adminUpdateRubricCriterionRef = (dcOrVars, vars) => {
+const addPaymentItemRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateRubricCriterion', inputVars);
+  return mutationRef(dcInstance, 'AddPaymentItem', inputVars);
 }
-adminUpdateRubricCriterionRef.operationName = 'AdminUpdateRubricCriterion';
-exports.adminUpdateRubricCriterionRef = adminUpdateRubricCriterionRef;
+addPaymentItemRef.operationName = 'AddPaymentItem';
+exports.addPaymentItemRef = addPaymentItemRef;
 
-exports.adminUpdateRubricCriterion = function adminUpdateRubricCriterion(dcOrVars, vars) {
+exports.addPaymentItem = function addPaymentItem(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateRubricCriterionRef(dcInstance, inputVars));
+  return executeMutation(addPaymentItemRef(dcInstance, inputVars));
 }
 ;
 
-const adminDeleteRubricCriterionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+const myPaymentHistoryRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminDeleteRubricCriterion', inputVars);
+  return queryRef(dcInstance, 'MyPaymentHistory');
 }
-adminDeleteRubricCriterionRef.operationName = 'AdminDeleteRubricCriterion';
-exports.adminDeleteRubricCriterionRef = adminDeleteRubricCriterionRef;
+myPaymentHistoryRef.operationName = 'MyPaymentHistory';
+exports.myPaymentHistoryRef = myPaymentHistoryRef;
 
-exports.adminDeleteRubricCriterion = function adminDeleteRubricCriterion(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminDeleteRubricCriterionRef(dcInstance, inputVars));
-}
-;
-
-const adminUpdateRubricCriterionOrderRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'AdminUpdateRubricCriterionOrder', inputVars);
-}
-adminUpdateRubricCriterionOrderRef.operationName = 'AdminUpdateRubricCriterionOrder';
-exports.adminUpdateRubricCriterionOrderRef = adminUpdateRubricCriterionOrderRef;
-
-exports.adminUpdateRubricCriterionOrder = function adminUpdateRubricCriterionOrder(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(adminUpdateRubricCriterionOrderRef(dcInstance, inputVars));
+exports.myPaymentHistory = function myPaymentHistory(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(myPaymentHistoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
