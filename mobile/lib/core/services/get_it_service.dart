@@ -12,6 +12,7 @@ import 'package:optimatech_lms/features/courses/data/repositories/categories_rep
 import 'package:optimatech_lms/features/courses/data/repositories/courses_repository_impl.dart';
 import 'package:optimatech_lms/features/courses/domain/repositories/courses_repository.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
+import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source.dart';
 import 'package:optimatech_lms/features/profile/data/datasources/theme_local_data_source.dart';
 import 'package:optimatech_lms/features/profile/presentation/manager/theme/theme_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +21,7 @@ import '../../features/courses/data/datasources/categories_remote_datasource/cat
 import '../../features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource.dart';
 import '../../features/courses/domain/repositories/categories_repository.dart';
 import '../../features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
-import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source.dart';
+import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source_impl.dart';
 import 'package:optimatech_lms/features/home/data/repositories/home_repository_impl.dart';
 import 'package:optimatech_lms/features/home/domain/repositories/home_repository.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_continue_learning_courses_use_case.dart';
@@ -34,15 +35,23 @@ Future<void> setupDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
-  getIt.registerLazySingleton<FirebaseAuthService>(() => FirebaseAuthService(),);
-  getIt.registerLazySingleton<FireStoreService>(() => FireStoreService(),);
-  getIt.registerLazySingleton<AuthLocalDataSources>(() => AuthLocalDataSourcesImpl(sharedPreferences: getIt<SharedPreferences>()),);
-  getIt.registerLazySingleton<AuthRepository>(() =>
-      AuthRepositoryImpl(
-        firebaseAuthService: getIt<FirebaseAuthService>(),
-        fireStoreService: getIt<FireStoreService>(),
-        authLocalDataSources: getIt<AuthLocalDataSources>()),
-      );
+  getIt.registerLazySingleton<FirebaseAuthService>(
+    () => FirebaseAuthService(),
+  );
+  getIt.registerLazySingleton<FireStoreService>(
+    () => FireStoreService(),
+  );
+  getIt.registerLazySingleton<AuthLocalDataSources>(
+    () =>
+        AuthLocalDataSourcesImpl(sharedPreferences: getIt<SharedPreferences>()),
+  );
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      firebaseAuthService: getIt<FirebaseAuthService>(),
+      fireStoreService: getIt<FireStoreService>(),
+      authLocalDataSources: getIt<AuthLocalDataSources>(),
+    ),
+  );
 
   getIt.registerFactory<LogInCubit>(
     () => LogInCubit(authRepository: getIt<AuthRepository>()),
@@ -77,22 +86,29 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<CoursesRemoteDatasource>(
-      () => CoursesRemoteDatasourceImpl(DefaultConnector.instance));
+    () => CoursesRemoteDatasourceImpl(DefaultConnector.instance),
+  );
   getIt.registerLazySingleton<CoursesRepository>(
-      () => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()));
+    () => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()),
+  );
   getIt.registerFactory<CoursesCubit>(
-      () => CoursesCubit(repository: getIt<CoursesRepository>()));
+    () => CoursesCubit(repository: getIt<CoursesRepository>()),
+  );
 
   getIt.registerLazySingleton<CategoriesRemoteDatasource>(
-      () => CategoriesRemoteDatasourceImpl(DefaultConnector.instance));
+    () => CategoriesRemoteDatasourceImpl(DefaultConnector.instance),
+  );
   getIt.registerLazySingleton<CategoriesRepository>(
-      () => CategoriesRepositoryImpl(getIt<CategoriesRemoteDatasource>()));
+    () => CategoriesRepositoryImpl(getIt<CategoriesRemoteDatasource>()),
+  );
   getIt.registerFactory<CategoriesCubit>(
-      () => CategoriesCubit(repository: getIt<CategoriesRepository>()));
-
+    () => CategoriesCubit(repository: getIt<CategoriesRepository>()),
+  );
 
   getIt.registerLazySingleton<ThemeLocalDataSource>(
-      () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()));
+    () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()),
+  );
   getIt.registerFactory<ThemeCubit>(
-      () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>()));
+    () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>()),
+  );
 }
