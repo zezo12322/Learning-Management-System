@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/features/home/data/models/popular_course_model.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/popular_course_card.dart';
-import '../../domain/entities/course_entity.dart' as home;
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart'
     as courses;
 import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
@@ -27,7 +27,7 @@ const _popularCardIcons = [
 ];
 
 // ------------- Popular Courses Section Builder (horizontal scroll) --------
-Widget buildPopularCoursesSection(List<home.HomeCourseEntity> popularCourses) {
+Widget buildPopularCoursesSection(List<PopularCourseModel> popularCourses) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
