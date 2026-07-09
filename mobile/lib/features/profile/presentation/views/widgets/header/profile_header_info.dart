@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileHeaderInfo extends StatelessWidget {
   const ProfileHeaderInfo({
@@ -11,11 +12,16 @@ class ProfileHeaderInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final displayName = currentUser?.displayName ??
+        (currentUser?.email?.split('@').first) ??
+        'Student';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Sarah Johnson',
+          displayName,
           style: context.textTheme.titleSmall?.copyWith(
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
