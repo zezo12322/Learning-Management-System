@@ -1,22 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../domain/entities/course_entity.dart';
-import '../../../domain/entities/student_progress_entity.dart';
+import 'package:optimatech_lms/features/home/data/models/continue_learning_model.dart';
+import 'package:optimatech_lms/features/home/data/models/popular_course_model.dart';
+import 'package:optimatech_lms/features/home/data/models/recommended_course_model.dart';
 
 part 'home_course_state.freezed.dart';
 
 @freezed
-class HomeCoursesState with _$HomeCoursesState {
-  const factory HomeCoursesState.initial() = _Initial;
+class HomeCourseState with _$HomeCourseState {
+  const factory HomeCourseState.initial() = _Initial;
 
-  const factory HomeCoursesState.loading() = _Loading;
+  const factory HomeCourseState.loading() = _Loading;
 
-  const factory HomeCoursesState.success({
-    required StudentProgressEntity? continueLearning,
-    required List<HomeCourseEntity> popularCourses,
-    required List<HomeCourseEntity> recommendedCourses,
-  }) = _Success;
+  const factory HomeCourseState.loaded({
+    required List<ContinueLearningModel> continueLearning,
+    required List<PopularCourseModel> popularCourses,
+    required List<RecommendedCourseModel> recommendedCourses,
+  }) = _Loaded;
 
-  const factory HomeCoursesState.error({
-    required String message,
-  }) = _Error;
+  const factory HomeCourseState.error(String message) = _Error;
 }
