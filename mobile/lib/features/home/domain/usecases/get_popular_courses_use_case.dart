@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:optimatech_lms/core/error/failures.dart';
-import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
+import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/home_use_case.dart';
 import '../repositories/home_repository.dart';
 
