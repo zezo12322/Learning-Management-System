@@ -27,6 +27,7 @@ type User @table(name: "users") {
   email: String!
   name: String!
   avatar: String
+  encryptedNationalId: String
   createdAt: Timestamp! @default(expr: "request.time")
   lastLogin: Timestamp
 }

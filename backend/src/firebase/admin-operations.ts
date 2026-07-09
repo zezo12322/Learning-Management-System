@@ -1182,6 +1182,42 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // --- Video descriptions (CoursesService strips gated descriptions per entitlement) ---
+  GetCourseVideos: /* GraphQL */ `
+    query GetCourseVideos($courseId: UUID!) {
+      course(id: $courseId) {
+        id
+        title
+        status
+        deletedAt
+        author {
+          id
+        }
+        createdBy {
+          id
+        }
+        videoSections: courseSections_on_course(
+          where: { deletedAt: { eq: null } }
+          orderBy: [{ order: ASC }]
+        ) {
+          id
+          title
+          videoLectures: courseLectures_on_section(
+            where: { deletedAt: { eq: null }, type: { eq: VIDEO } }
+            orderBy: [{ order: ASC }]
+          ) {
+            id
+            title
+            content
+            duration
+            isFreePreview
+            order
+          }
+        }
+      }
+    }
+  `,
+
   // --- Curriculum outline (CatalogService strips gated content per entitlement) ---
   GetCourseCurriculum: /* GraphQL */ `
     query GetCourseCurriculum($courseId: UUID!) {
@@ -1312,4 +1348,6 @@ export const FORCE_ADMIN_OPERATIONS: ReadonlySet<string> = new Set([
   // Content reads gated in the service (getContent / catalog entitlement)
   'GetLectureContent',
   'GetCourseCurriculum',
+  // Video descriptions gated in CoursesService (owner/admin/enrollee entitlement)
+  'GetCourseVideos',
 ]);
