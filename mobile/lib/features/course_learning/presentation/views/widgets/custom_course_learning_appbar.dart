@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomCourseLearningAppbar extends StatelessWidget implements PreferredSize{
+class CustomCourseLearningAppbar extends StatelessWidget implements PreferredSizeWidget {
   const CustomCourseLearningAppbar({
     super.key,
   });
@@ -18,9 +18,6 @@ class CustomCourseLearningAppbar extends StatelessWidget implements PreferredSiz
       ),
     );
   }
-
-  @override
-  Widget get child => throw UnimplementedError();
 
   @override
   Size get preferredSize => Size.zero;

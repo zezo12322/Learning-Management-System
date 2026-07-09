@@ -46,7 +46,7 @@ class _CourseLearningViewState extends State<CourseLearningView> {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      physics: const CarouselScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 16.h),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
