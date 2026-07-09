@@ -5,6 +5,7 @@
     "noUnusedLocals": true,
     "rootDir": "src",
     "outDir": "lib",
+    "types": ["jest", "node"],
     "sourceMap": true,
     "strict": true,
     "target": "es2020",

@@ -2243,198 +2243,6 @@ export interface VerifyCertificateVariables {
   hash: string;
 }
 
-interface UpsertCourseRatingRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
-  operationName: string;
-}
-export const upsertCourseRatingRef: UpsertCourseRatingRef;
-
-export function upsertCourseRating(vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
-export function upsertCourseRating(dc: DataConnect, vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
-
-interface DeleteCourseRatingRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
-  operationName: string;
-}
-export const deleteCourseRatingRef: DeleteCourseRatingRef;
-
-export function deleteCourseRating(vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
-export function deleteCourseRating(dc: DataConnect, vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
-
-interface GetMyCourseRatingRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
-  operationName: string;
-}
-export const getMyCourseRatingRef: GetMyCourseRatingRef;
-
-export function getMyCourseRating(vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
-export function getMyCourseRating(dc: DataConnect, vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
-
-interface ListCourseRatingsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
-  operationName: string;
-}
-export const listCourseRatingsRef: ListCourseRatingsRef;
-
-export function listCourseRatings(vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
-export function listCourseRatings(dc: DataConnect, vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
-
-interface GetCourseRatingsForSummaryRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
-  operationName: string;
-}
-export const getCourseRatingsForSummaryRef: GetCourseRatingsForSummaryRef;
-
-export function getCourseRatingsForSummary(vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
-export function getCourseRatingsForSummary(dc: DataConnect, vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
-
-interface AdminUpdateCourseRatingAggregateRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
-  operationName: string;
-}
-export const adminUpdateCourseRatingAggregateRef: AdminUpdateCourseRatingAggregateRef;
-
-export function adminUpdateCourseRatingAggregate(vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
-export function adminUpdateCourseRatingAggregate(dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
-
-interface GetCourseSessionsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetCourseSessionsVariables): QueryRef<GetCourseSessionsData, GetCourseSessionsVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetCourseSessionsVariables): QueryRef<GetCourseSessionsData, GetCourseSessionsVariables>;
-  operationName: string;
-}
-export const getCourseSessionsRef: GetCourseSessionsRef;
-
-export function getCourseSessions(vars: GetCourseSessionsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseSessionsData, GetCourseSessionsVariables>;
-export function getCourseSessions(dc: DataConnect, vars: GetCourseSessionsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseSessionsData, GetCourseSessionsVariables>;
-
-interface CheckInToSessionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: CheckInToSessionVariables): MutationRef<CheckInToSessionData, CheckInToSessionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: CheckInToSessionVariables): MutationRef<CheckInToSessionData, CheckInToSessionVariables>;
-  operationName: string;
-}
-export const checkInToSessionRef: CheckInToSessionRef;
-
-export function checkInToSession(vars: CheckInToSessionVariables): MutationPromise<CheckInToSessionData, CheckInToSessionVariables>;
-export function checkInToSession(dc: DataConnect, vars: CheckInToSessionVariables): MutationPromise<CheckInToSessionData, CheckInToSessionVariables>;
-
-interface SyncUserRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: SyncUserVariables): MutationRef<SyncUserData, SyncUserVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: SyncUserVariables): MutationRef<SyncUserData, SyncUserVariables>;
-  operationName: string;
-}
-export const syncUserRef: SyncUserRef;
-
-export function syncUser(vars: SyncUserVariables): MutationPromise<SyncUserData, SyncUserVariables>;
-export function syncUser(dc: DataConnect, vars: SyncUserVariables): MutationPromise<SyncUserData, SyncUserVariables>;
-
-interface GetMeRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<GetMeData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<GetMeData, undefined>;
-  operationName: string;
-}
-export const getMeRef: GetMeRef;
-
-export function getMe(options?: ExecuteQueryOptions): QueryPromise<GetMeData, undefined>;
-export function getMe(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetMeData, undefined>;
-
-interface UpdateMyProfileRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars?: UpdateMyProfileVariables): MutationRef<UpdateMyProfileData, UpdateMyProfileVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars?: UpdateMyProfileVariables): MutationRef<UpdateMyProfileData, UpdateMyProfileVariables>;
-  operationName: string;
-}
-export const updateMyProfileRef: UpdateMyProfileRef;
-
-export function updateMyProfile(vars?: UpdateMyProfileVariables): MutationPromise<UpdateMyProfileData, UpdateMyProfileVariables>;
-export function updateMyProfile(dc: DataConnect, vars?: UpdateMyProfileVariables): MutationPromise<UpdateMyProfileData, UpdateMyProfileVariables>;
-
-interface MyCertificatesRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<MyCertificatesData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<MyCertificatesData, undefined>;
-  operationName: string;
-}
-export const myCertificatesRef: MyCertificatesRef;
-
-export function myCertificates(options?: ExecuteQueryOptions): QueryPromise<MyCertificatesData, undefined>;
-export function myCertificates(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MyCertificatesData, undefined>;
-
-interface VerifyCertificateRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: VerifyCertificateVariables): QueryRef<VerifyCertificateData, VerifyCertificateVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: VerifyCertificateVariables): QueryRef<VerifyCertificateData, VerifyCertificateVariables>;
-  operationName: string;
-}
-export const verifyCertificateRef: VerifyCertificateRef;
-
-export function verifyCertificate(vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
-export function verifyCertificate(dc: DataConnect, vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
-
-interface LogPaymentRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: LogPaymentVariables): MutationRef<LogPaymentData, LogPaymentVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: LogPaymentVariables): MutationRef<LogPaymentData, LogPaymentVariables>;
-  operationName: string;
-}
-export const logPaymentRef: LogPaymentRef;
-
-export function logPayment(vars: LogPaymentVariables): MutationPromise<LogPaymentData, LogPaymentVariables>;
-export function logPayment(dc: DataConnect, vars: LogPaymentVariables): MutationPromise<LogPaymentData, LogPaymentVariables>;
-
-interface AddPaymentItemRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AddPaymentItemVariables): MutationRef<AddPaymentItemData, AddPaymentItemVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AddPaymentItemVariables): MutationRef<AddPaymentItemData, AddPaymentItemVariables>;
-  operationName: string;
-}
-export const addPaymentItemRef: AddPaymentItemRef;
-
-export function addPaymentItem(vars: AddPaymentItemVariables): MutationPromise<AddPaymentItemData, AddPaymentItemVariables>;
-export function addPaymentItem(dc: DataConnect, vars: AddPaymentItemVariables): MutationPromise<AddPaymentItemData, AddPaymentItemVariables>;
-
-interface MyPaymentHistoryRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<MyPaymentHistoryData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<MyPaymentHistoryData, undefined>;
-  operationName: string;
-}
-export const myPaymentHistoryRef: MyPaymentHistoryRef;
-
-export function myPaymentHistory(options?: ExecuteQueryOptions): QueryPromise<MyPaymentHistoryData, undefined>;
-export function myPaymentHistory(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MyPaymentHistoryData, undefined>;
-
 interface GetUserClaimsFnRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetUserClaimsFnVariables): QueryRef<GetUserClaimsFnData, GetUserClaimsFnVariables>;
@@ -2578,6 +2386,282 @@ export const getCourseInstructorsRef: GetCourseInstructorsRef;
 
 export function getCourseInstructors(vars: GetCourseInstructorsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseInstructorsData, GetCourseInstructorsVariables>;
 export function getCourseInstructors(dc: DataConnect, vars: GetCourseInstructorsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseInstructorsData, GetCourseInstructorsVariables>;
+
+interface GetMissionForEnrollmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  operationName: string;
+}
+export const getMissionForEnrollmentRef: GetMissionForEnrollmentRef;
+
+export function getMissionForEnrollment(vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+export function getMissionForEnrollment(dc: DataConnect, vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+
+interface SubmitMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SubmitMissionVariables): MutationRef<SubmitMissionData, SubmitMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SubmitMissionVariables): MutationRef<SubmitMissionData, SubmitMissionVariables>;
+  operationName: string;
+}
+export const submitMissionRef: SubmitMissionRef;
+
+export function submitMission(vars: SubmitMissionVariables): MutationPromise<SubmitMissionData, SubmitMissionVariables>;
+export function submitMission(dc: DataConnect, vars: SubmitMissionVariables): MutationPromise<SubmitMissionData, SubmitMissionVariables>;
+
+interface MySubmissionsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<MySubmissionsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<MySubmissionsData, undefined>;
+  operationName: string;
+}
+export const mySubmissionsRef: MySubmissionsRef;
+
+export function mySubmissions(options?: ExecuteQueryOptions): QueryPromise<MySubmissionsData, undefined>;
+export function mySubmissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MySubmissionsData, undefined>;
+
+interface GradeSubmissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GradeSubmissionVariables): MutationRef<GradeSubmissionData, GradeSubmissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GradeSubmissionVariables): MutationRef<GradeSubmissionData, GradeSubmissionVariables>;
+  operationName: string;
+}
+export const gradeSubmissionRef: GradeSubmissionRef;
+
+export function gradeSubmission(vars: GradeSubmissionVariables): MutationPromise<GradeSubmissionData, GradeSubmissionVariables>;
+export function gradeSubmission(dc: DataConnect, vars: GradeSubmissionVariables): MutationPromise<GradeSubmissionData, GradeSubmissionVariables>;
+
+interface AddCriterionScoreRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AddCriterionScoreVariables): MutationRef<AddCriterionScoreData, AddCriterionScoreVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AddCriterionScoreVariables): MutationRef<AddCriterionScoreData, AddCriterionScoreVariables>;
+  operationName: string;
+}
+export const addCriterionScoreRef: AddCriterionScoreRef;
+
+export function addCriterionScore(vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
+export function addCriterionScore(dc: DataConnect, vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
+
+interface GetSubmissionForGradingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  operationName: string;
+}
+export const getSubmissionForGradingRef: GetSubmissionForGradingRef;
+
+export function getSubmissionForGrading(vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+export function getSubmissionForGrading(dc: DataConnect, vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+
+interface GetEnrollmentForUserMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  operationName: string;
+}
+export const getEnrollmentForUserMissionRef: GetEnrollmentForUserMissionRef;
+
+export function getEnrollmentForUserMission(vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+export function getEnrollmentForUserMission(dc: DataConnect, vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+
+interface AdminCreateMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateMissionVariables): MutationRef<AdminCreateMissionData, AdminCreateMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateMissionVariables): MutationRef<AdminCreateMissionData, AdminCreateMissionVariables>;
+  operationName: string;
+}
+export const adminCreateMissionRef: AdminCreateMissionRef;
+
+export function adminCreateMission(vars: AdminCreateMissionVariables): MutationPromise<AdminCreateMissionData, AdminCreateMissionVariables>;
+export function adminCreateMission(dc: DataConnect, vars: AdminCreateMissionVariables): MutationPromise<AdminCreateMissionData, AdminCreateMissionVariables>;
+
+interface AdminUpdateMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateMissionVariables): MutationRef<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateMissionVariables): MutationRef<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+  operationName: string;
+}
+export const adminUpdateMissionRef: AdminUpdateMissionRef;
+
+export function adminUpdateMission(vars: AdminUpdateMissionVariables): MutationPromise<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+export function adminUpdateMission(dc: DataConnect, vars: AdminUpdateMissionVariables): MutationPromise<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+
+interface AdminSoftDeleteMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminSoftDeleteMissionVariables): MutationRef<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminSoftDeleteMissionVariables): MutationRef<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+  operationName: string;
+}
+export const adminSoftDeleteMissionRef: AdminSoftDeleteMissionRef;
+
+export function adminSoftDeleteMission(vars: AdminSoftDeleteMissionVariables): MutationPromise<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+export function adminSoftDeleteMission(dc: DataConnect, vars: AdminSoftDeleteMissionVariables): MutationPromise<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+
+interface AdminGetMissionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminGetMissionVariables): QueryRef<AdminGetMissionData, AdminGetMissionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminGetMissionVariables): QueryRef<AdminGetMissionData, AdminGetMissionVariables>;
+  operationName: string;
+}
+export const adminGetMissionRef: AdminGetMissionRef;
+
+export function adminGetMission(vars: AdminGetMissionVariables, options?: ExecuteQueryOptions): QueryPromise<AdminGetMissionData, AdminGetMissionVariables>;
+export function adminGetMission(dc: DataConnect, vars: AdminGetMissionVariables, options?: ExecuteQueryOptions): QueryPromise<AdminGetMissionData, AdminGetMissionVariables>;
+
+interface AdminListMyMissionsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<AdminListMyMissionsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<AdminListMyMissionsData, undefined>;
+  operationName: string;
+}
+export const adminListMyMissionsRef: AdminListMyMissionsRef;
+
+export function adminListMyMissions(options?: ExecuteQueryOptions): QueryPromise<AdminListMyMissionsData, undefined>;
+export function adminListMyMissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<AdminListMyMissionsData, undefined>;
+
+interface AdminCreateMicroLessonRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateMicroLessonVariables): MutationRef<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateMicroLessonVariables): MutationRef<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+  operationName: string;
+}
+export const adminCreateMicroLessonRef: AdminCreateMicroLessonRef;
+
+export function adminCreateMicroLesson(vars: AdminCreateMicroLessonVariables): MutationPromise<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+export function adminCreateMicroLesson(dc: DataConnect, vars: AdminCreateMicroLessonVariables): MutationPromise<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+
+interface AdminUpdateMicroLessonRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateMicroLessonVariables): MutationRef<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateMicroLessonVariables): MutationRef<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+  operationName: string;
+}
+export const adminUpdateMicroLessonRef: AdminUpdateMicroLessonRef;
+
+export function adminUpdateMicroLesson(vars: AdminUpdateMicroLessonVariables): MutationPromise<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+export function adminUpdateMicroLesson(dc: DataConnect, vars: AdminUpdateMicroLessonVariables): MutationPromise<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+
+interface AdminDeleteMicroLessonRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminDeleteMicroLessonVariables): MutationRef<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminDeleteMicroLessonVariables): MutationRef<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+  operationName: string;
+}
+export const adminDeleteMicroLessonRef: AdminDeleteMicroLessonRef;
+
+export function adminDeleteMicroLesson(vars: AdminDeleteMicroLessonVariables): MutationPromise<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+export function adminDeleteMicroLesson(dc: DataConnect, vars: AdminDeleteMicroLessonVariables): MutationPromise<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+
+interface AdminUpdateMicroLessonOrderRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateMicroLessonOrderVariables): MutationRef<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateMicroLessonOrderVariables): MutationRef<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+  operationName: string;
+}
+export const adminUpdateMicroLessonOrderRef: AdminUpdateMicroLessonOrderRef;
+
+export function adminUpdateMicroLessonOrder(vars: AdminUpdateMicroLessonOrderVariables): MutationPromise<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+export function adminUpdateMicroLessonOrder(dc: DataConnect, vars: AdminUpdateMicroLessonOrderVariables): MutationPromise<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+
+interface AdminCreateMissionTemplateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateMissionTemplateVariables): MutationRef<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateMissionTemplateVariables): MutationRef<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+  operationName: string;
+}
+export const adminCreateMissionTemplateRef: AdminCreateMissionTemplateRef;
+
+export function adminCreateMissionTemplate(vars: AdminCreateMissionTemplateVariables): MutationPromise<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+export function adminCreateMissionTemplate(dc: DataConnect, vars: AdminCreateMissionTemplateVariables): MutationPromise<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+
+interface AdminDeleteMissionTemplateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminDeleteMissionTemplateVariables): MutationRef<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminDeleteMissionTemplateVariables): MutationRef<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+  operationName: string;
+}
+export const adminDeleteMissionTemplateRef: AdminDeleteMissionTemplateRef;
+
+export function adminDeleteMissionTemplate(vars: AdminDeleteMissionTemplateVariables): MutationPromise<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+export function adminDeleteMissionTemplate(dc: DataConnect, vars: AdminDeleteMissionTemplateVariables): MutationPromise<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+
+interface GetMissionTemplatesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMissionTemplatesVariables): QueryRef<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMissionTemplatesVariables): QueryRef<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+  operationName: string;
+}
+export const getMissionTemplatesRef: GetMissionTemplatesRef;
+
+export function getMissionTemplates(vars: GetMissionTemplatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+export function getMissionTemplates(dc: DataConnect, vars: GetMissionTemplatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+
+interface AdminCreateRubricCriterionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateRubricCriterionVariables): MutationRef<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateRubricCriterionVariables): MutationRef<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+  operationName: string;
+}
+export const adminCreateRubricCriterionRef: AdminCreateRubricCriterionRef;
+
+export function adminCreateRubricCriterion(vars: AdminCreateRubricCriterionVariables): MutationPromise<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+export function adminCreateRubricCriterion(dc: DataConnect, vars: AdminCreateRubricCriterionVariables): MutationPromise<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+
+interface AdminUpdateRubricCriterionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateRubricCriterionVariables): MutationRef<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateRubricCriterionVariables): MutationRef<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+  operationName: string;
+}
+export const adminUpdateRubricCriterionRef: AdminUpdateRubricCriterionRef;
+
+export function adminUpdateRubricCriterion(vars: AdminUpdateRubricCriterionVariables): MutationPromise<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+export function adminUpdateRubricCriterion(dc: DataConnect, vars: AdminUpdateRubricCriterionVariables): MutationPromise<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+
+interface AdminDeleteRubricCriterionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminDeleteRubricCriterionVariables): MutationRef<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminDeleteRubricCriterionVariables): MutationRef<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+  operationName: string;
+}
+export const adminDeleteRubricCriterionRef: AdminDeleteRubricCriterionRef;
+
+export function adminDeleteRubricCriterion(vars: AdminDeleteRubricCriterionVariables): MutationPromise<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+export function adminDeleteRubricCriterion(dc: DataConnect, vars: AdminDeleteRubricCriterionVariables): MutationPromise<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+
+interface AdminUpdateRubricCriterionOrderRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminUpdateRubricCriterionOrderVariables): MutationRef<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminUpdateRubricCriterionOrderVariables): MutationRef<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+  operationName: string;
+}
+export const adminUpdateRubricCriterionOrderRef: AdminUpdateRubricCriterionOrderRef;
+
+export function adminUpdateRubricCriterionOrder(vars: AdminUpdateRubricCriterionOrderVariables): MutationPromise<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+export function adminUpdateRubricCriterionOrder(dc: DataConnect, vars: AdminUpdateRubricCriterionOrderVariables): MutationPromise<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
 
 interface GetQuizQuestionsRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2878,210 +2962,6 @@ export const adminUpdateQuizOptionOrderRef: AdminUpdateQuizOptionOrderRef;
 
 export function adminUpdateQuizOptionOrder(vars: AdminUpdateQuizOptionOrderVariables): MutationPromise<AdminUpdateQuizOptionOrderData, AdminUpdateQuizOptionOrderVariables>;
 export function adminUpdateQuizOptionOrder(dc: DataConnect, vars: AdminUpdateQuizOptionOrderVariables): MutationPromise<AdminUpdateQuizOptionOrderData, AdminUpdateQuizOptionOrderVariables>;
-
-interface GetMyCourseAccessRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMyCourseAccessVariables): QueryRef<GetMyCourseAccessData, GetMyCourseAccessVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMyCourseAccessVariables): QueryRef<GetMyCourseAccessData, GetMyCourseAccessVariables>;
-  operationName: string;
-}
-export const getMyCourseAccessRef: GetMyCourseAccessRef;
-
-export function getMyCourseAccess(vars: GetMyCourseAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseAccessData, GetMyCourseAccessVariables>;
-export function getMyCourseAccess(dc: DataConnect, vars: GetMyCourseAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseAccessData, GetMyCourseAccessVariables>;
-
-interface GetMyMissionAccessRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMyMissionAccessVariables): QueryRef<GetMyMissionAccessData, GetMyMissionAccessVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMyMissionAccessVariables): QueryRef<GetMyMissionAccessData, GetMyMissionAccessVariables>;
-  operationName: string;
-}
-export const getMyMissionAccessRef: GetMyMissionAccessRef;
-
-export function getMyMissionAccess(vars: GetMyMissionAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyMissionAccessData, GetMyMissionAccessVariables>;
-export function getMyMissionAccess(dc: DataConnect, vars: GetMyMissionAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyMissionAccessData, GetMyMissionAccessVariables>;
-
-interface GetQuestionCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetQuestionCourseVariables): QueryRef<GetQuestionCourseData, GetQuestionCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetQuestionCourseVariables): QueryRef<GetQuestionCourseData, GetQuestionCourseVariables>;
-  operationName: string;
-}
-export const getQuestionCourseRef: GetQuestionCourseRef;
-
-export function getQuestionCourse(vars: GetQuestionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetQuestionCourseData, GetQuestionCourseVariables>;
-export function getQuestionCourse(dc: DataConnect, vars: GetQuestionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetQuestionCourseData, GetQuestionCourseVariables>;
-
-interface GetOptionCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetOptionCourseVariables): QueryRef<GetOptionCourseData, GetOptionCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetOptionCourseVariables): QueryRef<GetOptionCourseData, GetOptionCourseVariables>;
-  operationName: string;
-}
-export const getOptionCourseRef: GetOptionCourseRef;
-
-export function getOptionCourse(vars: GetOptionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetOptionCourseData, GetOptionCourseVariables>;
-export function getOptionCourse(dc: DataConnect, vars: GetOptionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetOptionCourseData, GetOptionCourseVariables>;
-
-interface GetSectionCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetSectionCourseVariables): QueryRef<GetSectionCourseData, GetSectionCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetSectionCourseVariables): QueryRef<GetSectionCourseData, GetSectionCourseVariables>;
-  operationName: string;
-}
-export const getSectionCourseRef: GetSectionCourseRef;
-
-export function getSectionCourse(vars: GetSectionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetSectionCourseData, GetSectionCourseVariables>;
-export function getSectionCourse(dc: DataConnect, vars: GetSectionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetSectionCourseData, GetSectionCourseVariables>;
-
-interface GetMicroLessonMissionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMicroLessonMissionVariables): QueryRef<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMicroLessonMissionVariables): QueryRef<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
-  operationName: string;
-}
-export const getMicroLessonMissionRef: GetMicroLessonMissionRef;
-
-export function getMicroLessonMission(vars: GetMicroLessonMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
-export function getMicroLessonMission(dc: DataConnect, vars: GetMicroLessonMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
-
-interface GetCriterionMissionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetCriterionMissionVariables): QueryRef<GetCriterionMissionData, GetCriterionMissionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetCriterionMissionVariables): QueryRef<GetCriterionMissionData, GetCriterionMissionVariables>;
-  operationName: string;
-}
-export const getCriterionMissionRef: GetCriterionMissionRef;
-
-export function getCriterionMission(vars: GetCriterionMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetCriterionMissionData, GetCriterionMissionVariables>;
-export function getCriterionMission(dc: DataConnect, vars: GetCriterionMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetCriterionMissionData, GetCriterionMissionVariables>;
-
-interface GetTemplateMissionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetTemplateMissionVariables): QueryRef<GetTemplateMissionData, GetTemplateMissionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetTemplateMissionVariables): QueryRef<GetTemplateMissionData, GetTemplateMissionVariables>;
-  operationName: string;
-}
-export const getTemplateMissionRef: GetTemplateMissionRef;
-
-export function getTemplateMission(vars: GetTemplateMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetTemplateMissionData, GetTemplateMissionVariables>;
-export function getTemplateMission(dc: DataConnect, vars: GetTemplateMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetTemplateMissionData, GetTemplateMissionVariables>;
-
-interface InstructorDeleteCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-  operationName: string;
-}
-export const instructorDeleteCourseRef: InstructorDeleteCourseRef;
-
-export function instructorDeleteCourse(vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-export function instructorDeleteCourse(dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-
-interface SuperAdminDeleteCourseRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-  operationName: string;
-}
-export const superAdminDeleteCourseRef: SuperAdminDeleteCourseRef;
-
-export function superAdminDeleteCourse(vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-export function superAdminDeleteCourse(dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-
-interface AdminCreateSessionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateSessionVariables): MutationRef<AdminCreateSessionData, AdminCreateSessionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateSessionVariables): MutationRef<AdminCreateSessionData, AdminCreateSessionVariables>;
-  operationName: string;
-}
-export const adminCreateSessionRef: AdminCreateSessionRef;
-
-export function adminCreateSession(vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
-export function adminCreateSession(dc: DataConnect, vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
-
-interface InstructorCancelSessionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-  operationName: string;
-}
-export const instructorCancelSessionRef: InstructorCancelSessionRef;
-
-export function instructorCancelSession(vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-export function instructorCancelSession(dc: DataConnect, vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-
-interface SuperAdminCancelSessionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-  operationName: string;
-}
-export const superAdminCancelSessionRef: SuperAdminCancelSessionRef;
-
-export function superAdminCancelSession(vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-export function superAdminCancelSession(dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-
-interface AdminCreateSubscriptionTierRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateSubscriptionTierVariables): MutationRef<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateSubscriptionTierVariables): MutationRef<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-  operationName: string;
-}
-export const adminCreateSubscriptionTierRef: AdminCreateSubscriptionTierRef;
-
-export function adminCreateSubscriptionTier(vars: AdminCreateSubscriptionTierVariables): MutationPromise<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-export function adminCreateSubscriptionTier(dc: DataConnect, vars: AdminCreateSubscriptionTierVariables): MutationPromise<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-
-interface AdminDeprecateSubscriptionTierRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeprecateSubscriptionTierVariables): MutationRef<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeprecateSubscriptionTierVariables): MutationRef<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-  operationName: string;
-}
-export const adminDeprecateSubscriptionTierRef: AdminDeprecateSubscriptionTierRef;
-
-export function adminDeprecateSubscriptionTier(vars: AdminDeprecateSubscriptionTierVariables): MutationPromise<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-export function adminDeprecateSubscriptionTier(dc: DataConnect, vars: AdminDeprecateSubscriptionTierVariables): MutationPromise<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-
-interface AdminCreateCategoryRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateCategoryVariables): MutationRef<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateCategoryVariables): MutationRef<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-  operationName: string;
-}
-export const adminCreateCategoryRef: AdminCreateCategoryRef;
-
-export function adminCreateCategory(vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-export function adminCreateCategory(dc: DataConnect, vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-
-interface GetUserClaimsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
-  operationName: string;
-}
-export const getUserClaimsRef: GetUserClaimsRef;
-
-export function getUserClaims(vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
-export function getUserClaims(dc: DataConnect, vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
 
 interface ListCategoriesRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -3563,279 +3443,399 @@ export const getUserEnrollmentForMissionRef: GetUserEnrollmentForMissionRef;
 export function getUserEnrollmentForMission(vars: GetUserEnrollmentForMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
 export function getUserEnrollmentForMission(dc: DataConnect, vars: GetUserEnrollmentForMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
 
-interface GetMissionForEnrollmentRef {
+interface UpsertCourseRatingRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  (vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMissionForEnrollmentVariables): QueryRef<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+  (dc: DataConnect, vars: UpsertCourseRatingVariables): MutationRef<UpsertCourseRatingData, UpsertCourseRatingVariables>;
   operationName: string;
 }
-export const getMissionForEnrollmentRef: GetMissionForEnrollmentRef;
+export const upsertCourseRatingRef: UpsertCourseRatingRef;
 
-export function getMissionForEnrollment(vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
-export function getMissionForEnrollment(dc: DataConnect, vars: GetMissionForEnrollmentVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionForEnrollmentData, GetMissionForEnrollmentVariables>;
+export function upsertCourseRating(vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
+export function upsertCourseRating(dc: DataConnect, vars: UpsertCourseRatingVariables): MutationPromise<UpsertCourseRatingData, UpsertCourseRatingVariables>;
 
-interface SubmitMissionRef {
+interface DeleteCourseRatingRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: SubmitMissionVariables): MutationRef<SubmitMissionData, SubmitMissionVariables>;
+  (vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: SubmitMissionVariables): MutationRef<SubmitMissionData, SubmitMissionVariables>;
+  (dc: DataConnect, vars: DeleteCourseRatingVariables): MutationRef<DeleteCourseRatingData, DeleteCourseRatingVariables>;
   operationName: string;
 }
-export const submitMissionRef: SubmitMissionRef;
+export const deleteCourseRatingRef: DeleteCourseRatingRef;
 
-export function submitMission(vars: SubmitMissionVariables): MutationPromise<SubmitMissionData, SubmitMissionVariables>;
-export function submitMission(dc: DataConnect, vars: SubmitMissionVariables): MutationPromise<SubmitMissionData, SubmitMissionVariables>;
+export function deleteCourseRating(vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
+export function deleteCourseRating(dc: DataConnect, vars: DeleteCourseRatingVariables): MutationPromise<DeleteCourseRatingData, DeleteCourseRatingVariables>;
 
-interface MySubmissionsRef {
+interface GetMyCourseRatingRef {
   /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<MySubmissionsData, undefined>;
+  (vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<MySubmissionsData, undefined>;
+  (dc: DataConnect, vars: GetMyCourseRatingVariables): QueryRef<GetMyCourseRatingData, GetMyCourseRatingVariables>;
   operationName: string;
 }
-export const mySubmissionsRef: MySubmissionsRef;
+export const getMyCourseRatingRef: GetMyCourseRatingRef;
 
-export function mySubmissions(options?: ExecuteQueryOptions): QueryPromise<MySubmissionsData, undefined>;
-export function mySubmissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MySubmissionsData, undefined>;
+export function getMyCourseRating(vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
+export function getMyCourseRating(dc: DataConnect, vars: GetMyCourseRatingVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseRatingData, GetMyCourseRatingVariables>;
 
-interface GradeSubmissionRef {
+interface ListCourseRatingsRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: GradeSubmissionVariables): MutationRef<GradeSubmissionData, GradeSubmissionVariables>;
+  (vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GradeSubmissionVariables): MutationRef<GradeSubmissionData, GradeSubmissionVariables>;
+  (dc: DataConnect, vars: ListCourseRatingsVariables): QueryRef<ListCourseRatingsData, ListCourseRatingsVariables>;
   operationName: string;
 }
-export const gradeSubmissionRef: GradeSubmissionRef;
+export const listCourseRatingsRef: ListCourseRatingsRef;
 
-export function gradeSubmission(vars: GradeSubmissionVariables): MutationPromise<GradeSubmissionData, GradeSubmissionVariables>;
-export function gradeSubmission(dc: DataConnect, vars: GradeSubmissionVariables): MutationPromise<GradeSubmissionData, GradeSubmissionVariables>;
+export function listCourseRatings(vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
+export function listCourseRatings(dc: DataConnect, vars: ListCourseRatingsVariables, options?: ExecuteQueryOptions): QueryPromise<ListCourseRatingsData, ListCourseRatingsVariables>;
 
-interface AddCriterionScoreRef {
+interface GetCourseRatingsForSummaryRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AddCriterionScoreVariables): MutationRef<AddCriterionScoreData, AddCriterionScoreVariables>;
+  (vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AddCriterionScoreVariables): MutationRef<AddCriterionScoreData, AddCriterionScoreVariables>;
+  (dc: DataConnect, vars: GetCourseRatingsForSummaryVariables): QueryRef<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
   operationName: string;
 }
-export const addCriterionScoreRef: AddCriterionScoreRef;
+export const getCourseRatingsForSummaryRef: GetCourseRatingsForSummaryRef;
 
-export function addCriterionScore(vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
-export function addCriterionScore(dc: DataConnect, vars: AddCriterionScoreVariables): MutationPromise<AddCriterionScoreData, AddCriterionScoreVariables>;
+export function getCourseRatingsForSummary(vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
+export function getCourseRatingsForSummary(dc: DataConnect, vars: GetCourseRatingsForSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseRatingsForSummaryData, GetCourseRatingsForSummaryVariables>;
 
-interface GetSubmissionForGradingRef {
+interface AdminUpdateCourseRatingAggregateRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  (vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetSubmissionForGradingVariables): QueryRef<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+  (dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationRef<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
   operationName: string;
 }
-export const getSubmissionForGradingRef: GetSubmissionForGradingRef;
+export const adminUpdateCourseRatingAggregateRef: AdminUpdateCourseRatingAggregateRef;
 
-export function getSubmissionForGrading(vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
-export function getSubmissionForGrading(dc: DataConnect, vars: GetSubmissionForGradingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSubmissionForGradingData, GetSubmissionForGradingVariables>;
+export function adminUpdateCourseRatingAggregate(vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
+export function adminUpdateCourseRatingAggregate(dc: DataConnect, vars: AdminUpdateCourseRatingAggregateVariables): MutationPromise<AdminUpdateCourseRatingAggregateData, AdminUpdateCourseRatingAggregateVariables>;
 
-interface GetEnrollmentForUserMissionRef {
+interface GetMyCourseAccessRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  (vars: GetMyCourseAccessVariables): QueryRef<GetMyCourseAccessData, GetMyCourseAccessVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetEnrollmentForUserMissionVariables): QueryRef<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+  (dc: DataConnect, vars: GetMyCourseAccessVariables): QueryRef<GetMyCourseAccessData, GetMyCourseAccessVariables>;
   operationName: string;
 }
-export const getEnrollmentForUserMissionRef: GetEnrollmentForUserMissionRef;
+export const getMyCourseAccessRef: GetMyCourseAccessRef;
 
-export function getEnrollmentForUserMission(vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
-export function getEnrollmentForUserMission(dc: DataConnect, vars: GetEnrollmentForUserMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetEnrollmentForUserMissionData, GetEnrollmentForUserMissionVariables>;
+export function getMyCourseAccess(vars: GetMyCourseAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseAccessData, GetMyCourseAccessVariables>;
+export function getMyCourseAccess(dc: DataConnect, vars: GetMyCourseAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyCourseAccessData, GetMyCourseAccessVariables>;
 
-interface AdminCreateMissionRef {
+interface GetMyMissionAccessRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateMissionVariables): MutationRef<AdminCreateMissionData, AdminCreateMissionVariables>;
+  (vars: GetMyMissionAccessVariables): QueryRef<GetMyMissionAccessData, GetMyMissionAccessVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateMissionVariables): MutationRef<AdminCreateMissionData, AdminCreateMissionVariables>;
+  (dc: DataConnect, vars: GetMyMissionAccessVariables): QueryRef<GetMyMissionAccessData, GetMyMissionAccessVariables>;
   operationName: string;
 }
-export const adminCreateMissionRef: AdminCreateMissionRef;
+export const getMyMissionAccessRef: GetMyMissionAccessRef;
 
-export function adminCreateMission(vars: AdminCreateMissionVariables): MutationPromise<AdminCreateMissionData, AdminCreateMissionVariables>;
-export function adminCreateMission(dc: DataConnect, vars: AdminCreateMissionVariables): MutationPromise<AdminCreateMissionData, AdminCreateMissionVariables>;
+export function getMyMissionAccess(vars: GetMyMissionAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyMissionAccessData, GetMyMissionAccessVariables>;
+export function getMyMissionAccess(dc: DataConnect, vars: GetMyMissionAccessVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyMissionAccessData, GetMyMissionAccessVariables>;
 
-interface AdminUpdateMissionRef {
+interface GetQuestionCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateMissionVariables): MutationRef<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+  (vars: GetQuestionCourseVariables): QueryRef<GetQuestionCourseData, GetQuestionCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateMissionVariables): MutationRef<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+  (dc: DataConnect, vars: GetQuestionCourseVariables): QueryRef<GetQuestionCourseData, GetQuestionCourseVariables>;
   operationName: string;
 }
-export const adminUpdateMissionRef: AdminUpdateMissionRef;
+export const getQuestionCourseRef: GetQuestionCourseRef;
 
-export function adminUpdateMission(vars: AdminUpdateMissionVariables): MutationPromise<AdminUpdateMissionData, AdminUpdateMissionVariables>;
-export function adminUpdateMission(dc: DataConnect, vars: AdminUpdateMissionVariables): MutationPromise<AdminUpdateMissionData, AdminUpdateMissionVariables>;
+export function getQuestionCourse(vars: GetQuestionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetQuestionCourseData, GetQuestionCourseVariables>;
+export function getQuestionCourse(dc: DataConnect, vars: GetQuestionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetQuestionCourseData, GetQuestionCourseVariables>;
 
-interface AdminSoftDeleteMissionRef {
+interface GetOptionCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminSoftDeleteMissionVariables): MutationRef<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+  (vars: GetOptionCourseVariables): QueryRef<GetOptionCourseData, GetOptionCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminSoftDeleteMissionVariables): MutationRef<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+  (dc: DataConnect, vars: GetOptionCourseVariables): QueryRef<GetOptionCourseData, GetOptionCourseVariables>;
   operationName: string;
 }
-export const adminSoftDeleteMissionRef: AdminSoftDeleteMissionRef;
+export const getOptionCourseRef: GetOptionCourseRef;
 
-export function adminSoftDeleteMission(vars: AdminSoftDeleteMissionVariables): MutationPromise<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
-export function adminSoftDeleteMission(dc: DataConnect, vars: AdminSoftDeleteMissionVariables): MutationPromise<AdminSoftDeleteMissionData, AdminSoftDeleteMissionVariables>;
+export function getOptionCourse(vars: GetOptionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetOptionCourseData, GetOptionCourseVariables>;
+export function getOptionCourse(dc: DataConnect, vars: GetOptionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetOptionCourseData, GetOptionCourseVariables>;
 
-interface AdminGetMissionRef {
+interface GetSectionCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminGetMissionVariables): QueryRef<AdminGetMissionData, AdminGetMissionVariables>;
+  (vars: GetSectionCourseVariables): QueryRef<GetSectionCourseData, GetSectionCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminGetMissionVariables): QueryRef<AdminGetMissionData, AdminGetMissionVariables>;
+  (dc: DataConnect, vars: GetSectionCourseVariables): QueryRef<GetSectionCourseData, GetSectionCourseVariables>;
   operationName: string;
 }
-export const adminGetMissionRef: AdminGetMissionRef;
+export const getSectionCourseRef: GetSectionCourseRef;
 
-export function adminGetMission(vars: AdminGetMissionVariables, options?: ExecuteQueryOptions): QueryPromise<AdminGetMissionData, AdminGetMissionVariables>;
-export function adminGetMission(dc: DataConnect, vars: AdminGetMissionVariables, options?: ExecuteQueryOptions): QueryPromise<AdminGetMissionData, AdminGetMissionVariables>;
+export function getSectionCourse(vars: GetSectionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetSectionCourseData, GetSectionCourseVariables>;
+export function getSectionCourse(dc: DataConnect, vars: GetSectionCourseVariables, options?: ExecuteQueryOptions): QueryPromise<GetSectionCourseData, GetSectionCourseVariables>;
 
-interface AdminListMyMissionsRef {
+interface GetMicroLessonMissionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<AdminListMyMissionsData, undefined>;
+  (vars: GetMicroLessonMissionVariables): QueryRef<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<AdminListMyMissionsData, undefined>;
+  (dc: DataConnect, vars: GetMicroLessonMissionVariables): QueryRef<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
   operationName: string;
 }
-export const adminListMyMissionsRef: AdminListMyMissionsRef;
+export const getMicroLessonMissionRef: GetMicroLessonMissionRef;
 
-export function adminListMyMissions(options?: ExecuteQueryOptions): QueryPromise<AdminListMyMissionsData, undefined>;
-export function adminListMyMissions(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<AdminListMyMissionsData, undefined>;
+export function getMicroLessonMission(vars: GetMicroLessonMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
+export function getMicroLessonMission(dc: DataConnect, vars: GetMicroLessonMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMicroLessonMissionData, GetMicroLessonMissionVariables>;
 
-interface AdminCreateMicroLessonRef {
+interface GetCriterionMissionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateMicroLessonVariables): MutationRef<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+  (vars: GetCriterionMissionVariables): QueryRef<GetCriterionMissionData, GetCriterionMissionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateMicroLessonVariables): MutationRef<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+  (dc: DataConnect, vars: GetCriterionMissionVariables): QueryRef<GetCriterionMissionData, GetCriterionMissionVariables>;
   operationName: string;
 }
-export const adminCreateMicroLessonRef: AdminCreateMicroLessonRef;
+export const getCriterionMissionRef: GetCriterionMissionRef;
 
-export function adminCreateMicroLesson(vars: AdminCreateMicroLessonVariables): MutationPromise<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
-export function adminCreateMicroLesson(dc: DataConnect, vars: AdminCreateMicroLessonVariables): MutationPromise<AdminCreateMicroLessonData, AdminCreateMicroLessonVariables>;
+export function getCriterionMission(vars: GetCriterionMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetCriterionMissionData, GetCriterionMissionVariables>;
+export function getCriterionMission(dc: DataConnect, vars: GetCriterionMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetCriterionMissionData, GetCriterionMissionVariables>;
 
-interface AdminUpdateMicroLessonRef {
+interface GetTemplateMissionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateMicroLessonVariables): MutationRef<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+  (vars: GetTemplateMissionVariables): QueryRef<GetTemplateMissionData, GetTemplateMissionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateMicroLessonVariables): MutationRef<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+  (dc: DataConnect, vars: GetTemplateMissionVariables): QueryRef<GetTemplateMissionData, GetTemplateMissionVariables>;
   operationName: string;
 }
-export const adminUpdateMicroLessonRef: AdminUpdateMicroLessonRef;
+export const getTemplateMissionRef: GetTemplateMissionRef;
 
-export function adminUpdateMicroLesson(vars: AdminUpdateMicroLessonVariables): MutationPromise<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
-export function adminUpdateMicroLesson(dc: DataConnect, vars: AdminUpdateMicroLessonVariables): MutationPromise<AdminUpdateMicroLessonData, AdminUpdateMicroLessonVariables>;
+export function getTemplateMission(vars: GetTemplateMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetTemplateMissionData, GetTemplateMissionVariables>;
+export function getTemplateMission(dc: DataConnect, vars: GetTemplateMissionVariables, options?: ExecuteQueryOptions): QueryPromise<GetTemplateMissionData, GetTemplateMissionVariables>;
 
-interface AdminDeleteMicroLessonRef {
+interface GetCourseSessionsRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeleteMicroLessonVariables): MutationRef<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+  (vars: GetCourseSessionsVariables): QueryRef<GetCourseSessionsData, GetCourseSessionsVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeleteMicroLessonVariables): MutationRef<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+  (dc: DataConnect, vars: GetCourseSessionsVariables): QueryRef<GetCourseSessionsData, GetCourseSessionsVariables>;
   operationName: string;
 }
-export const adminDeleteMicroLessonRef: AdminDeleteMicroLessonRef;
+export const getCourseSessionsRef: GetCourseSessionsRef;
 
-export function adminDeleteMicroLesson(vars: AdminDeleteMicroLessonVariables): MutationPromise<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
-export function adminDeleteMicroLesson(dc: DataConnect, vars: AdminDeleteMicroLessonVariables): MutationPromise<AdminDeleteMicroLessonData, AdminDeleteMicroLessonVariables>;
+export function getCourseSessions(vars: GetCourseSessionsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseSessionsData, GetCourseSessionsVariables>;
+export function getCourseSessions(dc: DataConnect, vars: GetCourseSessionsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCourseSessionsData, GetCourseSessionsVariables>;
 
-interface AdminUpdateMicroLessonOrderRef {
+interface CheckInToSessionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateMicroLessonOrderVariables): MutationRef<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+  (vars: CheckInToSessionVariables): MutationRef<CheckInToSessionData, CheckInToSessionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateMicroLessonOrderVariables): MutationRef<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+  (dc: DataConnect, vars: CheckInToSessionVariables): MutationRef<CheckInToSessionData, CheckInToSessionVariables>;
   operationName: string;
 }
-export const adminUpdateMicroLessonOrderRef: AdminUpdateMicroLessonOrderRef;
+export const checkInToSessionRef: CheckInToSessionRef;
 
-export function adminUpdateMicroLessonOrder(vars: AdminUpdateMicroLessonOrderVariables): MutationPromise<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
-export function adminUpdateMicroLessonOrder(dc: DataConnect, vars: AdminUpdateMicroLessonOrderVariables): MutationPromise<AdminUpdateMicroLessonOrderData, AdminUpdateMicroLessonOrderVariables>;
+export function checkInToSession(vars: CheckInToSessionVariables): MutationPromise<CheckInToSessionData, CheckInToSessionVariables>;
+export function checkInToSession(dc: DataConnect, vars: CheckInToSessionVariables): MutationPromise<CheckInToSessionData, CheckInToSessionVariables>;
 
-interface AdminCreateMissionTemplateRef {
+interface SyncUserRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateMissionTemplateVariables): MutationRef<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+  (vars: SyncUserVariables): MutationRef<SyncUserData, SyncUserVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateMissionTemplateVariables): MutationRef<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+  (dc: DataConnect, vars: SyncUserVariables): MutationRef<SyncUserData, SyncUserVariables>;
   operationName: string;
 }
-export const adminCreateMissionTemplateRef: AdminCreateMissionTemplateRef;
+export const syncUserRef: SyncUserRef;
 
-export function adminCreateMissionTemplate(vars: AdminCreateMissionTemplateVariables): MutationPromise<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
-export function adminCreateMissionTemplate(dc: DataConnect, vars: AdminCreateMissionTemplateVariables): MutationPromise<AdminCreateMissionTemplateData, AdminCreateMissionTemplateVariables>;
+export function syncUser(vars: SyncUserVariables): MutationPromise<SyncUserData, SyncUserVariables>;
+export function syncUser(dc: DataConnect, vars: SyncUserVariables): MutationPromise<SyncUserData, SyncUserVariables>;
 
-interface AdminDeleteMissionTemplateRef {
+interface GetMeRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeleteMissionTemplateVariables): MutationRef<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+  (): QueryRef<GetMeData, undefined>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeleteMissionTemplateVariables): MutationRef<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+  (dc: DataConnect): QueryRef<GetMeData, undefined>;
   operationName: string;
 }
-export const adminDeleteMissionTemplateRef: AdminDeleteMissionTemplateRef;
+export const getMeRef: GetMeRef;
 
-export function adminDeleteMissionTemplate(vars: AdminDeleteMissionTemplateVariables): MutationPromise<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
-export function adminDeleteMissionTemplate(dc: DataConnect, vars: AdminDeleteMissionTemplateVariables): MutationPromise<AdminDeleteMissionTemplateData, AdminDeleteMissionTemplateVariables>;
+export function getMe(options?: ExecuteQueryOptions): QueryPromise<GetMeData, undefined>;
+export function getMe(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetMeData, undefined>;
 
-interface GetMissionTemplatesRef {
+interface UpdateMyProfileRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: GetMissionTemplatesVariables): QueryRef<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+  (vars?: UpdateMyProfileVariables): MutationRef<UpdateMyProfileData, UpdateMyProfileVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: GetMissionTemplatesVariables): QueryRef<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+  (dc: DataConnect, vars?: UpdateMyProfileVariables): MutationRef<UpdateMyProfileData, UpdateMyProfileVariables>;
   operationName: string;
 }
-export const getMissionTemplatesRef: GetMissionTemplatesRef;
+export const updateMyProfileRef: UpdateMyProfileRef;
 
-export function getMissionTemplates(vars: GetMissionTemplatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionTemplatesData, GetMissionTemplatesVariables>;
-export function getMissionTemplates(dc: DataConnect, vars: GetMissionTemplatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetMissionTemplatesData, GetMissionTemplatesVariables>;
+export function updateMyProfile(vars?: UpdateMyProfileVariables): MutationPromise<UpdateMyProfileData, UpdateMyProfileVariables>;
+export function updateMyProfile(dc: DataConnect, vars?: UpdateMyProfileVariables): MutationPromise<UpdateMyProfileData, UpdateMyProfileVariables>;
 
-interface AdminCreateRubricCriterionRef {
+interface InstructorDeleteCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminCreateRubricCriterionVariables): MutationRef<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+  (vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminCreateRubricCriterionVariables): MutationRef<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+  (dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationRef<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
   operationName: string;
 }
-export const adminCreateRubricCriterionRef: AdminCreateRubricCriterionRef;
+export const instructorDeleteCourseRef: InstructorDeleteCourseRef;
 
-export function adminCreateRubricCriterion(vars: AdminCreateRubricCriterionVariables): MutationPromise<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
-export function adminCreateRubricCriterion(dc: DataConnect, vars: AdminCreateRubricCriterionVariables): MutationPromise<AdminCreateRubricCriterionData, AdminCreateRubricCriterionVariables>;
+export function instructorDeleteCourse(vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
+export function instructorDeleteCourse(dc: DataConnect, vars: InstructorDeleteCourseVariables): MutationPromise<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
 
-interface AdminUpdateRubricCriterionRef {
+interface SuperAdminDeleteCourseRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateRubricCriterionVariables): MutationRef<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+  (vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateRubricCriterionVariables): MutationRef<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+  (dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationRef<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
   operationName: string;
 }
-export const adminUpdateRubricCriterionRef: AdminUpdateRubricCriterionRef;
+export const superAdminDeleteCourseRef: SuperAdminDeleteCourseRef;
 
-export function adminUpdateRubricCriterion(vars: AdminUpdateRubricCriterionVariables): MutationPromise<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
-export function adminUpdateRubricCriterion(dc: DataConnect, vars: AdminUpdateRubricCriterionVariables): MutationPromise<AdminUpdateRubricCriterionData, AdminUpdateRubricCriterionVariables>;
+export function superAdminDeleteCourse(vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+export function superAdminDeleteCourse(dc: DataConnect, vars: SuperAdminDeleteCourseVariables): MutationPromise<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
 
-interface AdminDeleteRubricCriterionRef {
+interface AdminCreateSessionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminDeleteRubricCriterionVariables): MutationRef<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+  (vars: AdminCreateSessionVariables): MutationRef<AdminCreateSessionData, AdminCreateSessionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminDeleteRubricCriterionVariables): MutationRef<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+  (dc: DataConnect, vars: AdminCreateSessionVariables): MutationRef<AdminCreateSessionData, AdminCreateSessionVariables>;
   operationName: string;
 }
-export const adminDeleteRubricCriterionRef: AdminDeleteRubricCriterionRef;
+export const adminCreateSessionRef: AdminCreateSessionRef;
 
-export function adminDeleteRubricCriterion(vars: AdminDeleteRubricCriterionVariables): MutationPromise<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
-export function adminDeleteRubricCriterion(dc: DataConnect, vars: AdminDeleteRubricCriterionVariables): MutationPromise<AdminDeleteRubricCriterionData, AdminDeleteRubricCriterionVariables>;
+export function adminCreateSession(vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
+export function adminCreateSession(dc: DataConnect, vars: AdminCreateSessionVariables): MutationPromise<AdminCreateSessionData, AdminCreateSessionVariables>;
 
-interface AdminUpdateRubricCriterionOrderRef {
+interface InstructorCancelSessionRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: AdminUpdateRubricCriterionOrderVariables): MutationRef<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+  (vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: AdminUpdateRubricCriterionOrderVariables): MutationRef<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+  (dc: DataConnect, vars: InstructorCancelSessionVariables): MutationRef<InstructorCancelSessionData, InstructorCancelSessionVariables>;
   operationName: string;
 }
-export const adminUpdateRubricCriterionOrderRef: AdminUpdateRubricCriterionOrderRef;
+export const instructorCancelSessionRef: InstructorCancelSessionRef;
 
-export function adminUpdateRubricCriterionOrder(vars: AdminUpdateRubricCriterionOrderVariables): MutationPromise<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
-export function adminUpdateRubricCriterionOrder(dc: DataConnect, vars: AdminUpdateRubricCriterionOrderVariables): MutationPromise<AdminUpdateRubricCriterionOrderData, AdminUpdateRubricCriterionOrderVariables>;
+export function instructorCancelSession(vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
+export function instructorCancelSession(dc: DataConnect, vars: InstructorCancelSessionVariables): MutationPromise<InstructorCancelSessionData, InstructorCancelSessionVariables>;
+
+interface SuperAdminCancelSessionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationRef<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+  operationName: string;
+}
+export const superAdminCancelSessionRef: SuperAdminCancelSessionRef;
+
+export function superAdminCancelSession(vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+export function superAdminCancelSession(dc: DataConnect, vars: SuperAdminCancelSessionVariables): MutationPromise<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
+
+interface AdminCreateSubscriptionTierRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateSubscriptionTierVariables): MutationRef<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateSubscriptionTierVariables): MutationRef<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
+  operationName: string;
+}
+export const adminCreateSubscriptionTierRef: AdminCreateSubscriptionTierRef;
+
+export function adminCreateSubscriptionTier(vars: AdminCreateSubscriptionTierVariables): MutationPromise<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
+export function adminCreateSubscriptionTier(dc: DataConnect, vars: AdminCreateSubscriptionTierVariables): MutationPromise<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
+
+interface AdminDeprecateSubscriptionTierRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminDeprecateSubscriptionTierVariables): MutationRef<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminDeprecateSubscriptionTierVariables): MutationRef<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
+  operationName: string;
+}
+export const adminDeprecateSubscriptionTierRef: AdminDeprecateSubscriptionTierRef;
+
+export function adminDeprecateSubscriptionTier(vars: AdminDeprecateSubscriptionTierVariables): MutationPromise<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
+export function adminDeprecateSubscriptionTier(dc: DataConnect, vars: AdminDeprecateSubscriptionTierVariables): MutationPromise<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
+
+interface AdminCreateCategoryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AdminCreateCategoryVariables): MutationRef<AdminCreateCategoryData, AdminCreateCategoryVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AdminCreateCategoryVariables): MutationRef<AdminCreateCategoryData, AdminCreateCategoryVariables>;
+  operationName: string;
+}
+export const adminCreateCategoryRef: AdminCreateCategoryRef;
+
+export function adminCreateCategory(vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
+export function adminCreateCategory(dc: DataConnect, vars: AdminCreateCategoryVariables): MutationPromise<AdminCreateCategoryData, AdminCreateCategoryVariables>;
+
+interface GetUserClaimsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserClaimsVariables): QueryRef<GetUserClaimsData, GetUserClaimsVariables>;
+  operationName: string;
+}
+export const getUserClaimsRef: GetUserClaimsRef;
+
+export function getUserClaims(vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
+export function getUserClaims(dc: DataConnect, vars: GetUserClaimsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserClaimsData, GetUserClaimsVariables>;
+
+interface MyCertificatesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<MyCertificatesData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<MyCertificatesData, undefined>;
+  operationName: string;
+}
+export const myCertificatesRef: MyCertificatesRef;
+
+export function myCertificates(options?: ExecuteQueryOptions): QueryPromise<MyCertificatesData, undefined>;
+export function myCertificates(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MyCertificatesData, undefined>;
+
+interface VerifyCertificateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: VerifyCertificateVariables): QueryRef<VerifyCertificateData, VerifyCertificateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: VerifyCertificateVariables): QueryRef<VerifyCertificateData, VerifyCertificateVariables>;
+  operationName: string;
+}
+export const verifyCertificateRef: VerifyCertificateRef;
+
+export function verifyCertificate(vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
+export function verifyCertificate(dc: DataConnect, vars: VerifyCertificateVariables, options?: ExecuteQueryOptions): QueryPromise<VerifyCertificateData, VerifyCertificateVariables>;
+
+interface LogPaymentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: LogPaymentVariables): MutationRef<LogPaymentData, LogPaymentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: LogPaymentVariables): MutationRef<LogPaymentData, LogPaymentVariables>;
+  operationName: string;
+}
+export const logPaymentRef: LogPaymentRef;
+
+export function logPayment(vars: LogPaymentVariables): MutationPromise<LogPaymentData, LogPaymentVariables>;
+export function logPayment(dc: DataConnect, vars: LogPaymentVariables): MutationPromise<LogPaymentData, LogPaymentVariables>;
+
+interface AddPaymentItemRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AddPaymentItemVariables): MutationRef<AddPaymentItemData, AddPaymentItemVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AddPaymentItemVariables): MutationRef<AddPaymentItemData, AddPaymentItemVariables>;
+  operationName: string;
+}
+export const addPaymentItemRef: AddPaymentItemRef;
+
+export function addPaymentItem(vars: AddPaymentItemVariables): MutationPromise<AddPaymentItemData, AddPaymentItemVariables>;
+export function addPaymentItem(dc: DataConnect, vars: AddPaymentItemVariables): MutationPromise<AddPaymentItemData, AddPaymentItemVariables>;
+
+interface MyPaymentHistoryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<MyPaymentHistoryData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<MyPaymentHistoryData, undefined>;
+  operationName: string;
+}
+export const myPaymentHistoryRef: MyPaymentHistoryRef;
+
+export function myPaymentHistory(options?: ExecuteQueryOptions): QueryPromise<MyPaymentHistoryData, undefined>;
+export function myPaymentHistory(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<MyPaymentHistoryData, undefined>;
 

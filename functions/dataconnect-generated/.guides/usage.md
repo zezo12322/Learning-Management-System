@@ -14,38 +14,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { upsertCourseRating, deleteCourseRating, getMyCourseRating, listCourseRatings, getCourseRatingsForSummary, adminUpdateCourseRatingAggregate, getCourseSessions, checkInToSession, syncUser, getMe } from '@dataconnect/functions-generated';
+import { getUserClaimsFn, createDefaultUserAndProfileFn, deleteUserRecordFn, createDefaultUserFn, getTargetUserRolesFn, removeRoleFn, assignNewRoleFn, getPendingSubmissions, getMyPendingSubmissions, adminAddCourseInstructor } from '@dataconnect/functions-generated';
 
 
-// Operation UpsertCourseRating:  For variables, look at type UpsertCourseRatingVars in ../index.d.ts
-const { data } = await UpsertCourseRating(dataConnect, upsertCourseRatingVars);
+// Operation GetUserClaimsFn:  For variables, look at type GetUserClaimsFnVars in ../index.d.ts
+const { data } = await GetUserClaimsFn(dataConnect, getUserClaimsFnVars);
 
-// Operation DeleteCourseRating:  For variables, look at type DeleteCourseRatingVars in ../index.d.ts
-const { data } = await DeleteCourseRating(dataConnect, deleteCourseRatingVars);
+// Operation CreateDefaultUserAndProfileFn:  For variables, look at type CreateDefaultUserAndProfileFnVars in ../index.d.ts
+const { data } = await CreateDefaultUserAndProfileFn(dataConnect, createDefaultUserAndProfileFnVars);
 
-// Operation GetMyCourseRating:  For variables, look at type GetMyCourseRatingVars in ../index.d.ts
-const { data } = await GetMyCourseRating(dataConnect, getMyCourseRatingVars);
+// Operation DeleteUserRecordFn:  For variables, look at type DeleteUserRecordFnVars in ../index.d.ts
+const { data } = await DeleteUserRecordFn(dataConnect, deleteUserRecordFnVars);
 
-// Operation ListCourseRatings:  For variables, look at type ListCourseRatingsVars in ../index.d.ts
-const { data } = await ListCourseRatings(dataConnect, listCourseRatingsVars);
+// Operation CreateDefaultUserFn:  For variables, look at type CreateDefaultUserFnVars in ../index.d.ts
+const { data } = await CreateDefaultUserFn(dataConnect, createDefaultUserFnVars);
 
-// Operation GetCourseRatingsForSummary:  For variables, look at type GetCourseRatingsForSummaryVars in ../index.d.ts
-const { data } = await GetCourseRatingsForSummary(dataConnect, getCourseRatingsForSummaryVars);
+// Operation GetTargetUserRolesFn:  For variables, look at type GetTargetUserRolesFnVars in ../index.d.ts
+const { data } = await GetTargetUserRolesFn(dataConnect, getTargetUserRolesFnVars);
 
-// Operation AdminUpdateCourseRatingAggregate:  For variables, look at type AdminUpdateCourseRatingAggregateVars in ../index.d.ts
-const { data } = await AdminUpdateCourseRatingAggregate(dataConnect, adminUpdateCourseRatingAggregateVars);
+// Operation RemoveRoleFn:  For variables, look at type RemoveRoleFnVars in ../index.d.ts
+const { data } = await RemoveRoleFn(dataConnect, removeRoleFnVars);
 
-// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
-const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
+// Operation AssignNewRoleFn:  For variables, look at type AssignNewRoleFnVars in ../index.d.ts
+const { data } = await AssignNewRoleFn(dataConnect, assignNewRoleFnVars);
 
-// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
-const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
+// Operation GetPendingSubmissions: 
+const { data } = await GetPendingSubmissions(dataConnect);
 
-// Operation SyncUser:  For variables, look at type SyncUserVars in ../index.d.ts
-const { data } = await SyncUser(dataConnect, syncUserVars);
+// Operation GetMyPendingSubmissions: 
+const { data } = await GetMyPendingSubmissions(dataConnect);
 
-// Operation GetMe: 
-const { data } = await GetMe(dataConnect);
+// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
+const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
 
 
 ```
