@@ -10,7 +10,7 @@ DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTie
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
 DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
-DefaultConnector.instance.LogPayment(logPaymentVariables).execute();
+DefaultConnector.instance.MyCertificates().execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.AdminUpdateRubricCriterion({ ... })
-.criterionName(...)
+await DefaultConnector.instance.UpdateMyProfile({ ... })
+.bio(...)
 .execute();
 ```
 
