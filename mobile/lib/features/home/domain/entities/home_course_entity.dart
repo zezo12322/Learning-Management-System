@@ -4,8 +4,8 @@ class HomeCourseEntity extends Equatable {
   final List<CourseInstructorEntity> instructors;
   final String id;
   final String title;
-  final double rating; 
-  final String image;  
+  final double rating;
+  final String image;
 
   final double price;
   final String level;
@@ -14,6 +14,10 @@ class HomeCourseEntity extends Equatable {
   final String courseStatus;
   final String language;
   final int ratingCount;
+
+  // Curriculum Safety
+  final List<CourseSectionEntity>? sections;
+  final List<CourseLessonEntity>? lessons;
 
   const HomeCourseEntity({
     required this.instructors,
@@ -28,6 +32,8 @@ class HomeCourseEntity extends Equatable {
     this.courseStatus = 'PUBLISHED',
     this.language = '',
     required this.ratingCount,
+    this.sections,
+    this.lessons,
   });
 
   @override
@@ -43,11 +49,44 @@ class HomeCourseEntity extends Equatable {
         courseStatus,
         language,
         ratingCount,
+        sections,
+        lessons,
       ];
 }
+
 class CourseInstructorEntity {
   final String name;
   final String? avatar;
 
   const CourseInstructorEntity({required this.name, this.avatar});
+}
+
+class CourseSectionEntity extends Equatable {
+  final String id;
+  final String title;
+  final List<CourseLessonEntity> lessons;
+
+  const CourseSectionEntity({
+    required this.id,
+    required this.title,
+    required this.lessons,
+  });
+
+  @override
+  List<Object?> get props => [id, title, lessons];
+}
+
+class CourseLessonEntity extends Equatable {
+  final String id;
+  final String title;
+  final int? duration;
+
+  const CourseLessonEntity({
+    required this.id,
+    required this.title,
+    this.duration,
+  });
+
+  @override
+  List<Object?> get props => [id, title, duration];
 }
