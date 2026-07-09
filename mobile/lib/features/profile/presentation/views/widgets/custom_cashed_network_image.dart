@@ -5,7 +5,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 class CustomCachedNetworkImage extends StatelessWidget {
   const CustomCachedNetworkImage({super.key, required this.imagePath});
 
-  final String imagePath;
+  final String? imagePath;
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
