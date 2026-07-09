@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:optimatech_lms/core/error/failures.dart';
 import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source.dart';
-import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
+import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
 import 'package:optimatech_lms/features/home/domain/repositories/home_repository.dart';
 
@@ -12,15 +12,15 @@ class HomeRepositoryImpl implements HomeRepository {
   HomeRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, StudentProgressEntity?>>
+  Future<Either<Failure, List<StudentProgressEntity>>>
       getContinueLearningCourses() async {
     try {
       final result = await remoteDataSource.getContinueLearningCourses();
-      return Right<Failure, StudentProgressEntity?>(result);
+      return Right<Failure, List<StudentProgressEntity>>(result);
     } on ServerException catch (e) {
-      return Left<Failure, StudentProgressEntity?>(ServerFailure(e.message));
+      return Left<Failure, List<StudentProgressEntity>>(ServerFailure(e.message));
     } catch (e) {
-      return Left<Failure, StudentProgressEntity?>(ServerFailure(e.toString()));
+      return Left<Failure, List<StudentProgressEntity>>(ServerFailure(e.toString()));
     }
   }
 
