@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/features/home/data/models/recommended_course_model.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/recommended_course_card.dart';
-import '../../domain/entities/course_entity.dart' as home;
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart'
     as courses;
 import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
@@ -30,7 +30,7 @@ const _recommendedIcons = [
 
 // ----------- Recommended Courses Section Builder (horizontal scroll) ------
 Widget buildRecommendedCoursesSection(
-    List<home.HomeCourseEntity> recommendedCourses) {
+    List<RecommendedCourseModel> recommendedCourses) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -39,11 +39,26 @@ Widget buildRecommendedCoursesSection(
         onViewAllTap: () {},
       ),
       Gap(14.h),
-      SizedBox(
-        height: 84.h,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
+      if (recommendedCourses.isEmpty)
+        SizedBox(
+          height: 84.h,
+          child: Center(
+            child: Text(
+              'Keep learning to unlock personalized recommendations!',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        )
+      else
+        SizedBox(
+          height: 84.h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
           itemCount: recommendedCourses.length,
           separatorBuilder: (_, __) => Gap(12.w),
           itemBuilder: (context, index) {
