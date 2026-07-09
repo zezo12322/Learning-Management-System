@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
-import '../../domain/entities/course_entity.dart';
+import '../../domain/entities/home_course_entity.dart';
 
 // ------------- Continue Learning Section Builder -------------
 Widget buildContinueLearningSection(
