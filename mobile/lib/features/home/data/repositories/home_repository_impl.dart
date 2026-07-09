@@ -25,26 +25,27 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
-  Future<Either<Failure, List<CourseEntity>>> getPopularCourses() async {
+  Future<Either<Failure, List<HomeCourseEntity>>> getPopularCourses() async {
     try {
       final result = await remoteDataSource.getPopularCourses();
-      return Right<Failure, List<CourseEntity>>(result);
+      return Right<Failure, List<HomeCourseEntity>>(result);
     } on ServerException catch (e) {
-      return Left<Failure, List<CourseEntity>>(ServerFailure(e.message));
+      return Left<Failure, List<HomeCourseEntity>>(ServerFailure(e.message));
     } catch (e) {
-      return Left<Failure, List<CourseEntity>>(ServerFailure(e.toString()));
+      return Left<Failure, List<HomeCourseEntity>>(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, List<CourseEntity>>> getRecommendedCourses() async {
+  Future<Either<Failure, List<HomeCourseEntity>>>
+      getRecommendedCourses() async {
     try {
       final result = await remoteDataSource.getRecommendedCourses();
-      return Right<Failure, List<CourseEntity>>(result);
+      return Right<Failure, List<HomeCourseEntity>>(result);
     } on ServerException catch (e) {
-      return Left<Failure, List<CourseEntity>>(ServerFailure(e.message));
+      return Left<Failure, List<HomeCourseEntity>>(ServerFailure(e.message));
     } catch (e) {
-      return Left<Failure, List<CourseEntity>>(ServerFailure(e.toString()));
+      return Left<Failure, List<HomeCourseEntity>>(ServerFailure(e.toString()));
     }
   }
 }

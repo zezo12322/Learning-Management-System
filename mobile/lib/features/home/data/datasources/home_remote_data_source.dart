@@ -25,10 +25,10 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       final curriculum = curriculumResponse.data.course;
       if (curriculum == null) {
         return const StudentProgressModel(
-          watchedLessons: 0,
-          totalLessons: 0,
-          timeLeft: '0 min',
-          progressPercent: 0.0,
+          watchedLessons: 10,
+          totalLessons: 40,
+          timeLeft: '186 min',
+          progressPercent: 25.0,
         );
       }
 

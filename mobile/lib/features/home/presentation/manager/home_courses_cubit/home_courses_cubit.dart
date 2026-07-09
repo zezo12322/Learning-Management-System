@@ -35,9 +35,9 @@ class HomeCoursesCubit extends Cubit<HomeCoursesState> {
     final continueLearningResult =
         results[0] as Either<Failure, StudentProgressEntity?>;
     final popularCoursesResult =
-        results[1] as Either<Failure, List<CourseEntity>>;
+        results[1] as Either<Failure, List<HomeCourseEntity>>;
     final recommendedCoursesResult =
-        results[2] as Either<Failure, List<CourseEntity>>;
+        results[2] as Either<Failure, List<HomeCourseEntity>>;
 
     final failureMessage = continueLearningResult.fold(
           (failure) => failure.message,
@@ -59,9 +59,9 @@ class HomeCoursesCubit extends Cubit<HomeCoursesState> {
 
     final continueLearning = continueLearningResult.getOrElse(() => null);
     final popularCourses =
-        popularCoursesResult.getOrElse(() => <CourseEntity>[]);
+        popularCoursesResult.getOrElse(() => <HomeCourseEntity>[]);
     final recommendedCourses =
-        recommendedCoursesResult.getOrElse(() => <CourseEntity>[]);
+        recommendedCoursesResult.getOrElse(() => <HomeCourseEntity>[]);
 
     emit(
       HomeCoursesState.success(
