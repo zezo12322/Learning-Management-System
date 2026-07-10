@@ -1,4 +1,34 @@
 /// Pure domain entity — zero Flutter/Firebase imports.
+enum LessonStatus { completed, active, locked }
+
+class CourseLessonEntity {
+  final String id;
+  final int number;
+  final String title;
+  final String duration;
+  final LessonStatus status;
+
+  const CourseLessonEntity({
+    required this.id,
+    required this.number,
+    required this.title,
+    required this.duration,
+    required this.status,
+  });
+}
+
+class CourseSectionEntity {
+  final String id;
+  final String title;
+  final List<CourseLessonEntity> lessons;
+
+  const CourseSectionEntity({
+    required this.id,
+    required this.title,
+    required this.lessons,
+  });
+}
+
 class CourseEntity {
   final String id;
   final String title;
@@ -11,10 +41,11 @@ class CourseEntity {
   final String categoryName;
   final List<String> tags;
   final List<CourseInstructorEntity> instructors;
+  final List<CourseSectionEntity> sections;
+  final List<CourseLessonEntity> lessons;
   final bool isBookmarked;
   final double avgRating;
   final int ratingCount;
-
 
   const CourseEntity({
     required this.id,
@@ -28,6 +59,8 @@ class CourseEntity {
     required this.categoryName,
     required this.tags,
     required this.instructors,
+    this.sections = const [],
+    this.lessons = const [],
     this.isBookmarked = false,
     required this.avgRating,
     required this.ratingCount,

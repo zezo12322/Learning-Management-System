@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/features/course_details/presentation/models/course_details_mock_data.dart';
+import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 
 class CurriculumLessonList extends StatelessWidget {
   const CurriculumLessonList({
     super.key,
     required this.lessons,
     this.onLessonTap,
+    this.activeLessonId,
   });
 
-  final List<CourseLesson> lessons;
-  final ValueChanged<CourseLesson>? onLessonTap;
+  final List<CourseLessonEntity> lessons;
+  final ValueChanged<CourseLessonEntity>? onLessonTap;
+  final String? activeLessonId;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class CurriculumLessonList extends StatelessWidget {
               ),
             ),
             InkWell(
+              // TODO: Navigate to all lessons
               onTap: () {},
               borderRadius: BorderRadius.circular(8.r),
               child: Padding(
@@ -64,6 +67,7 @@ class CurriculumLessonList extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 8.h),
             child: _LessonTile(
               lesson: lesson,
+              isActive: lesson.id == activeLessonId,
               onTap: onLessonTap != null ? () => onLessonTap!(lesson) : null,
             ),
           ),
@@ -77,17 +81,69 @@ class _LessonTile extends StatelessWidget {
   const _LessonTile({
     required this.lesson,
     this.onTap,
+    this.isActive = false,
   });
 
-  final CourseLesson lesson;
+  final CourseLessonEntity lesson;
   final VoidCallback? onTap;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    if (isActive) {
+      return _buildTile(
+        context,
+        backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
+        leading: Container(
+          width: 32.w,
+          height: 32.w,
+          decoration: BoxDecoration(
+            color: colorScheme.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.play_arrow_rounded,
+            size: 18.sp,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+        titleColor: colorScheme.primary,
+        durationColor: colorScheme.onSurfaceVariant,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              lesson.duration,
+              style: TextStyles.labelSmall.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            Gap(8.w),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              child: Text(
+                'Now Playing',
+                style: TextStyles.labelSmall.copyWith(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeights.semiBold,
+                  fontSize: 10.sp,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     switch (lesson.status) {
       case LessonStatus.completed:
+      case LessonStatus.active:
         return _buildTile(
           context,
           backgroundColor: colorScheme.surface,
@@ -109,53 +165,6 @@ class _LessonTile extends StatelessWidget {
               size: 14.sp,
               color: colorScheme.secondary,
             ),
-          ),
-        );
-      case LessonStatus.active:
-        return _buildTile(
-          context,
-          backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
-          leading: Container(
-            width: 32.w,
-            height: 32.w,
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.play_arrow_rounded,
-              size: 18.sp,
-              color: colorScheme.onPrimary,
-            ),
-          ),
-          titleColor: colorScheme.primary,
-          durationColor: colorScheme.onSurfaceVariant,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                lesson.duration,
-                style: TextStyles.labelSmall.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Gap(8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Now Playing',
-                  style: TextStyles.labelSmall.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeights.semiBold,
-                    fontSize: 10.sp,
-                  ),
-                ),
-              ),
-            ],
           ),
         );
       case LessonStatus.locked:
@@ -199,7 +208,7 @@ class _LessonTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
-              color: lesson.status == LessonStatus.active
+              color: isActive
                   ? colorScheme.primary.withValues(alpha: 0.2)
                   : colorScheme.outline.withValues(alpha: 0.6),
             ),
@@ -219,7 +228,7 @@ class _LessonTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (lesson.status != LessonStatus.active) ...[
+              if (!isActive) ...[
                 Text(
                   lesson.duration,
                   style: TextStyles.labelSmall.copyWith(
