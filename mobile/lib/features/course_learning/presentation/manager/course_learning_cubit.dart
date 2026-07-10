@@ -13,6 +13,9 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     required this.getLectureContentUseCase,
   }) : super(const CourseLearningState());
 
+  String? _courseId;
+  String? _lastRequestedLectureId;
+
   List<CurriculumLectureEntity> get _flatLectures {
     final curriculum = state.curriculum;
     if (curriculum == null) return const [];
@@ -44,10 +47,15 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
   }
 
   Future<void> fetchCourseCurriculum(String courseId) async {
+    _courseId = courseId;
+    _lastRequestedLectureId = null;
+
     emit(
       state.copyWith(
-        curriculumState: Status.loading,
         curriculumErrorMessage: null,
+        lectureState: Status.initial,
+        currentLecture: null,
+        lectureErrorMessage: null,
       ),
     );
     final result = await getCourseCurriculumUseCase.call(courseId);
@@ -60,13 +68,33 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     );
   }
 
+  /// Retries the last curriculum fetch. Used by `AppErrorWidget.onRetry`.
+  Future<void> retryFetchCurriculum() async {
+    final courseId = _courseId;
+    if (courseId == null) return;
+    await fetchCourseCurriculum(courseId);
+  }
+
   Future<void> fetchLectureContent(String lectureId) async {
+    _lastRequestedLectureId = lectureId;
+
     emit(state.copyWith(lectureState: Status.loading, lectureErrorMessage: null));
     final result = await getLectureContentUseCase.call(lectureId);
+
+    // If the user has since selected a different lecture, drop this response.
+    if (_lastRequestedLectureId != lectureId) return;
+
     result.fold(
       (failure) => emit(state.copyWith(lectureState: Status.failure, lectureErrorMessage: failure.message)),
       (lecture) => emit(state.copyWith(lectureState: Status.loaded, currentLecture: lecture)),
     );
+  }
+
+  /// Retries the last lecture fetch. Used by `AppErrorWidget.onRetry`.
+  Future<void> retryFetchLecture() async {
+    final lectureId = _lastRequestedLectureId ?? state.currentLecture?.id;
+    if (lectureId == null) return;
+    await fetchLectureContent(lectureId);
   }
 
   Future<void> _selectInitialLectureIfNeeded() async {
@@ -79,7 +107,8 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
   }
 
   Future<void> selectLectureById(String lectureId) async {
-    if (state.currentLecture?.id == lectureId) return;
+    final alreadyLoaded = state.currentLecture?.id == lectureId && state.lectureState == Status.loaded;
+    if (alreadyLoaded) return;
     await fetchLectureContent(lectureId);
   }
 
