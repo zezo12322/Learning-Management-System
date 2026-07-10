@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/features/course_details/presentation/models/course_details_mock_data.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 
 class CourseStatsCard extends StatelessWidget {
@@ -14,27 +13,28 @@ class CourseStatsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    // TODO: Total Duration Should be fetched from the API
     final stats = [
-      _StatItem(
+      const _StatItem(
         icon: Icons.access_time_rounded,
-        value: CourseDetailsMockData.totalDuration,
+        value: '20 hours',
         label: 'Total Duration',
       ),
-      _StatItem(
+      // TODO: Total Lessons Should be fetched from the API
+      const _StatItem(
         icon: Icons.play_circle_outline_rounded,
-        value: CourseDetailsMockData.lessonCount,
+        value: '12 Lessons',
         label: 'Lessons',
       ),
       _StatItem(
         icon: Icons.bar_chart_rounded,
-        value: course.level.isNotEmpty
-            ? course.level
-            : CourseDetailsMockData.level,
+        value: course.level.isNotEmpty ? course.level : 'Beginner',
         label: 'Level',
       ),
-      _StatItem(
+      // TODO: Certificate Should be fetched from the API
+      const _StatItem(
         icon: Icons.workspace_premium_outlined,
-        value: CourseDetailsMockData.certificateLabel,
+        value: 'Certificate',
         label: 'Included',
       ),
     ];
