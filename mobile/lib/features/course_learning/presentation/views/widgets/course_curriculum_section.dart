@@ -60,17 +60,17 @@ class CourseCurriculumSection extends StatelessWidget {
               ...section.lectures.asMap().entries.map((entry) {
                 final index = entry.key;
                 final lecture = entry.value;
-                
+
                 return BlocBuilder<CourseLearningCubit, CourseLearningState>(
                   buildWhen: (prev, curr) => prev.currentLecture?.id != curr.currentLecture?.id,
                   builder: (context, state) {
                     final isCurrent = state.currentLecture?.id == lecture.id;
-                    
+
                     return CurriculumLessonTile(
                       lecture: lecture,
                       order: index + 1,
                       isCurrent: isCurrent,
-                      onTap: () => context.read<CourseLearningCubit>().fetchLectureContent(lecture.id),
+                      onTap: () => context.read<CourseLearningCubit>().selectLectureById(lecture.id),
                     );
                   },
                 );

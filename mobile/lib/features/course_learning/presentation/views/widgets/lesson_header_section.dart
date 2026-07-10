@@ -28,6 +28,28 @@ class LessonHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = context.theme.colorScheme.primary;
     final secondaryTextColor = context.theme.colorScheme.onSurfaceVariant;
+    final items = <Widget>[];
+
+    if (durationLabel.isNotEmpty) {
+      items.add(_MetaItem(
+        icon: Icons.access_time_rounded,
+        label: durationLabel,
+      ));
+    }
+
+    if (lessonProgressLabel.isNotEmpty) {
+      if (items.isNotEmpty) items.add(_Dot(color: secondaryTextColor));
+      items.add(_MetaItem(
+        icon: Icons.smart_display_outlined,
+        label: lessonProgressLabel,
+      ));
+    }
+
+    if (items.isNotEmpty) items.add(_Dot(color: secondaryTextColor));
+    items.add(_StatusChip(
+      label: statusLabel,
+      color: primary,
+    ));
 
     return Row(
       children: [
@@ -58,23 +80,29 @@ class LessonHeaderSection extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: 8.w,
                 runSpacing: 8.h,
-                children: [
-                  _MetaItem(
-                    icon: Icons.access_time_rounded,
-                    label: durationLabel,
-                  ),
-                  _Dot(color: secondaryTextColor),
-                  _MetaItem(
-                    icon: Icons.smart_display_outlined,
-                    label: lessonProgressLabel,
-                  ),
-                  _Dot(color: secondaryTextColor),
-                  _StatusChip(
-                    label: statusLabel,
-                    color: primary,
-                  ),
-                ],
-              ),
+                children: items,
+              )
+              // Wrap(
+              //   crossAxisAlignment: WrapCrossAlignment.center,
+              //   spacing: 8.w,
+              //   runSpacing: 8.h,
+              //   children: [
+              //     _MetaItem(
+              //       icon: Icons.access_time_rounded,
+              //       label: durationLabel,
+              //     ),
+              //     _Dot(color: secondaryTextColor),
+              //     _MetaItem(
+              //       icon: Icons.smart_display_outlined,
+              //       label: lessonProgressLabel,
+              //     ),
+              //     _Dot(color: secondaryTextColor),
+              //     _StatusChip(
+              //       label: statusLabel,
+              //       color: primary,
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),

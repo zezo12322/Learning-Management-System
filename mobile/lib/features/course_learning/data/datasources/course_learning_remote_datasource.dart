@@ -27,6 +27,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId) async{
     try{
       final result = await defaultConnector.getCourseCurriculum(courseId: courseId).execute();
+      //return CourseCurriculumModel.dummy();
       return CourseCurriculumModel.fromConnectorResult(result.data.course!);
     }on DataConnectError catch (e) {
       throw CustomExceptions(message: e.message ?? 'Data Connect error');
@@ -38,8 +39,8 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   @override
   Future<LectureContentModel> getLectureContent(String lectureId) async {
     try {
-      final result = await defaultConnector.getLectureContent(
-          lectureId: lectureId).execute();
+      final result = await defaultConnector.getLectureContent(lectureId: lectureId).execute();
+      //return LectureContentModel.dummy(lectureId);
       return LectureContentModel.fromConnectorResult(result.data);
     } on DataConnectError catch (e) {
       throw CustomExceptions(message: e.message ?? 'Data Connect error');

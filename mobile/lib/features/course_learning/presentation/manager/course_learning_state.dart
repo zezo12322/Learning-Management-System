@@ -12,8 +12,13 @@ class CourseLearningState with _$CourseLearningState {
   const factory CourseLearningState({
     @Default(Status.initial) Status curriculumState,
     @Default(Status.initial) Status lectureState,
+    @Default(Status.initial) Status actionState,
+    
     CourseCurriculumEntity? curriculum,
     LectureContentEntity? currentLecture,
-    String? errorMessage,
+
+    String? curriculumErrorMessage,
+    String? lectureErrorMessage,
+    String? actionErrorMessage,
   }) = _CourseLearningState;
 }

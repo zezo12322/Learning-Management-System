@@ -18,10 +18,13 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$CourseLearningState {
   Status get curriculumState => throw _privateConstructorUsedError;
   Status get lectureState => throw _privateConstructorUsedError;
+  Status get actionState => throw _privateConstructorUsedError;
   CourseCurriculumEntity? get curriculum => throw _privateConstructorUsedError;
   LectureContentEntity? get currentLecture =>
       throw _privateConstructorUsedError;
-  String? get errorMessage => throw _privateConstructorUsedError;
+  String? get curriculumErrorMessage => throw _privateConstructorUsedError;
+  String? get lectureErrorMessage => throw _privateConstructorUsedError;
+  String? get actionErrorMessage => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $CourseLearningStateCopyWith<CourseLearningState> get copyWith =>
@@ -37,9 +40,12 @@ abstract class $CourseLearningStateCopyWith<$Res> {
   $Res call(
       {Status curriculumState,
       Status lectureState,
+      Status actionState,
       CourseCurriculumEntity? curriculum,
       LectureContentEntity? currentLecture,
-      String? errorMessage});
+      String? curriculumErrorMessage,
+      String? lectureErrorMessage,
+      String? actionErrorMessage});
 }
 
 /// @nodoc
@@ -57,9 +63,12 @@ class _$CourseLearningStateCopyWithImpl<$Res, $Val extends CourseLearningState>
   $Res call({
     Object? curriculumState = null,
     Object? lectureState = null,
+    Object? actionState = null,
     Object? curriculum = freezed,
     Object? currentLecture = freezed,
-    Object? errorMessage = freezed,
+    Object? curriculumErrorMessage = freezed,
+    Object? lectureErrorMessage = freezed,
+    Object? actionErrorMessage = freezed,
   }) {
     return _then(_value.copyWith(
       curriculumState: null == curriculumState
@@ -70,6 +79,10 @@ class _$CourseLearningStateCopyWithImpl<$Res, $Val extends CourseLearningState>
           ? _value.lectureState
           : lectureState // ignore: cast_nullable_to_non_nullable
               as Status,
+      actionState: null == actionState
+          ? _value.actionState
+          : actionState // ignore: cast_nullable_to_non_nullable
+              as Status,
       curriculum: freezed == curriculum
           ? _value.curriculum
           : curriculum // ignore: cast_nullable_to_non_nullable
@@ -78,9 +91,17 @@ class _$CourseLearningStateCopyWithImpl<$Res, $Val extends CourseLearningState>
           ? _value.currentLecture
           : currentLecture // ignore: cast_nullable_to_non_nullable
               as LectureContentEntity?,
-      errorMessage: freezed == errorMessage
-          ? _value.errorMessage
-          : errorMessage // ignore: cast_nullable_to_non_nullable
+      curriculumErrorMessage: freezed == curriculumErrorMessage
+          ? _value.curriculumErrorMessage
+          : curriculumErrorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      lectureErrorMessage: freezed == lectureErrorMessage
+          ? _value.lectureErrorMessage
+          : lectureErrorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      actionErrorMessage: freezed == actionErrorMessage
+          ? _value.actionErrorMessage
+          : actionErrorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -97,9 +118,12 @@ abstract class _$$CourseLearningStateImplCopyWith<$Res>
   $Res call(
       {Status curriculumState,
       Status lectureState,
+      Status actionState,
       CourseCurriculumEntity? curriculum,
       LectureContentEntity? currentLecture,
-      String? errorMessage});
+      String? curriculumErrorMessage,
+      String? lectureErrorMessage,
+      String? actionErrorMessage});
 }
 
 /// @nodoc
@@ -115,9 +139,12 @@ class __$$CourseLearningStateImplCopyWithImpl<$Res>
   $Res call({
     Object? curriculumState = null,
     Object? lectureState = null,
+    Object? actionState = null,
     Object? curriculum = freezed,
     Object? currentLecture = freezed,
-    Object? errorMessage = freezed,
+    Object? curriculumErrorMessage = freezed,
+    Object? lectureErrorMessage = freezed,
+    Object? actionErrorMessage = freezed,
   }) {
     return _then(_$CourseLearningStateImpl(
       curriculumState: null == curriculumState
@@ -128,6 +155,10 @@ class __$$CourseLearningStateImplCopyWithImpl<$Res>
           ? _value.lectureState
           : lectureState // ignore: cast_nullable_to_non_nullable
               as Status,
+      actionState: null == actionState
+          ? _value.actionState
+          : actionState // ignore: cast_nullable_to_non_nullable
+              as Status,
       curriculum: freezed == curriculum
           ? _value.curriculum
           : curriculum // ignore: cast_nullable_to_non_nullable
@@ -136,9 +167,17 @@ class __$$CourseLearningStateImplCopyWithImpl<$Res>
           ? _value.currentLecture
           : currentLecture // ignore: cast_nullable_to_non_nullable
               as LectureContentEntity?,
-      errorMessage: freezed == errorMessage
-          ? _value.errorMessage
-          : errorMessage // ignore: cast_nullable_to_non_nullable
+      curriculumErrorMessage: freezed == curriculumErrorMessage
+          ? _value.curriculumErrorMessage
+          : curriculumErrorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      lectureErrorMessage: freezed == lectureErrorMessage
+          ? _value.lectureErrorMessage
+          : lectureErrorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      actionErrorMessage: freezed == actionErrorMessage
+          ? _value.actionErrorMessage
+          : actionErrorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -150,9 +189,12 @@ class _$CourseLearningStateImpl implements _CourseLearningState {
   const _$CourseLearningStateImpl(
       {this.curriculumState = Status.initial,
       this.lectureState = Status.initial,
+      this.actionState = Status.initial,
       this.curriculum,
       this.currentLecture,
-      this.errorMessage});
+      this.curriculumErrorMessage,
+      this.lectureErrorMessage,
+      this.actionErrorMessage});
 
   @override
   @JsonKey()
@@ -161,15 +203,22 @@ class _$CourseLearningStateImpl implements _CourseLearningState {
   @JsonKey()
   final Status lectureState;
   @override
+  @JsonKey()
+  final Status actionState;
+  @override
   final CourseCurriculumEntity? curriculum;
   @override
   final LectureContentEntity? currentLecture;
   @override
-  final String? errorMessage;
+  final String? curriculumErrorMessage;
+  @override
+  final String? lectureErrorMessage;
+  @override
+  final String? actionErrorMessage;
 
   @override
   String toString() {
-    return 'CourseLearningState(curriculumState: $curriculumState, lectureState: $lectureState, curriculum: $curriculum, currentLecture: $currentLecture, errorMessage: $errorMessage)';
+    return 'CourseLearningState(curriculumState: $curriculumState, lectureState: $lectureState, actionState: $actionState, curriculum: $curriculum, currentLecture: $currentLecture, curriculumErrorMessage: $curriculumErrorMessage, lectureErrorMessage: $lectureErrorMessage, actionErrorMessage: $actionErrorMessage)';
   }
 
   @override
@@ -181,17 +230,31 @@ class _$CourseLearningStateImpl implements _CourseLearningState {
                 other.curriculumState == curriculumState) &&
             (identical(other.lectureState, lectureState) ||
                 other.lectureState == lectureState) &&
+            (identical(other.actionState, actionState) ||
+                other.actionState == actionState) &&
             (identical(other.curriculum, curriculum) ||
                 other.curriculum == curriculum) &&
             (identical(other.currentLecture, currentLecture) ||
                 other.currentLecture == currentLecture) &&
-            (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
+            (identical(other.curriculumErrorMessage, curriculumErrorMessage) ||
+                other.curriculumErrorMessage == curriculumErrorMessage) &&
+            (identical(other.lectureErrorMessage, lectureErrorMessage) ||
+                other.lectureErrorMessage == lectureErrorMessage) &&
+            (identical(other.actionErrorMessage, actionErrorMessage) ||
+                other.actionErrorMessage == actionErrorMessage));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, curriculumState, lectureState,
-      curriculum, currentLecture, errorMessage);
+  int get hashCode => Object.hash(
+      runtimeType,
+      curriculumState,
+      lectureState,
+      actionState,
+      curriculum,
+      currentLecture,
+      curriculumErrorMessage,
+      lectureErrorMessage,
+      actionErrorMessage);
 
   @JsonKey(ignore: true)
   @override
@@ -205,20 +268,29 @@ abstract class _CourseLearningState implements CourseLearningState {
   const factory _CourseLearningState(
       {final Status curriculumState,
       final Status lectureState,
+      final Status actionState,
       final CourseCurriculumEntity? curriculum,
       final LectureContentEntity? currentLecture,
-      final String? errorMessage}) = _$CourseLearningStateImpl;
+      final String? curriculumErrorMessage,
+      final String? lectureErrorMessage,
+      final String? actionErrorMessage}) = _$CourseLearningStateImpl;
 
   @override
   Status get curriculumState;
   @override
   Status get lectureState;
   @override
+  Status get actionState;
+  @override
   CourseCurriculumEntity? get curriculum;
   @override
   LectureContentEntity? get currentLecture;
   @override
-  String? get errorMessage;
+  String? get curriculumErrorMessage;
+  @override
+  String? get lectureErrorMessage;
+  @override
+  String? get actionErrorMessage;
   @override
   @JsonKey(ignore: true)
   _$$CourseLearningStateImplCopyWith<_$CourseLearningStateImpl> get copyWith =>
