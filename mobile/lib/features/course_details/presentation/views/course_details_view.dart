@@ -150,6 +150,8 @@ class _CourseDetailsViewState extends State<CourseDetailsView> {
                                       return buildPopularCoursesSection(
                                         popularCourses,
                                         customTitle: 'course_details.you_might_also_like'.tr(),
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
                                       );
                                     },
                                     orElse: () => const SizedBox.shrink(),
