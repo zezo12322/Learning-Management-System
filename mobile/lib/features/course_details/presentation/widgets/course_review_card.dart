@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/features/course_details/presentation/models/course_details_mock_data.dart';
 
 class CourseReviewCard extends StatelessWidget {
   const CourseReviewCard({super.key});
@@ -18,7 +17,7 @@ class CourseReviewCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Reviews (${CourseDetailsMockData.reviewCount})',
+                'Reviews (0)',
                 style: TextStyles.titleSmall.copyWith(
                   fontSize: 18.sp,
                   color: colorScheme.onSurface,

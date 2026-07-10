@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/features/course_details/presentation/models/course_details_mock_data.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 
 class CourseHeroSection extends StatefulWidget {
@@ -109,7 +108,7 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             // category name from course entity
                             widget.course.categoryName.isNotEmpty
                                 ? widget.course.categoryName
-                                : CourseDetailsMockData.category,
+                                : 'Design',
                             style: TextStyles.labelSmall.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeights.semiBold,

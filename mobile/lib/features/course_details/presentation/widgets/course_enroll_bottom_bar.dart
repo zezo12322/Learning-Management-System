@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/features/course_details/presentation/models/course_details_mock_data.dart';
 
 class CourseEnrollBottomBar extends StatelessWidget {
   const CourseEnrollBottomBar({
@@ -66,7 +65,7 @@ class CourseEnrollBottomBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '\$${CourseDetailsMockData.originalPrice.toStringAsFixed(2)}',
+                      '\$${(price * 1.25).toStringAsFixed(2)}',
                       style: TextStyles.labelMedium.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         decoration: TextDecoration.lineThrough,
@@ -83,7 +82,7 @@ class CourseEnrollBottomBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
-                        '${CourseDetailsMockData.discountPercent}% OFF',
+                        '25% OFF',
                         style: TextStyles.labelSmall.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeights.bold,
