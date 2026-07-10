@@ -22,7 +22,8 @@ Route<dynamic> generateRoute(RouteSettings settings){
     case CoursesView.routeName:
       return MaterialPageRoute(builder: (_) => const CoursesView());
     case CourseLearningView.routeName:
-      return MaterialPageRoute(builder: (_) => const CourseLearningView());
+      final courseId = settings.arguments as String;
+      return MaterialPageRoute(builder: (_) => CourseLearningView(courseId: courseId,));
     case ProfileView.routeName:
       return MaterialPageRoute(builder: (_) => const ProfileView());
     default:

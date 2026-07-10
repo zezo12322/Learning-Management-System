@@ -1,33 +1,21 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_state.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/curriculum_lesson_tile.dart';
-
-enum CurriculumLessonStatus{
-  current,
-  completed,
-  locked
-}
-
-class CurriculumLessonData {
-  final int order;
-  final String title;
-  final String duration;
-  final String status;
-
-
-  CurriculumLessonData({required this.order, required this.title, required this.duration, required this.status});
-}
 
 class CourseCurriculumSection extends StatelessWidget {
   const CourseCurriculumSection({
     super.key,
-    required this.lessons,
+    required this.curriculum,
   });
 
-  final List<CurriculumLessonData> lessons;
+  final CourseCurriculumEntity curriculum;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +31,7 @@ class CourseCurriculumSection extends StatelessWidget {
             ),
             Text(
               'lesson_learning.curriculum.lessons_count'.tr(
-                namedArgs: {'count': '${lessons.length}'},
+                namedArgs: {'count': '${curriculum.totalLectures}'},
               ),
               style: context.textTheme.bodySmall?.copyWith(
                 color: context.theme.colorScheme.onSurfaceVariant,
@@ -51,16 +39,46 @@ class CourseCurriculumSection extends StatelessWidget {
             ),
           ],
         ),
-        Gap(8.h),
-        Column(
-          children: lessons
-              .map(
-                (lesson) => CurriculumLessonTile(
-              data: lesson,
-              onTap: () {},
-            ),
-          ).toList(),
-        ),
+        Gap(16.h),
+        ...curriculum.sections.map((section) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (curriculum.sections.length > 1) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Text(
+                    section.title,
+                    style: context.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                Gap(8.h),
+              ],
+              ...section.lectures.asMap().entries.map((entry) {
+                final index = entry.key;
+                final lecture = entry.value;
+                
+                return BlocBuilder<CourseLearningCubit, CourseLearningState>(
+                  buildWhen: (prev, curr) => prev.currentLecture?.id != curr.currentLecture?.id,
+                  builder: (context, state) {
+                    final isCurrent = state.currentLecture?.id == lecture.id;
+                    
+                    return CurriculumLessonTile(
+                      lecture: lecture,
+                      order: index + 1,
+                      isCurrent: isCurrent,
+                      onTap: () => context.read<CourseLearningCubit>().fetchLectureContent(lecture.id),
+                    );
+                  },
+                );
+              }),
+              Gap(16.h),
+            ],
+          );
+        }),
       ],
     );
   }
