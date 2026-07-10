@@ -6,6 +6,12 @@ import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_i
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/course_learning/data/datasources/course_learning_remote_datasource.dart';
+import 'package:optimatech_lms/features/course_learning/data/repositories/course_learning_repository_impl.dart';
+import 'package:optimatech_lms/features/course_learning/domain/repositories/course_learning_repository.dart';
+import 'package:optimatech_lms/features/course_learning/domain/usecases/get_course_curriculum_usecase.dart';
+import 'package:optimatech_lms/features/course_learning/domain/usecases/get_lecture_content_usecase.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
 import 'package:optimatech_lms/features/courses/data/datasources/categories_remote_datasource/categories_remote_datasource.dart';
 import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource_impl.dart';
 import 'package:optimatech_lms/features/courses/data/repositories/categories_repository_impl.dart';
@@ -95,4 +101,24 @@ Future<void> setupDependencies() async {
       () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()));
   getIt.registerFactory<ThemeCubit>(
       () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>()));
+
+  // ========================= Course Learning Feature =========================
+  getIt.registerLazySingleton<CourseLearningRemoteDataSource>(
+    () => CourseLearningRemoteDataSourceImpl(defaultConnector: DefaultConnector.instance),
+  );
+  getIt.registerLazySingleton<CourseLearningRepository>(
+    () => CourseLearningRepositoryImpl(remoteDataSource: getIt<CourseLearningRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<GetCourseCurriculumUseCase>(
+    () => GetCourseCurriculumUseCase(getIt<CourseLearningRepository>()),
+  );
+  getIt.registerLazySingleton<GetLectureContentUseCase>(
+    () => GetLectureContentUseCase(getIt<CourseLearningRepository>()),
+  );
+  getIt.registerFactory<CourseLearningCubit>(
+    () => CourseLearningCubit(
+      getCourseCurriculumUseCase: getIt<GetCourseCurriculumUseCase>(),
+      getLectureContentUseCase: getIt<GetLectureContentUseCase>(),
+    ),
+  );
 }

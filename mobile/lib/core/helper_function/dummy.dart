@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/category_entity.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
-import '../../features/courses/presentation/views/widgets/courses_category_Section.dart';
-import '../utils/app_colors.dart';
 
 CourseEntity get dummySkeletonCourseItem => const CourseEntity(
   id: '_',
