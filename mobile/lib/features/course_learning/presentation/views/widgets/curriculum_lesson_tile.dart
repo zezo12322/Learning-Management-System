@@ -4,39 +4,43 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
-import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/course_curriculum_section.dart';
+import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
 
 class CurriculumLessonTile extends StatelessWidget {
   const CurriculumLessonTile({
     super.key,
-    required this.data,
+    required this.lecture,
+    required this.order,
+    this.isCurrent = false,
+    this.isCompleted = false,
+    this.isLocked = false,
     this.onTap,
   });
 
-  final CurriculumLessonData data;
+  final CurriculumLectureEntity lecture;
+  final int order;
+  final bool isCurrent;
+  final bool isCompleted;
+  final bool isLocked;
   final VoidCallback? onTap;
-
-  bool get _isCurrent => data.status == CurriculumLessonStatus.current.name;
-  bool get _isCompleted => data.status == CurriculumLessonStatus.completed.name;
-  bool get _isLocked => data.status == CurriculumLessonStatus.locked.name;
 
   @override
   Widget build(BuildContext context) {
     final Color primary = context.theme.colorScheme.primary;
 
     return Material(
-      color: _isCurrent ? primary.withValues(alpha: 0.08) : Colors.transparent,
+      color: isCurrent ? primary.withValues(alpha: 0.08) : Colors.transparent,
       borderRadius: BorderRadius.circular(14.r),
       child: InkWell(
-        onTap: onTap,
+        onTap: isLocked ? null : onTap,
         borderRadius: BorderRadius.circular(14.r),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
           decoration: BoxDecoration(
-            border: !_isCurrent
+            border: !isCurrent
               ? Border(
                   left: BorderSide(
-                    color: _isLocked
+                    color: isLocked
                       ? Colors.transparent
                       : primary.withValues(alpha: 0.5),
                     width: 3,
@@ -47,35 +51,36 @@ class CurriculumLessonTile extends StatelessWidget {
           child: Row(
             children: [
               _LeadingIcon(
-                isCurrent: _isCurrent,
-                isCompleted: _isCompleted,
-                isLocked: _isLocked,
-                order: data.order,
+                isCurrent: isCurrent,
+                isCompleted: isCompleted,
+                isLocked: isLocked,
+                order: order,
               ),
               Gap(14.w),
               Expanded(
                 child: Text(
-                  '${data.order}. ${data.title}',
+                  '$order. ${lecture.title}',
                   style: context.textTheme.bodyMedium?.copyWith(
-                    fontWeight: _isCurrent ? FontWeight.w700 : FontWeight.w600,
-                    color: _isCurrent
+                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                    color: isCurrent
                         ? primary
                         : context.theme.colorScheme.onSurface,
                   ),
                 ),
               ),
               Gap(8.w),
-              Text(
-                data.duration,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.theme.colorScheme.onSurfaceVariant,
+              if (lecture.durationMinutes != null)
+                Text(
+                  '${lecture.durationMinutes} min',
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
               Gap(10.w),
-              if (_isCurrent)
+              if (isCurrent)
                 _NowPlayingBadge(primary: primary)
               else ...[
-                _TrailingIcon(isCompleted: _isCompleted, isLocked: _isLocked),
+                _TrailingIcon(isCompleted: isCompleted, isLocked: isLocked),
               ],
             ],
           ),
