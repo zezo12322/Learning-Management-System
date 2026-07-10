@@ -26,9 +26,8 @@ class OverviewTab extends StatelessWidget {
         ),
         Gap(8.h),
         Text(
-          '${course.description ?? CourseDetailsMockData.description} '
-          'This comprehensive course covers everything from design thinking to '
-          'prototyping, giving you practical skills you can apply immediately.',
+          // this return null alwas
+          '${course.description ?? 'Master core concepts and practical workflows through real-world projects designed to build your expertise from the ground up.'} ',
           style: TextStyles.bodySmall.copyWith(
             color: colorScheme.onSurfaceVariant,
             height: 1.55,
