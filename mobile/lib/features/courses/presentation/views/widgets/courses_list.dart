@@ -10,7 +10,6 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/course_card.dart';
-import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
 
 class CoursesList extends StatelessWidget {
   const CoursesList({super.key,});
@@ -84,14 +83,7 @@ class _CoursesListView extends StatelessWidget {
         
         return CourseCard(
           item: detailedCourse,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CourseDetailsView(course: detailedCourse),
-              ),
-            );
-          },
+          onTap: () {},
           onBookmarkTap: () => context.read<CoursesCubit>().toggleBookmark(course.id),
           onMoreTap: () {},
         );
