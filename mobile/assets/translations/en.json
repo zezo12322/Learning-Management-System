@@ -144,6 +144,9 @@
     "not_found_msg": "The route you requested does not exist.",
     "go_home": "Go to Home"
   },
+  "course_details": {
+    "you_might_also_like": "You might also like"
+  },
   "courses": {
     "title": "Courses",
     "searchHint": "Search for courses, lessons, quizzes...",
