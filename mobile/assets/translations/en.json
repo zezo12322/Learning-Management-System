@@ -118,6 +118,8 @@
     "lessons": "lessons",
     "of_lessons": "{completed} of {total} lessons",
     "min_left": "{time} left",
+    "min": "min",
+    "inProgress": "In Progress",
     "error_title": "Something went wrong",
     "retry": "Try Again",
     "assignments": {

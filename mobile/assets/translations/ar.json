@@ -118,6 +118,8 @@
     "lessons": "دروس",
     "of_lessons": "{completed} من {total} دروس",
     "min_left": "متبقي {time}",
+    "min": "دقيقة",
+    "inProgress": "جاري الدراسة",
     "error_title": "حدث خطأ ما",
     "retry": "إعادة المحاولة",
     "assignments": {
