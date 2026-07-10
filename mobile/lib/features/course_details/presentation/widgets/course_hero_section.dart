@@ -146,7 +146,7 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             ),
                             Gap(4.w),
                             Text(
-                              '${widget.course.avgRating > 0 ? widget.course.avgRating : CourseDetailsMockData.rating} (${_formatCount(widget.course.ratingCount > 0 ? widget.course.ratingCount : CourseDetailsMockData.ratingCount)})',
+                              '${widget.course.avgRating > 0 ? widget.course.avgRating : 0} (${_formatCount(widget.course.ratingCount > 0 ? widget.course.ratingCount : 0)})',
                               style: TextStyles.labelSmall.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeights.semiBold,
@@ -161,7 +161,7 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             Gap(4.w),
                             Flexible(
                               child: Text(
-                                '${_formatCount(CourseDetailsMockData.studentCount)} Students',
+                                '0 Students',
                                 style: TextStyles.labelSmall.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),
@@ -331,7 +331,7 @@ class _HeroIllustration extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      'UI/UX',
+                      'study',
                       style: TextStyles.labelSmall.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeights.bold,

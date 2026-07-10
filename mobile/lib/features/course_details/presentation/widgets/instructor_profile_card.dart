@@ -7,7 +7,7 @@ import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.d
 
 class InstructorProfileCard extends StatelessWidget {
   const InstructorProfileCard({super.key, this.instructor});
-  
+
   final CourseInstructorEntity? instructor;
 
   @override
@@ -26,12 +26,16 @@ class InstructorProfileCard extends StatelessWidget {
           CircleAvatar(
             radius: 28.r,
             backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
-            backgroundImage: instructor?.avatar != null ? NetworkImage(instructor!.avatar!) : null,
-            child: instructor?.avatar == null ? Icon(
-              Icons.person_rounded,
-              size: 28.sp,
-              color: colorScheme.primary,
-            ) : null,
+            backgroundImage: instructor?.avatar != null
+                ? NetworkImage(instructor!.avatar!)
+                : null,
+            child: instructor?.avatar == null
+                ? Icon(
+                    Icons.person_rounded,
+                    size: 28.sp,
+                    color: colorScheme.primary,
+                  )
+                : null,
           ),
           Gap(12.w),
           Expanded(
@@ -42,7 +46,7 @@ class InstructorProfileCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        instructor?.name ?? CourseDetailsMockData.instructorName,
+                        instructor?.name ?? 'Instructor User',
                         style: TextStyles.labelLarge.copyWith(
                           fontWeight: FontWeights.bold,
                           color: colorScheme.onSurface,
@@ -60,7 +64,8 @@ class InstructorProfileCard extends StatelessWidget {
                 ),
                 Gap(2.h),
                 Text(
-                  CourseDetailsMockData.instructorTitle,
+                  // TODO: Replace with actual instructor title when available
+                  'UI/ UX Designer',
                   style: TextStyles.bodySmall.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -100,7 +105,8 @@ class InstructorProfileCard extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               minimumSize: Size(0, 36.h),
               padding: EdgeInsets.symmetric(horizontal: 12.w),
-              side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.4)),
+              side:
+                  BorderSide(color: colorScheme.primary.withValues(alpha: 0.4)),
               foregroundColor: colorScheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),
