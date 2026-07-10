@@ -11,15 +11,15 @@ class LessonBottomBar extends StatelessWidget {
   const LessonBottomBar({
     super.key,
     this.isCompleted = false,
-    this.onPrevious,
+    required this.onPrevious,
     this.onMarkComplete,
-    this.onNext,
+    required this.onNext,
   });
 
   final bool isCompleted;
-  final VoidCallback? onPrevious;
+  final VoidCallback onPrevious;
   final VoidCallback? onMarkComplete;
-  final VoidCallback? onNext;
+  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class LessonBottomBar extends StatelessWidget {
               height: 40.h,
               child: SecondaryButton(
                 text: 'lesson_learning.actions.previous'.tr(),
-                onPressed: onPrevious ?? () {},
+                onPressed: onPrevious,
               ),
             ),
           ),
@@ -59,7 +59,7 @@ class LessonBottomBar extends StatelessWidget {
               height: 40.h,
               child: PrimaryButton(
                 text: 'lesson_learning.actions.next'.tr(),
-                onPressed: onNext ?? () {},
+                onPressed: onNext,
               ),
             ),
           ),
@@ -92,7 +92,9 @@ class _MarkCompleteButton extends StatelessWidget {
         children: [
           Flexible(
             child: Text(
-              'lesson_learning.actions.mark_complete'.tr(),
+              isCompleted
+                  ? 'Completed'
+                  : 'lesson_learning.actions.mark_complete'.tr(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.labelLarge?.copyWith(

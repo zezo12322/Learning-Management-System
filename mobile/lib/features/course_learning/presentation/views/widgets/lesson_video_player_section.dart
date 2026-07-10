@@ -6,7 +6,8 @@ import 'package:video_player/video_player.dart';
 
 class LessonVideoPlayerSection extends StatefulWidget {
   const LessonVideoPlayerSection({
-    super.key, required this.url,
+    super.key,
+    required this.url,
   });
 
   final String url;
@@ -16,71 +17,145 @@ class LessonVideoPlayerSection extends StatefulWidget {
 }
 
 class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
-  late VideoPlayerController _videoPlayerController;
+  VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
+
   bool _hasError = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
-    _initializePlayer();
     super.initState();
+    _initializePlayer();
+  }
+
+  @override
+  void didUpdateWidget(covariant LessonVideoPlayerSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.url != widget.url) {
+      _reinitializePlayer();
+    }
+  }
+
+  Future<void> _reinitializePlayer() async {
+    _disposeControllers();
+    if (!mounted) return;
+    await _initializePlayer();
   }
 
   Future<void> _initializePlayer() async {
-    try {
-      _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(widget.url),
-      );
+    final url = widget.url.trim();
 
-      await _videoPlayerController.initialize();
-
+    if (url.isEmpty) {
       if (mounted) {
-        _chewieController = ChewieController(
-          videoPlayerController: _videoPlayerController,
-          aspectRatio: 16 / 9,
-          autoPlay: true,
-          allowedScreenSleep: false,
-          materialProgressColors: ChewieProgressColors(
-            playedColor: context.theme.colorScheme.primary,
-            handleColor: Colors.white,
-            bufferedColor: Colors.white24,
-            backgroundColor: Colors.white12,
-          ),
-          placeholder: Container(
-            color: Colors.black,
-            child: Center(
-              child: CircularProgressIndicator(color: context.theme.colorScheme.primary),
+        setState(() {
+          _hasError = false;
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+          _hasError = false;
+        });
+      }
+
+      final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      await controller.initialize();
+
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+
+      final chewie = ChewieController(
+        videoPlayerController: controller,
+        aspectRatio: controller.value.aspectRatio == 0
+            ? 16 / 9
+            : controller.value.aspectRatio,
+        autoPlay: true,
+        allowedScreenSleep: false,
+        materialProgressColors: ChewieProgressColors(
+          playedColor: context.theme.colorScheme.primary,
+          handleColor: Colors.white,
+          bufferedColor: Colors.white24,
+          backgroundColor: Colors.white12,
+        ),
+        placeholder: Container(
+          color: Colors.black,
+          child: Center(
+            child: CircularProgressIndicator(
+              color: context.theme.colorScheme.primary,
             ),
           ),
-          errorBuilder: (context, errorMessage) {
-            return Center(
-              child: Text(
-                'lesson_learning.video.error_lesson'.tr(),
-                style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
-              )
-            );
-          },
-        );
-        setState(() {});
+        ),
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              'lesson_learning.video.error_lesson'.tr(),
+              style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+            ),
+          );
+        },
+      );
+
+      _videoPlayerController = controller;
+      _chewieController = chewie;
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = false;
+        });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         setState(() {
           _hasError = true;
-          // print('error ========================================================>> $e');
+          _isLoading = false;
         });
       }
     }
   }
 
+  void _disposeControllers() async {
+    final chewie = _chewieController;
+    final video = _videoPlayerController;
+
+    _chewieController = null;
+    _videoPlayerController = null;
+
+    chewie?.dispose();
+    video?.dispose();
+  }
+
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
+    _disposeControllers();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.url.trim().isEmpty) {
+      return AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Container(
+          color: Colors.black,
+          alignment: Alignment.center,
+          child: Text(
+            'lesson_learning.video.error_lesson'.tr(),
+            style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
     if (_hasError) {
       return AspectRatio(
         aspectRatio: 16 / 9,
@@ -95,13 +170,7 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
               ),
               IconButton(
                 icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  _hasError = false;
-                  _videoPlayerController.dispose();
-                  _chewieController?.dispose();
-                  _initializePlayer();
-                  setState(() {});
-                },
+                onPressed: _reinitializePlayer,
               ),
             ],
           ),
@@ -109,15 +178,21 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
       );
     }
 
+    if (_isLoading || _chewieController == null) {
+      return const AspectRatio(
+        aspectRatio: 16 / 9,
+        child: ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+          ),
+        ),
+      );
+    }
+
     return AspectRatio(
       aspectRatio: 16 / 9,
-      child: _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
-        ? Chewie(controller: _chewieController!)
-        : Container(
-            color: Colors.black,
-            child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF6366F1))),
-          ),
+      child: Chewie(controller: _chewieController!),
     );
   }
 }

@@ -31,21 +31,14 @@ class _CourseLearningViewState extends State<CourseLearningView> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<CourseLearningCubit>()..fetchCourseCurriculum(widget.courseId),
+      create: (_) => getIt<CourseLearningCubit>()
+        ..fetchCourseCurriculum(widget.courseId),
       child: Scaffold(
         appBar: const CustomCourseLearningAppbar(),
         backgroundColor: Colors.black,
         body: Column(
           children: [
-            // ------------- Video player (fixed, non-scrolling) -------------
-            BlocSelector<CourseLearningCubit, CourseLearningState, String>(
-              selector: (state) => state.currentLecture?.videoUrl ?? '',
-              builder: (context, url) {
-                return LessonVideoPlayerSection(url: url);
-              },
-            ),
-
-            // ------------- Scrollable lesson content -------------
+            const _LectureVideoSection(),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -62,27 +55,10 @@ class _CourseLearningViewState extends State<CourseLearningView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            BlocBuilder<CourseLearningCubit, CourseLearningState>(
-                              buildWhen: (prev, curr) =>
-                                prev.curriculum != curr.curriculum ||
-                                prev.currentLecture != curr.currentLecture,
-                              builder: (context, state) {
-                                final curriculum = state.curriculum;
-                                final lecture = state.currentLecture;
-
-                                return LessonHeaderSection(
-                                  courseTitle: curriculum?.title ?? '',
-                                  lessonTitle: lecture?.title ?? '',
-                                  durationLabel: lecture?.duration != null ? '${lecture!.duration} min' : '',
-                                  lessonProgressLabel: curriculum != null
-                                    ? 'Lesson ${curriculum.sections.expand((s) => s.lectures).toList().indexWhere((l) => l.id == lecture?.id) + 1} of ${curriculum.totalLectures}'
-                                    : '',
-                                  statusLabel: 'In Progress',
-                                  isBookmarked: _isBookmarked,
-                                  onBookmarkTap: () {
-                                    setState(() => _isBookmarked = !_isBookmarked);
-                                  },
-                                );
+                            _LessonHeaderSection(
+                              isBookmarked: _isBookmarked,
+                              onBookmarkTap: () {
+                                setState(() => _isBookmarked = !_isBookmarked);
                               },
                             ),
                             Gap(6.h),
@@ -95,33 +71,12 @@ class _CourseLearningViewState extends State<CourseLearningView> {
                               onSelected: (tab) => setState(() => _selectedTab = tab),
                             ),
                             Gap(22.h),
-                            BlocBuilder<CourseLearningCubit, CourseLearningState>(
-                              buildWhen: (previous, current) =>
-                                  previous.curriculum != current.curriculum ||
-                                  previous.curriculumState != current.curriculumState,
-                              builder: (context, state) {
-                                if (state.curriculumState == Status.loading) {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-                                if (state.curriculum == null || state.curriculumState == Status.initial) {
-                                  return const SizedBox.shrink();
-                                }
-                                return CourseCurriculumSection(
-                                  curriculum: state.curriculum!,
-                                );
-                              },
-                            ),
-                            Gap(24.h),
-                            //const LessonAboutSection(),
+                            _TabContent(selectedTab: _selectedTab),
                           ],
                         ),
                       ),
                     ),
-                    LessonBottomBar(
-                      onPrevious: () {},
-                      onMarkComplete: () {},
-                      onNext: () {},
-                    ),
+                    const _BottomBarSection(),
                   ],
                 ),
               ),
@@ -129,6 +84,136 @@ class _CourseLearningViewState extends State<CourseLearningView> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _LectureVideoSection extends StatelessWidget {
+  const _LectureVideoSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CourseLearningCubit, CourseLearningState, String?>(
+      selector: (state) => state.currentLecture?.videoUrl,
+      builder: (context, url) {
+        return LessonVideoPlayerSection(
+          key: ValueKey(url ?? 'empty-video'),
+          url: url ?? '',
+        );
+      },
+    );
+  }
+}
+
+class _LessonHeaderSection extends StatelessWidget {
+  const _LessonHeaderSection({
+    required this.isBookmarked,
+    required this.onBookmarkTap,
+  });
+
+  final bool isBookmarked;
+  final VoidCallback onBookmarkTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CourseLearningCubit, CourseLearningState>(
+      buildWhen: (prev, curr) =>
+      prev.curriculum != curr.curriculum ||
+          prev.currentLecture != curr.currentLecture,
+      builder: (context, state) {
+        final curriculum = state.curriculum;
+        final lecture = state.currentLecture;
+        final cubit = context.read<CourseLearningCubit>();
+        final isLectureLoading =
+            state.lectureState == Status.loading && state.currentLecture == null;
+
+        return LessonHeaderSection(
+          courseTitle: curriculum?.title ?? '',
+          lessonTitle: isLectureLoading ? 'Loading...' : (lecture?.title ?? ''),
+          durationLabel: lecture?.duration != null ? '${lecture!.duration} min' : '',
+          lessonProgressLabel: cubit.currentLessonProgressLabel,
+          statusLabel: 'In Progress',
+          isBookmarked: isBookmarked,
+          onBookmarkTap: onBookmarkTap,
+        );
+      },
+    );
+  }
+}
+
+class _TabContent extends StatelessWidget {
+  const _TabContent({required this.selectedTab});
+
+  final LessonTab selectedTab;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (selectedTab) {
+      case LessonTab.curriculum:
+        return const _CurriculumTabContent();
+      case LessonTab.notes:
+      case LessonTab.resources:
+      case LessonTab.discussion:
+        return const LessonAboutSection();
+    }
+  }
+}
+
+class _CurriculumTabContent extends StatelessWidget {
+  const _CurriculumTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CourseLearningCubit, CourseLearningState>(
+      buildWhen: (previous, current) =>
+      previous.curriculum != current.curriculum ||
+          previous.curriculumState != current.curriculumState ||
+          previous.currentLecture?.id != current.currentLecture?.id,
+      builder: (context, state) {
+        if (state.curriculumState == Status.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state.curriculumState == Status.failure) {
+          return Center(
+            child: Text(
+              state.curriculumErrorMessage ?? 'Something went wrong',
+            ),
+          );
+        }
+
+        if (state.curriculum == null) {
+          return const SizedBox.shrink();
+        }
+
+        return CourseCurriculumSection(
+          curriculum: state.curriculum!,
+        );
+      },
+    );
+  }
+}
+
+class _BottomBarSection extends StatelessWidget {
+  const _BottomBarSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CourseLearningCubit, CourseLearningState>(
+      buildWhen: (prev, curr) =>
+      prev.currentLecture?.id != curr.currentLecture?.id ||
+          prev.curriculum != curr.curriculum,
+      builder: (context, state) {
+        final cubit = context.read<CourseLearningCubit>();
+
+        return LessonBottomBar(
+          onPrevious: cubit.hasPreviousLecture ? cubit.goToPreviousLecture : (){},
+          onMarkComplete: state.currentLecture == null
+              ? null
+              : cubit.markCurrentLectureAsCompleted,
+          onNext: cubit.hasNextLecture ? cubit.goToNextLecture : (){},
+        );
+      },
     );
   }
 }
