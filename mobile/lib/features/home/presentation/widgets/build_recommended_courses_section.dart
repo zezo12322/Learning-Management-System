@@ -43,12 +43,14 @@ Widget buildRecommendedCoursesSection(
         SizedBox(
           height: 84.h,
           child: Center(
-            child: Text(
-              'Keep learning to unlock personalized recommendations!',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+            child: Builder(
+              builder: (context) => Text(
+                'home.keep_learning_recommendations'.tr(),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -190,7 +191,7 @@ class HomeErrorView extends StatelessWidget {
 
               // Error title
               Text(
-                'Something went wrong',
+                'home.error.something_went_wrong'.tr(),
                 style: TextStyles.titleSmall.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -218,7 +219,7 @@ class HomeErrorView extends StatelessWidget {
                   onPressed: onRetry,
                   icon: Icon(Icons.refresh_rounded, size: 20.sp),
                   label: Text(
-                    'Try Again',
+                    'home.error.try_again'.tr(),
                     style: TextStyles.labelLarge.copyWith(
                       color: colorScheme.onPrimary,
                     ),
