@@ -50,15 +50,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class CustomBackButton extends StatelessWidget {
-  const CustomBackButton({super.key});
-
+  const CustomBackButton({super.key, this.backgroundColor, this.iconColor});
+  final Color? backgroundColor;
+  final Color? iconColor;
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 48.w,
       height: 48.h,
       decoration: BoxDecoration(
-        color: context.theme.colorScheme.surface,
+        color: backgroundColor ?? context.theme.colorScheme.surface,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -70,7 +71,7 @@ class CustomBackButton extends StatelessWidget {
       ),
       child: IconButton(
         onPressed: () => Navigator.pop(context),
-        icon: Icon(Icons.arrow_back, color: context.theme.colorScheme.onSurface,),
+        icon: Icon(Icons.arrow_back, color: iconColor ?? context.theme.colorScheme.onSurface,),
       ),
     );
   }

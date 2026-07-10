@@ -27,27 +27,15 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetTemplateMission*](#gettemplatemission)
   - [*GetCourseSessions*](#getcoursesessions)
   - [*GetMe*](#getme)
+  - [*GetUserClaims*](#getuserclaims)
   - [*MyCertificates*](#mycertificates)
   - [*VerifyCertificate*](#verifycertificate)
-  - [*ListCategories*](#listcategories)
-  - [*ListPublishedCourses*](#listpublishedcourses)
-  - [*SearchPublishedCourses*](#searchpublishedcourses)
-  - [*GetCourseCurriculum*](#getcoursecurriculum)
-  - [*GetLectureContent*](#getlecturecontent)
-  - [*GetUserLectureProgress*](#getuserlectureprogress)
-  - [*GetMyCourseProgress*](#getmycourseprogress)
-  - [*GetCourseForEnrollment*](#getcourseforenrollment)
-  - [*AdminGetCourse*](#admingetcourse)
-  - [*AdminListMyCourses*](#adminlistmycourses)
+  - [*MyPaymentHistory*](#mypaymenthistory)
+  - [*GetUserClaimsFn*](#getuserclaimsfn)
+  - [*GetTargetUserRolesFn*](#gettargetuserrolesfn)
   - [*GetPendingSubmissions*](#getpendingsubmissions)
   - [*GetMyPendingSubmissions*](#getmypendingsubmissions)
   - [*GetCourseInstructors*](#getcourseinstructors)
-  - [*GetLectureDuration*](#getlectureduration)
-  - [*GetCourseCompletionStatus*](#getcoursecompletionstatus)
-  - [*GetCourseCompletionStatusForUser*](#getcoursecompletionstatusforuser)
-  - [*GetUserEnrollmentForCourseByUser*](#getuserenrollmentforcoursebyuser)
-  - [*GetUserEnrollmentForCourse*](#getuserenrollmentforcourse)
-  - [*GetUserEnrollmentForMission*](#getuserenrollmentformission)
   - [*GetMissionForEnrollment*](#getmissionforenrollment)
   - [*MySubmissions*](#mysubmissions)
   - [*GetSubmissionForGrading*](#getsubmissionforgrading)
@@ -55,8 +43,6 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*AdminGetMission*](#admingetmission)
   - [*AdminListMyMissions*](#adminlistmymissions)
   - [*GetMissionTemplates*](#getmissiontemplates)
-  - [*GetUserClaims*](#getuserclaims)
-  - [*MyPaymentHistory*](#mypaymenthistory)
   - [*GetQuizQuestions*](#getquizquestions)
   - [*GetExpiredAttempts*](#getexpiredattempts)
   - [*GetUserQuizAttempts*](#getuserquizattempts)
@@ -68,6 +54,27 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetOptionWithQuestion*](#getoptionwithquestion)
   - [*GetActiveQuizSession*](#getactivequizsession)
   - [*AdminGetQuiz*](#admingetquiz)
+  - [*ListCategories*](#listcategories)
+  - [*ListPublishedCourses*](#listpublishedcourses)
+  - [*SearchPublishedCourses*](#searchpublishedcourses)
+  - [*ListPopularCourses*](#listpopularcourses)
+  - [*ListRecommendedCourses*](#listrecommendedcourses)
+  - [*GetMyEnrolledCourseCategories*](#getmyenrolledcoursecategories)
+  - [*GetMyContinueLearning*](#getmycontinuelearning)
+  - [*GetCourseVideos*](#getcoursevideos)
+  - [*GetCourseCurriculum*](#getcoursecurriculum)
+  - [*GetLectureContent*](#getlecturecontent)
+  - [*GetUserLectureProgress*](#getuserlectureprogress)
+  - [*GetMyCourseProgress*](#getmycourseprogress)
+  - [*GetCourseForEnrollment*](#getcourseforenrollment)
+  - [*AdminGetCourse*](#admingetcourse)
+  - [*AdminListMyCourses*](#adminlistmycourses)
+  - [*GetLectureDuration*](#getlectureduration)
+  - [*GetCourseCompletionStatus*](#getcoursecompletionstatus)
+  - [*GetCourseCompletionStatusForUser*](#getcoursecompletionstatusforuser)
+  - [*GetUserEnrollmentForCourseByUser*](#getuserenrollmentforcoursebyuser)
+  - [*GetUserEnrollmentForCourse*](#getuserenrollmentforcourse)
+  - [*GetUserEnrollmentForMission*](#getuserenrollmentformission)
   - [*GetMyCourseRating*](#getmycourserating)
   - [*ListCourseRatings*](#listcourseratings)
   - [*GetCourseRatingsForSummary*](#getcourseratingsforsummary)
@@ -75,27 +82,23 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*CheckInToSession*](#checkintosession)
   - [*SyncUser*](#syncuser)
   - [*UpdateMyProfile*](#updatemyprofile)
-  - [*AdminCreateCourse*](#admincreatecourse)
-  - [*AdminUpdateCourse*](#adminupdatecourse)
-  - [*AdminUpdateCourseStatus*](#adminupdatecoursestatus)
-  - [*AdminSoftDeleteCourse*](#adminsoftdeletecourse)
-  - [*AdminCreateSection*](#admincreatesection)
-  - [*AdminUpdateSection*](#adminupdatesection)
-  - [*AdminSoftDeleteSection*](#adminsoftdeletesection)
-  - [*AdminUpdateSectionOrder*](#adminupdatesectionorder)
-  - [*AdminCreateLectureFull*](#admincreatelecturefull)
-  - [*AdminUpdateLecture*](#adminupdatelecture)
-  - [*AdminSoftDeleteLecture*](#adminsoftdeletelecture)
-  - [*AdminUpdateLectureOrder*](#adminupdatelectureorder)
-  - [*AdminMoveLectureToSection*](#adminmovelecturetosection)
-  - [*AdminSoftDeleteLecturesBySection*](#adminsoftdeletelecturesbysection)
+  - [*InstructorDeleteCourse*](#instructordeletecourse)
+  - [*SuperAdminDeleteCourse*](#superadmindeletecourse)
+  - [*AdminCreateSession*](#admincreatesession)
+  - [*InstructorCancelSession*](#instructorcancelsession)
+  - [*SuperAdminCancelSession*](#superadmincancelsession)
+  - [*AdminCreateSubscriptionTier*](#admincreatesubscriptiontier)
+  - [*AdminDeprecateSubscriptionTier*](#admindeprecatesubscriptiontier)
+  - [*AdminCreateCategory*](#admincreatecategory)
+  - [*LogPayment*](#logpayment)
+  - [*AddPaymentItem*](#addpaymentitem)
+  - [*CreateDefaultUserAndProfileFn*](#createdefaultuserandprofilefn)
+  - [*DeleteUserRecordFn*](#deleteuserrecordfn)
+  - [*CreateDefaultUserFn*](#createdefaultuserfn)
+  - [*RemoveRoleFn*](#removerolefn)
+  - [*AssignNewRoleFn*](#assignnewrolefn)
   - [*AdminAddCourseInstructor*](#adminaddcourseinstructor)
   - [*AdminRemoveCourseInstructor*](#adminremovecourseinstructor)
-  - [*EnrollInCourse*](#enrollincourse)
-  - [*EnrollInMission*](#enrollinmission)
-  - [*UpdateLectureProgress*](#updatelectureprogress)
-  - [*AdminUpsertLectureProgress*](#adminupsertlectureprogress)
-  - [*UpdateEnrollmentStatus*](#updateenrollmentstatus)
   - [*SubmitMission*](#submitmission)
   - [*GradeSubmission*](#gradesubmission)
   - [*AddCriterionScore*](#addcriterionscore)
@@ -112,16 +115,6 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*AdminUpdateRubricCriterion*](#adminupdaterubriccriterion)
   - [*AdminDeleteRubricCriterion*](#admindeleterubriccriterion)
   - [*AdminUpdateRubricCriterionOrder*](#adminupdaterubriccriterionorder)
-  - [*InstructorDeleteCourse*](#instructordeletecourse)
-  - [*SuperAdminDeleteCourse*](#superadmindeletecourse)
-  - [*AdminCreateSession*](#admincreatesession)
-  - [*InstructorCancelSession*](#instructorcancelsession)
-  - [*SuperAdminCancelSession*](#superadmincancelsession)
-  - [*AdminCreateSubscriptionTier*](#admincreatesubscriptiontier)
-  - [*AdminDeprecateSubscriptionTier*](#admindeprecatesubscriptiontier)
-  - [*AdminCreateCategory*](#admincreatecategory)
-  - [*LogPayment*](#logpayment)
-  - [*AddPaymentItem*](#addpaymentitem)
   - [*StartQuizAttempt*](#startquizattempt)
   - [*SubmitQuizAnswer*](#submitquizanswer)
   - [*FinishQuizAttemptIfOpen*](#finishquizattemptifopen)
@@ -136,6 +129,25 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*AdminUpdateQuizOption*](#adminupdatequizoption)
   - [*AdminDeleteQuizOption*](#admindeletequizoption)
   - [*AdminUpdateQuizOptionOrder*](#adminupdatequizoptionorder)
+  - [*AdminCreateCourse*](#admincreatecourse)
+  - [*AdminUpdateCourse*](#adminupdatecourse)
+  - [*AdminUpdateCourseStatus*](#adminupdatecoursestatus)
+  - [*AdminSoftDeleteCourse*](#adminsoftdeletecourse)
+  - [*AdminCreateSection*](#admincreatesection)
+  - [*AdminUpdateSection*](#adminupdatesection)
+  - [*AdminSoftDeleteSection*](#adminsoftdeletesection)
+  - [*AdminUpdateSectionOrder*](#adminupdatesectionorder)
+  - [*AdminCreateLectureFull*](#admincreatelecturefull)
+  - [*AdminUpdateLecture*](#adminupdatelecture)
+  - [*AdminSoftDeleteLecture*](#adminsoftdeletelecture)
+  - [*AdminUpdateLectureOrder*](#adminupdatelectureorder)
+  - [*AdminMoveLectureToSection*](#adminmovelecturetosection)
+  - [*AdminSoftDeleteLecturesBySection*](#adminsoftdeletelecturesbysection)
+  - [*EnrollInCourse*](#enrollincourse)
+  - [*EnrollInMission*](#enrollinmission)
+  - [*UpdateLectureProgress*](#updatelectureprogress)
+  - [*AdminUpsertLectureProgress*](#adminupsertlectureprogress)
+  - [*UpdateEnrollmentStatus*](#updateenrollmentstatus)
   - [*UpsertCourseRating*](#upsertcourserating)
   - [*DeleteCourseRating*](#deletecourserating)
   - [*AdminUpdateCourseRatingAggregate*](#adminupdatecourseratingaggregate)
@@ -1203,6 +1215,98 @@ export default function GetMeComponent() {
 }
 ```
 
+## GetUserClaims
+You can execute the `GetUserClaims` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserClaims(dc: DataConnect, vars: GetUserClaimsVariables, options?: useDataConnectQueryOptions<GetUserClaimsData>): UseDataConnectQueryResult<GetUserClaimsData, GetUserClaimsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserClaims(vars: GetUserClaimsVariables, options?: useDataConnectQueryOptions<GetUserClaimsData>): UseDataConnectQueryResult<GetUserClaimsData, GetUserClaimsVariables>;
+```
+
+### Variables
+The `GetUserClaims` Query requires an argument of type `GetUserClaimsVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserClaimsVariables {
+  uid: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserClaims` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserClaims` Query is of type `GetUserClaimsData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserClaimsData {
+  user?: {
+    id: string;
+    userRoles_on_user: ({
+      role: {
+        name: string;
+      };
+    })[];
+    profile_on_user?: {
+      company?: string | null;
+    };
+  } & User_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserClaims`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserClaimsVariables } from '@dataconnect/generated';
+import { useGetUserClaims } from '@dataconnect/generated/react'
+
+export default function GetUserClaimsComponent() {
+  // The `useGetUserClaims` Query hook requires an argument of type `GetUserClaimsVariables`:
+  const getUserClaimsVars: GetUserClaimsVariables = {
+    uid: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserClaims(getUserClaimsVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserClaims({ uid: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserClaims(dataConnect, getUserClaimsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserClaims(getUserClaimsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserClaims(dataConnect, getUserClaimsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
 ## MyCertificates
 You can execute the `MyCertificates` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
 
@@ -1381,840 +1485,79 @@ export default function VerifyCertificateComponent() {
 }
 ```
 
-## ListCategories
-You can execute the `ListCategories` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+## MyPaymentHistory
+You can execute the `MyPaymentHistory` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
 
 ```javascript
-useListCategories(dc: DataConnect, options?: useDataConnectQueryOptions<ListCategoriesData>): UseDataConnectQueryResult<ListCategoriesData, undefined>;
+useMyPaymentHistory(dc: DataConnect, options?: useDataConnectQueryOptions<MyPaymentHistoryData>): UseDataConnectQueryResult<MyPaymentHistoryData, undefined>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useListCategories(options?: useDataConnectQueryOptions<ListCategoriesData>): UseDataConnectQueryResult<ListCategoriesData, undefined>;
+useMyPaymentHistory(options?: useDataConnectQueryOptions<MyPaymentHistoryData>): UseDataConnectQueryResult<MyPaymentHistoryData, undefined>;
 ```
 
 ### Variables
-The `ListCategories` Query has no variables.
+The `MyPaymentHistory` Query has no variables.
 ### Return Type
-Recall that calling the `ListCategories` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+Recall that calling the `MyPaymentHistory` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
 
 To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
 
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListCategories` Query is of type `ListCategoriesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `MyPaymentHistory` Query is of type `MyPaymentHistoryData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface ListCategoriesData {
-  categories: ({
+export interface MyPaymentHistoryData {
+  payments: ({
     id: UUIDString;
-    name: string;
-    description?: string | null;
-  } & Category_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `ListCategories`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig } from '@dataconnect/generated';
-import { useListCategories } from '@dataconnect/generated/react'
-
-export default function ListCategoriesComponent() {
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useListCategories();
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useListCategories(dataConnect);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useListCategories(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useListCategories(dataConnect, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.categories);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## ListPublishedCourses
-You can execute the `ListPublishedCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useListPublishedCourses(dc: DataConnect, options?: useDataConnectQueryOptions<ListPublishedCoursesData>): UseDataConnectQueryResult<ListPublishedCoursesData, undefined>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useListPublishedCourses(options?: useDataConnectQueryOptions<ListPublishedCoursesData>): UseDataConnectQueryResult<ListPublishedCoursesData, undefined>;
-```
-
-### Variables
-The `ListPublishedCourses` Query has no variables.
-### Return Type
-Recall that calling the `ListPublishedCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListPublishedCourses` Query is of type `ListPublishedCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface ListPublishedCoursesData {
-  courses: ({
-    id: UUIDString;
-    title: string;
-    price: number;
-    level: CourseLevel;
-    thumbnail?: string | null;
-    tags: string[];
-    avgRating: number;
-    ratingCount: number;
-    category: {
-      name: string;
-    };
-    author: {
-      name: string;
-      avatar?: string | null;
-    };
-  } & Course_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `ListPublishedCourses`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig } from '@dataconnect/generated';
-import { useListPublishedCourses } from '@dataconnect/generated/react'
-
-export default function ListPublishedCoursesComponent() {
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useListPublishedCourses();
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useListPublishedCourses(dataConnect);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useListPublishedCourses(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useListPublishedCourses(dataConnect, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.courses);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## SearchPublishedCourses
-You can execute the `SearchPublishedCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useSearchPublishedCourses(dc: DataConnect, vars: SearchPublishedCoursesVariables, options?: useDataConnectQueryOptions<SearchPublishedCoursesData>): UseDataConnectQueryResult<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useSearchPublishedCourses(vars: SearchPublishedCoursesVariables, options?: useDataConnectQueryOptions<SearchPublishedCoursesData>): UseDataConnectQueryResult<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
-```
-
-### Variables
-The `SearchPublishedCourses` Query requires an argument of type `SearchPublishedCoursesVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface SearchPublishedCoursesVariables {
-  searchQuery: string;
-}
-```
-### Return Type
-Recall that calling the `SearchPublishedCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `SearchPublishedCourses` Query is of type `SearchPublishedCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface SearchPublishedCoursesData {
-  courses: ({
-    id: UUIDString;
-    title: string;
-    price: number;
-    level: CourseLevel;
-    thumbnail?: string | null;
-    tags: string[];
-    category: {
-      name: string;
-    };
-    author: {
-      name: string;
-      avatar?: string | null;
-    };
-  } & Course_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `SearchPublishedCourses`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, SearchPublishedCoursesVariables } from '@dataconnect/generated';
-import { useSearchPublishedCourses } from '@dataconnect/generated/react'
-
-export default function SearchPublishedCoursesComponent() {
-  // The `useSearchPublishedCourses` Query hook requires an argument of type `SearchPublishedCoursesVariables`:
-  const searchPublishedCoursesVars: SearchPublishedCoursesVariables = {
-    searchQuery: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useSearchPublishedCourses(searchPublishedCoursesVars);
-  // Variables can be defined inline as well.
-  const query = useSearchPublishedCourses({ searchQuery: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useSearchPublishedCourses(dataConnect, searchPublishedCoursesVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useSearchPublishedCourses(searchPublishedCoursesVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useSearchPublishedCourses(dataConnect, searchPublishedCoursesVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.courses);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetCourseCurriculum
-You can execute the `GetCourseCurriculum` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetCourseCurriculum(dc: DataConnect, vars: GetCourseCurriculumVariables, options?: useDataConnectQueryOptions<GetCourseCurriculumData>): UseDataConnectQueryResult<GetCourseCurriculumData, GetCourseCurriculumVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetCourseCurriculum(vars: GetCourseCurriculumVariables, options?: useDataConnectQueryOptions<GetCourseCurriculumData>): UseDataConnectQueryResult<GetCourseCurriculumData, GetCourseCurriculumVariables>;
-```
-
-### Variables
-The `GetCourseCurriculum` Query requires an argument of type `GetCourseCurriculumVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetCourseCurriculumVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetCourseCurriculum` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCurriculum` Query is of type `GetCourseCurriculumData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetCourseCurriculumData {
-  course?: {
-    id: UUIDString;
-    title: string;
-    description?: string | null;
-    language: string;
-    publishedSections: ({
-      id: UUIDString;
-      title: string;
-      publishedLectures: ({
-        id: UUIDString;
-        title: string;
-        type: LectureType;
-        content?: string | null;
-        duration?: number | null;
-        isFreePreview: boolean;
-      } & CourseLecture_Key)[];
-    } & CourseSection_Key)[];
-  } & Course_Key;
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetCourseCurriculum`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetCourseCurriculumVariables } from '@dataconnect/generated';
-import { useGetCourseCurriculum } from '@dataconnect/generated/react'
-
-export default function GetCourseCurriculumComponent() {
-  // The `useGetCourseCurriculum` Query hook requires an argument of type `GetCourseCurriculumVariables`:
-  const getCourseCurriculumVars: GetCourseCurriculumVariables = {
-    courseId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetCourseCurriculum(getCourseCurriculumVars);
-  // Variables can be defined inline as well.
-  const query = useGetCourseCurriculum({ courseId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetCourseCurriculum(dataConnect, getCourseCurriculumVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCurriculum(getCourseCurriculumVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCurriculum(dataConnect, getCourseCurriculumVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.course);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetLectureContent
-You can execute the `GetLectureContent` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetLectureContent(dc: DataConnect, vars: GetLectureContentVariables, options?: useDataConnectQueryOptions<GetLectureContentData>): UseDataConnectQueryResult<GetLectureContentData, GetLectureContentVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetLectureContent(vars: GetLectureContentVariables, options?: useDataConnectQueryOptions<GetLectureContentData>): UseDataConnectQueryResult<GetLectureContentData, GetLectureContentVariables>;
-```
-
-### Variables
-The `GetLectureContent` Query requires an argument of type `GetLectureContentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetLectureContentVariables {
-  lectureId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetLectureContent` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetLectureContent` Query is of type `GetLectureContentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetLectureContentData {
-  courseLecture?: {
-    id: UUIDString;
-    title: string;
-    type: LectureType;
-    videoUrl?: string | null;
-    content?: string | null;
-    duration?: number | null;
-    transcriptUrl?: string | null;
-    isFreePreview: boolean;
-    section: {
-      course: {
-        id: UUIDString;
-        author: {
-          id: string;
-        } & User_Key;
-        createdBy: {
-          id: string;
-        } & User_Key;
-      } & Course_Key;
-    };
-  } & CourseLecture_Key;
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetLectureContent`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetLectureContentVariables } from '@dataconnect/generated';
-import { useGetLectureContent } from '@dataconnect/generated/react'
-
-export default function GetLectureContentComponent() {
-  // The `useGetLectureContent` Query hook requires an argument of type `GetLectureContentVariables`:
-  const getLectureContentVars: GetLectureContentVariables = {
-    lectureId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetLectureContent(getLectureContentVars);
-  // Variables can be defined inline as well.
-  const query = useGetLectureContent({ lectureId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetLectureContent(dataConnect, getLectureContentVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetLectureContent(getLectureContentVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetLectureContent(dataConnect, getLectureContentVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.courseLecture);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetUserLectureProgress
-You can execute the `GetUserLectureProgress` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetUserLectureProgress(dc: DataConnect, vars: GetUserLectureProgressVariables, options?: useDataConnectQueryOptions<GetUserLectureProgressData>): UseDataConnectQueryResult<GetUserLectureProgressData, GetUserLectureProgressVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetUserLectureProgress(vars: GetUserLectureProgressVariables, options?: useDataConnectQueryOptions<GetUserLectureProgressData>): UseDataConnectQueryResult<GetUserLectureProgressData, GetUserLectureProgressVariables>;
-```
-
-### Variables
-The `GetUserLectureProgress` Query requires an argument of type `GetUserLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetUserLectureProgressVariables {
-  lectureId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetUserLectureProgress` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserLectureProgress` Query is of type `GetUserLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetUserLectureProgressData {
-  lectureProgresses: ({
-    lastWatchedSecond: number;
-    completedAt?: TimestampString | null;
-  })[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetUserLectureProgress`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetUserLectureProgressVariables } from '@dataconnect/generated';
-import { useGetUserLectureProgress } from '@dataconnect/generated/react'
-
-export default function GetUserLectureProgressComponent() {
-  // The `useGetUserLectureProgress` Query hook requires an argument of type `GetUserLectureProgressVariables`:
-  const getUserLectureProgressVars: GetUserLectureProgressVariables = {
-    lectureId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetUserLectureProgress(getUserLectureProgressVars);
-  // Variables can be defined inline as well.
-  const query = useGetUserLectureProgress({ lectureId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetUserLectureProgress(dataConnect, getUserLectureProgressVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserLectureProgress(getUserLectureProgressVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserLectureProgress(dataConnect, getUserLectureProgressVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.lectureProgresses);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetMyCourseProgress
-You can execute the `GetMyCourseProgress` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetMyCourseProgress(dc: DataConnect, vars: GetMyCourseProgressVariables, options?: useDataConnectQueryOptions<GetMyCourseProgressData>): UseDataConnectQueryResult<GetMyCourseProgressData, GetMyCourseProgressVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetMyCourseProgress(vars: GetMyCourseProgressVariables, options?: useDataConnectQueryOptions<GetMyCourseProgressData>): UseDataConnectQueryResult<GetMyCourseProgressData, GetMyCourseProgressVariables>;
-```
-
-### Variables
-The `GetMyCourseProgress` Query requires an argument of type `GetMyCourseProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetMyCourseProgressVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetMyCourseProgress` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMyCourseProgress` Query is of type `GetMyCourseProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetMyCourseProgressData {
-  sections: ({
-    id: UUIDString;
-    title: string;
-    progressLectures: ({
-      id: UUIDString;
-      title: string;
-      userProgress: ({
-        completedAt?: TimestampString | null;
-      })[];
-    } & CourseLecture_Key)[];
-  } & CourseSection_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetMyCourseProgress`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetMyCourseProgressVariables } from '@dataconnect/generated';
-import { useGetMyCourseProgress } from '@dataconnect/generated/react'
-
-export default function GetMyCourseProgressComponent() {
-  // The `useGetMyCourseProgress` Query hook requires an argument of type `GetMyCourseProgressVariables`:
-  const getMyCourseProgressVars: GetMyCourseProgressVariables = {
-    courseId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetMyCourseProgress(getMyCourseProgressVars);
-  // Variables can be defined inline as well.
-  const query = useGetMyCourseProgress({ courseId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetMyCourseProgress(dataConnect, getMyCourseProgressVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetMyCourseProgress(getMyCourseProgressVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetMyCourseProgress(dataConnect, getMyCourseProgressVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.sections);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetCourseForEnrollment
-You can execute the `GetCourseForEnrollment` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetCourseForEnrollment(dc: DataConnect, vars: GetCourseForEnrollmentVariables, options?: useDataConnectQueryOptions<GetCourseForEnrollmentData>): UseDataConnectQueryResult<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetCourseForEnrollment(vars: GetCourseForEnrollmentVariables, options?: useDataConnectQueryOptions<GetCourseForEnrollmentData>): UseDataConnectQueryResult<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
-```
-
-### Variables
-The `GetCourseForEnrollment` Query requires an argument of type `GetCourseForEnrollmentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetCourseForEnrollmentVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetCourseForEnrollment` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseForEnrollment` Query is of type `GetCourseForEnrollmentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetCourseForEnrollmentData {
-  course?: {
-    id: UUIDString;
-    status: CourseStatus;
-    price: number;
-    deletedAt?: TimestampString | null;
-  } & Course_Key;
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetCourseForEnrollment`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetCourseForEnrollmentVariables } from '@dataconnect/generated';
-import { useGetCourseForEnrollment } from '@dataconnect/generated/react'
-
-export default function GetCourseForEnrollmentComponent() {
-  // The `useGetCourseForEnrollment` Query hook requires an argument of type `GetCourseForEnrollmentVariables`:
-  const getCourseForEnrollmentVars: GetCourseForEnrollmentVariables = {
-    courseId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetCourseForEnrollment(getCourseForEnrollmentVars);
-  // Variables can be defined inline as well.
-  const query = useGetCourseForEnrollment({ courseId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseForEnrollment(getCourseForEnrollmentVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.course);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminGetCourse
-You can execute the `AdminGetCourse` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useAdminGetCourse(dc: DataConnect, vars: AdminGetCourseVariables, options?: useDataConnectQueryOptions<AdminGetCourseData>): UseDataConnectQueryResult<AdminGetCourseData, AdminGetCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useAdminGetCourse(vars: AdminGetCourseVariables, options?: useDataConnectQueryOptions<AdminGetCourseData>): UseDataConnectQueryResult<AdminGetCourseData, AdminGetCourseVariables>;
-```
-
-### Variables
-The `AdminGetCourse` Query requires an argument of type `AdminGetCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminGetCourseVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `AdminGetCourse` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `AdminGetCourse` Query is of type `AdminGetCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminGetCourseData {
-  course?: {
-    id: UUIDString;
-    title: string;
-    description?: string | null;
-    price: number;
-    status: CourseStatus;
-    language: string;
-    level: CourseLevel;
-    thumbnail?: string | null;
-    tags: string[];
-    deletedAt?: TimestampString | null;
+    customerEmailSnapshot: string;
+    gateway: PaymentGateway;
+    status: PaymentStatus;
+    amount: number;
+    currency: string;
+    referenceId: string;
     createdAt: TimestampString;
-    updatedAt: TimestampString;
-    category: {
-      id: UUIDString;
-      name: string;
-    } & Category_Key;
-    author: {
-      id: string;
-      name: string;
-      email: string;
-      avatar?: string | null;
-    } & User_Key;
-    createdBy: {
-      id: string;
-      name: string;
-    } & User_Key;
-    instructors: ({
-      user: {
-        id: string;
-        name: string;
-        email: string;
-        avatar?: string | null;
-      } & User_Key;
-    })[];
-    adminSections: ({
-      id: UUIDString;
-      title: string;
-      order: number;
-      adminLectures: ({
-        id: UUIDString;
+    paymentItems_on_payment: ({
+      targetType: PaymentItemTarget;
+      priceAtPurchase: number;
+      course?: {
         title: string;
-        type: LectureType;
-        videoUrl?: string | null;
-        content?: string | null;
-        duration?: number | null;
-        transcriptUrl?: string | null;
-        isFreePreview: boolean;
-        order: number;
-      } & CourseLecture_Key)[];
-    } & CourseSection_Key)[];
-  } & Course_Key;
+      };
+      mission?: {
+        title: string;
+      };
+      subscriptionTier?: {
+        name: string;
+      };
+    })[];
+  } & Payment_Key)[];
 }
 ```
 
 To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
 
-### Using `AdminGetCourse`'s Query hook function
+### Using `MyPaymentHistory`'s Query hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminGetCourseVariables } from '@dataconnect/generated';
-import { useAdminGetCourse } from '@dataconnect/generated/react'
+import { connectorConfig } from '@dataconnect/generated';
+import { useMyPaymentHistory } from '@dataconnect/generated/react'
 
-export default function AdminGetCourseComponent() {
-  // The `useAdminGetCourse` Query hook requires an argument of type `AdminGetCourseVariables`:
-  const adminGetCourseVars: AdminGetCourseVariables = {
-    courseId: ..., 
-  };
-
+export default function MyPaymentHistoryComponent() {
   // You don't have to do anything to "execute" the Query.
   // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useAdminGetCourse(adminGetCourseVars);
-  // Variables can be defined inline as well.
-  const query = useAdminGetCourse({ courseId: ..., });
+  const query = useMyPaymentHistory();
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const query = useAdminGetCourse(dataConnect, adminGetCourseVars);
+  const query = useMyPaymentHistory(dataConnect);
 
   // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
   const options = { staleTime: 5 * 1000 };
-  const query = useAdminGetCourse(adminGetCourseVars, options);
+  const query = useMyPaymentHistory(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = { staleTime: 5 * 1000 };
-  const query = useAdminGetCourse(dataConnect, adminGetCourseVars, options);
+  const query = useMyPaymentHistory(dataConnect, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -2227,74 +1570,85 @@ export default function AdminGetCourseComponent() {
 
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
-    console.log(query.data.course);
+    console.log(query.data.payments);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminListMyCourses
-You can execute the `AdminListMyCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+## GetUserClaimsFn
+You can execute the `GetUserClaimsFn` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
 
 ```javascript
-useAdminListMyCourses(dc: DataConnect, options?: useDataConnectQueryOptions<AdminListMyCoursesData>): UseDataConnectQueryResult<AdminListMyCoursesData, undefined>;
+useGetUserClaimsFn(dc: DataConnect, vars: GetUserClaimsFnVariables, options?: useDataConnectQueryOptions<GetUserClaimsFnData>): UseDataConnectQueryResult<GetUserClaimsFnData, GetUserClaimsFnVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Query hook function.
 ```javascript
-useAdminListMyCourses(options?: useDataConnectQueryOptions<AdminListMyCoursesData>): UseDataConnectQueryResult<AdminListMyCoursesData, undefined>;
+useGetUserClaimsFn(vars: GetUserClaimsFnVariables, options?: useDataConnectQueryOptions<GetUserClaimsFnData>): UseDataConnectQueryResult<GetUserClaimsFnData, GetUserClaimsFnVariables>;
 ```
 
 ### Variables
-The `AdminListMyCourses` Query has no variables.
+The `GetUserClaimsFn` Query requires an argument of type `GetUserClaimsFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserClaimsFnVariables {
+  uid: string;
+}
+```
 ### Return Type
-Recall that calling the `AdminListMyCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+Recall that calling the `GetUserClaimsFn` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
 
 To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
 
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `AdminListMyCourses` Query is of type `AdminListMyCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserClaimsFn` Query is of type `GetUserClaimsFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminListMyCoursesData {
-  courses: ({
-    id: UUIDString;
-    title: string;
-    status: CourseStatus;
-    level: CourseLevel;
-    thumbnail?: string | null;
-    price: number;
-    updatedAt: TimestampString;
-    category: {
-      name: string;
+export interface GetUserClaimsFnData {
+  user?: {
+    userRoles_on_user: ({
+      role: {
+        name: string;
+      };
+    })[];
+    profile_on_user?: {
+      company?: string | null;
     };
-  } & Course_Key)[];
+  };
 }
 ```
 
 To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
 
-### Using `AdminListMyCourses`'s Query hook function
+### Using `GetUserClaimsFn`'s Query hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig } from '@dataconnect/generated';
-import { useAdminListMyCourses } from '@dataconnect/generated/react'
+import { connectorConfig, GetUserClaimsFnVariables } from '@dataconnect/generated';
+import { useGetUserClaimsFn } from '@dataconnect/generated/react'
 
-export default function AdminListMyCoursesComponent() {
+export default function GetUserClaimsFnComponent() {
+  // The `useGetUserClaimsFn` Query hook requires an argument of type `GetUserClaimsFnVariables`:
+  const getUserClaimsFnVars: GetUserClaimsFnVariables = {
+    uid: ..., 
+  };
+
   // You don't have to do anything to "execute" the Query.
   // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useAdminListMyCourses();
+  const query = useGetUserClaimsFn(getUserClaimsFnVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserClaimsFn({ uid: ..., });
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const query = useAdminListMyCourses(dataConnect);
+  const query = useGetUserClaimsFn(dataConnect, getUserClaimsFnVars);
 
   // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
   const options = { staleTime: 5 * 1000 };
-  const query = useAdminListMyCourses(options);
+  const query = useGetUserClaimsFn(getUserClaimsFnVars, options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = { staleTime: 5 * 1000 };
-  const query = useAdminListMyCourses(dataConnect, options);
+  const query = useGetUserClaimsFn(dataConnect, getUserClaimsFnVars, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -2307,7 +1661,93 @@ export default function AdminListMyCoursesComponent() {
 
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
-    console.log(query.data.courses);
+    console.log(query.data.user);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetTargetUserRolesFn
+You can execute the `GetTargetUserRolesFn` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetTargetUserRolesFn(dc: DataConnect, vars: GetTargetUserRolesFnVariables, options?: useDataConnectQueryOptions<GetTargetUserRolesFnData>): UseDataConnectQueryResult<GetTargetUserRolesFnData, GetTargetUserRolesFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetTargetUserRolesFn(vars: GetTargetUserRolesFnVariables, options?: useDataConnectQueryOptions<GetTargetUserRolesFnData>): UseDataConnectQueryResult<GetTargetUserRolesFnData, GetTargetUserRolesFnVariables>;
+```
+
+### Variables
+The `GetTargetUserRolesFn` Query requires an argument of type `GetTargetUserRolesFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetTargetUserRolesFnVariables {
+  uid: string;
+}
+```
+### Return Type
+Recall that calling the `GetTargetUserRolesFn` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetTargetUserRolesFn` Query is of type `GetTargetUserRolesFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetTargetUserRolesFnData {
+  user?: {
+    userRoles_on_user: ({
+      roleId: UUIDString;
+    })[];
+  };
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetTargetUserRolesFn`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetTargetUserRolesFnVariables } from '@dataconnect/generated';
+import { useGetTargetUserRolesFn } from '@dataconnect/generated/react'
+
+export default function GetTargetUserRolesFnComponent() {
+  // The `useGetTargetUserRolesFn` Query hook requires an argument of type `GetTargetUserRolesFnVariables`:
+  const getTargetUserRolesFnVars: GetTargetUserRolesFnVariables = {
+    uid: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetTargetUserRolesFn(getTargetUserRolesFnVars);
+  // Variables can be defined inline as well.
+  const query = useGetTargetUserRolesFn({ uid: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetTargetUserRolesFn(dataConnect, getTargetUserRolesFnVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetTargetUserRolesFn(getTargetUserRolesFnVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetTargetUserRolesFn(dataConnect, getTargetUserRolesFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -2567,536 +2007,6 @@ export default function GetCourseInstructorsComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.courseInstructors);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetLectureDuration
-You can execute the `GetLectureDuration` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetLectureDuration(dc: DataConnect, vars: GetLectureDurationVariables, options?: useDataConnectQueryOptions<GetLectureDurationData>): UseDataConnectQueryResult<GetLectureDurationData, GetLectureDurationVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetLectureDuration(vars: GetLectureDurationVariables, options?: useDataConnectQueryOptions<GetLectureDurationData>): UseDataConnectQueryResult<GetLectureDurationData, GetLectureDurationVariables>;
-```
-
-### Variables
-The `GetLectureDuration` Query requires an argument of type `GetLectureDurationVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetLectureDurationVariables {
-  lectureId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetLectureDuration` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetLectureDuration` Query is of type `GetLectureDurationData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetLectureDurationData {
-  courseLecture?: {
-    id: UUIDString;
-    duration?: number | null;
-    section: {
-      course: {
-        id: UUIDString;
-      } & Course_Key;
-    };
-  } & CourseLecture_Key;
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetLectureDuration`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetLectureDurationVariables } from '@dataconnect/generated';
-import { useGetLectureDuration } from '@dataconnect/generated/react'
-
-export default function GetLectureDurationComponent() {
-  // The `useGetLectureDuration` Query hook requires an argument of type `GetLectureDurationVariables`:
-  const getLectureDurationVars: GetLectureDurationVariables = {
-    lectureId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetLectureDuration(getLectureDurationVars);
-  // Variables can be defined inline as well.
-  const query = useGetLectureDuration({ lectureId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetLectureDuration(dataConnect, getLectureDurationVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetLectureDuration(getLectureDurationVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetLectureDuration(dataConnect, getLectureDurationVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.courseLecture);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetCourseCompletionStatus
-You can execute the `GetCourseCompletionStatus` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetCourseCompletionStatus(dc: DataConnect, vars: GetCourseCompletionStatusVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusData>): UseDataConnectQueryResult<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetCourseCompletionStatus(vars: GetCourseCompletionStatusVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusData>): UseDataConnectQueryResult<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
-```
-
-### Variables
-The `GetCourseCompletionStatus` Query requires an argument of type `GetCourseCompletionStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetCourseCompletionStatusVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetCourseCompletionStatus` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCompletionStatus` Query is of type `GetCourseCompletionStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetCourseCompletionStatusData {
-  sections: ({
-    completionLectures: ({
-      id: UUIDString;
-      completionProgress: ({
-        completedAt?: TimestampString | null;
-      })[];
-    } & CourseLecture_Key)[];
-  })[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetCourseCompletionStatus`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetCourseCompletionStatusVariables } from '@dataconnect/generated';
-import { useGetCourseCompletionStatus } from '@dataconnect/generated/react'
-
-export default function GetCourseCompletionStatusComponent() {
-  // The `useGetCourseCompletionStatus` Query hook requires an argument of type `GetCourseCompletionStatusVariables`:
-  const getCourseCompletionStatusVars: GetCourseCompletionStatusVariables = {
-    courseId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetCourseCompletionStatus(getCourseCompletionStatusVars);
-  // Variables can be defined inline as well.
-  const query = useGetCourseCompletionStatus({ courseId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetCourseCompletionStatus(dataConnect, getCourseCompletionStatusVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCompletionStatus(getCourseCompletionStatusVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCompletionStatus(dataConnect, getCourseCompletionStatusVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.sections);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetCourseCompletionStatusForUser
-You can execute the `GetCourseCompletionStatusForUser` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetCourseCompletionStatusForUser(dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusForUserData>): UseDataConnectQueryResult<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetCourseCompletionStatusForUser(vars: GetCourseCompletionStatusForUserVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusForUserData>): UseDataConnectQueryResult<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
-```
-
-### Variables
-The `GetCourseCompletionStatusForUser` Query requires an argument of type `GetCourseCompletionStatusForUserVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetCourseCompletionStatusForUserVariables {
-  courseId: UUIDString;
-  userId: string;
-}
-```
-### Return Type
-Recall that calling the `GetCourseCompletionStatusForUser` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCompletionStatusForUser` Query is of type `GetCourseCompletionStatusForUserData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetCourseCompletionStatusForUserData {
-  sections: ({
-    userCompletionLectures: ({
-      id: UUIDString;
-      userCompletionProgress: ({
-        completedAt?: TimestampString | null;
-      })[];
-    } & CourseLecture_Key)[];
-  })[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetCourseCompletionStatusForUser`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetCourseCompletionStatusForUserVariables } from '@dataconnect/generated';
-import { useGetCourseCompletionStatusForUser } from '@dataconnect/generated/react'
-
-export default function GetCourseCompletionStatusForUserComponent() {
-  // The `useGetCourseCompletionStatusForUser` Query hook requires an argument of type `GetCourseCompletionStatusForUserVariables`:
-  const getCourseCompletionStatusForUserVars: GetCourseCompletionStatusForUserVariables = {
-    courseId: ..., 
-    userId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetCourseCompletionStatusForUser(getCourseCompletionStatusForUserVars);
-  // Variables can be defined inline as well.
-  const query = useGetCourseCompletionStatusForUser({ courseId: ..., userId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetCourseCompletionStatusForUser(dataConnect, getCourseCompletionStatusForUserVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCompletionStatusForUser(getCourseCompletionStatusForUserVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetCourseCompletionStatusForUser(dataConnect, getCourseCompletionStatusForUserVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.sections);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetUserEnrollmentForCourseByUser
-You can execute the `GetUserEnrollmentForCourseByUser` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetUserEnrollmentForCourseByUser(dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseByUserData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetUserEnrollmentForCourseByUser(vars: GetUserEnrollmentForCourseByUserVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseByUserData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
-```
-
-### Variables
-The `GetUserEnrollmentForCourseByUser` Query requires an argument of type `GetUserEnrollmentForCourseByUserVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetUserEnrollmentForCourseByUserVariables {
-  courseId: UUIDString;
-  userId: string;
-}
-```
-### Return Type
-Recall that calling the `GetUserEnrollmentForCourseByUser` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForCourseByUser` Query is of type `GetUserEnrollmentForCourseByUserData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetUserEnrollmentForCourseByUserData {
-  enrollments: ({
-    id: UUIDString;
-    status: EnrollmentStatus;
-    completedAt?: TimestampString | null;
-  } & Enrollment_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetUserEnrollmentForCourseByUser`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetUserEnrollmentForCourseByUserVariables } from '@dataconnect/generated';
-import { useGetUserEnrollmentForCourseByUser } from '@dataconnect/generated/react'
-
-export default function GetUserEnrollmentForCourseByUserComponent() {
-  // The `useGetUserEnrollmentForCourseByUser` Query hook requires an argument of type `GetUserEnrollmentForCourseByUserVariables`:
-  const getUserEnrollmentForCourseByUserVars: GetUserEnrollmentForCourseByUserVariables = {
-    courseId: ..., 
-    userId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetUserEnrollmentForCourseByUser(getUserEnrollmentForCourseByUserVars);
-  // Variables can be defined inline as well.
-  const query = useGetUserEnrollmentForCourseByUser({ courseId: ..., userId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetUserEnrollmentForCourseByUser(dataConnect, getUserEnrollmentForCourseByUserVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForCourseByUser(getUserEnrollmentForCourseByUserVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForCourseByUser(dataConnect, getUserEnrollmentForCourseByUserVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.enrollments);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetUserEnrollmentForCourse
-You can execute the `GetUserEnrollmentForCourse` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetUserEnrollmentForCourse(dc: DataConnect, vars: GetUserEnrollmentForCourseVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseData, GetUserEnrollmentForCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetUserEnrollmentForCourse(vars: GetUserEnrollmentForCourseVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseData, GetUserEnrollmentForCourseVariables>;
-```
-
-### Variables
-The `GetUserEnrollmentForCourse` Query requires an argument of type `GetUserEnrollmentForCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetUserEnrollmentForCourseVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetUserEnrollmentForCourse` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForCourse` Query is of type `GetUserEnrollmentForCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetUserEnrollmentForCourseData {
-  enrollments: ({
-    id: UUIDString;
-    status: EnrollmentStatus;
-    completedAt?: TimestampString | null;
-  } & Enrollment_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetUserEnrollmentForCourse`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetUserEnrollmentForCourseVariables } from '@dataconnect/generated';
-import { useGetUserEnrollmentForCourse } from '@dataconnect/generated/react'
-
-export default function GetUserEnrollmentForCourseComponent() {
-  // The `useGetUserEnrollmentForCourse` Query hook requires an argument of type `GetUserEnrollmentForCourseVariables`:
-  const getUserEnrollmentForCourseVars: GetUserEnrollmentForCourseVariables = {
-    courseId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetUserEnrollmentForCourse(getUserEnrollmentForCourseVars);
-  // Variables can be defined inline as well.
-  const query = useGetUserEnrollmentForCourse({ courseId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetUserEnrollmentForCourse(dataConnect, getUserEnrollmentForCourseVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForCourse(getUserEnrollmentForCourseVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForCourse(dataConnect, getUserEnrollmentForCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.enrollments);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetUserEnrollmentForMission
-You can execute the `GetUserEnrollmentForMission` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetUserEnrollmentForMission(dc: DataConnect, vars: GetUserEnrollmentForMissionVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForMissionData>): UseDataConnectQueryResult<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetUserEnrollmentForMission(vars: GetUserEnrollmentForMissionVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForMissionData>): UseDataConnectQueryResult<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
-```
-
-### Variables
-The `GetUserEnrollmentForMission` Query requires an argument of type `GetUserEnrollmentForMissionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetUserEnrollmentForMissionVariables {
-  missionId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `GetUserEnrollmentForMission` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForMission` Query is of type `GetUserEnrollmentForMissionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetUserEnrollmentForMissionData {
-  enrollments: ({
-    id: UUIDString;
-    status: EnrollmentStatus;
-    completedAt?: TimestampString | null;
-  } & Enrollment_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetUserEnrollmentForMission`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetUserEnrollmentForMissionVariables } from '@dataconnect/generated';
-import { useGetUserEnrollmentForMission } from '@dataconnect/generated/react'
-
-export default function GetUserEnrollmentForMissionComponent() {
-  // The `useGetUserEnrollmentForMission` Query hook requires an argument of type `GetUserEnrollmentForMissionVariables`:
-  const getUserEnrollmentForMissionVars: GetUserEnrollmentForMissionVariables = {
-    missionId: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetUserEnrollmentForMission(getUserEnrollmentForMissionVars);
-  // Variables can be defined inline as well.
-  const query = useGetUserEnrollmentForMission({ missionId: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetUserEnrollmentForMission(dataConnect, getUserEnrollmentForMissionVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForMission(getUserEnrollmentForMissionVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserEnrollmentForMission(dataConnect, getUserEnrollmentForMissionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.enrollments);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -3749,189 +2659,6 @@ export default function GetMissionTemplatesComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.missionTemplates);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## GetUserClaims
-You can execute the `GetUserClaims` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useGetUserClaims(dc: DataConnect, vars: GetUserClaimsVariables, options?: useDataConnectQueryOptions<GetUserClaimsData>): UseDataConnectQueryResult<GetUserClaimsData, GetUserClaimsVariables>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useGetUserClaims(vars: GetUserClaimsVariables, options?: useDataConnectQueryOptions<GetUserClaimsData>): UseDataConnectQueryResult<GetUserClaimsData, GetUserClaimsVariables>;
-```
-
-### Variables
-The `GetUserClaims` Query requires an argument of type `GetUserClaimsVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface GetUserClaimsVariables {
-  uid: string;
-}
-```
-### Return Type
-Recall that calling the `GetUserClaims` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserClaims` Query is of type `GetUserClaimsData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface GetUserClaimsData {
-  user?: {
-    id: string;
-    userRoles_on_user: ({
-      role: {
-        name: string;
-      };
-    })[];
-    profile_on_user?: {
-      company?: string | null;
-    };
-  } & User_Key;
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `GetUserClaims`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, GetUserClaimsVariables } from '@dataconnect/generated';
-import { useGetUserClaims } from '@dataconnect/generated/react'
-
-export default function GetUserClaimsComponent() {
-  // The `useGetUserClaims` Query hook requires an argument of type `GetUserClaimsVariables`:
-  const getUserClaimsVars: GetUserClaimsVariables = {
-    uid: ..., 
-  };
-
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useGetUserClaims(getUserClaimsVars);
-  // Variables can be defined inline as well.
-  const query = useGetUserClaims({ uid: ..., });
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useGetUserClaims(dataConnect, getUserClaimsVars);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserClaims(getUserClaimsVars, options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useGetUserClaims(dataConnect, getUserClaimsVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.user);
-  }
-  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## MyPaymentHistory
-You can execute the `MyPaymentHistory` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
-
-```javascript
-useMyPaymentHistory(dc: DataConnect, options?: useDataConnectQueryOptions<MyPaymentHistoryData>): UseDataConnectQueryResult<MyPaymentHistoryData, undefined>;
-```
-You can also pass in a `DataConnect` instance to the Query hook function.
-```javascript
-useMyPaymentHistory(options?: useDataConnectQueryOptions<MyPaymentHistoryData>): UseDataConnectQueryResult<MyPaymentHistoryData, undefined>;
-```
-
-### Variables
-The `MyPaymentHistory` Query has no variables.
-### Return Type
-Recall that calling the `MyPaymentHistory` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
-
-To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
-
-To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `MyPaymentHistory` Query is of type `MyPaymentHistoryData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface MyPaymentHistoryData {
-  payments: ({
-    id: UUIDString;
-    customerEmailSnapshot: string;
-    gateway: PaymentGateway;
-    status: PaymentStatus;
-    amount: number;
-    currency: string;
-    referenceId: string;
-    createdAt: TimestampString;
-    paymentItems_on_payment: ({
-      targetType: PaymentItemTarget;
-      priceAtPurchase: number;
-      course?: {
-        title: string;
-      };
-      mission?: {
-        title: string;
-      };
-      subscriptionTier?: {
-        name: string;
-      };
-    })[];
-  } & Payment_Key)[];
-}
-```
-
-To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
-
-### Using `MyPaymentHistory`'s Query hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig } from '@dataconnect/generated';
-import { useMyPaymentHistory } from '@dataconnect/generated/react'
-
-export default function MyPaymentHistoryComponent() {
-  // You don't have to do anything to "execute" the Query.
-  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
-  const query = useMyPaymentHistory();
-
-  // You can also pass in a `DataConnect` instance to the Query hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const query = useMyPaymentHistory(dataConnect);
-
-  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
-  const options = { staleTime: 5 * 1000 };
-  const query = useMyPaymentHistory(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = { staleTime: 5 * 1000 };
-  const query = useMyPaymentHistory(dataConnect, options);
-
-  // Then, you can render your component dynamically based on the status of the Query.
-  if (query.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (query.isError) {
-    return <div>Error: {query.error.message}</div>;
-  }
-
-  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
-  if (query.isSuccess) {
-    console.log(query.data.payments);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -4953,6 +3680,1954 @@ export default function AdminGetQuizComponent() {
 }
 ```
 
+## ListCategories
+You can execute the `ListCategories` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useListCategories(dc: DataConnect, options?: useDataConnectQueryOptions<ListCategoriesData>): UseDataConnectQueryResult<ListCategoriesData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useListCategories(options?: useDataConnectQueryOptions<ListCategoriesData>): UseDataConnectQueryResult<ListCategoriesData, undefined>;
+```
+
+### Variables
+The `ListCategories` Query has no variables.
+### Return Type
+Recall that calling the `ListCategories` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListCategories` Query is of type `ListCategoriesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ListCategoriesData {
+  categories: ({
+    id: UUIDString;
+    name: string;
+    description?: string | null;
+  } & Category_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `ListCategories`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@dataconnect/generated';
+import { useListCategories } from '@dataconnect/generated/react'
+
+export default function ListCategoriesComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useListCategories();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useListCategories(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useListCategories(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useListCategories(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.categories);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ListPublishedCourses
+You can execute the `ListPublishedCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useListPublishedCourses(dc: DataConnect, options?: useDataConnectQueryOptions<ListPublishedCoursesData>): UseDataConnectQueryResult<ListPublishedCoursesData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useListPublishedCourses(options?: useDataConnectQueryOptions<ListPublishedCoursesData>): UseDataConnectQueryResult<ListPublishedCoursesData, undefined>;
+```
+
+### Variables
+The `ListPublishedCourses` Query has no variables.
+### Return Type
+Recall that calling the `ListPublishedCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListPublishedCourses` Query is of type `ListPublishedCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ListPublishedCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    price: number;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    avgRating: number;
+    ratingCount: number;
+    category: {
+      name: string;
+    };
+    author: {
+      name: string;
+      avatar?: string | null;
+    };
+  } & Course_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `ListPublishedCourses`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@dataconnect/generated';
+import { useListPublishedCourses } from '@dataconnect/generated/react'
+
+export default function ListPublishedCoursesComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useListPublishedCourses();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useListPublishedCourses(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useListPublishedCourses(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useListPublishedCourses(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SearchPublishedCourses
+You can execute the `SearchPublishedCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useSearchPublishedCourses(dc: DataConnect, vars: SearchPublishedCoursesVariables, options?: useDataConnectQueryOptions<SearchPublishedCoursesData>): UseDataConnectQueryResult<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useSearchPublishedCourses(vars: SearchPublishedCoursesVariables, options?: useDataConnectQueryOptions<SearchPublishedCoursesData>): UseDataConnectQueryResult<SearchPublishedCoursesData, SearchPublishedCoursesVariables>;
+```
+
+### Variables
+The `SearchPublishedCourses` Query requires an argument of type `SearchPublishedCoursesVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SearchPublishedCoursesVariables {
+  searchQuery: string;
+}
+```
+### Return Type
+Recall that calling the `SearchPublishedCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `SearchPublishedCourses` Query is of type `SearchPublishedCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SearchPublishedCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    price: number;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    category: {
+      name: string;
+    };
+    author: {
+      name: string;
+      avatar?: string | null;
+    };
+  } & Course_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `SearchPublishedCourses`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SearchPublishedCoursesVariables } from '@dataconnect/generated';
+import { useSearchPublishedCourses } from '@dataconnect/generated/react'
+
+export default function SearchPublishedCoursesComponent() {
+  // The `useSearchPublishedCourses` Query hook requires an argument of type `SearchPublishedCoursesVariables`:
+  const searchPublishedCoursesVars: SearchPublishedCoursesVariables = {
+    searchQuery: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useSearchPublishedCourses(searchPublishedCoursesVars);
+  // Variables can be defined inline as well.
+  const query = useSearchPublishedCourses({ searchQuery: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useSearchPublishedCourses(dataConnect, searchPublishedCoursesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useSearchPublishedCourses(searchPublishedCoursesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useSearchPublishedCourses(dataConnect, searchPublishedCoursesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ListPopularCourses
+You can execute the `ListPopularCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useListPopularCourses(dc: DataConnect, vars?: ListPopularCoursesVariables, options?: useDataConnectQueryOptions<ListPopularCoursesData>): UseDataConnectQueryResult<ListPopularCoursesData, ListPopularCoursesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useListPopularCourses(vars?: ListPopularCoursesVariables, options?: useDataConnectQueryOptions<ListPopularCoursesData>): UseDataConnectQueryResult<ListPopularCoursesData, ListPopularCoursesVariables>;
+```
+
+### Variables
+The `ListPopularCourses` Query has an optional argument of type `ListPopularCoursesVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ListPopularCoursesVariables {
+  limit?: number | null;
+}
+```
+### Return Type
+Recall that calling the `ListPopularCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListPopularCourses` Query is of type `ListPopularCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ListPopularCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    price: number;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    avgRating: number;
+    ratingCount: number;
+    category: {
+      name: string;
+    };
+    author: {
+      name: string;
+      avatar?: string | null;
+    };
+  } & Course_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `ListPopularCourses`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ListPopularCoursesVariables } from '@dataconnect/generated';
+import { useListPopularCourses } from '@dataconnect/generated/react'
+
+export default function ListPopularCoursesComponent() {
+  // The `useListPopularCourses` Query hook has an optional argument of type `ListPopularCoursesVariables`:
+  const listPopularCoursesVars: ListPopularCoursesVariables = {
+    limit: ..., // optional
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useListPopularCourses(listPopularCoursesVars);
+  // Variables can be defined inline as well.
+  const query = useListPopularCourses({ limit: ..., });
+  // Since all variables are optional for this Query, you can omit the `ListPopularCoursesVariables` argument.
+  // (as long as you don't want to provide any `options`!)
+  const query = useListPopularCourses();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useListPopularCourses(dataConnect, listPopularCoursesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useListPopularCourses(listPopularCoursesVars, options);
+  // If you'd like to provide options without providing any variables, you must
+  // pass `undefined` where you would normally pass the variables.
+  const query = useListPopularCourses(undefined, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useListPopularCourses(dataConnect, listPopularCoursesVars /** or undefined */, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ListRecommendedCourses
+You can execute the `ListRecommendedCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useListRecommendedCourses(dc: DataConnect, vars: ListRecommendedCoursesVariables, options?: useDataConnectQueryOptions<ListRecommendedCoursesData>): UseDataConnectQueryResult<ListRecommendedCoursesData, ListRecommendedCoursesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useListRecommendedCourses(vars: ListRecommendedCoursesVariables, options?: useDataConnectQueryOptions<ListRecommendedCoursesData>): UseDataConnectQueryResult<ListRecommendedCoursesData, ListRecommendedCoursesVariables>;
+```
+
+### Variables
+The `ListRecommendedCourses` Query requires an argument of type `ListRecommendedCoursesVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ListRecommendedCoursesVariables {
+  categoryIds: UUIDString[];
+  excludeIds: UUIDString[];
+  limit?: number | null;
+}
+```
+### Return Type
+Recall that calling the `ListRecommendedCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `ListRecommendedCourses` Query is of type `ListRecommendedCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ListRecommendedCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    price: number;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    avgRating: number;
+    ratingCount: number;
+    category: {
+      name: string;
+    };
+    author: {
+      name: string;
+      avatar?: string | null;
+    };
+  } & Course_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `ListRecommendedCourses`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ListRecommendedCoursesVariables } from '@dataconnect/generated';
+import { useListRecommendedCourses } from '@dataconnect/generated/react'
+
+export default function ListRecommendedCoursesComponent() {
+  // The `useListRecommendedCourses` Query hook requires an argument of type `ListRecommendedCoursesVariables`:
+  const listRecommendedCoursesVars: ListRecommendedCoursesVariables = {
+    categoryIds: ..., 
+    excludeIds: ..., 
+    limit: ..., // optional
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useListRecommendedCourses(listRecommendedCoursesVars);
+  // Variables can be defined inline as well.
+  const query = useListRecommendedCourses({ categoryIds: ..., excludeIds: ..., limit: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useListRecommendedCourses(dataConnect, listRecommendedCoursesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useListRecommendedCourses(listRecommendedCoursesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useListRecommendedCourses(dataConnect, listRecommendedCoursesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetMyEnrolledCourseCategories
+You can execute the `GetMyEnrolledCourseCategories` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetMyEnrolledCourseCategories(dc: DataConnect, options?: useDataConnectQueryOptions<GetMyEnrolledCourseCategoriesData>): UseDataConnectQueryResult<GetMyEnrolledCourseCategoriesData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetMyEnrolledCourseCategories(options?: useDataConnectQueryOptions<GetMyEnrolledCourseCategoriesData>): UseDataConnectQueryResult<GetMyEnrolledCourseCategoriesData, undefined>;
+```
+
+### Variables
+The `GetMyEnrolledCourseCategories` Query has no variables.
+### Return Type
+Recall that calling the `GetMyEnrolledCourseCategories` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMyEnrolledCourseCategories` Query is of type `GetMyEnrolledCourseCategoriesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetMyEnrolledCourseCategoriesData {
+  enrollments: ({
+    course?: {
+      id: UUIDString;
+      deletedAt?: TimestampString | null;
+      status: CourseStatus;
+      category: {
+        id: UUIDString;
+      } & Category_Key;
+    } & Course_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetMyEnrolledCourseCategories`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@dataconnect/generated';
+import { useGetMyEnrolledCourseCategories } from '@dataconnect/generated/react'
+
+export default function GetMyEnrolledCourseCategoriesComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetMyEnrolledCourseCategories();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetMyEnrolledCourseCategories(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyEnrolledCourseCategories(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyEnrolledCourseCategories(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.enrollments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetMyContinueLearning
+You can execute the `GetMyContinueLearning` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetMyContinueLearning(dc: DataConnect, options?: useDataConnectQueryOptions<GetMyContinueLearningData>): UseDataConnectQueryResult<GetMyContinueLearningData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetMyContinueLearning(options?: useDataConnectQueryOptions<GetMyContinueLearningData>): UseDataConnectQueryResult<GetMyContinueLearningData, undefined>;
+```
+
+### Variables
+The `GetMyContinueLearning` Query has no variables.
+### Return Type
+Recall that calling the `GetMyContinueLearning` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMyContinueLearning` Query is of type `GetMyContinueLearningData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetMyContinueLearningData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    enrolledAt: TimestampString;
+    completedAt?: TimestampString | null;
+    course?: {
+      id: UUIDString;
+      title: string;
+      thumbnail?: string | null;
+      level: CourseLevel;
+      price: number;
+      deletedAt?: TimestampString | null;
+      category: {
+        name: string;
+      };
+      author: {
+        name: string;
+        avatar?: string | null;
+      };
+      clSections: ({
+        clLectures: ({
+          id: UUIDString;
+          clProgress: ({
+            completedAt?: TimestampString | null;
+          })[];
+        } & CourseLecture_Key)[];
+      })[];
+    } & Course_Key;
+  } & Enrollment_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetMyContinueLearning`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@dataconnect/generated';
+import { useGetMyContinueLearning } from '@dataconnect/generated/react'
+
+export default function GetMyContinueLearningComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetMyContinueLearning();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetMyContinueLearning(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyContinueLearning(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyContinueLearning(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.enrollments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCourseVideos
+You can execute the `GetCourseVideos` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCourseVideos(dc: DataConnect, vars: GetCourseVideosVariables, options?: useDataConnectQueryOptions<GetCourseVideosData>): UseDataConnectQueryResult<GetCourseVideosData, GetCourseVideosVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCourseVideos(vars: GetCourseVideosVariables, options?: useDataConnectQueryOptions<GetCourseVideosData>): UseDataConnectQueryResult<GetCourseVideosData, GetCourseVideosVariables>;
+```
+
+### Variables
+The `GetCourseVideos` Query requires an argument of type `GetCourseVideosVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCourseVideosVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCourseVideos` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseVideos` Query is of type `GetCourseVideosData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCourseVideosData {
+  course?: {
+    id: UUIDString;
+    title: string;
+    status: CourseStatus;
+    deletedAt?: TimestampString | null;
+    author: {
+      id: string;
+    } & User_Key;
+    createdBy: {
+      id: string;
+    } & User_Key;
+    videoSections: ({
+      id: UUIDString;
+      title: string;
+      videoLectures: ({
+        id: UUIDString;
+        title: string;
+        content?: string | null;
+        duration?: number | null;
+        isFreePreview: boolean;
+        order: number;
+      } & CourseLecture_Key)[];
+    } & CourseSection_Key)[];
+  } & Course_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCourseVideos`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCourseVideosVariables } from '@dataconnect/generated';
+import { useGetCourseVideos } from '@dataconnect/generated/react'
+
+export default function GetCourseVideosComponent() {
+  // The `useGetCourseVideos` Query hook requires an argument of type `GetCourseVideosVariables`:
+  const getCourseVideosVars: GetCourseVideosVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCourseVideos(getCourseVideosVars);
+  // Variables can be defined inline as well.
+  const query = useGetCourseVideos({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCourseVideos(dataConnect, getCourseVideosVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseVideos(getCourseVideosVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseVideos(dataConnect, getCourseVideosVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.course);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCourseCurriculum
+You can execute the `GetCourseCurriculum` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCourseCurriculum(dc: DataConnect, vars: GetCourseCurriculumVariables, options?: useDataConnectQueryOptions<GetCourseCurriculumData>): UseDataConnectQueryResult<GetCourseCurriculumData, GetCourseCurriculumVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCourseCurriculum(vars: GetCourseCurriculumVariables, options?: useDataConnectQueryOptions<GetCourseCurriculumData>): UseDataConnectQueryResult<GetCourseCurriculumData, GetCourseCurriculumVariables>;
+```
+
+### Variables
+The `GetCourseCurriculum` Query requires an argument of type `GetCourseCurriculumVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCourseCurriculumVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCourseCurriculum` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCurriculum` Query is of type `GetCourseCurriculumData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCourseCurriculumData {
+  course?: {
+    id: UUIDString;
+    title: string;
+    description?: string | null;
+    language: string;
+    publishedSections: ({
+      id: UUIDString;
+      title: string;
+      publishedLectures: ({
+        id: UUIDString;
+        title: string;
+        type: LectureType;
+        content?: string | null;
+        duration?: number | null;
+        isFreePreview: boolean;
+      } & CourseLecture_Key)[];
+    } & CourseSection_Key)[];
+  } & Course_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCourseCurriculum`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCourseCurriculumVariables } from '@dataconnect/generated';
+import { useGetCourseCurriculum } from '@dataconnect/generated/react'
+
+export default function GetCourseCurriculumComponent() {
+  // The `useGetCourseCurriculum` Query hook requires an argument of type `GetCourseCurriculumVariables`:
+  const getCourseCurriculumVars: GetCourseCurriculumVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCourseCurriculum(getCourseCurriculumVars);
+  // Variables can be defined inline as well.
+  const query = useGetCourseCurriculum({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCourseCurriculum(dataConnect, getCourseCurriculumVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCurriculum(getCourseCurriculumVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCurriculum(dataConnect, getCourseCurriculumVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.course);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetLectureContent
+You can execute the `GetLectureContent` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetLectureContent(dc: DataConnect, vars: GetLectureContentVariables, options?: useDataConnectQueryOptions<GetLectureContentData>): UseDataConnectQueryResult<GetLectureContentData, GetLectureContentVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetLectureContent(vars: GetLectureContentVariables, options?: useDataConnectQueryOptions<GetLectureContentData>): UseDataConnectQueryResult<GetLectureContentData, GetLectureContentVariables>;
+```
+
+### Variables
+The `GetLectureContent` Query requires an argument of type `GetLectureContentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetLectureContentVariables {
+  lectureId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetLectureContent` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetLectureContent` Query is of type `GetLectureContentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetLectureContentData {
+  courseLecture?: {
+    id: UUIDString;
+    title: string;
+    type: LectureType;
+    videoUrl?: string | null;
+    content?: string | null;
+    duration?: number | null;
+    transcriptUrl?: string | null;
+    isFreePreview: boolean;
+    section: {
+      course: {
+        id: UUIDString;
+        author: {
+          id: string;
+        } & User_Key;
+        createdBy: {
+          id: string;
+        } & User_Key;
+      } & Course_Key;
+    };
+  } & CourseLecture_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetLectureContent`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetLectureContentVariables } from '@dataconnect/generated';
+import { useGetLectureContent } from '@dataconnect/generated/react'
+
+export default function GetLectureContentComponent() {
+  // The `useGetLectureContent` Query hook requires an argument of type `GetLectureContentVariables`:
+  const getLectureContentVars: GetLectureContentVariables = {
+    lectureId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetLectureContent(getLectureContentVars);
+  // Variables can be defined inline as well.
+  const query = useGetLectureContent({ lectureId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetLectureContent(dataConnect, getLectureContentVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetLectureContent(getLectureContentVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetLectureContent(dataConnect, getLectureContentVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courseLecture);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserLectureProgress
+You can execute the `GetUserLectureProgress` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserLectureProgress(dc: DataConnect, vars: GetUserLectureProgressVariables, options?: useDataConnectQueryOptions<GetUserLectureProgressData>): UseDataConnectQueryResult<GetUserLectureProgressData, GetUserLectureProgressVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserLectureProgress(vars: GetUserLectureProgressVariables, options?: useDataConnectQueryOptions<GetUserLectureProgressData>): UseDataConnectQueryResult<GetUserLectureProgressData, GetUserLectureProgressVariables>;
+```
+
+### Variables
+The `GetUserLectureProgress` Query requires an argument of type `GetUserLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserLectureProgressVariables {
+  lectureId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetUserLectureProgress` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserLectureProgress` Query is of type `GetUserLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserLectureProgressData {
+  lectureProgresses: ({
+    lastWatchedSecond: number;
+    completedAt?: TimestampString | null;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserLectureProgress`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserLectureProgressVariables } from '@dataconnect/generated';
+import { useGetUserLectureProgress } from '@dataconnect/generated/react'
+
+export default function GetUserLectureProgressComponent() {
+  // The `useGetUserLectureProgress` Query hook requires an argument of type `GetUserLectureProgressVariables`:
+  const getUserLectureProgressVars: GetUserLectureProgressVariables = {
+    lectureId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserLectureProgress(getUserLectureProgressVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserLectureProgress({ lectureId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserLectureProgress(dataConnect, getUserLectureProgressVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserLectureProgress(getUserLectureProgressVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserLectureProgress(dataConnect, getUserLectureProgressVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.lectureProgresses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetMyCourseProgress
+You can execute the `GetMyCourseProgress` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetMyCourseProgress(dc: DataConnect, vars: GetMyCourseProgressVariables, options?: useDataConnectQueryOptions<GetMyCourseProgressData>): UseDataConnectQueryResult<GetMyCourseProgressData, GetMyCourseProgressVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetMyCourseProgress(vars: GetMyCourseProgressVariables, options?: useDataConnectQueryOptions<GetMyCourseProgressData>): UseDataConnectQueryResult<GetMyCourseProgressData, GetMyCourseProgressVariables>;
+```
+
+### Variables
+The `GetMyCourseProgress` Query requires an argument of type `GetMyCourseProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetMyCourseProgressVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetMyCourseProgress` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMyCourseProgress` Query is of type `GetMyCourseProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetMyCourseProgressData {
+  sections: ({
+    id: UUIDString;
+    title: string;
+    progressLectures: ({
+      id: UUIDString;
+      title: string;
+      userProgress: ({
+        completedAt?: TimestampString | null;
+      })[];
+    } & CourseLecture_Key)[];
+  } & CourseSection_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetMyCourseProgress`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetMyCourseProgressVariables } from '@dataconnect/generated';
+import { useGetMyCourseProgress } from '@dataconnect/generated/react'
+
+export default function GetMyCourseProgressComponent() {
+  // The `useGetMyCourseProgress` Query hook requires an argument of type `GetMyCourseProgressVariables`:
+  const getMyCourseProgressVars: GetMyCourseProgressVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetMyCourseProgress(getMyCourseProgressVars);
+  // Variables can be defined inline as well.
+  const query = useGetMyCourseProgress({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetMyCourseProgress(dataConnect, getMyCourseProgressVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyCourseProgress(getMyCourseProgressVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyCourseProgress(dataConnect, getMyCourseProgressVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.sections);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCourseForEnrollment
+You can execute the `GetCourseForEnrollment` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCourseForEnrollment(dc: DataConnect, vars: GetCourseForEnrollmentVariables, options?: useDataConnectQueryOptions<GetCourseForEnrollmentData>): UseDataConnectQueryResult<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCourseForEnrollment(vars: GetCourseForEnrollmentVariables, options?: useDataConnectQueryOptions<GetCourseForEnrollmentData>): UseDataConnectQueryResult<GetCourseForEnrollmentData, GetCourseForEnrollmentVariables>;
+```
+
+### Variables
+The `GetCourseForEnrollment` Query requires an argument of type `GetCourseForEnrollmentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCourseForEnrollmentVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCourseForEnrollment` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseForEnrollment` Query is of type `GetCourseForEnrollmentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCourseForEnrollmentData {
+  course?: {
+    id: UUIDString;
+    status: CourseStatus;
+    price: number;
+    deletedAt?: TimestampString | null;
+  } & Course_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCourseForEnrollment`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCourseForEnrollmentVariables } from '@dataconnect/generated';
+import { useGetCourseForEnrollment } from '@dataconnect/generated/react'
+
+export default function GetCourseForEnrollmentComponent() {
+  // The `useGetCourseForEnrollment` Query hook requires an argument of type `GetCourseForEnrollmentVariables`:
+  const getCourseForEnrollmentVars: GetCourseForEnrollmentVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCourseForEnrollment(getCourseForEnrollmentVars);
+  // Variables can be defined inline as well.
+  const query = useGetCourseForEnrollment({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseForEnrollment(getCourseForEnrollmentVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseForEnrollment(dataConnect, getCourseForEnrollmentVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.course);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminGetCourse
+You can execute the `AdminGetCourse` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useAdminGetCourse(dc: DataConnect, vars: AdminGetCourseVariables, options?: useDataConnectQueryOptions<AdminGetCourseData>): UseDataConnectQueryResult<AdminGetCourseData, AdminGetCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useAdminGetCourse(vars: AdminGetCourseVariables, options?: useDataConnectQueryOptions<AdminGetCourseData>): UseDataConnectQueryResult<AdminGetCourseData, AdminGetCourseVariables>;
+```
+
+### Variables
+The `AdminGetCourse` Query requires an argument of type `AdminGetCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminGetCourseVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AdminGetCourse` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `AdminGetCourse` Query is of type `AdminGetCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminGetCourseData {
+  course?: {
+    id: UUIDString;
+    title: string;
+    description?: string | null;
+    price: number;
+    status: CourseStatus;
+    language: string;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    tags: string[];
+    deletedAt?: TimestampString | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    category: {
+      id: UUIDString;
+      name: string;
+    } & Category_Key;
+    author: {
+      id: string;
+      name: string;
+      email: string;
+      avatar?: string | null;
+    } & User_Key;
+    createdBy: {
+      id: string;
+      name: string;
+    } & User_Key;
+    instructors: ({
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        avatar?: string | null;
+      } & User_Key;
+    })[];
+    adminSections: ({
+      id: UUIDString;
+      title: string;
+      order: number;
+      adminLectures: ({
+        id: UUIDString;
+        title: string;
+        type: LectureType;
+        videoUrl?: string | null;
+        content?: string | null;
+        duration?: number | null;
+        transcriptUrl?: string | null;
+        isFreePreview: boolean;
+        order: number;
+      } & CourseLecture_Key)[];
+    } & CourseSection_Key)[];
+  } & Course_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `AdminGetCourse`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminGetCourseVariables } from '@dataconnect/generated';
+import { useAdminGetCourse } from '@dataconnect/generated/react'
+
+export default function AdminGetCourseComponent() {
+  // The `useAdminGetCourse` Query hook requires an argument of type `AdminGetCourseVariables`:
+  const adminGetCourseVars: AdminGetCourseVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useAdminGetCourse(adminGetCourseVars);
+  // Variables can be defined inline as well.
+  const query = useAdminGetCourse({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useAdminGetCourse(dataConnect, adminGetCourseVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useAdminGetCourse(adminGetCourseVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useAdminGetCourse(dataConnect, adminGetCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.course);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminListMyCourses
+You can execute the `AdminListMyCourses` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useAdminListMyCourses(dc: DataConnect, options?: useDataConnectQueryOptions<AdminListMyCoursesData>): UseDataConnectQueryResult<AdminListMyCoursesData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useAdminListMyCourses(options?: useDataConnectQueryOptions<AdminListMyCoursesData>): UseDataConnectQueryResult<AdminListMyCoursesData, undefined>;
+```
+
+### Variables
+The `AdminListMyCourses` Query has no variables.
+### Return Type
+Recall that calling the `AdminListMyCourses` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `AdminListMyCourses` Query is of type `AdminListMyCoursesData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminListMyCoursesData {
+  courses: ({
+    id: UUIDString;
+    title: string;
+    status: CourseStatus;
+    level: CourseLevel;
+    thumbnail?: string | null;
+    price: number;
+    updatedAt: TimestampString;
+    category: {
+      name: string;
+    };
+  } & Course_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `AdminListMyCourses`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@dataconnect/generated';
+import { useAdminListMyCourses } from '@dataconnect/generated/react'
+
+export default function AdminListMyCoursesComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useAdminListMyCourses();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useAdminListMyCourses(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useAdminListMyCourses(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useAdminListMyCourses(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courses);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetLectureDuration
+You can execute the `GetLectureDuration` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetLectureDuration(dc: DataConnect, vars: GetLectureDurationVariables, options?: useDataConnectQueryOptions<GetLectureDurationData>): UseDataConnectQueryResult<GetLectureDurationData, GetLectureDurationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetLectureDuration(vars: GetLectureDurationVariables, options?: useDataConnectQueryOptions<GetLectureDurationData>): UseDataConnectQueryResult<GetLectureDurationData, GetLectureDurationVariables>;
+```
+
+### Variables
+The `GetLectureDuration` Query requires an argument of type `GetLectureDurationVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetLectureDurationVariables {
+  lectureId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetLectureDuration` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetLectureDuration` Query is of type `GetLectureDurationData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetLectureDurationData {
+  courseLecture?: {
+    id: UUIDString;
+    duration?: number | null;
+    section: {
+      course: {
+        id: UUIDString;
+      } & Course_Key;
+    };
+  } & CourseLecture_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetLectureDuration`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetLectureDurationVariables } from '@dataconnect/generated';
+import { useGetLectureDuration } from '@dataconnect/generated/react'
+
+export default function GetLectureDurationComponent() {
+  // The `useGetLectureDuration` Query hook requires an argument of type `GetLectureDurationVariables`:
+  const getLectureDurationVars: GetLectureDurationVariables = {
+    lectureId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetLectureDuration(getLectureDurationVars);
+  // Variables can be defined inline as well.
+  const query = useGetLectureDuration({ lectureId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetLectureDuration(dataConnect, getLectureDurationVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetLectureDuration(getLectureDurationVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetLectureDuration(dataConnect, getLectureDurationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.courseLecture);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCourseCompletionStatus
+You can execute the `GetCourseCompletionStatus` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCourseCompletionStatus(dc: DataConnect, vars: GetCourseCompletionStatusVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusData>): UseDataConnectQueryResult<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCourseCompletionStatus(vars: GetCourseCompletionStatusVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusData>): UseDataConnectQueryResult<GetCourseCompletionStatusData, GetCourseCompletionStatusVariables>;
+```
+
+### Variables
+The `GetCourseCompletionStatus` Query requires an argument of type `GetCourseCompletionStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCourseCompletionStatusVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCourseCompletionStatus` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCompletionStatus` Query is of type `GetCourseCompletionStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCourseCompletionStatusData {
+  sections: ({
+    completionLectures: ({
+      id: UUIDString;
+      completionProgress: ({
+        completedAt?: TimestampString | null;
+      })[];
+    } & CourseLecture_Key)[];
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCourseCompletionStatus`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCourseCompletionStatusVariables } from '@dataconnect/generated';
+import { useGetCourseCompletionStatus } from '@dataconnect/generated/react'
+
+export default function GetCourseCompletionStatusComponent() {
+  // The `useGetCourseCompletionStatus` Query hook requires an argument of type `GetCourseCompletionStatusVariables`:
+  const getCourseCompletionStatusVars: GetCourseCompletionStatusVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCourseCompletionStatus(getCourseCompletionStatusVars);
+  // Variables can be defined inline as well.
+  const query = useGetCourseCompletionStatus({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCourseCompletionStatus(dataConnect, getCourseCompletionStatusVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCompletionStatus(getCourseCompletionStatusVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCompletionStatus(dataConnect, getCourseCompletionStatusVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.sections);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCourseCompletionStatusForUser
+You can execute the `GetCourseCompletionStatusForUser` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCourseCompletionStatusForUser(dc: DataConnect, vars: GetCourseCompletionStatusForUserVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusForUserData>): UseDataConnectQueryResult<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCourseCompletionStatusForUser(vars: GetCourseCompletionStatusForUserVariables, options?: useDataConnectQueryOptions<GetCourseCompletionStatusForUserData>): UseDataConnectQueryResult<GetCourseCompletionStatusForUserData, GetCourseCompletionStatusForUserVariables>;
+```
+
+### Variables
+The `GetCourseCompletionStatusForUser` Query requires an argument of type `GetCourseCompletionStatusForUserVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCourseCompletionStatusForUserVariables {
+  courseId: UUIDString;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetCourseCompletionStatusForUser` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCourseCompletionStatusForUser` Query is of type `GetCourseCompletionStatusForUserData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCourseCompletionStatusForUserData {
+  sections: ({
+    userCompletionLectures: ({
+      id: UUIDString;
+      userCompletionProgress: ({
+        completedAt?: TimestampString | null;
+      })[];
+    } & CourseLecture_Key)[];
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCourseCompletionStatusForUser`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCourseCompletionStatusForUserVariables } from '@dataconnect/generated';
+import { useGetCourseCompletionStatusForUser } from '@dataconnect/generated/react'
+
+export default function GetCourseCompletionStatusForUserComponent() {
+  // The `useGetCourseCompletionStatusForUser` Query hook requires an argument of type `GetCourseCompletionStatusForUserVariables`:
+  const getCourseCompletionStatusForUserVars: GetCourseCompletionStatusForUserVariables = {
+    courseId: ..., 
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCourseCompletionStatusForUser(getCourseCompletionStatusForUserVars);
+  // Variables can be defined inline as well.
+  const query = useGetCourseCompletionStatusForUser({ courseId: ..., userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCourseCompletionStatusForUser(dataConnect, getCourseCompletionStatusForUserVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCompletionStatusForUser(getCourseCompletionStatusForUserVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCourseCompletionStatusForUser(dataConnect, getCourseCompletionStatusForUserVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.sections);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserEnrollmentForCourseByUser
+You can execute the `GetUserEnrollmentForCourseByUser` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserEnrollmentForCourseByUser(dc: DataConnect, vars: GetUserEnrollmentForCourseByUserVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseByUserData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserEnrollmentForCourseByUser(vars: GetUserEnrollmentForCourseByUserVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseByUserData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseByUserData, GetUserEnrollmentForCourseByUserVariables>;
+```
+
+### Variables
+The `GetUserEnrollmentForCourseByUser` Query requires an argument of type `GetUserEnrollmentForCourseByUserVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserEnrollmentForCourseByUserVariables {
+  courseId: UUIDString;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserEnrollmentForCourseByUser` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForCourseByUser` Query is of type `GetUserEnrollmentForCourseByUserData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserEnrollmentForCourseByUserData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserEnrollmentForCourseByUser`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserEnrollmentForCourseByUserVariables } from '@dataconnect/generated';
+import { useGetUserEnrollmentForCourseByUser } from '@dataconnect/generated/react'
+
+export default function GetUserEnrollmentForCourseByUserComponent() {
+  // The `useGetUserEnrollmentForCourseByUser` Query hook requires an argument of type `GetUserEnrollmentForCourseByUserVariables`:
+  const getUserEnrollmentForCourseByUserVars: GetUserEnrollmentForCourseByUserVariables = {
+    courseId: ..., 
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserEnrollmentForCourseByUser(getUserEnrollmentForCourseByUserVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserEnrollmentForCourseByUser({ courseId: ..., userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserEnrollmentForCourseByUser(dataConnect, getUserEnrollmentForCourseByUserVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForCourseByUser(getUserEnrollmentForCourseByUserVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForCourseByUser(dataConnect, getUserEnrollmentForCourseByUserVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.enrollments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserEnrollmentForCourse
+You can execute the `GetUserEnrollmentForCourse` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserEnrollmentForCourse(dc: DataConnect, vars: GetUserEnrollmentForCourseVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseData, GetUserEnrollmentForCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserEnrollmentForCourse(vars: GetUserEnrollmentForCourseVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForCourseData>): UseDataConnectQueryResult<GetUserEnrollmentForCourseData, GetUserEnrollmentForCourseVariables>;
+```
+
+### Variables
+The `GetUserEnrollmentForCourse` Query requires an argument of type `GetUserEnrollmentForCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserEnrollmentForCourseVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetUserEnrollmentForCourse` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForCourse` Query is of type `GetUserEnrollmentForCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserEnrollmentForCourseData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserEnrollmentForCourse`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserEnrollmentForCourseVariables } from '@dataconnect/generated';
+import { useGetUserEnrollmentForCourse } from '@dataconnect/generated/react'
+
+export default function GetUserEnrollmentForCourseComponent() {
+  // The `useGetUserEnrollmentForCourse` Query hook requires an argument of type `GetUserEnrollmentForCourseVariables`:
+  const getUserEnrollmentForCourseVars: GetUserEnrollmentForCourseVariables = {
+    courseId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserEnrollmentForCourse(getUserEnrollmentForCourseVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserEnrollmentForCourse({ courseId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserEnrollmentForCourse(dataConnect, getUserEnrollmentForCourseVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForCourse(getUserEnrollmentForCourseVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForCourse(dataConnect, getUserEnrollmentForCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.enrollments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserEnrollmentForMission
+You can execute the `GetUserEnrollmentForMission` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserEnrollmentForMission(dc: DataConnect, vars: GetUserEnrollmentForMissionVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForMissionData>): UseDataConnectQueryResult<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserEnrollmentForMission(vars: GetUserEnrollmentForMissionVariables, options?: useDataConnectQueryOptions<GetUserEnrollmentForMissionData>): UseDataConnectQueryResult<GetUserEnrollmentForMissionData, GetUserEnrollmentForMissionVariables>;
+```
+
+### Variables
+The `GetUserEnrollmentForMission` Query requires an argument of type `GetUserEnrollmentForMissionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserEnrollmentForMissionVariables {
+  missionId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetUserEnrollmentForMission` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserEnrollmentForMission` Query is of type `GetUserEnrollmentForMissionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserEnrollmentForMissionData {
+  enrollments: ({
+    id: UUIDString;
+    status: EnrollmentStatus;
+    completedAt?: TimestampString | null;
+  } & Enrollment_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserEnrollmentForMission`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserEnrollmentForMissionVariables } from '@dataconnect/generated';
+import { useGetUserEnrollmentForMission } from '@dataconnect/generated/react'
+
+export default function GetUserEnrollmentForMissionComponent() {
+  // The `useGetUserEnrollmentForMission` Query hook requires an argument of type `GetUserEnrollmentForMissionVariables`:
+  const getUserEnrollmentForMissionVars: GetUserEnrollmentForMissionVariables = {
+    missionId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserEnrollmentForMission(getUserEnrollmentForMissionVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserEnrollmentForMission({ missionId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserEnrollmentForMission(dataConnect, getUserEnrollmentForMissionVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForMission(getUserEnrollmentForMissionVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserEnrollmentForMission(dataConnect, getUserEnrollmentForMissionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.enrollments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
 ## GetMyCourseRating
 You can execute the `GetMyCourseRating` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
 
@@ -5544,388 +6219,74 @@ export default function UpdateMyProfileComponent() {
 }
 ```
 
-## AdminCreateCourse
-You can execute the `AdminCreateCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## InstructorDeleteCourse
+You can execute the `InstructorDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminCreateCourse(options?: useDataConnectMutationOptions<AdminCreateCourseData, FirebaseError, AdminCreateCourseVariables>): UseDataConnectMutationResult<AdminCreateCourseData, AdminCreateCourseVariables>;
+useInstructorDeleteCourse(options?: useDataConnectMutationOptions<InstructorDeleteCourseData, FirebaseError, InstructorDeleteCourseVariables>): UseDataConnectMutationResult<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminCreateCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateCourseData, FirebaseError, AdminCreateCourseVariables>): UseDataConnectMutationResult<AdminCreateCourseData, AdminCreateCourseVariables>;
+useInstructorDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<InstructorDeleteCourseData, FirebaseError, InstructorDeleteCourseVariables>): UseDataConnectMutationResult<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
 ```
 
 ### Variables
-The `AdminCreateCourse` Mutation requires an argument of type `AdminCreateCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `InstructorDeleteCourse` Mutation requires an argument of type `InstructorDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminCreateCourseVariables {
-  title: string;
-  description?: string | null;
-  price: number;
-  language: string;
-  level: CourseLevel;
-  categoryId: UUIDString;
-  tags: string[];
-  authorId: string;
-}
-```
-### Return Type
-Recall that calling the `AdminCreateCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateCourse` Mutation is of type `AdminCreateCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminCreateCourseData {
-  course_insert: Course_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminCreateCourse`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateCourseVariables } from '@dataconnect/generated';
-import { useAdminCreateCourse } from '@dataconnect/generated/react'
-
-export default function AdminCreateCourseComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateCourse();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateCourse(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateCourse(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateCourse(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateCourse` Mutation requires an argument of type `AdminCreateCourseVariables`:
-  const adminCreateCourseVars: AdminCreateCourseVariables = {
-    title: ..., 
-    description: ..., // optional
-    price: ..., 
-    language: ..., 
-    level: ..., 
-    categoryId: ..., 
-    tags: ..., 
-    authorId: ..., 
-  };
-  mutation.mutate(adminCreateCourseVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ title: ..., description: ..., price: ..., language: ..., level: ..., categoryId: ..., tags: ..., authorId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminCreateCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.course_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminUpdateCourse
-You can execute the `AdminUpdateCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminUpdateCourse(options?: useDataConnectMutationOptions<AdminUpdateCourseData, FirebaseError, AdminUpdateCourseVariables>): UseDataConnectMutationResult<AdminUpdateCourseData, AdminUpdateCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminUpdateCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateCourseData, FirebaseError, AdminUpdateCourseVariables>): UseDataConnectMutationResult<AdminUpdateCourseData, AdminUpdateCourseVariables>;
-```
-
-### Variables
-The `AdminUpdateCourse` Mutation requires an argument of type `AdminUpdateCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminUpdateCourseVariables {
-  courseId: UUIDString;
-  title?: string | null;
-  description?: string | null;
-  price?: number | null;
-  language?: string | null;
-  level?: CourseLevel | null;
-  categoryId?: UUIDString | null;
-  tags?: string[] | null;
-  thumbnail?: string | null;
-}
-```
-### Return Type
-Recall that calling the `AdminUpdateCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateCourse` Mutation is of type `AdminUpdateCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminUpdateCourseData {
-  course_update?: Course_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminUpdateCourse`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateCourseVariables } from '@dataconnect/generated';
-import { useAdminUpdateCourse } from '@dataconnect/generated/react'
-
-export default function AdminUpdateCourseComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateCourse();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateCourse(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateCourse(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateCourse(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateCourse` Mutation requires an argument of type `AdminUpdateCourseVariables`:
-  const adminUpdateCourseVars: AdminUpdateCourseVariables = {
-    courseId: ..., 
-    title: ..., // optional
-    description: ..., // optional
-    price: ..., // optional
-    language: ..., // optional
-    level: ..., // optional
-    categoryId: ..., // optional
-    tags: ..., // optional
-    thumbnail: ..., // optional
-  };
-  mutation.mutate(adminUpdateCourseVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., title: ..., description: ..., price: ..., language: ..., level: ..., categoryId: ..., tags: ..., thumbnail: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminUpdateCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.course_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminUpdateCourseStatus
-You can execute the `AdminUpdateCourseStatus` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminUpdateCourseStatus(options?: useDataConnectMutationOptions<AdminUpdateCourseStatusData, FirebaseError, AdminUpdateCourseStatusVariables>): UseDataConnectMutationResult<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminUpdateCourseStatus(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateCourseStatusData, FirebaseError, AdminUpdateCourseStatusVariables>): UseDataConnectMutationResult<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
-```
-
-### Variables
-The `AdminUpdateCourseStatus` Mutation requires an argument of type `AdminUpdateCourseStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminUpdateCourseStatusVariables {
-  courseId: UUIDString;
-  status: CourseStatus;
-}
-```
-### Return Type
-Recall that calling the `AdminUpdateCourseStatus` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateCourseStatus` Mutation is of type `AdminUpdateCourseStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminUpdateCourseStatusData {
-  course_update?: Course_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminUpdateCourseStatus`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateCourseStatusVariables } from '@dataconnect/generated';
-import { useAdminUpdateCourseStatus } from '@dataconnect/generated/react'
-
-export default function AdminUpdateCourseStatusComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateCourseStatus();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateCourseStatus(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateCourseStatus(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateCourseStatus(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateCourseStatus` Mutation requires an argument of type `AdminUpdateCourseStatusVariables`:
-  const adminUpdateCourseStatusVars: AdminUpdateCourseStatusVariables = {
-    courseId: ..., 
-    status: ..., 
-  };
-  mutation.mutate(adminUpdateCourseStatusVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., status: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminUpdateCourseStatusVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.course_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminSoftDeleteCourse
-You can execute the `AdminSoftDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminSoftDeleteCourse(options?: useDataConnectMutationOptions<AdminSoftDeleteCourseData, FirebaseError, AdminSoftDeleteCourseVariables>): UseDataConnectMutationResult<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminSoftDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteCourseData, FirebaseError, AdminSoftDeleteCourseVariables>): UseDataConnectMutationResult<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
-```
-
-### Variables
-The `AdminSoftDeleteCourse` Mutation requires an argument of type `AdminSoftDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminSoftDeleteCourseVariables {
+export interface InstructorDeleteCourseVariables {
   courseId: UUIDString;
 }
 ```
 ### Return Type
-Recall that calling the `AdminSoftDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `InstructorDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteCourse` Mutation is of type `AdminSoftDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `InstructorDeleteCourse` Mutation is of type `InstructorDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminSoftDeleteCourseData {
-  course_update?: Course_Key | null;
+export interface InstructorDeleteCourseData {
+  course_updateMany: number;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminSoftDeleteCourse`'s Mutation hook function
+### Using `InstructorDeleteCourse`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminSoftDeleteCourseVariables } from '@dataconnect/generated';
-import { useAdminSoftDeleteCourse } from '@dataconnect/generated/react'
+import { connectorConfig, InstructorDeleteCourseVariables } from '@dataconnect/generated';
+import { useInstructorDeleteCourse } from '@dataconnect/generated/react'
 
-export default function AdminSoftDeleteCourseComponent() {
+export default function InstructorDeleteCourseComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminSoftDeleteCourse();
+  const mutation = useInstructorDeleteCourse();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminSoftDeleteCourse(dataConnect);
+  const mutation = useInstructorDeleteCourse(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteCourse(options);
+  const mutation = useInstructorDeleteCourse(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteCourse(dataConnect, options);
+  const mutation = useInstructorDeleteCourse(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminSoftDeleteCourse` Mutation requires an argument of type `AdminSoftDeleteCourseVariables`:
-  const adminSoftDeleteCourseVars: AdminSoftDeleteCourseVariables = {
+  // The `useInstructorDeleteCourse` Mutation requires an argument of type `InstructorDeleteCourseVariables`:
+  const instructorDeleteCourseVars: InstructorDeleteCourseVariables = {
     courseId: ..., 
   };
-  mutation.mutate(adminSoftDeleteCourseVars);
+  mutation.mutate(instructorDeleteCourseVars);
   // Variables can be defined inline as well.
   mutation.mutate({ courseId: ..., });
 
@@ -5933,7 +6294,101 @@ export default function AdminSoftDeleteCourseComponent() {
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminSoftDeleteCourseVars, options);
+  mutation.mutate(instructorDeleteCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.course_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SuperAdminDeleteCourse
+You can execute the `SuperAdminDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useSuperAdminDeleteCourse(options?: useDataConnectMutationOptions<SuperAdminDeleteCourseData, FirebaseError, SuperAdminDeleteCourseVariables>): UseDataConnectMutationResult<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSuperAdminDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<SuperAdminDeleteCourseData, FirebaseError, SuperAdminDeleteCourseVariables>): UseDataConnectMutationResult<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
+```
+
+### Variables
+The `SuperAdminDeleteCourse` Mutation requires an argument of type `SuperAdminDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SuperAdminDeleteCourseVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `SuperAdminDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SuperAdminDeleteCourse` Mutation is of type `SuperAdminDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SuperAdminDeleteCourseData {
+  course_update?: Course_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SuperAdminDeleteCourse`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SuperAdminDeleteCourseVariables } from '@dataconnect/generated';
+import { useSuperAdminDeleteCourse } from '@dataconnect/generated/react'
+
+export default function SuperAdminDeleteCourseComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSuperAdminDeleteCourse();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSuperAdminDeleteCourse(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSuperAdminDeleteCourse(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSuperAdminDeleteCourse(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSuperAdminDeleteCourse` Mutation requires an argument of type `SuperAdminDeleteCourseVariables`:
+  const superAdminDeleteCourseVars: SuperAdminDeleteCourseVariables = {
+    courseId: ..., 
+  };
+  mutation.mutate(superAdminDeleteCourseVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(superAdminDeleteCourseVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -5952,482 +6407,94 @@ export default function AdminSoftDeleteCourseComponent() {
 }
 ```
 
-## AdminCreateSection
-You can execute the `AdminCreateSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## AdminCreateSession
+You can execute the `AdminCreateSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminCreateSection(options?: useDataConnectMutationOptions<AdminCreateSectionData, FirebaseError, AdminCreateSectionVariables>): UseDataConnectMutationResult<AdminCreateSectionData, AdminCreateSectionVariables>;
+useAdminCreateSession(options?: useDataConnectMutationOptions<AdminCreateSessionData, FirebaseError, AdminCreateSessionVariables>): UseDataConnectMutationResult<AdminCreateSessionData, AdminCreateSessionVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminCreateSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSectionData, FirebaseError, AdminCreateSectionVariables>): UseDataConnectMutationResult<AdminCreateSectionData, AdminCreateSectionVariables>;
+useAdminCreateSession(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSessionData, FirebaseError, AdminCreateSessionVariables>): UseDataConnectMutationResult<AdminCreateSessionData, AdminCreateSessionVariables>;
 ```
 
 ### Variables
-The `AdminCreateSection` Mutation requires an argument of type `AdminCreateSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `AdminCreateSession` Mutation requires an argument of type `AdminCreateSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminCreateSectionVariables {
+export interface AdminCreateSessionVariables {
   courseId: UUIDString;
   title: string;
-  order: number;
+  capacity?: number | null;
+  startTime: TimestampString;
+  endTime: TimestampString;
+  type: SessionType;
+  locationOrUrl: string;
 }
 ```
 ### Return Type
-Recall that calling the `AdminCreateSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `AdminCreateSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSection` Mutation is of type `AdminCreateSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSession` Mutation is of type `AdminCreateSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminCreateSectionData {
-  courseSection_insert: CourseSection_Key;
+export interface AdminCreateSessionData {
+  session_insert: Session_Key;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminCreateSection`'s Mutation hook function
+### Using `AdminCreateSession`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateSectionVariables } from '@dataconnect/generated';
-import { useAdminCreateSection } from '@dataconnect/generated/react'
+import { connectorConfig, AdminCreateSessionVariables } from '@dataconnect/generated';
+import { useAdminCreateSession } from '@dataconnect/generated/react'
 
-export default function AdminCreateSectionComponent() {
+export default function AdminCreateSessionComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateSection();
+  const mutation = useAdminCreateSession();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateSection(dataConnect);
+  const mutation = useAdminCreateSession(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminCreateSection(options);
+  const mutation = useAdminCreateSession(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminCreateSection(dataConnect, options);
+  const mutation = useAdminCreateSession(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateSection` Mutation requires an argument of type `AdminCreateSectionVariables`:
-  const adminCreateSectionVars: AdminCreateSectionVariables = {
+  // The `useAdminCreateSession` Mutation requires an argument of type `AdminCreateSessionVariables`:
+  const adminCreateSessionVars: AdminCreateSessionVariables = {
     courseId: ..., 
     title: ..., 
-    order: ..., 
-  };
-  mutation.mutate(adminCreateSectionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., title: ..., order: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminCreateSectionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.courseSection_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminUpdateSection
-You can execute the `AdminUpdateSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminUpdateSection(options?: useDataConnectMutationOptions<AdminUpdateSectionData, FirebaseError, AdminUpdateSectionVariables>): UseDataConnectMutationResult<AdminUpdateSectionData, AdminUpdateSectionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminUpdateSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateSectionData, FirebaseError, AdminUpdateSectionVariables>): UseDataConnectMutationResult<AdminUpdateSectionData, AdminUpdateSectionVariables>;
-```
-
-### Variables
-The `AdminUpdateSection` Mutation requires an argument of type `AdminUpdateSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminUpdateSectionVariables {
-  sectionId: UUIDString;
-  title: string;
-}
-```
-### Return Type
-Recall that calling the `AdminUpdateSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateSection` Mutation is of type `AdminUpdateSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminUpdateSectionData {
-  courseSection_update?: CourseSection_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminUpdateSection`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateSectionVariables } from '@dataconnect/generated';
-import { useAdminUpdateSection } from '@dataconnect/generated/react'
-
-export default function AdminUpdateSectionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateSection();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateSection(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateSection(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateSection(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateSection` Mutation requires an argument of type `AdminUpdateSectionVariables`:
-  const adminUpdateSectionVars: AdminUpdateSectionVariables = {
-    sectionId: ..., 
-    title: ..., 
-  };
-  mutation.mutate(adminUpdateSectionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ sectionId: ..., title: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminUpdateSectionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.courseSection_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminSoftDeleteSection
-You can execute the `AdminSoftDeleteSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminSoftDeleteSection(options?: useDataConnectMutationOptions<AdminSoftDeleteSectionData, FirebaseError, AdminSoftDeleteSectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminSoftDeleteSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteSectionData, FirebaseError, AdminSoftDeleteSectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
-```
-
-### Variables
-The `AdminSoftDeleteSection` Mutation requires an argument of type `AdminSoftDeleteSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminSoftDeleteSectionVariables {
-  sectionId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `AdminSoftDeleteSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteSection` Mutation is of type `AdminSoftDeleteSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminSoftDeleteSectionData {
-  courseSection_update?: CourseSection_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminSoftDeleteSection`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminSoftDeleteSectionVariables } from '@dataconnect/generated';
-import { useAdminSoftDeleteSection } from '@dataconnect/generated/react'
-
-export default function AdminSoftDeleteSectionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminSoftDeleteSection();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminSoftDeleteSection(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminSoftDeleteSection(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminSoftDeleteSection(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminSoftDeleteSection` Mutation requires an argument of type `AdminSoftDeleteSectionVariables`:
-  const adminSoftDeleteSectionVars: AdminSoftDeleteSectionVariables = {
-    sectionId: ..., 
-  };
-  mutation.mutate(adminSoftDeleteSectionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ sectionId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminSoftDeleteSectionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.courseSection_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminUpdateSectionOrder
-You can execute the `AdminUpdateSectionOrder` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminUpdateSectionOrder(options?: useDataConnectMutationOptions<AdminUpdateSectionOrderData, FirebaseError, AdminUpdateSectionOrderVariables>): UseDataConnectMutationResult<AdminUpdateSectionOrderData, AdminUpdateSectionOrderVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminUpdateSectionOrder(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateSectionOrderData, FirebaseError, AdminUpdateSectionOrderVariables>): UseDataConnectMutationResult<AdminUpdateSectionOrderData, AdminUpdateSectionOrderVariables>;
-```
-
-### Variables
-The `AdminUpdateSectionOrder` Mutation requires an argument of type `AdminUpdateSectionOrderVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminUpdateSectionOrderVariables {
-  sectionId: UUIDString;
-  order: number;
-}
-```
-### Return Type
-Recall that calling the `AdminUpdateSectionOrder` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateSectionOrder` Mutation is of type `AdminUpdateSectionOrderData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminUpdateSectionOrderData {
-  courseSection_update?: CourseSection_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminUpdateSectionOrder`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateSectionOrderVariables } from '@dataconnect/generated';
-import { useAdminUpdateSectionOrder } from '@dataconnect/generated/react'
-
-export default function AdminUpdateSectionOrderComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateSectionOrder();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateSectionOrder(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateSectionOrder(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpdateSectionOrder(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateSectionOrder` Mutation requires an argument of type `AdminUpdateSectionOrderVariables`:
-  const adminUpdateSectionOrderVars: AdminUpdateSectionOrderVariables = {
-    sectionId: ..., 
-    order: ..., 
-  };
-  mutation.mutate(adminUpdateSectionOrderVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ sectionId: ..., order: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminUpdateSectionOrderVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.courseSection_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminCreateLectureFull
-You can execute the `AdminCreateLectureFull` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminCreateLectureFull(options?: useDataConnectMutationOptions<AdminCreateLectureFullData, FirebaseError, AdminCreateLectureFullVariables>): UseDataConnectMutationResult<AdminCreateLectureFullData, AdminCreateLectureFullVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminCreateLectureFull(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateLectureFullData, FirebaseError, AdminCreateLectureFullVariables>): UseDataConnectMutationResult<AdminCreateLectureFullData, AdminCreateLectureFullVariables>;
-```
-
-### Variables
-The `AdminCreateLectureFull` Mutation requires an argument of type `AdminCreateLectureFullVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminCreateLectureFullVariables {
-  sectionId: UUIDString;
-  title: string;
-  type: LectureType;
-  videoUrl?: string | null;
-  content?: string | null;
-  duration?: number | null;
-  transcriptUrl?: string | null;
-  isFreePreview: boolean;
-  order: number;
-}
-```
-### Return Type
-Recall that calling the `AdminCreateLectureFull` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateLectureFull` Mutation is of type `AdminCreateLectureFullData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminCreateLectureFullData {
-  courseLecture_insert: CourseLecture_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminCreateLectureFull`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateLectureFullVariables } from '@dataconnect/generated';
-import { useAdminCreateLectureFull } from '@dataconnect/generated/react'
-
-export default function AdminCreateLectureFullComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateLectureFull();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateLectureFull(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateLectureFull(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateLectureFull(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateLectureFull` Mutation requires an argument of type `AdminCreateLectureFullVariables`:
-  const adminCreateLectureFullVars: AdminCreateLectureFullVariables = {
-    sectionId: ..., 
-    title: ..., 
+    capacity: ..., // optional
+    startTime: ..., 
+    endTime: ..., 
     type: ..., 
-    videoUrl: ..., // optional
-    content: ..., // optional
-    duration: ..., // optional
-    transcriptUrl: ..., // optional
-    isFreePreview: ..., 
-    order: ..., 
+    locationOrUrl: ..., 
   };
-  mutation.mutate(adminCreateLectureFullVars);
+  mutation.mutate(adminCreateSessionVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ sectionId: ..., title: ..., type: ..., videoUrl: ..., content: ..., duration: ..., transcriptUrl: ..., isFreePreview: ..., order: ..., });
+  mutation.mutate({ courseId: ..., title: ..., capacity: ..., startTime: ..., endTime: ..., type: ..., locationOrUrl: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminCreateLectureFullVars, options);
+  mutation.mutate(adminCreateSessionVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6440,102 +6507,88 @@ export default function AdminCreateLectureFullComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_insert);
+    console.log(mutation.data.session_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminUpdateLecture
-You can execute the `AdminUpdateLecture` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## InstructorCancelSession
+You can execute the `InstructorCancelSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminUpdateLecture(options?: useDataConnectMutationOptions<AdminUpdateLectureData, FirebaseError, AdminUpdateLectureVariables>): UseDataConnectMutationResult<AdminUpdateLectureData, AdminUpdateLectureVariables>;
+useInstructorCancelSession(options?: useDataConnectMutationOptions<InstructorCancelSessionData, FirebaseError, InstructorCancelSessionVariables>): UseDataConnectMutationResult<InstructorCancelSessionData, InstructorCancelSessionVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminUpdateLecture(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateLectureData, FirebaseError, AdminUpdateLectureVariables>): UseDataConnectMutationResult<AdminUpdateLectureData, AdminUpdateLectureVariables>;
+useInstructorCancelSession(dc: DataConnect, options?: useDataConnectMutationOptions<InstructorCancelSessionData, FirebaseError, InstructorCancelSessionVariables>): UseDataConnectMutationResult<InstructorCancelSessionData, InstructorCancelSessionVariables>;
 ```
 
 ### Variables
-The `AdminUpdateLecture` Mutation requires an argument of type `AdminUpdateLectureVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `InstructorCancelSession` Mutation requires an argument of type `InstructorCancelSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminUpdateLectureVariables {
-  lectureId: UUIDString;
-  title?: string | null;
-  type?: LectureType | null;
-  videoUrl?: string | null;
-  content?: string | null;
-  duration?: number | null;
-  transcriptUrl?: string | null;
-  isFreePreview?: boolean | null;
+export interface InstructorCancelSessionVariables {
+  sessionId: UUIDString;
 }
 ```
 ### Return Type
-Recall that calling the `AdminUpdateLecture` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `InstructorCancelSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateLecture` Mutation is of type `AdminUpdateLectureData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `InstructorCancelSession` Mutation is of type `InstructorCancelSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminUpdateLectureData {
-  courseLecture_update?: CourseLecture_Key | null;
+export interface InstructorCancelSessionData {
+  session_updateMany: number;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminUpdateLecture`'s Mutation hook function
+### Using `InstructorCancelSession`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateLectureVariables } from '@dataconnect/generated';
-import { useAdminUpdateLecture } from '@dataconnect/generated/react'
+import { connectorConfig, InstructorCancelSessionVariables } from '@dataconnect/generated';
+import { useInstructorCancelSession } from '@dataconnect/generated/react'
 
-export default function AdminUpdateLectureComponent() {
+export default function InstructorCancelSessionComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateLecture();
+  const mutation = useInstructorCancelSession();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateLecture(dataConnect);
+  const mutation = useInstructorCancelSession(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminUpdateLecture(options);
+  const mutation = useInstructorCancelSession(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminUpdateLecture(dataConnect, options);
+  const mutation = useInstructorCancelSession(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateLecture` Mutation requires an argument of type `AdminUpdateLectureVariables`:
-  const adminUpdateLectureVars: AdminUpdateLectureVariables = {
-    lectureId: ..., 
-    title: ..., // optional
-    type: ..., // optional
-    videoUrl: ..., // optional
-    content: ..., // optional
-    duration: ..., // optional
-    transcriptUrl: ..., // optional
-    isFreePreview: ..., // optional
+  // The `useInstructorCancelSession` Mutation requires an argument of type `InstructorCancelSessionVariables`:
+  const instructorCancelSessionVars: InstructorCancelSessionVariables = {
+    sessionId: ..., 
   };
-  mutation.mutate(adminUpdateLectureVars);
+  mutation.mutate(instructorCancelSessionVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ lectureId: ..., title: ..., type: ..., videoUrl: ..., content: ..., duration: ..., transcriptUrl: ..., isFreePreview: ..., });
+  mutation.mutate({ sessionId: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminUpdateLectureVars, options);
+  mutation.mutate(instructorCancelSessionVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6548,88 +6601,88 @@ export default function AdminUpdateLectureComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_update);
+    console.log(mutation.data.session_updateMany);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminSoftDeleteLecture
-You can execute the `AdminSoftDeleteLecture` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## SuperAdminCancelSession
+You can execute the `SuperAdminCancelSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminSoftDeleteLecture(options?: useDataConnectMutationOptions<AdminSoftDeleteLectureData, FirebaseError, AdminSoftDeleteLectureVariables>): UseDataConnectMutationResult<AdminSoftDeleteLectureData, AdminSoftDeleteLectureVariables>;
+useSuperAdminCancelSession(options?: useDataConnectMutationOptions<SuperAdminCancelSessionData, FirebaseError, SuperAdminCancelSessionVariables>): UseDataConnectMutationResult<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminSoftDeleteLecture(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteLectureData, FirebaseError, AdminSoftDeleteLectureVariables>): UseDataConnectMutationResult<AdminSoftDeleteLectureData, AdminSoftDeleteLectureVariables>;
+useSuperAdminCancelSession(dc: DataConnect, options?: useDataConnectMutationOptions<SuperAdminCancelSessionData, FirebaseError, SuperAdminCancelSessionVariables>): UseDataConnectMutationResult<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
 ```
 
 ### Variables
-The `AdminSoftDeleteLecture` Mutation requires an argument of type `AdminSoftDeleteLectureVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `SuperAdminCancelSession` Mutation requires an argument of type `SuperAdminCancelSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminSoftDeleteLectureVariables {
-  lectureId: UUIDString;
+export interface SuperAdminCancelSessionVariables {
+  sessionId: UUIDString;
 }
 ```
 ### Return Type
-Recall that calling the `AdminSoftDeleteLecture` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `SuperAdminCancelSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteLecture` Mutation is of type `AdminSoftDeleteLectureData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SuperAdminCancelSession` Mutation is of type `SuperAdminCancelSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminSoftDeleteLectureData {
-  courseLecture_update?: CourseLecture_Key | null;
+export interface SuperAdminCancelSessionData {
+  session_update?: Session_Key | null;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminSoftDeleteLecture`'s Mutation hook function
+### Using `SuperAdminCancelSession`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminSoftDeleteLectureVariables } from '@dataconnect/generated';
-import { useAdminSoftDeleteLecture } from '@dataconnect/generated/react'
+import { connectorConfig, SuperAdminCancelSessionVariables } from '@dataconnect/generated';
+import { useSuperAdminCancelSession } from '@dataconnect/generated/react'
 
-export default function AdminSoftDeleteLectureComponent() {
+export default function SuperAdminCancelSessionComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminSoftDeleteLecture();
+  const mutation = useSuperAdminCancelSession();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminSoftDeleteLecture(dataConnect);
+  const mutation = useSuperAdminCancelSession(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteLecture(options);
+  const mutation = useSuperAdminCancelSession(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteLecture(dataConnect, options);
+  const mutation = useSuperAdminCancelSession(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminSoftDeleteLecture` Mutation requires an argument of type `AdminSoftDeleteLectureVariables`:
-  const adminSoftDeleteLectureVars: AdminSoftDeleteLectureVariables = {
-    lectureId: ..., 
+  // The `useSuperAdminCancelSession` Mutation requires an argument of type `SuperAdminCancelSessionVariables`:
+  const superAdminCancelSessionVars: SuperAdminCancelSessionVariables = {
+    sessionId: ..., 
   };
-  mutation.mutate(adminSoftDeleteLectureVars);
+  mutation.mutate(superAdminCancelSessionVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ lectureId: ..., });
+  mutation.mutate({ sessionId: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminSoftDeleteLectureVars, options);
+  mutation.mutate(superAdminCancelSessionVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6642,90 +6695,94 @@ export default function AdminSoftDeleteLectureComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_update);
+    console.log(mutation.data.session_update);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminUpdateLectureOrder
-You can execute the `AdminUpdateLectureOrder` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## AdminCreateSubscriptionTier
+You can execute the `AdminCreateSubscriptionTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminUpdateLectureOrder(options?: useDataConnectMutationOptions<AdminUpdateLectureOrderData, FirebaseError, AdminUpdateLectureOrderVariables>): UseDataConnectMutationResult<AdminUpdateLectureOrderData, AdminUpdateLectureOrderVariables>;
+useAdminCreateSubscriptionTier(options?: useDataConnectMutationOptions<AdminCreateSubscriptionTierData, FirebaseError, AdminCreateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminUpdateLectureOrder(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateLectureOrderData, FirebaseError, AdminUpdateLectureOrderVariables>): UseDataConnectMutationResult<AdminUpdateLectureOrderData, AdminUpdateLectureOrderVariables>;
+useAdminCreateSubscriptionTier(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSubscriptionTierData, FirebaseError, AdminCreateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
 ```
 
 ### Variables
-The `AdminUpdateLectureOrder` Mutation requires an argument of type `AdminUpdateLectureOrderVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `AdminCreateSubscriptionTier` Mutation requires an argument of type `AdminCreateSubscriptionTierVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminUpdateLectureOrderVariables {
-  lectureId: UUIDString;
-  order: number;
+export interface AdminCreateSubscriptionTierVariables {
+  name: string;
+  price: number;
+  billingCycle: BillingCycle;
+  features: string[];
 }
 ```
 ### Return Type
-Recall that calling the `AdminUpdateLectureOrder` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `AdminCreateSubscriptionTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateLectureOrder` Mutation is of type `AdminUpdateLectureOrderData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSubscriptionTier` Mutation is of type `AdminCreateSubscriptionTierData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminUpdateLectureOrderData {
-  courseLecture_update?: CourseLecture_Key | null;
+export interface AdminCreateSubscriptionTierData {
+  subscriptionTier_insert: SubscriptionTier_Key;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminUpdateLectureOrder`'s Mutation hook function
+### Using `AdminCreateSubscriptionTier`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpdateLectureOrderVariables } from '@dataconnect/generated';
-import { useAdminUpdateLectureOrder } from '@dataconnect/generated/react'
+import { connectorConfig, AdminCreateSubscriptionTierVariables } from '@dataconnect/generated';
+import { useAdminCreateSubscriptionTier } from '@dataconnect/generated/react'
 
-export default function AdminUpdateLectureOrderComponent() {
+export default function AdminCreateSubscriptionTierComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpdateLectureOrder();
+  const mutation = useAdminCreateSubscriptionTier();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpdateLectureOrder(dataConnect);
+  const mutation = useAdminCreateSubscriptionTier(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminUpdateLectureOrder(options);
+  const mutation = useAdminCreateSubscriptionTier(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminUpdateLectureOrder(dataConnect, options);
+  const mutation = useAdminCreateSubscriptionTier(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpdateLectureOrder` Mutation requires an argument of type `AdminUpdateLectureOrderVariables`:
-  const adminUpdateLectureOrderVars: AdminUpdateLectureOrderVariables = {
-    lectureId: ..., 
-    order: ..., 
+  // The `useAdminCreateSubscriptionTier` Mutation requires an argument of type `AdminCreateSubscriptionTierVariables`:
+  const adminCreateSubscriptionTierVars: AdminCreateSubscriptionTierVariables = {
+    name: ..., 
+    price: ..., 
+    billingCycle: ..., 
+    features: ..., 
   };
-  mutation.mutate(adminUpdateLectureOrderVars);
+  mutation.mutate(adminCreateSubscriptionTierVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ lectureId: ..., order: ..., });
+  mutation.mutate({ name: ..., price: ..., billingCycle: ..., features: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminUpdateLectureOrderVars, options);
+  mutation.mutate(adminCreateSubscriptionTierVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6738,92 +6795,88 @@ export default function AdminUpdateLectureOrderComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_update);
+    console.log(mutation.data.subscriptionTier_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminMoveLectureToSection
-You can execute the `AdminMoveLectureToSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## AdminDeprecateSubscriptionTier
+You can execute the `AdminDeprecateSubscriptionTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminMoveLectureToSection(options?: useDataConnectMutationOptions<AdminMoveLectureToSectionData, FirebaseError, AdminMoveLectureToSectionVariables>): UseDataConnectMutationResult<AdminMoveLectureToSectionData, AdminMoveLectureToSectionVariables>;
+useAdminDeprecateSubscriptionTier(options?: useDataConnectMutationOptions<AdminDeprecateSubscriptionTierData, FirebaseError, AdminDeprecateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminMoveLectureToSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminMoveLectureToSectionData, FirebaseError, AdminMoveLectureToSectionVariables>): UseDataConnectMutationResult<AdminMoveLectureToSectionData, AdminMoveLectureToSectionVariables>;
+useAdminDeprecateSubscriptionTier(dc: DataConnect, options?: useDataConnectMutationOptions<AdminDeprecateSubscriptionTierData, FirebaseError, AdminDeprecateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
 ```
 
 ### Variables
-The `AdminMoveLectureToSection` Mutation requires an argument of type `AdminMoveLectureToSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `AdminDeprecateSubscriptionTier` Mutation requires an argument of type `AdminDeprecateSubscriptionTierVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminMoveLectureToSectionVariables {
-  lectureId: UUIDString;
-  newSectionId: UUIDString;
-  order: number;
+export interface AdminDeprecateSubscriptionTierVariables {
+  tierId: UUIDString;
 }
 ```
 ### Return Type
-Recall that calling the `AdminMoveLectureToSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `AdminDeprecateSubscriptionTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminMoveLectureToSection` Mutation is of type `AdminMoveLectureToSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminDeprecateSubscriptionTier` Mutation is of type `AdminDeprecateSubscriptionTierData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminMoveLectureToSectionData {
-  courseLecture_update?: CourseLecture_Key | null;
+export interface AdminDeprecateSubscriptionTierData {
+  subscriptionTier_update?: SubscriptionTier_Key | null;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminMoveLectureToSection`'s Mutation hook function
+### Using `AdminDeprecateSubscriptionTier`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminMoveLectureToSectionVariables } from '@dataconnect/generated';
-import { useAdminMoveLectureToSection } from '@dataconnect/generated/react'
+import { connectorConfig, AdminDeprecateSubscriptionTierVariables } from '@dataconnect/generated';
+import { useAdminDeprecateSubscriptionTier } from '@dataconnect/generated/react'
 
-export default function AdminMoveLectureToSectionComponent() {
+export default function AdminDeprecateSubscriptionTierComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminMoveLectureToSection();
+  const mutation = useAdminDeprecateSubscriptionTier();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminMoveLectureToSection(dataConnect);
+  const mutation = useAdminDeprecateSubscriptionTier(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminMoveLectureToSection(options);
+  const mutation = useAdminDeprecateSubscriptionTier(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminMoveLectureToSection(dataConnect, options);
+  const mutation = useAdminDeprecateSubscriptionTier(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminMoveLectureToSection` Mutation requires an argument of type `AdminMoveLectureToSectionVariables`:
-  const adminMoveLectureToSectionVars: AdminMoveLectureToSectionVariables = {
-    lectureId: ..., 
-    newSectionId: ..., 
-    order: ..., 
+  // The `useAdminDeprecateSubscriptionTier` Mutation requires an argument of type `AdminDeprecateSubscriptionTierVariables`:
+  const adminDeprecateSubscriptionTierVars: AdminDeprecateSubscriptionTierVariables = {
+    tierId: ..., 
   };
-  mutation.mutate(adminMoveLectureToSectionVars);
+  mutation.mutate(adminDeprecateSubscriptionTierVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ lectureId: ..., newSectionId: ..., order: ..., });
+  mutation.mutate({ tierId: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminMoveLectureToSectionVars, options);
+  mutation.mutate(adminDeprecateSubscriptionTierVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6836,88 +6889,90 @@ export default function AdminMoveLectureToSectionComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_update);
+    console.log(mutation.data.subscriptionTier_update);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
 
-## AdminSoftDeleteLecturesBySection
-You can execute the `AdminSoftDeleteLecturesBySection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+## AdminCreateCategory
+You can execute the `AdminCreateCategory` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
-useAdminSoftDeleteLecturesBySection(options?: useDataConnectMutationOptions<AdminSoftDeleteLecturesBySectionData, FirebaseError, AdminSoftDeleteLecturesBySectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
+useAdminCreateCategory(options?: useDataConnectMutationOptions<AdminCreateCategoryData, FirebaseError, AdminCreateCategoryVariables>): UseDataConnectMutationResult<AdminCreateCategoryData, AdminCreateCategoryVariables>;
 ```
 You can also pass in a `DataConnect` instance to the Mutation hook function.
 ```javascript
-useAdminSoftDeleteLecturesBySection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteLecturesBySectionData, FirebaseError, AdminSoftDeleteLecturesBySectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
+useAdminCreateCategory(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateCategoryData, FirebaseError, AdminCreateCategoryVariables>): UseDataConnectMutationResult<AdminCreateCategoryData, AdminCreateCategoryVariables>;
 ```
 
 ### Variables
-The `AdminSoftDeleteLecturesBySection` Mutation requires an argument of type `AdminSoftDeleteLecturesBySectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+The `AdminCreateCategory` Mutation requires an argument of type `AdminCreateCategoryVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 
 ```javascript
-export interface AdminSoftDeleteLecturesBySectionVariables {
-  sectionId: UUIDString;
+export interface AdminCreateCategoryVariables {
+  name: string;
+  description?: string | null;
 }
 ```
 ### Return Type
-Recall that calling the `AdminSoftDeleteLecturesBySection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+Recall that calling the `AdminCreateCategory` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
 
 To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
 
 To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
 
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteLecturesBySection` Mutation is of type `AdminSoftDeleteLecturesBySectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateCategory` Mutation is of type `AdminCreateCategoryData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
-export interface AdminSoftDeleteLecturesBySectionData {
-  courseLecture_updateMany: number;
+export interface AdminCreateCategoryData {
+  category_insert: Category_Key;
 }
 ```
 
 To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
 
-### Using `AdminSoftDeleteLecturesBySection`'s Mutation hook function
+### Using `AdminCreateCategory`'s Mutation hook function
 
 ```javascript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminSoftDeleteLecturesBySectionVariables } from '@dataconnect/generated';
-import { useAdminSoftDeleteLecturesBySection } from '@dataconnect/generated/react'
+import { connectorConfig, AdminCreateCategoryVariables } from '@dataconnect/generated';
+import { useAdminCreateCategory } from '@dataconnect/generated/react'
 
-export default function AdminSoftDeleteLecturesBySectionComponent() {
+export default function AdminCreateCategoryComponent() {
   // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminSoftDeleteLecturesBySection();
+  const mutation = useAdminCreateCategory();
 
   // You can also pass in a `DataConnect` instance to the Mutation hook function.
   const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminSoftDeleteLecturesBySection(dataConnect);
+  const mutation = useAdminCreateCategory(dataConnect);
 
   // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteLecturesBySection(options);
+  const mutation = useAdminCreateCategory(options);
 
   // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
   const dataConnect = getDataConnect(connectorConfig);
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  const mutation = useAdminSoftDeleteLecturesBySection(dataConnect, options);
+  const mutation = useAdminCreateCategory(dataConnect, options);
 
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminSoftDeleteLecturesBySection` Mutation requires an argument of type `AdminSoftDeleteLecturesBySectionVariables`:
-  const adminSoftDeleteLecturesBySectionVars: AdminSoftDeleteLecturesBySectionVariables = {
-    sectionId: ..., 
+  // The `useAdminCreateCategory` Mutation requires an argument of type `AdminCreateCategoryVariables`:
+  const adminCreateCategoryVars: AdminCreateCategoryVariables = {
+    name: ..., 
+    description: ..., // optional
   };
-  mutation.mutate(adminSoftDeleteLecturesBySectionVars);
+  mutation.mutate(adminCreateCategoryVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ sectionId: ..., });
+  mutation.mutate({ name: ..., description: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(adminSoftDeleteLecturesBySectionVars, options);
+  mutation.mutate(adminCreateCategoryVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -6930,7 +6985,703 @@ export default function AdminSoftDeleteLecturesBySectionComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.courseLecture_updateMany);
+    console.log(mutation.data.category_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## LogPayment
+You can execute the `LogPayment` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useLogPayment(options?: useDataConnectMutationOptions<LogPaymentData, FirebaseError, LogPaymentVariables>): UseDataConnectMutationResult<LogPaymentData, LogPaymentVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useLogPayment(dc: DataConnect, options?: useDataConnectMutationOptions<LogPaymentData, FirebaseError, LogPaymentVariables>): UseDataConnectMutationResult<LogPaymentData, LogPaymentVariables>;
+```
+
+### Variables
+The `LogPayment` Mutation requires an argument of type `LogPaymentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface LogPaymentVariables {
+  gateway: PaymentGateway;
+  referenceId: string;
+  amount: number;
+  currency?: string | null;
+  customerEmailSnapshot: string;
+}
+```
+### Return Type
+Recall that calling the `LogPayment` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `LogPayment` Mutation is of type `LogPaymentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface LogPaymentData {
+  payment_insert: Payment_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `LogPayment`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, LogPaymentVariables } from '@dataconnect/generated';
+import { useLogPayment } from '@dataconnect/generated/react'
+
+export default function LogPaymentComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useLogPayment();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useLogPayment(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useLogPayment(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useLogPayment(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useLogPayment` Mutation requires an argument of type `LogPaymentVariables`:
+  const logPaymentVars: LogPaymentVariables = {
+    gateway: ..., 
+    referenceId: ..., 
+    amount: ..., 
+    currency: ..., // optional
+    customerEmailSnapshot: ..., 
+  };
+  mutation.mutate(logPaymentVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ gateway: ..., referenceId: ..., amount: ..., currency: ..., customerEmailSnapshot: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(logPaymentVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.payment_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AddPaymentItem
+You can execute the `AddPaymentItem` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAddPaymentItem(options?: useDataConnectMutationOptions<AddPaymentItemData, FirebaseError, AddPaymentItemVariables>): UseDataConnectMutationResult<AddPaymentItemData, AddPaymentItemVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAddPaymentItem(dc: DataConnect, options?: useDataConnectMutationOptions<AddPaymentItemData, FirebaseError, AddPaymentItemVariables>): UseDataConnectMutationResult<AddPaymentItemData, AddPaymentItemVariables>;
+```
+
+### Variables
+The `AddPaymentItem` Mutation requires an argument of type `AddPaymentItemVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AddPaymentItemVariables {
+  paymentId: UUIDString;
+  targetType: PaymentItemTarget;
+  courseId?: UUIDString | null;
+  missionId?: UUIDString | null;
+  subscriptionTierId?: UUIDString | null;
+  price: number;
+}
+```
+### Return Type
+Recall that calling the `AddPaymentItem` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AddPaymentItem` Mutation is of type `AddPaymentItemData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AddPaymentItemData {
+  paymentItem_insert: PaymentItem_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AddPaymentItem`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AddPaymentItemVariables } from '@dataconnect/generated';
+import { useAddPaymentItem } from '@dataconnect/generated/react'
+
+export default function AddPaymentItemComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAddPaymentItem();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAddPaymentItem(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddPaymentItem(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAddPaymentItem(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAddPaymentItem` Mutation requires an argument of type `AddPaymentItemVariables`:
+  const addPaymentItemVars: AddPaymentItemVariables = {
+    paymentId: ..., 
+    targetType: ..., 
+    courseId: ..., // optional
+    missionId: ..., // optional
+    subscriptionTierId: ..., // optional
+    price: ..., 
+  };
+  mutation.mutate(addPaymentItemVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ paymentId: ..., targetType: ..., courseId: ..., missionId: ..., subscriptionTierId: ..., price: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(addPaymentItemVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.paymentItem_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateDefaultUserAndProfileFn
+You can execute the `CreateDefaultUserAndProfileFn` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateDefaultUserAndProfileFn(options?: useDataConnectMutationOptions<CreateDefaultUserAndProfileFnData, FirebaseError, CreateDefaultUserAndProfileFnVariables>): UseDataConnectMutationResult<CreateDefaultUserAndProfileFnData, CreateDefaultUserAndProfileFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateDefaultUserAndProfileFn(dc: DataConnect, options?: useDataConnectMutationOptions<CreateDefaultUserAndProfileFnData, FirebaseError, CreateDefaultUserAndProfileFnVariables>): UseDataConnectMutationResult<CreateDefaultUserAndProfileFnData, CreateDefaultUserAndProfileFnVariables>;
+```
+
+### Variables
+The `CreateDefaultUserAndProfileFn` Mutation requires an argument of type `CreateDefaultUserAndProfileFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateDefaultUserAndProfileFnVariables {
+  uid: string;
+  email: string;
+  name: string;
+}
+```
+### Return Type
+Recall that calling the `CreateDefaultUserAndProfileFn` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateDefaultUserAndProfileFn` Mutation is of type `CreateDefaultUserAndProfileFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateDefaultUserAndProfileFnData {
+  user_insert: User_Key;
+  profile_insert: Profile_Key;
+  userRole_insert: UserRole_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateDefaultUserAndProfileFn`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateDefaultUserAndProfileFnVariables } from '@dataconnect/generated';
+import { useCreateDefaultUserAndProfileFn } from '@dataconnect/generated/react'
+
+export default function CreateDefaultUserAndProfileFnComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateDefaultUserAndProfileFn();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateDefaultUserAndProfileFn(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateDefaultUserAndProfileFn(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateDefaultUserAndProfileFn(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateDefaultUserAndProfileFn` Mutation requires an argument of type `CreateDefaultUserAndProfileFnVariables`:
+  const createDefaultUserAndProfileFnVars: CreateDefaultUserAndProfileFnVariables = {
+    uid: ..., 
+    email: ..., 
+    name: ..., 
+  };
+  mutation.mutate(createDefaultUserAndProfileFnVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ uid: ..., email: ..., name: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createDefaultUserAndProfileFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_insert);
+    console.log(mutation.data.profile_insert);
+    console.log(mutation.data.userRole_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DeleteUserRecordFn
+You can execute the `DeleteUserRecordFn` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useDeleteUserRecordFn(options?: useDataConnectMutationOptions<DeleteUserRecordFnData, FirebaseError, DeleteUserRecordFnVariables>): UseDataConnectMutationResult<DeleteUserRecordFnData, DeleteUserRecordFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDeleteUserRecordFn(dc: DataConnect, options?: useDataConnectMutationOptions<DeleteUserRecordFnData, FirebaseError, DeleteUserRecordFnVariables>): UseDataConnectMutationResult<DeleteUserRecordFnData, DeleteUserRecordFnVariables>;
+```
+
+### Variables
+The `DeleteUserRecordFn` Mutation requires an argument of type `DeleteUserRecordFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DeleteUserRecordFnVariables {
+  uid: string;
+}
+```
+### Return Type
+Recall that calling the `DeleteUserRecordFn` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DeleteUserRecordFn` Mutation is of type `DeleteUserRecordFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DeleteUserRecordFnData {
+  user_delete?: User_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DeleteUserRecordFn`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DeleteUserRecordFnVariables } from '@dataconnect/generated';
+import { useDeleteUserRecordFn } from '@dataconnect/generated/react'
+
+export default function DeleteUserRecordFnComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDeleteUserRecordFn();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDeleteUserRecordFn(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteUserRecordFn(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteUserRecordFn(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDeleteUserRecordFn` Mutation requires an argument of type `DeleteUserRecordFnVariables`:
+  const deleteUserRecordFnVars: DeleteUserRecordFnVariables = {
+    uid: ..., 
+  };
+  mutation.mutate(deleteUserRecordFnVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ uid: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(deleteUserRecordFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_delete);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateDefaultUserFn
+You can execute the `CreateDefaultUserFn` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateDefaultUserFn(options?: useDataConnectMutationOptions<CreateDefaultUserFnData, FirebaseError, CreateDefaultUserFnVariables>): UseDataConnectMutationResult<CreateDefaultUserFnData, CreateDefaultUserFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateDefaultUserFn(dc: DataConnect, options?: useDataConnectMutationOptions<CreateDefaultUserFnData, FirebaseError, CreateDefaultUserFnVariables>): UseDataConnectMutationResult<CreateDefaultUserFnData, CreateDefaultUserFnVariables>;
+```
+
+### Variables
+The `CreateDefaultUserFn` Mutation requires an argument of type `CreateDefaultUserFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateDefaultUserFnVariables {
+  uid: string;
+  email: string;
+  name: string;
+  nid: string;
+}
+```
+### Return Type
+Recall that calling the `CreateDefaultUserFn` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateDefaultUserFn` Mutation is of type `CreateDefaultUserFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateDefaultUserFnData {
+  user_insert: User_Key;
+  userRole_insert: UserRole_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateDefaultUserFn`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateDefaultUserFnVariables } from '@dataconnect/generated';
+import { useCreateDefaultUserFn } from '@dataconnect/generated/react'
+
+export default function CreateDefaultUserFnComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateDefaultUserFn();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateDefaultUserFn(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateDefaultUserFn(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateDefaultUserFn(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateDefaultUserFn` Mutation requires an argument of type `CreateDefaultUserFnVariables`:
+  const createDefaultUserFnVars: CreateDefaultUserFnVariables = {
+    uid: ..., 
+    email: ..., 
+    name: ..., 
+    nid: ..., 
+  };
+  mutation.mutate(createDefaultUserFnVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ uid: ..., email: ..., name: ..., nid: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createDefaultUserFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_insert);
+    console.log(mutation.data.userRole_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RemoveRoleFn
+You can execute the `RemoveRoleFn` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useRemoveRoleFn(options?: useDataConnectMutationOptions<RemoveRoleFnData, FirebaseError, RemoveRoleFnVariables>): UseDataConnectMutationResult<RemoveRoleFnData, RemoveRoleFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRemoveRoleFn(dc: DataConnect, options?: useDataConnectMutationOptions<RemoveRoleFnData, FirebaseError, RemoveRoleFnVariables>): UseDataConnectMutationResult<RemoveRoleFnData, RemoveRoleFnVariables>;
+```
+
+### Variables
+The `RemoveRoleFn` Mutation requires an argument of type `RemoveRoleFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RemoveRoleFnVariables {
+  uid: string;
+  roleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `RemoveRoleFn` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RemoveRoleFn` Mutation is of type `RemoveRoleFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RemoveRoleFnData {
+  userRole_delete?: UserRole_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RemoveRoleFn`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RemoveRoleFnVariables } from '@dataconnect/generated';
+import { useRemoveRoleFn } from '@dataconnect/generated/react'
+
+export default function RemoveRoleFnComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRemoveRoleFn();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRemoveRoleFn(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRemoveRoleFn(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRemoveRoleFn(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRemoveRoleFn` Mutation requires an argument of type `RemoveRoleFnVariables`:
+  const removeRoleFnVars: RemoveRoleFnVariables = {
+    uid: ..., 
+    roleId: ..., 
+  };
+  mutation.mutate(removeRoleFnVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ uid: ..., roleId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(removeRoleFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.userRole_delete);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AssignNewRoleFn
+You can execute the `AssignNewRoleFn` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAssignNewRoleFn(options?: useDataConnectMutationOptions<AssignNewRoleFnData, FirebaseError, AssignNewRoleFnVariables>): UseDataConnectMutationResult<AssignNewRoleFnData, AssignNewRoleFnVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAssignNewRoleFn(dc: DataConnect, options?: useDataConnectMutationOptions<AssignNewRoleFnData, FirebaseError, AssignNewRoleFnVariables>): UseDataConnectMutationResult<AssignNewRoleFnData, AssignNewRoleFnVariables>;
+```
+
+### Variables
+The `AssignNewRoleFn` Mutation requires an argument of type `AssignNewRoleFnVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AssignNewRoleFnVariables {
+  uid: string;
+  roleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AssignNewRoleFn` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AssignNewRoleFn` Mutation is of type `AssignNewRoleFnData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AssignNewRoleFnData {
+  userRole_insert: UserRole_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AssignNewRoleFn`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AssignNewRoleFnVariables } from '@dataconnect/generated';
+import { useAssignNewRoleFn } from '@dataconnect/generated/react'
+
+export default function AssignNewRoleFnComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAssignNewRoleFn();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAssignNewRoleFn(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAssignNewRoleFn(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAssignNewRoleFn(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAssignNewRoleFn` Mutation requires an argument of type `AssignNewRoleFnVariables`:
+  const assignNewRoleFnVars: AssignNewRoleFnVariables = {
+    uid: ..., 
+    roleId: ..., 
+  };
+  mutation.mutate(assignNewRoleFnVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ uid: ..., roleId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(assignNewRoleFnVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.userRole_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -7123,496 +7874,6 @@ export default function AdminRemoveCourseInstructorComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.courseInstructor_delete);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## EnrollInCourse
-You can execute the `EnrollInCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useEnrollInCourse(options?: useDataConnectMutationOptions<EnrollInCourseData, FirebaseError, EnrollInCourseVariables>): UseDataConnectMutationResult<EnrollInCourseData, EnrollInCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useEnrollInCourse(dc: DataConnect, options?: useDataConnectMutationOptions<EnrollInCourseData, FirebaseError, EnrollInCourseVariables>): UseDataConnectMutationResult<EnrollInCourseData, EnrollInCourseVariables>;
-```
-
-### Variables
-The `EnrollInCourse` Mutation requires an argument of type `EnrollInCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface EnrollInCourseVariables {
-  courseId: UUIDString;
-  userId: string;
-}
-```
-### Return Type
-Recall that calling the `EnrollInCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `EnrollInCourse` Mutation is of type `EnrollInCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface EnrollInCourseData {
-  enrollment_insert: Enrollment_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `EnrollInCourse`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, EnrollInCourseVariables } from '@dataconnect/generated';
-import { useEnrollInCourse } from '@dataconnect/generated/react'
-
-export default function EnrollInCourseComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useEnrollInCourse();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useEnrollInCourse(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useEnrollInCourse(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useEnrollInCourse(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useEnrollInCourse` Mutation requires an argument of type `EnrollInCourseVariables`:
-  const enrollInCourseVars: EnrollInCourseVariables = {
-    courseId: ..., 
-    userId: ..., 
-  };
-  mutation.mutate(enrollInCourseVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., userId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(enrollInCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.enrollment_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## EnrollInMission
-You can execute the `EnrollInMission` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useEnrollInMission(options?: useDataConnectMutationOptions<EnrollInMissionData, FirebaseError, EnrollInMissionVariables>): UseDataConnectMutationResult<EnrollInMissionData, EnrollInMissionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useEnrollInMission(dc: DataConnect, options?: useDataConnectMutationOptions<EnrollInMissionData, FirebaseError, EnrollInMissionVariables>): UseDataConnectMutationResult<EnrollInMissionData, EnrollInMissionVariables>;
-```
-
-### Variables
-The `EnrollInMission` Mutation requires an argument of type `EnrollInMissionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface EnrollInMissionVariables {
-  missionId: UUIDString;
-  userId: string;
-}
-```
-### Return Type
-Recall that calling the `EnrollInMission` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `EnrollInMission` Mutation is of type `EnrollInMissionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface EnrollInMissionData {
-  enrollment_insert: Enrollment_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `EnrollInMission`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, EnrollInMissionVariables } from '@dataconnect/generated';
-import { useEnrollInMission } from '@dataconnect/generated/react'
-
-export default function EnrollInMissionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useEnrollInMission();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useEnrollInMission(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useEnrollInMission(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useEnrollInMission(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useEnrollInMission` Mutation requires an argument of type `EnrollInMissionVariables`:
-  const enrollInMissionVars: EnrollInMissionVariables = {
-    missionId: ..., 
-    userId: ..., 
-  };
-  mutation.mutate(enrollInMissionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ missionId: ..., userId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(enrollInMissionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.enrollment_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## UpdateLectureProgress
-You can execute the `UpdateLectureProgress` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useUpdateLectureProgress(options?: useDataConnectMutationOptions<UpdateLectureProgressData, FirebaseError, UpdateLectureProgressVariables>): UseDataConnectMutationResult<UpdateLectureProgressData, UpdateLectureProgressVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useUpdateLectureProgress(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateLectureProgressData, FirebaseError, UpdateLectureProgressVariables>): UseDataConnectMutationResult<UpdateLectureProgressData, UpdateLectureProgressVariables>;
-```
-
-### Variables
-The `UpdateLectureProgress` Mutation requires an argument of type `UpdateLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface UpdateLectureProgressVariables {
-  lectureId: UUIDString;
-  lastWatchedSecond: number;
-  completedAt?: TimestampString | null;
-  userId: string;
-}
-```
-### Return Type
-Recall that calling the `UpdateLectureProgress` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateLectureProgress` Mutation is of type `UpdateLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface UpdateLectureProgressData {
-  lectureProgress_upsert: LectureProgress_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `UpdateLectureProgress`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, UpdateLectureProgressVariables } from '@dataconnect/generated';
-import { useUpdateLectureProgress } from '@dataconnect/generated/react'
-
-export default function UpdateLectureProgressComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useUpdateLectureProgress();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useUpdateLectureProgress(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useUpdateLectureProgress(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useUpdateLectureProgress(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useUpdateLectureProgress` Mutation requires an argument of type `UpdateLectureProgressVariables`:
-  const updateLectureProgressVars: UpdateLectureProgressVariables = {
-    lectureId: ..., 
-    lastWatchedSecond: ..., 
-    completedAt: ..., // optional
-    userId: ..., 
-  };
-  mutation.mutate(updateLectureProgressVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ lectureId: ..., lastWatchedSecond: ..., completedAt: ..., userId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(updateLectureProgressVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.lectureProgress_upsert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminUpsertLectureProgress
-You can execute the `AdminUpsertLectureProgress` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminUpsertLectureProgress(options?: useDataConnectMutationOptions<AdminUpsertLectureProgressData, FirebaseError, AdminUpsertLectureProgressVariables>): UseDataConnectMutationResult<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminUpsertLectureProgress(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpsertLectureProgressData, FirebaseError, AdminUpsertLectureProgressVariables>): UseDataConnectMutationResult<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
-```
-
-### Variables
-The `AdminUpsertLectureProgress` Mutation requires an argument of type `AdminUpsertLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminUpsertLectureProgressVariables {
-  userId: string;
-  lectureId: UUIDString;
-  lastWatchedSecond: number;
-  completedAt?: TimestampString | null;
-}
-```
-### Return Type
-Recall that calling the `AdminUpsertLectureProgress` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpsertLectureProgress` Mutation is of type `AdminUpsertLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminUpsertLectureProgressData {
-  lectureProgress_upsert: LectureProgress_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminUpsertLectureProgress`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminUpsertLectureProgressVariables } from '@dataconnect/generated';
-import { useAdminUpsertLectureProgress } from '@dataconnect/generated/react'
-
-export default function AdminUpsertLectureProgressComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminUpsertLectureProgress();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminUpsertLectureProgress(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpsertLectureProgress(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminUpsertLectureProgress(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminUpsertLectureProgress` Mutation requires an argument of type `AdminUpsertLectureProgressVariables`:
-  const adminUpsertLectureProgressVars: AdminUpsertLectureProgressVariables = {
-    userId: ..., 
-    lectureId: ..., 
-    lastWatchedSecond: ..., 
-    completedAt: ..., // optional
-  };
-  mutation.mutate(adminUpsertLectureProgressVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ userId: ..., lectureId: ..., lastWatchedSecond: ..., completedAt: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminUpsertLectureProgressVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.lectureProgress_upsert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## UpdateEnrollmentStatus
-You can execute the `UpdateEnrollmentStatus` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useUpdateEnrollmentStatus(options?: useDataConnectMutationOptions<UpdateEnrollmentStatusData, FirebaseError, UpdateEnrollmentStatusVariables>): UseDataConnectMutationResult<UpdateEnrollmentStatusData, UpdateEnrollmentStatusVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useUpdateEnrollmentStatus(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateEnrollmentStatusData, FirebaseError, UpdateEnrollmentStatusVariables>): UseDataConnectMutationResult<UpdateEnrollmentStatusData, UpdateEnrollmentStatusVariables>;
-```
-
-### Variables
-The `UpdateEnrollmentStatus` Mutation requires an argument of type `UpdateEnrollmentStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface UpdateEnrollmentStatusVariables {
-  enrollmentId: UUIDString;
-  status: EnrollmentStatus;
-  completedAt?: TimestampString | null;
-}
-```
-### Return Type
-Recall that calling the `UpdateEnrollmentStatus` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateEnrollmentStatus` Mutation is of type `UpdateEnrollmentStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface UpdateEnrollmentStatusData {
-  enrollment_updateMany: number;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `UpdateEnrollmentStatus`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, UpdateEnrollmentStatusVariables } from '@dataconnect/generated';
-import { useUpdateEnrollmentStatus } from '@dataconnect/generated/react'
-
-export default function UpdateEnrollmentStatusComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useUpdateEnrollmentStatus();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useUpdateEnrollmentStatus(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useUpdateEnrollmentStatus(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useUpdateEnrollmentStatus(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useUpdateEnrollmentStatus` Mutation requires an argument of type `UpdateEnrollmentStatusVariables`:
-  const updateEnrollmentStatusVars: UpdateEnrollmentStatusVariables = {
-    enrollmentId: ..., 
-    status: ..., 
-    completedAt: ..., // optional
-  };
-  mutation.mutate(updateEnrollmentStatusVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ enrollmentId: ..., status: ..., completedAt: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(updateEnrollmentStatusVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.enrollment_updateMany);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -9208,984 +9469,6 @@ export default function AdminUpdateRubricCriterionOrderComponent() {
 }
 ```
 
-## InstructorDeleteCourse
-You can execute the `InstructorDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useInstructorDeleteCourse(options?: useDataConnectMutationOptions<InstructorDeleteCourseData, FirebaseError, InstructorDeleteCourseVariables>): UseDataConnectMutationResult<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useInstructorDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<InstructorDeleteCourseData, FirebaseError, InstructorDeleteCourseVariables>): UseDataConnectMutationResult<InstructorDeleteCourseData, InstructorDeleteCourseVariables>;
-```
-
-### Variables
-The `InstructorDeleteCourse` Mutation requires an argument of type `InstructorDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface InstructorDeleteCourseVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `InstructorDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `InstructorDeleteCourse` Mutation is of type `InstructorDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface InstructorDeleteCourseData {
-  course_updateMany: number;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `InstructorDeleteCourse`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, InstructorDeleteCourseVariables } from '@dataconnect/generated';
-import { useInstructorDeleteCourse } from '@dataconnect/generated/react'
-
-export default function InstructorDeleteCourseComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useInstructorDeleteCourse();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useInstructorDeleteCourse(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useInstructorDeleteCourse(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useInstructorDeleteCourse(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useInstructorDeleteCourse` Mutation requires an argument of type `InstructorDeleteCourseVariables`:
-  const instructorDeleteCourseVars: InstructorDeleteCourseVariables = {
-    courseId: ..., 
-  };
-  mutation.mutate(instructorDeleteCourseVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(instructorDeleteCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.course_updateMany);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## SuperAdminDeleteCourse
-You can execute the `SuperAdminDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useSuperAdminDeleteCourse(options?: useDataConnectMutationOptions<SuperAdminDeleteCourseData, FirebaseError, SuperAdminDeleteCourseVariables>): UseDataConnectMutationResult<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useSuperAdminDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<SuperAdminDeleteCourseData, FirebaseError, SuperAdminDeleteCourseVariables>): UseDataConnectMutationResult<SuperAdminDeleteCourseData, SuperAdminDeleteCourseVariables>;
-```
-
-### Variables
-The `SuperAdminDeleteCourse` Mutation requires an argument of type `SuperAdminDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface SuperAdminDeleteCourseVariables {
-  courseId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `SuperAdminDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SuperAdminDeleteCourse` Mutation is of type `SuperAdminDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface SuperAdminDeleteCourseData {
-  course_update?: Course_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `SuperAdminDeleteCourse`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, SuperAdminDeleteCourseVariables } from '@dataconnect/generated';
-import { useSuperAdminDeleteCourse } from '@dataconnect/generated/react'
-
-export default function SuperAdminDeleteCourseComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useSuperAdminDeleteCourse();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useSuperAdminDeleteCourse(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useSuperAdminDeleteCourse(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useSuperAdminDeleteCourse(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useSuperAdminDeleteCourse` Mutation requires an argument of type `SuperAdminDeleteCourseVariables`:
-  const superAdminDeleteCourseVars: SuperAdminDeleteCourseVariables = {
-    courseId: ..., 
-  };
-  mutation.mutate(superAdminDeleteCourseVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(superAdminDeleteCourseVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.course_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminCreateSession
-You can execute the `AdminCreateSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminCreateSession(options?: useDataConnectMutationOptions<AdminCreateSessionData, FirebaseError, AdminCreateSessionVariables>): UseDataConnectMutationResult<AdminCreateSessionData, AdminCreateSessionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminCreateSession(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSessionData, FirebaseError, AdminCreateSessionVariables>): UseDataConnectMutationResult<AdminCreateSessionData, AdminCreateSessionVariables>;
-```
-
-### Variables
-The `AdminCreateSession` Mutation requires an argument of type `AdminCreateSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminCreateSessionVariables {
-  courseId: UUIDString;
-  title: string;
-  capacity?: number | null;
-  startTime: TimestampString;
-  endTime: TimestampString;
-  type: SessionType;
-  locationOrUrl: string;
-}
-```
-### Return Type
-Recall that calling the `AdminCreateSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSession` Mutation is of type `AdminCreateSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminCreateSessionData {
-  session_insert: Session_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminCreateSession`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateSessionVariables } from '@dataconnect/generated';
-import { useAdminCreateSession } from '@dataconnect/generated/react'
-
-export default function AdminCreateSessionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateSession();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateSession(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateSession(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateSession(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateSession` Mutation requires an argument of type `AdminCreateSessionVariables`:
-  const adminCreateSessionVars: AdminCreateSessionVariables = {
-    courseId: ..., 
-    title: ..., 
-    capacity: ..., // optional
-    startTime: ..., 
-    endTime: ..., 
-    type: ..., 
-    locationOrUrl: ..., 
-  };
-  mutation.mutate(adminCreateSessionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ courseId: ..., title: ..., capacity: ..., startTime: ..., endTime: ..., type: ..., locationOrUrl: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminCreateSessionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.session_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## InstructorCancelSession
-You can execute the `InstructorCancelSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useInstructorCancelSession(options?: useDataConnectMutationOptions<InstructorCancelSessionData, FirebaseError, InstructorCancelSessionVariables>): UseDataConnectMutationResult<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useInstructorCancelSession(dc: DataConnect, options?: useDataConnectMutationOptions<InstructorCancelSessionData, FirebaseError, InstructorCancelSessionVariables>): UseDataConnectMutationResult<InstructorCancelSessionData, InstructorCancelSessionVariables>;
-```
-
-### Variables
-The `InstructorCancelSession` Mutation requires an argument of type `InstructorCancelSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface InstructorCancelSessionVariables {
-  sessionId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `InstructorCancelSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `InstructorCancelSession` Mutation is of type `InstructorCancelSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface InstructorCancelSessionData {
-  session_updateMany: number;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `InstructorCancelSession`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, InstructorCancelSessionVariables } from '@dataconnect/generated';
-import { useInstructorCancelSession } from '@dataconnect/generated/react'
-
-export default function InstructorCancelSessionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useInstructorCancelSession();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useInstructorCancelSession(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useInstructorCancelSession(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useInstructorCancelSession(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useInstructorCancelSession` Mutation requires an argument of type `InstructorCancelSessionVariables`:
-  const instructorCancelSessionVars: InstructorCancelSessionVariables = {
-    sessionId: ..., 
-  };
-  mutation.mutate(instructorCancelSessionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ sessionId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(instructorCancelSessionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.session_updateMany);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## SuperAdminCancelSession
-You can execute the `SuperAdminCancelSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useSuperAdminCancelSession(options?: useDataConnectMutationOptions<SuperAdminCancelSessionData, FirebaseError, SuperAdminCancelSessionVariables>): UseDataConnectMutationResult<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useSuperAdminCancelSession(dc: DataConnect, options?: useDataConnectMutationOptions<SuperAdminCancelSessionData, FirebaseError, SuperAdminCancelSessionVariables>): UseDataConnectMutationResult<SuperAdminCancelSessionData, SuperAdminCancelSessionVariables>;
-```
-
-### Variables
-The `SuperAdminCancelSession` Mutation requires an argument of type `SuperAdminCancelSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface SuperAdminCancelSessionVariables {
-  sessionId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `SuperAdminCancelSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SuperAdminCancelSession` Mutation is of type `SuperAdminCancelSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface SuperAdminCancelSessionData {
-  session_update?: Session_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `SuperAdminCancelSession`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, SuperAdminCancelSessionVariables } from '@dataconnect/generated';
-import { useSuperAdminCancelSession } from '@dataconnect/generated/react'
-
-export default function SuperAdminCancelSessionComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useSuperAdminCancelSession();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useSuperAdminCancelSession(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useSuperAdminCancelSession(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useSuperAdminCancelSession(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useSuperAdminCancelSession` Mutation requires an argument of type `SuperAdminCancelSessionVariables`:
-  const superAdminCancelSessionVars: SuperAdminCancelSessionVariables = {
-    sessionId: ..., 
-  };
-  mutation.mutate(superAdminCancelSessionVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ sessionId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(superAdminCancelSessionVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.session_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminCreateSubscriptionTier
-You can execute the `AdminCreateSubscriptionTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminCreateSubscriptionTier(options?: useDataConnectMutationOptions<AdminCreateSubscriptionTierData, FirebaseError, AdminCreateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminCreateSubscriptionTier(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSubscriptionTierData, FirebaseError, AdminCreateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminCreateSubscriptionTierData, AdminCreateSubscriptionTierVariables>;
-```
-
-### Variables
-The `AdminCreateSubscriptionTier` Mutation requires an argument of type `AdminCreateSubscriptionTierVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminCreateSubscriptionTierVariables {
-  name: string;
-  price: number;
-  billingCycle: BillingCycle;
-  features: string[];
-}
-```
-### Return Type
-Recall that calling the `AdminCreateSubscriptionTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSubscriptionTier` Mutation is of type `AdminCreateSubscriptionTierData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminCreateSubscriptionTierData {
-  subscriptionTier_insert: SubscriptionTier_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminCreateSubscriptionTier`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateSubscriptionTierVariables } from '@dataconnect/generated';
-import { useAdminCreateSubscriptionTier } from '@dataconnect/generated/react'
-
-export default function AdminCreateSubscriptionTierComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateSubscriptionTier();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateSubscriptionTier(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateSubscriptionTier(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateSubscriptionTier(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateSubscriptionTier` Mutation requires an argument of type `AdminCreateSubscriptionTierVariables`:
-  const adminCreateSubscriptionTierVars: AdminCreateSubscriptionTierVariables = {
-    name: ..., 
-    price: ..., 
-    billingCycle: ..., 
-    features: ..., 
-  };
-  mutation.mutate(adminCreateSubscriptionTierVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ name: ..., price: ..., billingCycle: ..., features: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminCreateSubscriptionTierVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.subscriptionTier_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminDeprecateSubscriptionTier
-You can execute the `AdminDeprecateSubscriptionTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminDeprecateSubscriptionTier(options?: useDataConnectMutationOptions<AdminDeprecateSubscriptionTierData, FirebaseError, AdminDeprecateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminDeprecateSubscriptionTier(dc: DataConnect, options?: useDataConnectMutationOptions<AdminDeprecateSubscriptionTierData, FirebaseError, AdminDeprecateSubscriptionTierVariables>): UseDataConnectMutationResult<AdminDeprecateSubscriptionTierData, AdminDeprecateSubscriptionTierVariables>;
-```
-
-### Variables
-The `AdminDeprecateSubscriptionTier` Mutation requires an argument of type `AdminDeprecateSubscriptionTierVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminDeprecateSubscriptionTierVariables {
-  tierId: UUIDString;
-}
-```
-### Return Type
-Recall that calling the `AdminDeprecateSubscriptionTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminDeprecateSubscriptionTier` Mutation is of type `AdminDeprecateSubscriptionTierData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminDeprecateSubscriptionTierData {
-  subscriptionTier_update?: SubscriptionTier_Key | null;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminDeprecateSubscriptionTier`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminDeprecateSubscriptionTierVariables } from '@dataconnect/generated';
-import { useAdminDeprecateSubscriptionTier } from '@dataconnect/generated/react'
-
-export default function AdminDeprecateSubscriptionTierComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminDeprecateSubscriptionTier();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminDeprecateSubscriptionTier(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminDeprecateSubscriptionTier(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminDeprecateSubscriptionTier(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminDeprecateSubscriptionTier` Mutation requires an argument of type `AdminDeprecateSubscriptionTierVariables`:
-  const adminDeprecateSubscriptionTierVars: AdminDeprecateSubscriptionTierVariables = {
-    tierId: ..., 
-  };
-  mutation.mutate(adminDeprecateSubscriptionTierVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ tierId: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminDeprecateSubscriptionTierVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.subscriptionTier_update);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AdminCreateCategory
-You can execute the `AdminCreateCategory` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAdminCreateCategory(options?: useDataConnectMutationOptions<AdminCreateCategoryData, FirebaseError, AdminCreateCategoryVariables>): UseDataConnectMutationResult<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAdminCreateCategory(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateCategoryData, FirebaseError, AdminCreateCategoryVariables>): UseDataConnectMutationResult<AdminCreateCategoryData, AdminCreateCategoryVariables>;
-```
-
-### Variables
-The `AdminCreateCategory` Mutation requires an argument of type `AdminCreateCategoryVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AdminCreateCategoryVariables {
-  name: string;
-  description?: string | null;
-}
-```
-### Return Type
-Recall that calling the `AdminCreateCategory` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateCategory` Mutation is of type `AdminCreateCategoryData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AdminCreateCategoryData {
-  category_insert: Category_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AdminCreateCategory`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AdminCreateCategoryVariables } from '@dataconnect/generated';
-import { useAdminCreateCategory } from '@dataconnect/generated/react'
-
-export default function AdminCreateCategoryComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAdminCreateCategory();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAdminCreateCategory(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateCategory(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAdminCreateCategory(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAdminCreateCategory` Mutation requires an argument of type `AdminCreateCategoryVariables`:
-  const adminCreateCategoryVars: AdminCreateCategoryVariables = {
-    name: ..., 
-    description: ..., // optional
-  };
-  mutation.mutate(adminCreateCategoryVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ name: ..., description: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(adminCreateCategoryVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.category_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## LogPayment
-You can execute the `LogPayment` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useLogPayment(options?: useDataConnectMutationOptions<LogPaymentData, FirebaseError, LogPaymentVariables>): UseDataConnectMutationResult<LogPaymentData, LogPaymentVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useLogPayment(dc: DataConnect, options?: useDataConnectMutationOptions<LogPaymentData, FirebaseError, LogPaymentVariables>): UseDataConnectMutationResult<LogPaymentData, LogPaymentVariables>;
-```
-
-### Variables
-The `LogPayment` Mutation requires an argument of type `LogPaymentVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface LogPaymentVariables {
-  gateway: PaymentGateway;
-  referenceId: string;
-  amount: number;
-  currency?: string | null;
-  customerEmailSnapshot: string;
-}
-```
-### Return Type
-Recall that calling the `LogPayment` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `LogPayment` Mutation is of type `LogPaymentData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface LogPaymentData {
-  payment_insert: Payment_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `LogPayment`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, LogPaymentVariables } from '@dataconnect/generated';
-import { useLogPayment } from '@dataconnect/generated/react'
-
-export default function LogPaymentComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useLogPayment();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useLogPayment(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useLogPayment(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useLogPayment(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useLogPayment` Mutation requires an argument of type `LogPaymentVariables`:
-  const logPaymentVars: LogPaymentVariables = {
-    gateway: ..., 
-    referenceId: ..., 
-    amount: ..., 
-    currency: ..., // optional
-    customerEmailSnapshot: ..., 
-  };
-  mutation.mutate(logPaymentVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ gateway: ..., referenceId: ..., amount: ..., currency: ..., customerEmailSnapshot: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(logPaymentVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.payment_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
-## AddPaymentItem
-You can execute the `AddPaymentItem` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
-```javascript
-useAddPaymentItem(options?: useDataConnectMutationOptions<AddPaymentItemData, FirebaseError, AddPaymentItemVariables>): UseDataConnectMutationResult<AddPaymentItemData, AddPaymentItemVariables>;
-```
-You can also pass in a `DataConnect` instance to the Mutation hook function.
-```javascript
-useAddPaymentItem(dc: DataConnect, options?: useDataConnectMutationOptions<AddPaymentItemData, FirebaseError, AddPaymentItemVariables>): UseDataConnectMutationResult<AddPaymentItemData, AddPaymentItemVariables>;
-```
-
-### Variables
-The `AddPaymentItem` Mutation requires an argument of type `AddPaymentItemVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-
-```javascript
-export interface AddPaymentItemVariables {
-  paymentId: UUIDString;
-  targetType: PaymentItemTarget;
-  courseId?: UUIDString | null;
-  missionId?: UUIDString | null;
-  subscriptionTierId?: UUIDString | null;
-  price: number;
-}
-```
-### Return Type
-Recall that calling the `AddPaymentItem` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
-
-To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
-
-To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
-
-To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AddPaymentItem` Mutation is of type `AddPaymentItemData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
-```javascript
-export interface AddPaymentItemData {
-  paymentItem_insert: PaymentItem_Key;
-}
-```
-
-To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
-
-### Using `AddPaymentItem`'s Mutation hook function
-
-```javascript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, AddPaymentItemVariables } from '@dataconnect/generated';
-import { useAddPaymentItem } from '@dataconnect/generated/react'
-
-export default function AddPaymentItemComponent() {
-  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
-  const mutation = useAddPaymentItem();
-
-  // You can also pass in a `DataConnect` instance to the Mutation hook function.
-  const dataConnect = getDataConnect(connectorConfig);
-  const mutation = useAddPaymentItem(dataConnect);
-
-  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAddPaymentItem(options);
-
-  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
-  const dataConnect = getDataConnect(connectorConfig);
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  const mutation = useAddPaymentItem(dataConnect, options);
-
-  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
-  // The `useAddPaymentItem` Mutation requires an argument of type `AddPaymentItemVariables`:
-  const addPaymentItemVars: AddPaymentItemVariables = {
-    paymentId: ..., 
-    targetType: ..., 
-    courseId: ..., // optional
-    missionId: ..., // optional
-    subscriptionTierId: ..., // optional
-    price: ..., 
-  };
-  mutation.mutate(addPaymentItemVars);
-  // Variables can be defined inline as well.
-  mutation.mutate({ paymentId: ..., targetType: ..., courseId: ..., missionId: ..., subscriptionTierId: ..., price: ..., });
-
-  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
-  const options = {
-    onSuccess: () => { console.log('Mutation succeeded!'); }
-  };
-  mutation.mutate(addPaymentItemVars, options);
-
-  // Then, you can render your component dynamically based on the status of the Mutation.
-  if (mutation.isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (mutation.isError) {
-    return <div>Error: {mutation.error.message}</div>;
-  }
-
-  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
-  if (mutation.isSuccess) {
-    console.log(mutation.data.paymentItem_insert);
-  }
-  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
-}
-```
-
 ## StartQuizAttempt
 You can execute the `StartQuizAttempt` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
 ```javascript
@@ -11547,6 +10830,1888 @@ export default function AdminUpdateQuizOptionOrderComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.quizOption_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminCreateCourse
+You can execute the `AdminCreateCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminCreateCourse(options?: useDataConnectMutationOptions<AdminCreateCourseData, FirebaseError, AdminCreateCourseVariables>): UseDataConnectMutationResult<AdminCreateCourseData, AdminCreateCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminCreateCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateCourseData, FirebaseError, AdminCreateCourseVariables>): UseDataConnectMutationResult<AdminCreateCourseData, AdminCreateCourseVariables>;
+```
+
+### Variables
+The `AdminCreateCourse` Mutation requires an argument of type `AdminCreateCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminCreateCourseVariables {
+  title: string;
+  description?: string | null;
+  price: number;
+  language: string;
+  level: CourseLevel;
+  categoryId: UUIDString;
+  tags: string[];
+  authorId: string;
+}
+```
+### Return Type
+Recall that calling the `AdminCreateCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateCourse` Mutation is of type `AdminCreateCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminCreateCourseData {
+  course_insert: Course_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminCreateCourse`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminCreateCourseVariables } from '@dataconnect/generated';
+import { useAdminCreateCourse } from '@dataconnect/generated/react'
+
+export default function AdminCreateCourseComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminCreateCourse();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminCreateCourse(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateCourse(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateCourse(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminCreateCourse` Mutation requires an argument of type `AdminCreateCourseVariables`:
+  const adminCreateCourseVars: AdminCreateCourseVariables = {
+    title: ..., 
+    description: ..., // optional
+    price: ..., 
+    language: ..., 
+    level: ..., 
+    categoryId: ..., 
+    tags: ..., 
+    authorId: ..., 
+  };
+  mutation.mutate(adminCreateCourseVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ title: ..., description: ..., price: ..., language: ..., level: ..., categoryId: ..., tags: ..., authorId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminCreateCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.course_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateCourse
+You can execute the `AdminUpdateCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateCourse(options?: useDataConnectMutationOptions<AdminUpdateCourseData, FirebaseError, AdminUpdateCourseVariables>): UseDataConnectMutationResult<AdminUpdateCourseData, AdminUpdateCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateCourseData, FirebaseError, AdminUpdateCourseVariables>): UseDataConnectMutationResult<AdminUpdateCourseData, AdminUpdateCourseVariables>;
+```
+
+### Variables
+The `AdminUpdateCourse` Mutation requires an argument of type `AdminUpdateCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateCourseVariables {
+  courseId: UUIDString;
+  title?: string | null;
+  description?: string | null;
+  price?: number | null;
+  language?: string | null;
+  level?: CourseLevel | null;
+  categoryId?: UUIDString | null;
+  tags?: string[] | null;
+  thumbnail?: string | null;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateCourse` Mutation is of type `AdminUpdateCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateCourseData {
+  course_update?: Course_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateCourse`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateCourseVariables } from '@dataconnect/generated';
+import { useAdminUpdateCourse } from '@dataconnect/generated/react'
+
+export default function AdminUpdateCourseComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateCourse();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateCourse(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateCourse(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateCourse(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateCourse` Mutation requires an argument of type `AdminUpdateCourseVariables`:
+  const adminUpdateCourseVars: AdminUpdateCourseVariables = {
+    courseId: ..., 
+    title: ..., // optional
+    description: ..., // optional
+    price: ..., // optional
+    language: ..., // optional
+    level: ..., // optional
+    categoryId: ..., // optional
+    tags: ..., // optional
+    thumbnail: ..., // optional
+  };
+  mutation.mutate(adminUpdateCourseVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., title: ..., description: ..., price: ..., language: ..., level: ..., categoryId: ..., tags: ..., thumbnail: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.course_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateCourseStatus
+You can execute the `AdminUpdateCourseStatus` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateCourseStatus(options?: useDataConnectMutationOptions<AdminUpdateCourseStatusData, FirebaseError, AdminUpdateCourseStatusVariables>): UseDataConnectMutationResult<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateCourseStatus(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateCourseStatusData, FirebaseError, AdminUpdateCourseStatusVariables>): UseDataConnectMutationResult<AdminUpdateCourseStatusData, AdminUpdateCourseStatusVariables>;
+```
+
+### Variables
+The `AdminUpdateCourseStatus` Mutation requires an argument of type `AdminUpdateCourseStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateCourseStatusVariables {
+  courseId: UUIDString;
+  status: CourseStatus;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateCourseStatus` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateCourseStatus` Mutation is of type `AdminUpdateCourseStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateCourseStatusData {
+  course_update?: Course_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateCourseStatus`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateCourseStatusVariables } from '@dataconnect/generated';
+import { useAdminUpdateCourseStatus } from '@dataconnect/generated/react'
+
+export default function AdminUpdateCourseStatusComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateCourseStatus();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateCourseStatus(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateCourseStatus(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateCourseStatus(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateCourseStatus` Mutation requires an argument of type `AdminUpdateCourseStatusVariables`:
+  const adminUpdateCourseStatusVars: AdminUpdateCourseStatusVariables = {
+    courseId: ..., 
+    status: ..., 
+  };
+  mutation.mutate(adminUpdateCourseStatusVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., status: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateCourseStatusVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.course_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminSoftDeleteCourse
+You can execute the `AdminSoftDeleteCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminSoftDeleteCourse(options?: useDataConnectMutationOptions<AdminSoftDeleteCourseData, FirebaseError, AdminSoftDeleteCourseVariables>): UseDataConnectMutationResult<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminSoftDeleteCourse(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteCourseData, FirebaseError, AdminSoftDeleteCourseVariables>): UseDataConnectMutationResult<AdminSoftDeleteCourseData, AdminSoftDeleteCourseVariables>;
+```
+
+### Variables
+The `AdminSoftDeleteCourse` Mutation requires an argument of type `AdminSoftDeleteCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminSoftDeleteCourseVariables {
+  courseId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AdminSoftDeleteCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteCourse` Mutation is of type `AdminSoftDeleteCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminSoftDeleteCourseData {
+  course_update?: Course_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminSoftDeleteCourse`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminSoftDeleteCourseVariables } from '@dataconnect/generated';
+import { useAdminSoftDeleteCourse } from '@dataconnect/generated/react'
+
+export default function AdminSoftDeleteCourseComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminSoftDeleteCourse();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminSoftDeleteCourse(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteCourse(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteCourse(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminSoftDeleteCourse` Mutation requires an argument of type `AdminSoftDeleteCourseVariables`:
+  const adminSoftDeleteCourseVars: AdminSoftDeleteCourseVariables = {
+    courseId: ..., 
+  };
+  mutation.mutate(adminSoftDeleteCourseVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminSoftDeleteCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.course_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminCreateSection
+You can execute the `AdminCreateSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminCreateSection(options?: useDataConnectMutationOptions<AdminCreateSectionData, FirebaseError, AdminCreateSectionVariables>): UseDataConnectMutationResult<AdminCreateSectionData, AdminCreateSectionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminCreateSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateSectionData, FirebaseError, AdminCreateSectionVariables>): UseDataConnectMutationResult<AdminCreateSectionData, AdminCreateSectionVariables>;
+```
+
+### Variables
+The `AdminCreateSection` Mutation requires an argument of type `AdminCreateSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminCreateSectionVariables {
+  courseId: UUIDString;
+  title: string;
+  order: number;
+}
+```
+### Return Type
+Recall that calling the `AdminCreateSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateSection` Mutation is of type `AdminCreateSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminCreateSectionData {
+  courseSection_insert: CourseSection_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminCreateSection`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminCreateSectionVariables } from '@dataconnect/generated';
+import { useAdminCreateSection } from '@dataconnect/generated/react'
+
+export default function AdminCreateSectionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminCreateSection();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminCreateSection(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateSection(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateSection(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminCreateSection` Mutation requires an argument of type `AdminCreateSectionVariables`:
+  const adminCreateSectionVars: AdminCreateSectionVariables = {
+    courseId: ..., 
+    title: ..., 
+    order: ..., 
+  };
+  mutation.mutate(adminCreateSectionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., title: ..., order: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminCreateSectionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseSection_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateSection
+You can execute the `AdminUpdateSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateSection(options?: useDataConnectMutationOptions<AdminUpdateSectionData, FirebaseError, AdminUpdateSectionVariables>): UseDataConnectMutationResult<AdminUpdateSectionData, AdminUpdateSectionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateSectionData, FirebaseError, AdminUpdateSectionVariables>): UseDataConnectMutationResult<AdminUpdateSectionData, AdminUpdateSectionVariables>;
+```
+
+### Variables
+The `AdminUpdateSection` Mutation requires an argument of type `AdminUpdateSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateSectionVariables {
+  sectionId: UUIDString;
+  title: string;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateSection` Mutation is of type `AdminUpdateSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateSectionData {
+  courseSection_update?: CourseSection_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateSection`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateSectionVariables } from '@dataconnect/generated';
+import { useAdminUpdateSection } from '@dataconnect/generated/react'
+
+export default function AdminUpdateSectionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateSection();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateSection(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateSection(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateSection(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateSection` Mutation requires an argument of type `AdminUpdateSectionVariables`:
+  const adminUpdateSectionVars: AdminUpdateSectionVariables = {
+    sectionId: ..., 
+    title: ..., 
+  };
+  mutation.mutate(adminUpdateSectionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ sectionId: ..., title: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateSectionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseSection_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminSoftDeleteSection
+You can execute the `AdminSoftDeleteSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminSoftDeleteSection(options?: useDataConnectMutationOptions<AdminSoftDeleteSectionData, FirebaseError, AdminSoftDeleteSectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminSoftDeleteSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteSectionData, FirebaseError, AdminSoftDeleteSectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteSectionData, AdminSoftDeleteSectionVariables>;
+```
+
+### Variables
+The `AdminSoftDeleteSection` Mutation requires an argument of type `AdminSoftDeleteSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminSoftDeleteSectionVariables {
+  sectionId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AdminSoftDeleteSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteSection` Mutation is of type `AdminSoftDeleteSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminSoftDeleteSectionData {
+  courseSection_update?: CourseSection_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminSoftDeleteSection`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminSoftDeleteSectionVariables } from '@dataconnect/generated';
+import { useAdminSoftDeleteSection } from '@dataconnect/generated/react'
+
+export default function AdminSoftDeleteSectionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminSoftDeleteSection();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminSoftDeleteSection(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteSection(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteSection(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminSoftDeleteSection` Mutation requires an argument of type `AdminSoftDeleteSectionVariables`:
+  const adminSoftDeleteSectionVars: AdminSoftDeleteSectionVariables = {
+    sectionId: ..., 
+  };
+  mutation.mutate(adminSoftDeleteSectionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ sectionId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminSoftDeleteSectionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseSection_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateSectionOrder
+You can execute the `AdminUpdateSectionOrder` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateSectionOrder(options?: useDataConnectMutationOptions<AdminUpdateSectionOrderData, FirebaseError, AdminUpdateSectionOrderVariables>): UseDataConnectMutationResult<AdminUpdateSectionOrderData, AdminUpdateSectionOrderVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateSectionOrder(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateSectionOrderData, FirebaseError, AdminUpdateSectionOrderVariables>): UseDataConnectMutationResult<AdminUpdateSectionOrderData, AdminUpdateSectionOrderVariables>;
+```
+
+### Variables
+The `AdminUpdateSectionOrder` Mutation requires an argument of type `AdminUpdateSectionOrderVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateSectionOrderVariables {
+  sectionId: UUIDString;
+  order: number;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateSectionOrder` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateSectionOrder` Mutation is of type `AdminUpdateSectionOrderData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateSectionOrderData {
+  courseSection_update?: CourseSection_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateSectionOrder`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateSectionOrderVariables } from '@dataconnect/generated';
+import { useAdminUpdateSectionOrder } from '@dataconnect/generated/react'
+
+export default function AdminUpdateSectionOrderComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateSectionOrder();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateSectionOrder(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateSectionOrder(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateSectionOrder(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateSectionOrder` Mutation requires an argument of type `AdminUpdateSectionOrderVariables`:
+  const adminUpdateSectionOrderVars: AdminUpdateSectionOrderVariables = {
+    sectionId: ..., 
+    order: ..., 
+  };
+  mutation.mutate(adminUpdateSectionOrderVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ sectionId: ..., order: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateSectionOrderVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseSection_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminCreateLectureFull
+You can execute the `AdminCreateLectureFull` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminCreateLectureFull(options?: useDataConnectMutationOptions<AdminCreateLectureFullData, FirebaseError, AdminCreateLectureFullVariables>): UseDataConnectMutationResult<AdminCreateLectureFullData, AdminCreateLectureFullVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminCreateLectureFull(dc: DataConnect, options?: useDataConnectMutationOptions<AdminCreateLectureFullData, FirebaseError, AdminCreateLectureFullVariables>): UseDataConnectMutationResult<AdminCreateLectureFullData, AdminCreateLectureFullVariables>;
+```
+
+### Variables
+The `AdminCreateLectureFull` Mutation requires an argument of type `AdminCreateLectureFullVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminCreateLectureFullVariables {
+  sectionId: UUIDString;
+  title: string;
+  type: LectureType;
+  videoUrl?: string | null;
+  content?: string | null;
+  duration?: number | null;
+  transcriptUrl?: string | null;
+  isFreePreview: boolean;
+  order: number;
+}
+```
+### Return Type
+Recall that calling the `AdminCreateLectureFull` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminCreateLectureFull` Mutation is of type `AdminCreateLectureFullData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminCreateLectureFullData {
+  courseLecture_insert: CourseLecture_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminCreateLectureFull`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminCreateLectureFullVariables } from '@dataconnect/generated';
+import { useAdminCreateLectureFull } from '@dataconnect/generated/react'
+
+export default function AdminCreateLectureFullComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminCreateLectureFull();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminCreateLectureFull(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateLectureFull(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminCreateLectureFull(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminCreateLectureFull` Mutation requires an argument of type `AdminCreateLectureFullVariables`:
+  const adminCreateLectureFullVars: AdminCreateLectureFullVariables = {
+    sectionId: ..., 
+    title: ..., 
+    type: ..., 
+    videoUrl: ..., // optional
+    content: ..., // optional
+    duration: ..., // optional
+    transcriptUrl: ..., // optional
+    isFreePreview: ..., 
+    order: ..., 
+  };
+  mutation.mutate(adminCreateLectureFullVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ sectionId: ..., title: ..., type: ..., videoUrl: ..., content: ..., duration: ..., transcriptUrl: ..., isFreePreview: ..., order: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminCreateLectureFullVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateLecture
+You can execute the `AdminUpdateLecture` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateLecture(options?: useDataConnectMutationOptions<AdminUpdateLectureData, FirebaseError, AdminUpdateLectureVariables>): UseDataConnectMutationResult<AdminUpdateLectureData, AdminUpdateLectureVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateLecture(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateLectureData, FirebaseError, AdminUpdateLectureVariables>): UseDataConnectMutationResult<AdminUpdateLectureData, AdminUpdateLectureVariables>;
+```
+
+### Variables
+The `AdminUpdateLecture` Mutation requires an argument of type `AdminUpdateLectureVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateLectureVariables {
+  lectureId: UUIDString;
+  title?: string | null;
+  type?: LectureType | null;
+  videoUrl?: string | null;
+  content?: string | null;
+  duration?: number | null;
+  transcriptUrl?: string | null;
+  isFreePreview?: boolean | null;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateLecture` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateLecture` Mutation is of type `AdminUpdateLectureData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateLectureData {
+  courseLecture_update?: CourseLecture_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateLecture`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateLectureVariables } from '@dataconnect/generated';
+import { useAdminUpdateLecture } from '@dataconnect/generated/react'
+
+export default function AdminUpdateLectureComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateLecture();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateLecture(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateLecture(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateLecture(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateLecture` Mutation requires an argument of type `AdminUpdateLectureVariables`:
+  const adminUpdateLectureVars: AdminUpdateLectureVariables = {
+    lectureId: ..., 
+    title: ..., // optional
+    type: ..., // optional
+    videoUrl: ..., // optional
+    content: ..., // optional
+    duration: ..., // optional
+    transcriptUrl: ..., // optional
+    isFreePreview: ..., // optional
+  };
+  mutation.mutate(adminUpdateLectureVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ lectureId: ..., title: ..., type: ..., videoUrl: ..., content: ..., duration: ..., transcriptUrl: ..., isFreePreview: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateLectureVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminSoftDeleteLecture
+You can execute the `AdminSoftDeleteLecture` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminSoftDeleteLecture(options?: useDataConnectMutationOptions<AdminSoftDeleteLectureData, FirebaseError, AdminSoftDeleteLectureVariables>): UseDataConnectMutationResult<AdminSoftDeleteLectureData, AdminSoftDeleteLectureVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminSoftDeleteLecture(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteLectureData, FirebaseError, AdminSoftDeleteLectureVariables>): UseDataConnectMutationResult<AdminSoftDeleteLectureData, AdminSoftDeleteLectureVariables>;
+```
+
+### Variables
+The `AdminSoftDeleteLecture` Mutation requires an argument of type `AdminSoftDeleteLectureVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminSoftDeleteLectureVariables {
+  lectureId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AdminSoftDeleteLecture` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteLecture` Mutation is of type `AdminSoftDeleteLectureData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminSoftDeleteLectureData {
+  courseLecture_update?: CourseLecture_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminSoftDeleteLecture`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminSoftDeleteLectureVariables } from '@dataconnect/generated';
+import { useAdminSoftDeleteLecture } from '@dataconnect/generated/react'
+
+export default function AdminSoftDeleteLectureComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminSoftDeleteLecture();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminSoftDeleteLecture(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteLecture(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteLecture(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminSoftDeleteLecture` Mutation requires an argument of type `AdminSoftDeleteLectureVariables`:
+  const adminSoftDeleteLectureVars: AdminSoftDeleteLectureVariables = {
+    lectureId: ..., 
+  };
+  mutation.mutate(adminSoftDeleteLectureVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ lectureId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminSoftDeleteLectureVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpdateLectureOrder
+You can execute the `AdminUpdateLectureOrder` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpdateLectureOrder(options?: useDataConnectMutationOptions<AdminUpdateLectureOrderData, FirebaseError, AdminUpdateLectureOrderVariables>): UseDataConnectMutationResult<AdminUpdateLectureOrderData, AdminUpdateLectureOrderVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpdateLectureOrder(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpdateLectureOrderData, FirebaseError, AdminUpdateLectureOrderVariables>): UseDataConnectMutationResult<AdminUpdateLectureOrderData, AdminUpdateLectureOrderVariables>;
+```
+
+### Variables
+The `AdminUpdateLectureOrder` Mutation requires an argument of type `AdminUpdateLectureOrderVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpdateLectureOrderVariables {
+  lectureId: UUIDString;
+  order: number;
+}
+```
+### Return Type
+Recall that calling the `AdminUpdateLectureOrder` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpdateLectureOrder` Mutation is of type `AdminUpdateLectureOrderData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpdateLectureOrderData {
+  courseLecture_update?: CourseLecture_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpdateLectureOrder`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpdateLectureOrderVariables } from '@dataconnect/generated';
+import { useAdminUpdateLectureOrder } from '@dataconnect/generated/react'
+
+export default function AdminUpdateLectureOrderComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpdateLectureOrder();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpdateLectureOrder(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateLectureOrder(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpdateLectureOrder(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpdateLectureOrder` Mutation requires an argument of type `AdminUpdateLectureOrderVariables`:
+  const adminUpdateLectureOrderVars: AdminUpdateLectureOrderVariables = {
+    lectureId: ..., 
+    order: ..., 
+  };
+  mutation.mutate(adminUpdateLectureOrderVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ lectureId: ..., order: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpdateLectureOrderVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminMoveLectureToSection
+You can execute the `AdminMoveLectureToSection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminMoveLectureToSection(options?: useDataConnectMutationOptions<AdminMoveLectureToSectionData, FirebaseError, AdminMoveLectureToSectionVariables>): UseDataConnectMutationResult<AdminMoveLectureToSectionData, AdminMoveLectureToSectionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminMoveLectureToSection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminMoveLectureToSectionData, FirebaseError, AdminMoveLectureToSectionVariables>): UseDataConnectMutationResult<AdminMoveLectureToSectionData, AdminMoveLectureToSectionVariables>;
+```
+
+### Variables
+The `AdminMoveLectureToSection` Mutation requires an argument of type `AdminMoveLectureToSectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminMoveLectureToSectionVariables {
+  lectureId: UUIDString;
+  newSectionId: UUIDString;
+  order: number;
+}
+```
+### Return Type
+Recall that calling the `AdminMoveLectureToSection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminMoveLectureToSection` Mutation is of type `AdminMoveLectureToSectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminMoveLectureToSectionData {
+  courseLecture_update?: CourseLecture_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminMoveLectureToSection`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminMoveLectureToSectionVariables } from '@dataconnect/generated';
+import { useAdminMoveLectureToSection } from '@dataconnect/generated/react'
+
+export default function AdminMoveLectureToSectionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminMoveLectureToSection();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminMoveLectureToSection(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminMoveLectureToSection(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminMoveLectureToSection(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminMoveLectureToSection` Mutation requires an argument of type `AdminMoveLectureToSectionVariables`:
+  const adminMoveLectureToSectionVars: AdminMoveLectureToSectionVariables = {
+    lectureId: ..., 
+    newSectionId: ..., 
+    order: ..., 
+  };
+  mutation.mutate(adminMoveLectureToSectionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ lectureId: ..., newSectionId: ..., order: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminMoveLectureToSectionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminSoftDeleteLecturesBySection
+You can execute the `AdminSoftDeleteLecturesBySection` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminSoftDeleteLecturesBySection(options?: useDataConnectMutationOptions<AdminSoftDeleteLecturesBySectionData, FirebaseError, AdminSoftDeleteLecturesBySectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminSoftDeleteLecturesBySection(dc: DataConnect, options?: useDataConnectMutationOptions<AdminSoftDeleteLecturesBySectionData, FirebaseError, AdminSoftDeleteLecturesBySectionVariables>): UseDataConnectMutationResult<AdminSoftDeleteLecturesBySectionData, AdminSoftDeleteLecturesBySectionVariables>;
+```
+
+### Variables
+The `AdminSoftDeleteLecturesBySection` Mutation requires an argument of type `AdminSoftDeleteLecturesBySectionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminSoftDeleteLecturesBySectionVariables {
+  sectionId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `AdminSoftDeleteLecturesBySection` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminSoftDeleteLecturesBySection` Mutation is of type `AdminSoftDeleteLecturesBySectionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminSoftDeleteLecturesBySectionData {
+  courseLecture_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminSoftDeleteLecturesBySection`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminSoftDeleteLecturesBySectionVariables } from '@dataconnect/generated';
+import { useAdminSoftDeleteLecturesBySection } from '@dataconnect/generated/react'
+
+export default function AdminSoftDeleteLecturesBySectionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminSoftDeleteLecturesBySection();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminSoftDeleteLecturesBySection(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteLecturesBySection(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminSoftDeleteLecturesBySection(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminSoftDeleteLecturesBySection` Mutation requires an argument of type `AdminSoftDeleteLecturesBySectionVariables`:
+  const adminSoftDeleteLecturesBySectionVars: AdminSoftDeleteLecturesBySectionVariables = {
+    sectionId: ..., 
+  };
+  mutation.mutate(adminSoftDeleteLecturesBySectionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ sectionId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminSoftDeleteLecturesBySectionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.courseLecture_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## EnrollInCourse
+You can execute the `EnrollInCourse` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useEnrollInCourse(options?: useDataConnectMutationOptions<EnrollInCourseData, FirebaseError, EnrollInCourseVariables>): UseDataConnectMutationResult<EnrollInCourseData, EnrollInCourseVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useEnrollInCourse(dc: DataConnect, options?: useDataConnectMutationOptions<EnrollInCourseData, FirebaseError, EnrollInCourseVariables>): UseDataConnectMutationResult<EnrollInCourseData, EnrollInCourseVariables>;
+```
+
+### Variables
+The `EnrollInCourse` Mutation requires an argument of type `EnrollInCourseVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface EnrollInCourseVariables {
+  courseId: UUIDString;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `EnrollInCourse` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `EnrollInCourse` Mutation is of type `EnrollInCourseData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface EnrollInCourseData {
+  enrollment_insert: Enrollment_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `EnrollInCourse`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, EnrollInCourseVariables } from '@dataconnect/generated';
+import { useEnrollInCourse } from '@dataconnect/generated/react'
+
+export default function EnrollInCourseComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useEnrollInCourse();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useEnrollInCourse(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useEnrollInCourse(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useEnrollInCourse(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useEnrollInCourse` Mutation requires an argument of type `EnrollInCourseVariables`:
+  const enrollInCourseVars: EnrollInCourseVariables = {
+    courseId: ..., 
+    userId: ..., 
+  };
+  mutation.mutate(enrollInCourseVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ courseId: ..., userId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(enrollInCourseVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.enrollment_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## EnrollInMission
+You can execute the `EnrollInMission` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useEnrollInMission(options?: useDataConnectMutationOptions<EnrollInMissionData, FirebaseError, EnrollInMissionVariables>): UseDataConnectMutationResult<EnrollInMissionData, EnrollInMissionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useEnrollInMission(dc: DataConnect, options?: useDataConnectMutationOptions<EnrollInMissionData, FirebaseError, EnrollInMissionVariables>): UseDataConnectMutationResult<EnrollInMissionData, EnrollInMissionVariables>;
+```
+
+### Variables
+The `EnrollInMission` Mutation requires an argument of type `EnrollInMissionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface EnrollInMissionVariables {
+  missionId: UUIDString;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `EnrollInMission` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `EnrollInMission` Mutation is of type `EnrollInMissionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface EnrollInMissionData {
+  enrollment_insert: Enrollment_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `EnrollInMission`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, EnrollInMissionVariables } from '@dataconnect/generated';
+import { useEnrollInMission } from '@dataconnect/generated/react'
+
+export default function EnrollInMissionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useEnrollInMission();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useEnrollInMission(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useEnrollInMission(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useEnrollInMission(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useEnrollInMission` Mutation requires an argument of type `EnrollInMissionVariables`:
+  const enrollInMissionVars: EnrollInMissionVariables = {
+    missionId: ..., 
+    userId: ..., 
+  };
+  mutation.mutate(enrollInMissionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ missionId: ..., userId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(enrollInMissionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.enrollment_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateLectureProgress
+You can execute the `UpdateLectureProgress` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateLectureProgress(options?: useDataConnectMutationOptions<UpdateLectureProgressData, FirebaseError, UpdateLectureProgressVariables>): UseDataConnectMutationResult<UpdateLectureProgressData, UpdateLectureProgressVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateLectureProgress(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateLectureProgressData, FirebaseError, UpdateLectureProgressVariables>): UseDataConnectMutationResult<UpdateLectureProgressData, UpdateLectureProgressVariables>;
+```
+
+### Variables
+The `UpdateLectureProgress` Mutation requires an argument of type `UpdateLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateLectureProgressVariables {
+  lectureId: UUIDString;
+  lastWatchedSecond: number;
+  completedAt?: TimestampString | null;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `UpdateLectureProgress` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateLectureProgress` Mutation is of type `UpdateLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateLectureProgressData {
+  lectureProgress_upsert: LectureProgress_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateLectureProgress`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateLectureProgressVariables } from '@dataconnect/generated';
+import { useUpdateLectureProgress } from '@dataconnect/generated/react'
+
+export default function UpdateLectureProgressComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateLectureProgress();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateLectureProgress(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateLectureProgress(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateLectureProgress(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateLectureProgress` Mutation requires an argument of type `UpdateLectureProgressVariables`:
+  const updateLectureProgressVars: UpdateLectureProgressVariables = {
+    lectureId: ..., 
+    lastWatchedSecond: ..., 
+    completedAt: ..., // optional
+    userId: ..., 
+  };
+  mutation.mutate(updateLectureProgressVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ lectureId: ..., lastWatchedSecond: ..., completedAt: ..., userId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateLectureProgressVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.lectureProgress_upsert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AdminUpsertLectureProgress
+You can execute the `AdminUpsertLectureProgress` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useAdminUpsertLectureProgress(options?: useDataConnectMutationOptions<AdminUpsertLectureProgressData, FirebaseError, AdminUpsertLectureProgressVariables>): UseDataConnectMutationResult<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAdminUpsertLectureProgress(dc: DataConnect, options?: useDataConnectMutationOptions<AdminUpsertLectureProgressData, FirebaseError, AdminUpsertLectureProgressVariables>): UseDataConnectMutationResult<AdminUpsertLectureProgressData, AdminUpsertLectureProgressVariables>;
+```
+
+### Variables
+The `AdminUpsertLectureProgress` Mutation requires an argument of type `AdminUpsertLectureProgressVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AdminUpsertLectureProgressVariables {
+  userId: string;
+  lectureId: UUIDString;
+  lastWatchedSecond: number;
+  completedAt?: TimestampString | null;
+}
+```
+### Return Type
+Recall that calling the `AdminUpsertLectureProgress` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AdminUpsertLectureProgress` Mutation is of type `AdminUpsertLectureProgressData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AdminUpsertLectureProgressData {
+  lectureProgress_upsert: LectureProgress_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AdminUpsertLectureProgress`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AdminUpsertLectureProgressVariables } from '@dataconnect/generated';
+import { useAdminUpsertLectureProgress } from '@dataconnect/generated/react'
+
+export default function AdminUpsertLectureProgressComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAdminUpsertLectureProgress();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAdminUpsertLectureProgress(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpsertLectureProgress(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAdminUpsertLectureProgress(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAdminUpsertLectureProgress` Mutation requires an argument of type `AdminUpsertLectureProgressVariables`:
+  const adminUpsertLectureProgressVars: AdminUpsertLectureProgressVariables = {
+    userId: ..., 
+    lectureId: ..., 
+    lastWatchedSecond: ..., 
+    completedAt: ..., // optional
+  };
+  mutation.mutate(adminUpsertLectureProgressVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., lectureId: ..., lastWatchedSecond: ..., completedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(adminUpsertLectureProgressVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.lectureProgress_upsert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateEnrollmentStatus
+You can execute the `UpdateEnrollmentStatus` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateEnrollmentStatus(options?: useDataConnectMutationOptions<UpdateEnrollmentStatusData, FirebaseError, UpdateEnrollmentStatusVariables>): UseDataConnectMutationResult<UpdateEnrollmentStatusData, UpdateEnrollmentStatusVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateEnrollmentStatus(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateEnrollmentStatusData, FirebaseError, UpdateEnrollmentStatusVariables>): UseDataConnectMutationResult<UpdateEnrollmentStatusData, UpdateEnrollmentStatusVariables>;
+```
+
+### Variables
+The `UpdateEnrollmentStatus` Mutation requires an argument of type `UpdateEnrollmentStatusVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateEnrollmentStatusVariables {
+  enrollmentId: UUIDString;
+  status: EnrollmentStatus;
+  completedAt?: TimestampString | null;
+}
+```
+### Return Type
+Recall that calling the `UpdateEnrollmentStatus` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateEnrollmentStatus` Mutation is of type `UpdateEnrollmentStatusData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateEnrollmentStatusData {
+  enrollment_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateEnrollmentStatus`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateEnrollmentStatusVariables } from '@dataconnect/generated';
+import { useUpdateEnrollmentStatus } from '@dataconnect/generated/react'
+
+export default function UpdateEnrollmentStatusComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateEnrollmentStatus();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateEnrollmentStatus(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateEnrollmentStatus(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateEnrollmentStatus(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateEnrollmentStatus` Mutation requires an argument of type `UpdateEnrollmentStatusVariables`:
+  const updateEnrollmentStatusVars: UpdateEnrollmentStatusVariables = {
+    enrollmentId: ..., 
+    status: ..., 
+    completedAt: ..., // optional
+  };
+  mutation.mutate(updateEnrollmentStatusVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ enrollmentId: ..., status: ..., completedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateEnrollmentStatusVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.enrollment_updateMany);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

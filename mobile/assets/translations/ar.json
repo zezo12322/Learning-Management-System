@@ -249,5 +249,31 @@
       "change_Theme": " تغيير المظهر",
       "select_theme": "اختر المظهر"
     }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "فشل تحميل الدرس، يرجى المحاولة مرة أخرى لاحقًا.",
+      "error_playing": "خطأ في تشغيل الفيديو"
+    },
+    "actions": {
+      "previous": "السابق",
+      "mark_complete": "إكمال الدرس",
+      "next": "التالي"
+    },
+    "tabs": {
+      "curriculum": "المحتوى",
+      "notes": "الملاحظات",
+      "resources": "الموارد",
+      "discussion": "النقاش"
+    },
+    "curriculum": {
+      "title": "محتوى الدورة",
+      "lessons_count": "{count} درس",
+      "now_playing": "يتم تشغيله الآن"
+    },
+    "about": {
+      "title": "حول هذا الدرس",
+      "description": "تعرّف على أساليب مختلفة لبحث المستخدم وكيف تختار الأنسب لمشروعك."
+    }
   }
 }

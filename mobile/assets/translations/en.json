@@ -253,5 +253,31 @@
       "change_Theme": "Change Theme",
       "select_theme": "Select Theme"
     }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "Failed to load the lesson, please try again later.",
+      "error_playing": "Error playing video"
+    },
+    "actions": {
+      "previous": "Previous",
+      "mark_complete": "Mark Complete",
+      "next": "Next"
+    },
+    "tabs": {
+      "curriculum": "Curriculum",
+      "notes": "Notes",
+      "resources": "Resources",
+      "discussion": "Discussion"
+    },
+    "curriculum": {
+      "title": "Course Curriculum",
+      "lessons_count": "{count} Lessons",
+      "now_playing": "Now Playing"
+    },
+    "about": {
+      "title": "About this lesson",
+      "description": "Learn different user research methods and how to choose the right one for your project."
+    }
   }
 }
