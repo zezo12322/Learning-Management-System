@@ -1,7 +1,10 @@
 import 'package:chewie/chewie.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' as esay;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:optimatech_lms/core/services/language_service.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
+import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 import 'package:video_player/video_player.dart';
 
 class LessonVideoPlayerSection extends StatefulWidget {
@@ -161,16 +164,32 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         aspectRatio: 16 / 9,
         child: Container(
           color: Colors.black,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
             children: [
-              Text(
-                'lesson_learning.video.error_playing'.tr(),
-                style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+              Positioned.directional(
+                textDirection: LanguageService.isArabic(context) ? TextDirection.rtl : TextDirection.ltr,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.h),
+                  child: CustomBackButton(
+                    backgroundColor: context.theme.colorScheme.surface.withValues(alpha: 0.1),
+                    iconColor: Colors.white,
+                  ),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: _reinitializePlayer,
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'lesson_learning.video.error_playing'.tr(),
+                      style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: _reinitializePlayer,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -192,7 +211,20 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
 
     return AspectRatio(
       aspectRatio: 16 / 9,
-      child: Chewie(controller: _chewieController!),
+      child: Stack(
+        children: [
+          Chewie(controller: _chewieController!),
+          Positioned.directional(
+            textDirection: LanguageService.isArabic(context) ? TextDirection.rtl : TextDirection.ltr,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.h),
+              child: CustomBackButton(
+                backgroundColor: context.theme.colorScheme.surface.withValues(alpha: 0.1),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
