@@ -71,7 +71,7 @@ Widget buildRecommendedCoursesSection(
               width: 280.w,
               child: RecommendedCourseCard(
                 title: course.title,
-                subtitle: '${(index + 1) * 4} ${'home.lessons'.tr()}',
+                subtitle: '0 ${'home.lessons'.tr()}',
                 icon: _recommendedIcons[index % _recommendedIcons.length],
                 iconColor: iconColor,
                 iconBackgroundColor: iconColor.withValues(alpha: 0.1),
