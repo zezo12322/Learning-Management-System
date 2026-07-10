@@ -127,8 +127,9 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                         ),
                         Gap(8.h),
                         Text(
+                          // description is always null from the API, so we use a mock description as a fallback
                           widget.course.description ??
-                              CourseDetailsMockData.description,
+                              'Master core concepts and practical workflows through real-world projects designed to build your expertise from the ground up.',
                           style: TextStyles.bodySmall.copyWith(
                             color: Colors.white.withValues(alpha: 0.85),
                             height: 1.45,
