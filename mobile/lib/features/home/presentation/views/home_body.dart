@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,8 +6,10 @@ import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/core/widgets/app_header/app_header.dart';
 import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
-import 'package:optimatech_lms/features/home/domain/entities/course_entity.dart';
-import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
+import 'package:optimatech_lms/features/home/data/models/continue_learning_model.dart';
+import 'package:optimatech_lms/features/home/data/models/popular_course_model.dart';
+import 'package:optimatech_lms/features/home/data/models/recommended_course_model.dart';
+import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_course_state.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
@@ -22,11 +25,12 @@ import '../../../courses/presentation/views/widgets/show_courses_filter_bottom_s
 // ============================================================================
 
 class HomeBody extends StatelessWidget {
-  const HomeBody({super.key});
+  final VoidCallback onProfileTap;
+  const HomeBody({super.key, required this.onProfileTap});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCoursesCubit, HomeCoursesState>(
+    return BlocBuilder<HomeCoursesCubit, HomeCourseState>(
       builder: (context, state) {
         return state.when(
           initial: () => const SizedBox.shrink(),
@@ -35,11 +39,12 @@ class HomeBody extends StatelessWidget {
             message: message,
             onRetry: () => context.read<HomeCoursesCubit>().fetchHomeCourses(),
           ),
-          success: (continueLearning, popularCourses, recommendedCourses) =>
+          loaded: (continueLearning, popularCourses, recommendedCourses) =>
               _HomeSuccessView(
             continueLearning: continueLearning,
             popularCourses: popularCourses,
             recommendedCourses: recommendedCourses,
+            onProfileTap: onProfileTap,
           ),
         );
       },
@@ -56,11 +61,13 @@ class _HomeSuccessView extends StatefulWidget {
     required this.continueLearning,
     required this.popularCourses,
     required this.recommendedCourses,
+    required this.onProfileTap,
   });
 
-  final StudentProgressEntity? continueLearning;
-  final List<CourseEntity> popularCourses;
-  final List<CourseEntity> recommendedCourses;
+  final List<ContinueLearningModel> continueLearning;
+  final List<PopularCourseModel> popularCourses;
+  final List<RecommendedCourseModel> recommendedCourses;
+  final VoidCallback onProfileTap;
 
   @override
   State<_HomeSuccessView> createState() => _HomeSuccessViewState();
@@ -77,11 +84,11 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 
   @override
   Widget build(BuildContext context) {
-    final CourseEntity? continueCourse = widget.popularCourses.isNotEmpty
+    final HomeCourseEntity? continueCourse = widget.popularCourses.isNotEmpty
         ? widget.popularCourses.first
         : widget.recommendedCourses.isNotEmpty
-        ? widget.recommendedCourses.first
-        : null;
+            ? widget.recommendedCourses.first
+            : null;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -94,8 +101,8 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               // ------------- App Header -------------
               AppHeader(
                 onNotificationTap: () {},
-                userName: 'Leonel Messi',
                 notificationCount: 10,
+                onProfileTap: widget.onProfileTap,
               ),
               Gap(20.h),
 
@@ -114,7 +121,9 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 
               // ------------- Continue Learning Section -------------
               buildContinueLearningSection(
-                widget.continueLearning,
+                widget.continueLearning.isNotEmpty
+                    ? widget.continueLearning.first
+                    : null,
                 continueCourse,
               ),
               Gap(28.h),
@@ -130,9 +139,7 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               Gap(28.h),
 
               // ------------- Recommended Courses Section -------------
-              if (widget.recommendedCourses.isNotEmpty) ...[
-                buildRecommendedCoursesSection(widget.recommendedCourses),
-              ],
+              buildRecommendedCoursesSection(widget.recommendedCourses),
               Gap(24.h),
             ],
           ),
@@ -146,7 +153,8 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 // ============================================================================
 
 class HomeErrorView extends StatelessWidget {
-  const HomeErrorView({super.key,
+  const HomeErrorView({
+    super.key,
     required this.message,
     required this.onRetry,
   });
@@ -183,7 +191,7 @@ class HomeErrorView extends StatelessWidget {
 
               // Error title
               Text(
-                'Something went wrong',
+                'home.error.something_went_wrong'.tr(),
                 style: TextStyles.titleSmall.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -211,7 +219,7 @@ class HomeErrorView extends StatelessWidget {
                   onPressed: onRetry,
                   icon: Icon(Icons.refresh_rounded, size: 20.sp),
                   label: Text(
-                    'Try Again',
+                    'home.error.try_again'.tr(),
                     style: TextStyles.labelLarge.copyWith(
                       color: colorScheme.onPrimary,
                     ),

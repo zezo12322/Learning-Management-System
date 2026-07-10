@@ -18,6 +18,7 @@ import 'package:optimatech_lms/features/courses/data/repositories/categories_rep
 import 'package:optimatech_lms/features/courses/data/repositories/courses_repository_impl.dart';
 import 'package:optimatech_lms/features/courses/domain/repositories/courses_repository.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
+import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source.dart';
 import 'package:optimatech_lms/features/profile/data/datasources/theme_local_data_source.dart';
 import 'package:optimatech_lms/features/profile/presentation/manager/theme/theme_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,13 +27,17 @@ import '../../features/courses/data/datasources/categories_remote_datasource/cat
 import '../../features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource.dart';
 import '../../features/courses/domain/repositories/categories_repository.dart';
 import '../../features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
-import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source.dart';
+import 'package:optimatech_lms/features/home/data/datasources/home_remote_data_source_impl.dart';
 import 'package:optimatech_lms/features/home/data/repositories/home_repository_impl.dart';
 import 'package:optimatech_lms/features/home/domain/repositories/home_repository.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_continue_learning_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_popular_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_recommended_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
+import 'package:optimatech_lms/features/course_details/data/data_source/course_details_remote_data_source.dart';
+import 'package:optimatech_lms/features/course_details/data/repositories/course_details_repository_impl.dart';
+import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
+import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -83,22 +88,28 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<CoursesRemoteDatasource>(
-      () => CoursesRemoteDatasourceImpl(DefaultConnector.instance));
+    () => CoursesRemoteDatasourceImpl(DefaultConnector.instance),
+  );
   getIt.registerLazySingleton<CoursesRepository>(
-      () => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()));
+    () => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()),
+  );
   getIt.registerFactory<CoursesCubit>(
-      () => CoursesCubit(repository: getIt<CoursesRepository>()));
+    () => CoursesCubit(repository: getIt<CoursesRepository>()),
+  );
 
   getIt.registerLazySingleton<CategoriesRemoteDatasource>(
-      () => CategoriesRemoteDatasourceImpl(DefaultConnector.instance));
+    () => CategoriesRemoteDatasourceImpl(DefaultConnector.instance),
+  );
   getIt.registerLazySingleton<CategoriesRepository>(
-      () => CategoriesRepositoryImpl(getIt<CategoriesRemoteDatasource>()));
+    () => CategoriesRepositoryImpl(getIt<CategoriesRemoteDatasource>()),
+  );
   getIt.registerFactory<CategoriesCubit>(
-      () => CategoriesCubit(repository: getIt<CategoriesRepository>()));
-
+    () => CategoriesCubit(repository: getIt<CategoriesRepository>()),
+  );
 
   getIt.registerLazySingleton<ThemeLocalDataSource>(
-      () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()));
+    () => ThemeLocalDataSourceImpl(getIt<SharedPreferences>()),
+  );
   getIt.registerFactory<ThemeCubit>(
       () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>()));
 
@@ -120,5 +131,18 @@ Future<void> setupDependencies() async {
       getCourseCurriculumUseCase: getIt<GetCourseCurriculumUseCase>(),
       getLectureContentUseCase: getIt<GetLectureContentUseCase>(),
     ),
+  );
+    () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>(),
+  );
+
+  // ========================= Course Details Feature =========================
+  getIt.registerLazySingleton<CourseDetailsRemoteDataSource>(
+    () => const CourseDetailsRemoteDataSourceImpl(),
+  );
+  getIt.registerLazySingleton<CourseDetailsRepository>(
+    () => CourseDetailsRepositoryImpl(remoteDataSource: getIt<CourseDetailsRemoteDataSource>()),
+  );
+  getIt.registerFactory<CourseDetailsCubit>(
+    () => CourseDetailsCubit(getIt<CourseDetailsRepository>()),
   );
 }

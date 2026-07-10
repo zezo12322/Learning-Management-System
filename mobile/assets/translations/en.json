@@ -118,6 +118,8 @@
     "lessons": "lessons",
     "of_lessons": "{completed} of {total} lessons",
     "min_left": "{time} left",
+    "min": "min",
+    "inProgress": "In Progress",
     "error_title": "Something went wrong",
     "retry": "Try Again",
     "assignments": {
@@ -141,6 +143,9 @@
     "not_found": "Page Not Found",
     "not_found_msg": "The route you requested does not exist.",
     "go_home": "Go to Home"
+  },
+  "course_details": {
+    "you_might_also_like": "You might also like"
   },
   "courses": {
     "title": "Courses",

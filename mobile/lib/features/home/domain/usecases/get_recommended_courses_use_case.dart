@@ -1,14 +1,18 @@
 import 'package:dartz/dartz.dart';
 import 'package:optimatech_lms/core/error/failures.dart';
-import '../entities/course_entity.dart';
+import 'package:optimatech_lms/features/home/domain/usecases/home_use_case.dart';
+import '../entities/home_course_entity.dart';
 import '../repositories/home_repository.dart';
 
-class GetRecommendedCoursesUseCase {
-  final HomeRepository repository;
+class GetRecommendedCoursesUseCase
+    extends HomeUseCase<List<HomeCourseEntity>, NoParams> {
+  final HomeRepository homeRepository;
 
-  GetRecommendedCoursesUseCase(this.repository);
+  GetRecommendedCoursesUseCase(this.homeRepository);
 
-  Future<Either<Failure, List<CourseEntity>>> call() async {
-    return await repository.getRecommendedCourses();
-  }
+  @override
+  Future<Either<Failure, List<HomeCourseEntity>>> call(
+    NoParams? params,
+  ) async =>
+      await homeRepository.getRecommendedCourses();
 }
