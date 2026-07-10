@@ -193,7 +193,10 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
                   ),
                 ),
               ),
-              CourseEnrollBottomBar(price: widget.course.price),
+              CourseEnrollBottomBar(
+                price: widget.course.price,
+                onEnroll: () {},
+              ),
             ],
           );
         },

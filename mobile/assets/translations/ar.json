@@ -144,6 +144,9 @@
     "not_found_msg": "المسار الذي طلبته غير موجود.",
     "go_home": "الذهاب للرئيسية"
   },
+  "course_details": {
+    "you_might_also_like": "قد يعجبك أيضاً"
+  },
   "courses": {
     "title": "الكورسات",
     "searchHint": "ابحث عن كورسات أو دروس أو اختبارات...",

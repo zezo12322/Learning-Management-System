@@ -96,36 +96,44 @@ class CourseEnrollBottomBar extends StatelessWidget {
             ),
           ),
           Gap(12.w),
-          SizedBox(
+          Container(
             width: 160.w,
             height: 48.h,
-            child: ElevatedButton(
-              onPressed: onEnroll,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Enroll Now',
-                    style: TextStyles.labelLarge.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeights.semiBold,
-                    ),
-                  ),
-                  Gap(6.w),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 18.sp,
-                    color: colorScheme.onPrimary,
-                  ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primary,
+                  Color.lerp(
+                      colorScheme.primary, const Color(0xFF1E1B4B), 0.45)!,
                 ],
+              ),
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onEnroll,
+                borderRadius: BorderRadius.circular(14.r),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Enroll Now',
+                      style: TextStyles.labelLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeights.semiBold,
+                      ),
+                    ),
+                    Gap(6.w),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18.sp,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
