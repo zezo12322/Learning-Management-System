@@ -102,12 +102,12 @@ class _LectureVideoSection extends StatelessWidget {
           prev.lectureState != curr.lectureState,
       builder: (context, state) {
         if (state.lectureState == Status.loading) {
-          return const AspectRatio(
+          return AspectRatio(
             aspectRatio: 16 / 9,
             child: ColoredBox(
               color: Colors.black,
               child: Center(
-                child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                child: CircularProgressIndicator(color: context.theme.colorScheme.primary),
               ),
             ),
           );
@@ -121,7 +121,6 @@ class _LectureVideoSection extends StatelessWidget {
         }
 
         final url = state.currentLecture?.videoUrl ?? '';
-
         return LessonVideoPlayerSection(
           key: ValueKey(url.isEmpty ? 'empty-video' : url),
           url: url,
