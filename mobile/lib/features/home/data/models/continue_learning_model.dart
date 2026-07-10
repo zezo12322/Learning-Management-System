@@ -10,7 +10,8 @@ class ContinueLearningModel extends StudentProgressEntity {
   });
 
   factory ContinueLearningModel.fromDataConnect(
-      GetMyContinueLearningEnrollmentsCourse course) {
+    GetMyContinueLearningEnrollmentsCourse course,
+  ) {
     // Zero client-side logic enforcement:
     // We await the backend to provide totalLessons, watchedLessons, and progressPercent directly.
     // For now, we set them to placeholder defaults (0).

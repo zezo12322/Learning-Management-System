@@ -30,7 +30,7 @@ Widget buildContinueLearningSection(
         progress: progress?.progressPercent ?? 0.0,
         lessonsCompleted: progress?.watchedLessons ?? 0,
         totalLessons: progress?.totalLessons ?? 0,
-        timeLeft: progress?.timeLeft ?? '0 min',
+        timeLeft: progress?.timeLeft ?? '0 ${'home.min'.tr()}',
         onTap: () {},
         onPlayTap: () {},
       ),

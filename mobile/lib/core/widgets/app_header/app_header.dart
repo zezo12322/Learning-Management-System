@@ -46,7 +46,7 @@ class AppHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                '$displayName!',
+                displayName,
                 style: TextStyles.titleSmall.copyWith(
                   fontSize: 22.sp,
                   fontWeight: FontWeights.bold,
