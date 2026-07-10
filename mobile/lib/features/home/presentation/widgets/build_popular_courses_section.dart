@@ -27,20 +27,26 @@ const _popularCardIcons = [
 ];
 
 // ------------- Popular Courses Section Builder (horizontal scroll) --------
-Widget buildPopularCoursesSection(List<PopularCourseModel> popularCourses) {
+Widget buildPopularCoursesSection(
+  List<PopularCourseModel> popularCourses, {
+  String? customTitle,
+  bool shrinkWrap = false,
+  ScrollPhysics? physics,
+}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       HomeSectionHeader(
-        title: 'home.popular_courses'.tr(),
+        title: customTitle ?? 'home.popular_courses'.tr(),
         onViewAllTap: () {},
       ),
       Gap(14.h),
       SizedBox(
         height: 210.h,
         child: ListView.separated(
+          shrinkWrap: shrinkWrap,
           scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
+          physics: physics ?? const BouncingScrollPhysics(),
           itemCount: popularCourses.length,
           separatorBuilder: (_, __) => Gap(12.w),
           itemBuilder: (context, index) {
