@@ -47,8 +47,7 @@ Widget buildPopularCoursesSection(List<PopularCourseModel> popularCourses) {
             final course = popularCourses[index];
             return PopularCourseCard(
               title: course.title,
-              studentCount:
-                  '${(index + 1) * 5}.${index}K ${'home.students'.tr()}',
+              studentCount: '0 ${'home.students'.tr()}',
               rating: course.rating,
               headerColor:
                   _popularCardColors[index % _popularCardColors.length],
