@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/app_text_styles.dart';
+
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/course_content_tabs.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/course_enroll_bottom_bar.dart';
@@ -18,10 +18,14 @@ import 'package:optimatech_lms/features/home/presentation/manager/home_courses_c
 import 'package:optimatech_lms/features/home/presentation/widgets/build_popular_courses_section.dart';
 import 'package:optimatech_lms/core/services/get_it_service.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/video_player_stage.dart';
-import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/over_view_tap/overview_tab.dart';
+import 'package:optimatech_lms/features/course_details/domain/entities/course_curriculum_entity.dart';
+import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_cubit.dart';
+import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
+import 'package:optimatech_lms/features/course_details/presentation/widgets/resources_content.dart';
+import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
 
-class CourseDetailsView extends StatefulWidget {
+class CourseDetailsView extends StatelessWidget {
   const CourseDetailsView({super.key, required this.course});
 
   final CourseEntity course;
@@ -29,10 +33,24 @@ class CourseDetailsView extends StatefulWidget {
   static const routeName = '/course-details';
 
   @override
-  State<CourseDetailsView> createState() => _CourseDetailsViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider<CourseDetailsCubit>(
+      create: (context) => getIt<CourseDetailsCubit>()..loadCurriculum(course.id),
+      child: _CourseDetailsContent(course: course),
+    );
+  }
 }
 
-class _CourseDetailsViewState extends State<CourseDetailsView> {
+class _CourseDetailsContent extends StatefulWidget {
+  const _CourseDetailsContent({required this.course});
+
+  final CourseEntity course;
+
+  @override
+  State<_CourseDetailsContent> createState() => _CourseDetailsContentState();
+}
+
+class _CourseDetailsContentState extends State<_CourseDetailsContent> {
   // show video player stage screen
   bool _showVideoPlayer = false;
   // selected tab index 0: overview, 1: curriculum, 2: reviews, 3: resources
@@ -83,221 +101,131 @@ class _CourseDetailsViewState extends State<CourseDetailsView> {
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceDim,
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (_showVideoPlayer)
-                    VideoPlayerStage(
-                      lessonTitle: widget.course.lessons.firstWhere(
-                        (l) => l.id == _activeLessonId,
-                        orElse: () => widget.course.lessons.isNotEmpty 
-                            ? widget.course.lessons.first 
-                            : CourseLessonEntity(id: '', number: 0, title: widget.course.title, duration: '', status: LessonStatus.completed),
-                      ).title,
-                      onBack: _closeVideoPlayer,
-                    )
-                  else
-                    // instructor profile card, course stats card, and course content tabs
-                    CourseHeroSection(
-                      course: widget.course,
-                      onPlayTap: _openVideoPlayer,
-                    ),
-                  Transform.translate(
-                    offset: Offset(0, _showVideoPlayer ? 0 : -20.h),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceDim,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(_showVideoPlayer ? 0 : 24.r),
+      body: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
+        builder: (context, state) {
+          List<CourseLessonEntity> allLessons = [];
+          if (state is CourseDetailsLoaded) {
+            allLessons = state.curriculum.sections.expand((s) => s.lessons).toList();
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_showVideoPlayer)
+                        VideoPlayerStage(
+                          lessonTitle: allLessons.firstWhere(
+                            (l) => l.id == _activeLessonId,
+                            orElse: () => allLessons.isNotEmpty 
+                                ? allLessons.first 
+                                : CourseLessonEntity(id: '', number: 0, title: widget.course.title, duration: '', status: LessonStatus.completed),
+                          ).title,
+                          onBack: _closeVideoPlayer,
+                        )
+                      else
+                        // instructor profile card, course stats card, and course content tabs
+                        CourseHeroSection(
+                          course: widget.course,
+                          onPlayTap: _openVideoPlayer,
                         ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            if (!_showVideoPlayer) ...[
-                              InstructorProfileCard(
-                                instructor: widget.course.instructors.isNotEmpty
-                                    ? widget.course.instructors.first
-                                    : null,
-                              ),
-                              Gap(16.h),
-                              CourseStatsCard(course: widget.course),
-                              Gap(20.h),
-                            ],
-                            CourseContentTabs(
-                              selectedIndex: _selectedTabIndex,
-                              onTabSelected: (index) {
-                                setState(() => _selectedTabIndex = index);
-                              },
+                      Transform.translate(
+                        offset: Offset(0, _showVideoPlayer ? 0 : -20.h),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceDim,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(_showVideoPlayer ? 0 : 24.r),
                             ),
-                            Gap(20.h),
-                            _buildTabContent(),
-                            Gap(32.h),
-                            BlocProvider<HomeCoursesCubit>(
-                              create: (context) =>
-                                  getIt<HomeCoursesCubit>()..fetchHomeCourses(),
-                              child: BlocBuilder<HomeCoursesCubit, HomeCourseState>(
-                                builder: (context, state) {
-                                  return state.maybeWhen(
-                                    loaded: (_, popularCourses, __) {
-                                      if (popularCourses.isEmpty) return const SizedBox.shrink();
-                                      return buildPopularCoursesSection(
-                                        popularCourses,
-                                        customTitle: 'course_details.you_might_also_like'.tr(),
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (!_showVideoPlayer) ...[
+                                  InstructorProfileCard(
+                                    instructor: widget.course.instructors.isNotEmpty
+                                        ? widget.course.instructors.first
+                                        : null,
+                                  ),
+                                  Gap(16.h),
+                                  CourseStatsCard(course: widget.course),
+                                  Gap(20.h),
+                                ],
+                                CourseContentTabs(
+                                  selectedIndex: _selectedTabIndex,
+                                  onTabSelected: (index) {
+                                    setState(() => _selectedTabIndex = index);
+                                  },
+                                ),
+                                Gap(20.h),
+                                _buildTabContent(state, allLessons),
+                                Gap(32.h),
+                                BlocProvider<HomeCoursesCubit>(
+                                  create: (context) =>
+                                      getIt<HomeCoursesCubit>()..fetchHomeCourses(),
+                                  child: BlocBuilder<HomeCoursesCubit, HomeCourseState>(
+                                    builder: (context, state) {
+                                      return state.maybeWhen(
+                                        loaded: (_, popularCourses, __) {
+                                          if (popularCourses.isEmpty) return const SizedBox.shrink();
+                                          return buildPopularCoursesSection(
+                                            popularCourses,
+                                            customTitle: 'course_details.you_might_also_like'.tr(),
+                                            shrinkWrap: true,
+                                            physics: const NeverScrollableScrollPhysics(),
+                                          );
+                                        },
+                                        orElse: () => const SizedBox.shrink(),
                                       );
                                     },
-                                    orElse: () => const SizedBox.shrink(),
-                                  );
-                                },
-                              ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          CourseEnrollBottomBar(price: widget.course.price),
-        ],
+              CourseEnrollBottomBar(price: widget.course.price),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildTabContent() {
+  Widget _buildTabContent(CourseDetailsState state, List<CourseLessonEntity> allLessons) {
     switch (_selectedTabIndex) {
       case 0:
         return OverviewTab(course: widget.course);
       case 1:
-        return _CurriculumContent(
-          course: widget.course,
+        if (state is CourseDetailsLoading || state is CourseDetailsInitial) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state is CourseDetailsError) {
+          return AppErrorWidget(
+            message: state.message,
+            onRetry: () => context.read<CourseDetailsCubit>().loadCurriculum(widget.course.id),
+          );
+        }
+        return CurriculumLessonList(
+          lessons: allLessons,
           onLessonTap: _onLessonTap,
           activeLessonId: _activeLessonId,
         );
       case 2:
         return const CourseReviewCard();
       case 3:
-        return _ResourcesContent();
+        return const ResourcesContent();
       default:
         return const SizedBox.shrink();
     }
-  }
-}
-
-class _CurriculumContent extends StatelessWidget {
-  const _CurriculumContent({
-    required this.course,
-    required this.onLessonTap,
-    this.activeLessonId,
-  });
-
-  final CourseEntity course;
-  final ValueChanged<CourseLessonEntity> onLessonTap;
-  final String? activeLessonId;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        CurriculumLessonList(
-          lessons: course.lessons,
-          onLessonTap: onLessonTap,
-          activeLessonId: activeLessonId,
-        ),
-      ],
-    );
-  }
-}
-
-class _ResourcesContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final resources = [
-      ('Course Slides', Icons.slideshow_outlined, 'PDF • 2.4 MB'),
-      ('Design Checklist', Icons.checklist_rounded, 'PDF • 890 KB'),
-      ('Figma Template', Icons.design_services_outlined, 'FIG • 5.1 MB'),
-      ('Color Palette Guide', Icons.palette_outlined, 'PDF • 1.2 MB'),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Downloadable Resources',
-          style: TextStyles.titleSmall.copyWith(
-            fontSize: 18.sp,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        Gap(12.h),
-        ...resources.map(
-          (resource) => Container(
-            margin: EdgeInsets.only(bottom: 8.h),
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40.w,
-                  height: 40.w,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Icon(
-                    resource.$2,
-                    size: 20.sp,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                Gap(12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        resource.$1,
-                        style: TextStyles.labelMedium.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeights.semiBold,
-                        ),
-                      ),
-                      Gap(2.h),
-                      Text(
-                        resource.$3,
-                        style: TextStyles.labelSmall.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.download_outlined,
-                  size: 22.sp,
-                  color: colorScheme.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }
