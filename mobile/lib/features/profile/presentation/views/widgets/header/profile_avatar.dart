@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/widgets/custom_cashed_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -11,6 +12,8 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final photoURL = FirebaseAuth.instance.currentUser?.photoURL;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -27,8 +30,8 @@ class ProfileAvatar extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(999.r),
-            child: const CustomCachedNetworkImage(
-              imagePath: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop',
+            child: CustomCachedNetworkImage(
+              imagePath: photoURL,
             ),
           ),
         ),

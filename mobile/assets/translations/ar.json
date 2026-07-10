@@ -118,6 +118,8 @@
     "lessons": "دروس",
     "of_lessons": "{completed} من {total} دروس",
     "min_left": "متبقي {time}",
+    "min": "دقيقة",
+    "inProgress": "جاري الدراسة",
     "error_title": "حدث خطأ ما",
     "retry": "إعادة المحاولة",
     "assignments": {
@@ -141,6 +143,9 @@
     "not_found": "الصفحة غير موجودة",
     "not_found_msg": "المسار الذي طلبته غير موجود.",
     "go_home": "الذهاب للرئيسية"
+  },
+  "course_details": {
+    "you_might_also_like": "قد يعجبك أيضاً"
   },
   "courses": {
     "title": "الكورسات",

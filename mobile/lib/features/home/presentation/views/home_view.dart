@@ -69,7 +69,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     if (currentScreen == 0) {
       bodyWidget = BlocProvider<HomeCoursesCubit>(
         create: (context) => getIt<HomeCoursesCubit>()..fetchHomeCourses(),
-        child: const HomeBody(),
+        child: HomeBody(
+          onProfileTap: () => onTabTapped(3),
+        ),
       );
     } else if (currentScreen == 1) {
       bodyWidget = const CoursesView();

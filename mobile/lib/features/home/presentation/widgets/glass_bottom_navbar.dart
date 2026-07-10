@@ -166,42 +166,47 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                                         vertical: 6,
                                       )
                                     : null,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    AnimatedSwitcher(
-                                      duration: const Duration(
-                                        milliseconds: 280,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 280,
+                                        ),
+                                        child: IconTheme(
+                                          data: IconThemeData(
+                                            size: isSelected ? 22 : 19,
+                                            color: isSelected
+                                                ? context
+                                                    .theme.colorScheme.primary
+                                                : context
+                                                    .theme.colorScheme.onSurface
+                                                    .withValues(alpha: 0.9),
+                                          ),
+                                          child: isSelected
+                                              ? item.filledIcon
+                                              : item.icon,
+                                        ),
                                       ),
-                                      child: IconTheme(
-                                        data: IconThemeData(
-                                          size: isSelected ? 22 : 19,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item.label,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
                                           color: isSelected
-                                              ? context
-                                                  .theme.colorScheme.primary
+                                              ? context.theme.colorScheme.primary
                                               : context
                                                   .theme.colorScheme.onSurface
                                                   .withValues(alpha: 0.9),
                                         ),
-                                        child: isSelected
-                                            ? item.filledIcon
-                                            : item.icon,
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      item.label,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: isSelected
-                                            ? context.theme.colorScheme.primary
-                                            : context
-                                                .theme.colorScheme.onSurface
-                                                .withValues(alpha: 0.9),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

@@ -5,7 +5,7 @@ import 'package:optimatech_lms/core/utils/app_colors.dart';
 class AppHeaderAvatar extends StatelessWidget {
   const AppHeaderAvatar({required this.profilePicture, super.key});
 
-  final String profilePicture;
+  final String? profilePicture;
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +18,9 @@ class AppHeaderAvatar extends StatelessWidget {
           CircleAvatar(
             radius: 26.r,
             backgroundColor: AppColors.disableBackground,
-            backgroundImage: NetworkImage(
-              profilePicture,
-            ),
+            backgroundImage: (profilePicture != null && profilePicture!.isNotEmpty)
+                ? NetworkImage(profilePicture!) as ImageProvider
+                : const AssetImage('assets/images/placeholder.png'),
           ),
           Positioned(
             right: 2.w,

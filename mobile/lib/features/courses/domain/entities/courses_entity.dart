@@ -1,4 +1,3 @@
-/// Pure domain entity — zero Flutter/Firebase imports.
 class CourseEntity {
   final String id;
   final String title;
@@ -14,7 +13,6 @@ class CourseEntity {
   final bool isBookmarked;
   final double avgRating;
   final int ratingCount;
-
 
   const CourseEntity({
     required this.id,

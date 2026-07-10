@@ -66,7 +66,7 @@ class ContinueLearningCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
-                            'In Progress',
+                            'home.inProgress'.tr(),
                             style: TextStyles.labelSmall.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeights.semiBold,
@@ -89,8 +89,7 @@ class ContinueLearningCard extends StatelessWidget {
                           children: [
                             _MetaItem(
                               icon: Icons.menu_book_outlined,
-                              label:
-                              'home.of_lessons'.tr(
+                              label: 'home.of_lessons'.tr(
                                 namedArgs: {
                                   'completed': '$lessonsCompleted',
                                   'total': '$totalLessons',

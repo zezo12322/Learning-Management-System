@@ -5,13 +5,13 @@ import 'package:gap/gap.dart';
 import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/continue_learning_card.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_section_header.dart';
-import '../../domain/entities/course_entity.dart';
+import '../../domain/entities/home_course_entity.dart';
 
 // ------------- Continue Learning Section Builder -------------
 Widget buildContinueLearningSection(
-    StudentProgressEntity? progress,
-    CourseEntity? continueCourse,
-    ) {
+  StudentProgressEntity? progress,
+  HomeCourseEntity? continueCourse,
+) {
   final title = continueCourse?.title ?? 'UI/UX Design Principles';
   final image =
       continueCourse?.image ?? 'assets/images/student_illustrator.png';
@@ -30,7 +30,7 @@ Widget buildContinueLearningSection(
         progress: progress?.progressPercent ?? 0.0,
         lessonsCompleted: progress?.watchedLessons ?? 0,
         totalLessons: progress?.totalLessons ?? 0,
-        timeLeft: progress?.timeLeft ?? '0 min',
+        timeLeft: progress?.timeLeft ?? '0 ${'home.min'.tr()}',
         onTap: () {},
         onPlayTap: () {},
       ),
