@@ -28,6 +28,10 @@ import 'package:optimatech_lms/features/home/domain/usecases/get_continue_learni
 import 'package:optimatech_lms/features/home/domain/usecases/get_popular_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/domain/usecases/get_recommended_courses_use_case.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
+import 'package:optimatech_lms/features/course_details/data/data_source/course_details_remote_data_source.dart';
+import 'package:optimatech_lms/features/course_details/data/repositories/course_details_repository_impl.dart';
+import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
+import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -110,5 +114,16 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<ThemeCubit>(
     () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>()),
+  );
+
+  // ========================= Course Details Feature =========================
+  getIt.registerLazySingleton<CourseDetailsRemoteDataSource>(
+    () => const CourseDetailsRemoteDataSourceImpl(),
+  );
+  getIt.registerLazySingleton<CourseDetailsRepository>(
+    () => CourseDetailsRepositoryImpl(remoteDataSource: getIt<CourseDetailsRemoteDataSource>()),
+  );
+  getIt.registerFactory<CourseDetailsCubit>(
+    () => CourseDetailsCubit(getIt<CourseDetailsRepository>()),
   );
 }
