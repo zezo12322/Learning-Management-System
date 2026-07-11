@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/helper_function/dummy.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
-import 'package:optimatech_lms/features/course_learning/presentation/views/course_learning_view.dart';
+import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
@@ -83,7 +83,12 @@ class _CoursesListView extends StatelessWidget {
             ratingCount: course.ratingCount,
           ),
           onTap: () {
-            Navigator.pushNamed(context, CourseLearningView.routeName, arguments: course.id);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CourseDetailsView(course: course),
+              ),
+            );
           },
           onBookmarkTap: () => context.read<CoursesCubit>().toggleBookmark(course.id),
           onMoreTap: () {},

@@ -14,29 +14,17 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getUserClaimsFn, createDefaultUserAndProfileFn, deleteUserRecordFn, createDefaultUserFn, getTargetUserRolesFn, removeRoleFn, assignNewRoleFn, getPendingSubmissions, getMyPendingSubmissions, adminAddCourseInstructor } from '@dataconnect/functions-generated';
+import { logPayment, addPaymentItem, myPaymentHistory, getPendingSubmissions, getMyPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors, enrollInCourse, enrollInMission } from '@dataconnect/functions-generated';
 
 
-// Operation GetUserClaimsFn:  For variables, look at type GetUserClaimsFnVars in ../index.d.ts
-const { data } = await GetUserClaimsFn(dataConnect, getUserClaimsFnVars);
+// Operation LogPayment:  For variables, look at type LogPaymentVars in ../index.d.ts
+const { data } = await LogPayment(dataConnect, logPaymentVars);
 
-// Operation CreateDefaultUserAndProfileFn:  For variables, look at type CreateDefaultUserAndProfileFnVars in ../index.d.ts
-const { data } = await CreateDefaultUserAndProfileFn(dataConnect, createDefaultUserAndProfileFnVars);
+// Operation AddPaymentItem:  For variables, look at type AddPaymentItemVars in ../index.d.ts
+const { data } = await AddPaymentItem(dataConnect, addPaymentItemVars);
 
-// Operation DeleteUserRecordFn:  For variables, look at type DeleteUserRecordFnVars in ../index.d.ts
-const { data } = await DeleteUserRecordFn(dataConnect, deleteUserRecordFnVars);
-
-// Operation CreateDefaultUserFn:  For variables, look at type CreateDefaultUserFnVars in ../index.d.ts
-const { data } = await CreateDefaultUserFn(dataConnect, createDefaultUserFnVars);
-
-// Operation GetTargetUserRolesFn:  For variables, look at type GetTargetUserRolesFnVars in ../index.d.ts
-const { data } = await GetTargetUserRolesFn(dataConnect, getTargetUserRolesFnVars);
-
-// Operation RemoveRoleFn:  For variables, look at type RemoveRoleFnVars in ../index.d.ts
-const { data } = await RemoveRoleFn(dataConnect, removeRoleFnVars);
-
-// Operation AssignNewRoleFn:  For variables, look at type AssignNewRoleFnVars in ../index.d.ts
-const { data } = await AssignNewRoleFn(dataConnect, assignNewRoleFnVars);
+// Operation MyPaymentHistory: 
+const { data } = await MyPaymentHistory(dataConnect);
 
 // Operation GetPendingSubmissions: 
 const { data } = await GetPendingSubmissions(dataConnect);
@@ -46,6 +34,18 @@ const { data } = await GetMyPendingSubmissions(dataConnect);
 
 // Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
 const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
+
+// Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
+const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
+
+// Operation GetCourseInstructors:  For variables, look at type GetCourseInstructorsVars in ../index.d.ts
+const { data } = await GetCourseInstructors(dataConnect, getCourseInstructorsVars);
+
+// Operation EnrollInCourse:  For variables, look at type EnrollInCourseVars in ../index.d.ts
+const { data } = await EnrollInCourse(dataConnect, enrollInCourseVars);
+
+// Operation EnrollInMission:  For variables, look at type EnrollInMissionVars in ../index.d.ts
+const { data } = await EnrollInMission(dataConnect, enrollInMissionVars);
 
 
 ```

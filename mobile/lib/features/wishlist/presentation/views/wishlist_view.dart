@@ -27,7 +27,7 @@ class _WishlistViewState extends State<WishlistView> {
         showBackButton: false,
         actions: [
           NotificationButton(
-            count: 10,
+            count: 0,
             onTap: () {},
           ),
           Gap(16.w),

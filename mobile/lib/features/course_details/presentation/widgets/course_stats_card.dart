@@ -3,27 +3,38 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
+import 'package:optimatech_lms/features/course_details/domain/entities/course_curriculum_entity.dart';
 
 class CourseStatsCard extends StatelessWidget {
-  const CourseStatsCard({super.key, required this.course});
+  const CourseStatsCard({super.key, required this.course, required this.lessons});
 
   final CourseEntity course;
+  final List<CourseLessonEntity> lessons;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // TODO: Total Duration Should be fetched from the API
+    int totalMinutes = 0;
+    for (var lesson in lessons) {
+      final match = RegExp(r'(\d+)').firstMatch(lesson.duration);
+      if (match != null) {
+        totalMinutes += int.tryParse(match.group(1) ?? '0') ?? 0;
+      }
+    }
+    
+    final hours = totalMinutes ~/ 60;
+    final durationString = hours > 0 ? '$hours hours' : '$totalMinutes Min';
+
     final stats = [
-      const _StatItem(
+      _StatItem(
         icon: Icons.access_time_rounded,
-        value: '20 hours',
+        value: durationString,
         label: 'Total Duration',
       ),
-      // TODO: Total Lessons Should be fetched from the API
-      const _StatItem(
+      _StatItem(
         icon: Icons.play_circle_outline_rounded,
-        value: '12 Lessons',
+        value: '${lessons.length} Lessons',
         label: 'Lessons',
       ),
       _StatItem(

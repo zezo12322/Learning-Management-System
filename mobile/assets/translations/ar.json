@@ -111,6 +111,7 @@
     "continue_learning": "أكمل التعلّم",
     "popular_courses": "الكورسات الشائعة",
     "recommended_courses": "كورسات مقترحة لك",
+    "keep_learning_recommendations": "استمر في التعلم للحصول على اقتراحات مخصصة",
     "assignments_missions": "التكليفات / المهام",
     "view_all": "عرض الكل",
     "in_progress": "قيد التقدم",
@@ -197,7 +198,7 @@
     },
     "header": {
       "role": "طالب",
-      "joined": "انضم في مارس 2024",
+      "joined": "انضم في {}",
       "stats": {
         "courses": "الكورسات المسجل بها",
         "courses_subtitle": "تعلّم نشط",

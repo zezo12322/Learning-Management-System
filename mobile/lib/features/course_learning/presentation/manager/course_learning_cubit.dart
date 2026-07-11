@@ -2,15 +2,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_course_curriculum_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_lecture_content_usecase.dart';
+import 'package:optimatech_lms/features/course_learning/domain/usecases/update_lecture_progress_usecase.dart';
 import 'course_learning_state.dart';
 
 class CourseLearningCubit extends Cubit<CourseLearningState> {
   final GetCourseCurriculumUseCase getCourseCurriculumUseCase;
   final GetLectureContentUseCase getLectureContentUseCase;
+  final UpdateLectureProgressUseCase updateLectureProgressUseCase;
 
   CourseLearningCubit({
     required this.getCourseCurriculumUseCase,
     required this.getLectureContentUseCase,
+    required this.updateLectureProgressUseCase,
   }) : super(const CourseLearningState());
 
   String? _courseId;
@@ -127,7 +130,17 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
   }
 
   Future<void> markCurrentLectureAsCompleted() async {
-    /// placeholder لحين إضافة progress use case
-    /// دلوقتي بنسيبه بدون implementation حقيقية بدل ما نكذب على الـ UI
+    final currentLectureId = state.currentLecture?.id;
+    if (currentLectureId == null) return;
+
+    final duration = state.currentLecture?.duration ?? 0;
+    
+    // We optimistically mark it as complete by hitting the synchronous PUT endpoint.
+    // The NestJS backend will accept this since it's the explicit "mark complete" action.
+    await updateLectureProgressUseCase(
+      lectureId: currentLectureId,
+      lastWatchedSecond: duration > 0 ? (duration * 60) : 0, // Fallback if duration is in minutes
+      completed: true,
+    );
   }
 }

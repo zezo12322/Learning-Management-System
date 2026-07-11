@@ -1,6 +1,16 @@
 {
   "emulators": {
+    "auth": {
+      "port": 9099,
+      "host": "127.0.0.1"
+    },
+    "firestore": {
+      "port": 8081,
+      "host": "127.0.0.1"
+    },
     "dataconnect": {
+      "port": 9399,
+      "host": "127.0.0.1",
       "dataDir": "dataconnect/.dataconnect/pgliteData"
     }
   },

@@ -111,6 +111,7 @@
     "continue_learning": "Continue Learning",
     "popular_courses": "Popular Courses",
     "recommended_courses": "Recommended Courses",
+    "keep_learning_recommendations": "Keep learning to get tailored recommendations",
     "assignments_missions": "Assignments / Missions",
     "view_all": "View all",
     "in_progress": "In Progress",
@@ -201,7 +202,7 @@
     },
     "header": {
       "role": "Student",
-      "joined": "Joined March 2024",
+      "joined": "Joined {}",
       "stats": {
         "courses": "Courses Enrolled",
         "courses_subtitle": "Active learning",

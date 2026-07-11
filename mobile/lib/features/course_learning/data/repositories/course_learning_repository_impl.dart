@@ -59,9 +59,19 @@ class CourseLearningRepositoryImpl implements CourseLearningRepository {
   //   throw UnimplementedError();
   // }
   //
-  // @override
-  // Future<Either<Failure, void>> updateLectureProgress({required String lectureId, required int lastWatchedSecond, String? completedAtIso}) {
-  //   // TDO: implement updateLectureProgress
-  //   throw UnimplementedError();
-  // }
+  @override
+  Future<Either<Failure, void>> updateLectureProgress({
+    required String lectureId,
+    required int lastWatchedSecond,
+    bool completed = false,
+  }) async {
+    try {
+      await _remoteDataSource.updateLectureProgress(lectureId, lastWatchedSecond, completed: completed);
+      return const Right(null);
+    } on CustomExceptions catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('auth.error.genericError'.tr()));
+    }
+  }
 }
