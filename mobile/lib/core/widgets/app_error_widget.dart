@@ -45,8 +45,7 @@ class AppErrorWidget extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              //message ?? 'common.error_widget.default_message'.tr(),
-              'common.error_widget.default_message'.tr(),
+              message ?? 'common.error_widget.default_message'.tr(),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.theme.colorScheme.onSurfaceVariant,
               ),

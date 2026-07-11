@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/section_header.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/widgets/info/profile_info_tile.dart';
 
 class ProfileInfoSection extends StatelessWidget {
@@ -10,32 +11,28 @@ class ProfileInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName ?? (user?.email?.split('@').first) ?? 'Unknown';
+    final email = user?.email ?? 'No email linked';
+    final phone = user?.phoneNumber ?? 'No phone linked';
+    
     final items = [
       ProfileInfoTileData(
         icon: Icons.person_outline_rounded,
         titleKey: 'profile.info.full_name'.tr(),
-        value: 'Sarah Johnson',
+        value: displayName,
       ),
       ProfileInfoTileData(
         icon: Icons.email_outlined,
         titleKey: 'profile.info.email'.tr(),
-        value: 'sarah.johnson@email.com',
+        value: email,
       ),
-      ProfileInfoTileData(
-        icon: Icons.call_outlined,
-        titleKey: 'profile.info.phone'.tr(),
-        value: '+20 101 234 5678',
-      ),
-      ProfileInfoTileData(
-        icon: Icons.location_on_outlined,
-        titleKey: 'profile.info.location'.tr(),
-        value: 'Cairo, Egypt',
-      ),
-      ProfileInfoTileData(
-        icon: Icons.calendar_month_outlined,
-        titleKey: 'profile.info.birth_date'.tr(),
-        value: '15 March 2001',
-      ),
+      if (user?.phoneNumber != null)
+        ProfileInfoTileData(
+          icon: Icons.call_outlined,
+          titleKey: 'profile.info.phone'.tr(),
+          value: phone,
+        ),
     ];
 
     return Column(

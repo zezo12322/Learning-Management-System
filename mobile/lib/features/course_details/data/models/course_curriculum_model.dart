@@ -6,16 +6,16 @@ class CourseCurriculumModel extends CourseCurriculumEntity {
     required super.sections,
   });
 
-  factory CourseCurriculumModel.fromConnectorResult(dynamic json, String courseId) {
+  factory CourseCurriculumModel.fromJson(dynamic json, String courseId) {
     if (json == null) {
       return CourseCurriculumModel(courseId: courseId, sections: const []);
     }
 
-    final sectionsList = json['sections'] as List<dynamic>? ?? [];
+    final sectionsList = json['publishedSections'] as List<dynamic>? ?? json['sections'] as List<dynamic>? ?? [];
     return CourseCurriculumModel(
       courseId: courseId,
       sections: sectionsList
-          .map((s) => CourseSectionModel.fromConnectorResult(s))
+          .map((s) => CourseSectionModel.fromJson(s))
           .toList(),
     );
   }
@@ -28,17 +28,17 @@ class CourseSectionModel extends CourseSectionEntity {
     required super.lessons,
   });
 
-  factory CourseSectionModel.fromConnectorResult(dynamic json) {
+  factory CourseSectionModel.fromJson(dynamic json) {
     if (json == null) {
       return const CourseSectionModel(id: '', title: '', lessons: []);
     }
 
-    final lessonsList = json['lessons'] as List<dynamic>? ?? [];
+    final lessonsList = json['publishedLectures'] as List<dynamic>? ?? json['lessons'] as List<dynamic>? ?? [];
     return CourseSectionModel(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
       lessons: lessonsList
-          .map((l) => CourseLessonModel.fromConnectorResult(l))
+          .map((l) => CourseLessonModel.fromJson(l))
           .toList(),
     );
   }
@@ -54,7 +54,7 @@ class CourseLessonModel extends CourseLessonEntity {
     required super.status,
   });
 
-  factory CourseLessonModel.fromConnectorResult(dynamic json) {
+  factory CourseLessonModel.fromJson(dynamic json) {
     if (json == null) {
       return const CourseLessonModel(
         id: '',

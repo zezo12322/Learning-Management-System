@@ -101,7 +101,7 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               // ------------- App Header -------------
               AppHeader(
                 onNotificationTap: () {},
-                notificationCount: 10,
+                notificationCount: 0,
                 onProfileTap: widget.onProfileTap,
               ),
               Gap(20.h),
@@ -120,13 +120,13 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               Gap(24.h),
 
               // ------------- Continue Learning Section -------------
-              buildContinueLearningSection(
-                widget.continueLearning.isNotEmpty
-                    ? widget.continueLearning.first
-                    : null,
-                continueCourse,
-              ),
-              Gap(28.h),
+              if (widget.continueLearning.isNotEmpty) ...[
+                buildContinueLearningSection(
+                  context,
+                  widget.continueLearning.first,
+                ),
+                Gap(28.h),
+              ],
 
               // ------------- Popular Courses Section -------------
               if (widget.popularCourses.isNotEmpty) ...[

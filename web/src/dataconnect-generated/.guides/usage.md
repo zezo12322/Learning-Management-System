@@ -12,8 +12,20 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetMyCourseAccess, useGetMyMissionAccess, useGetQuestionCourse, useGetOptionCourse, useGetSectionCourse, useGetMicroLessonMission, useGetCriterionMission, useGetTemplateMission, useGetCourseSessions, useCheckInToSession } from '@dataconnect/generated/react';
+import { useUpsertCourseRating, useDeleteCourseRating, useGetMyCourseRating, useListCourseRatings, useGetCourseRatingsForSummary, useAdminUpdateCourseRatingAggregate, useGetMyCourseAccess, useGetMyMissionAccess, useGetQuestionCourse, useGetOptionCourse } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
+
+const { data, isPending, isSuccess, isError, error } = useUpsertCourseRating(upsertCourseRatingVars);
+
+const { data, isPending, isSuccess, isError, error } = useDeleteCourseRating(deleteCourseRatingVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetMyCourseRating(getMyCourseRatingVars);
+
+const { data, isPending, isSuccess, isError, error } = useListCourseRatings(listCourseRatingsVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetCourseRatingsForSummary(getCourseRatingsForSummaryVars);
+
+const { data, isPending, isSuccess, isError, error } = useAdminUpdateCourseRatingAggregate(adminUpdateCourseRatingAggregateVars);
 
 const { data, isPending, isSuccess, isError, error } = useGetMyCourseAccess(getMyCourseAccessVars);
 
@@ -22,18 +34,6 @@ const { data, isPending, isSuccess, isError, error } = useGetMyMissionAccess(get
 const { data, isPending, isSuccess, isError, error } = useGetQuestionCourse(getQuestionCourseVars);
 
 const { data, isPending, isSuccess, isError, error } = useGetOptionCourse(getOptionCourseVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetSectionCourse(getSectionCourseVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetMicroLessonMission(getMicroLessonMissionVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetCriterionMission(getCriterionMissionVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetTemplateMission(getTemplateMissionVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetCourseSessions(getCourseSessionsVars);
-
-const { data, isPending, isSuccess, isError, error } = useCheckInToSession(checkInToSessionVars);
 
 ```
 
@@ -72,8 +72,26 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getMyCourseAccess, getMyMissionAccess, getQuestionCourse, getOptionCourse, getSectionCourse, getMicroLessonMission, getCriterionMission, getTemplateMission, getCourseSessions, checkInToSession } from '@dataconnect/generated';
+import { upsertCourseRating, deleteCourseRating, getMyCourseRating, listCourseRatings, getCourseRatingsForSummary, adminUpdateCourseRatingAggregate, getMyCourseAccess, getMyMissionAccess, getQuestionCourse, getOptionCourse } from '@dataconnect/generated';
 
+
+// Operation UpsertCourseRating:  For variables, look at type UpsertCourseRatingVars in ../index.d.ts
+const { data } = await UpsertCourseRating(dataConnect, upsertCourseRatingVars);
+
+// Operation DeleteCourseRating:  For variables, look at type DeleteCourseRatingVars in ../index.d.ts
+const { data } = await DeleteCourseRating(dataConnect, deleteCourseRatingVars);
+
+// Operation GetMyCourseRating:  For variables, look at type GetMyCourseRatingVars in ../index.d.ts
+const { data } = await GetMyCourseRating(dataConnect, getMyCourseRatingVars);
+
+// Operation ListCourseRatings:  For variables, look at type ListCourseRatingsVars in ../index.d.ts
+const { data } = await ListCourseRatings(dataConnect, listCourseRatingsVars);
+
+// Operation GetCourseRatingsForSummary:  For variables, look at type GetCourseRatingsForSummaryVars in ../index.d.ts
+const { data } = await GetCourseRatingsForSummary(dataConnect, getCourseRatingsForSummaryVars);
+
+// Operation AdminUpdateCourseRatingAggregate:  For variables, look at type AdminUpdateCourseRatingAggregateVars in ../index.d.ts
+const { data } = await AdminUpdateCourseRatingAggregate(dataConnect, adminUpdateCourseRatingAggregateVars);
 
 // Operation GetMyCourseAccess:  For variables, look at type GetMyCourseAccessVars in ../index.d.ts
 const { data } = await GetMyCourseAccess(dataConnect, getMyCourseAccessVars);
@@ -86,24 +104,6 @@ const { data } = await GetQuestionCourse(dataConnect, getQuestionCourseVars);
 
 // Operation GetOptionCourse:  For variables, look at type GetOptionCourseVars in ../index.d.ts
 const { data } = await GetOptionCourse(dataConnect, getOptionCourseVars);
-
-// Operation GetSectionCourse:  For variables, look at type GetSectionCourseVars in ../index.d.ts
-const { data } = await GetSectionCourse(dataConnect, getSectionCourseVars);
-
-// Operation GetMicroLessonMission:  For variables, look at type GetMicroLessonMissionVars in ../index.d.ts
-const { data } = await GetMicroLessonMission(dataConnect, getMicroLessonMissionVars);
-
-// Operation GetCriterionMission:  For variables, look at type GetCriterionMissionVars in ../index.d.ts
-const { data } = await GetCriterionMission(dataConnect, getCriterionMissionVars);
-
-// Operation GetTemplateMission:  For variables, look at type GetTemplateMissionVars in ../index.d.ts
-const { data } = await GetTemplateMission(dataConnect, getTemplateMissionVars);
-
-// Operation GetCourseSessions:  For variables, look at type GetCourseSessionsVars in ../index.d.ts
-const { data } = await GetCourseSessions(dataConnect, getCourseSessionsVars);
-
-// Operation CheckInToSession:  For variables, look at type CheckInToSessionVars in ../index.d.ts
-const { data } = await CheckInToSession(dataConnect, checkInToSessionVars);
 
 
 ```

@@ -6,11 +6,13 @@ import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_i
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
+import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/datasources/course_learning_remote_datasource.dart';
 import 'package:optimatech_lms/features/course_learning/data/repositories/course_learning_repository_impl.dart';
 import 'package:optimatech_lms/features/course_learning/domain/repositories/course_learning_repository.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_course_curriculum_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_lecture_content_usecase.dart';
+import 'package:optimatech_lms/features/course_learning/domain/usecases/update_lecture_progress_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
 import 'package:optimatech_lms/features/courses/data/datasources/categories_remote_datasource/categories_remote_datasource.dart';
 import 'package:optimatech_lms/features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource_impl.dart';
@@ -44,6 +46,8 @@ Future<void> setupDependencies() async {
   // ========================= Auth Feature =========================
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  getIt.registerLazySingleton<ApiService>(() => ApiService());
 
   getIt.registerLazySingleton<FirebaseAuthService>(() => FirebaseAuthService(),);
   getIt.registerLazySingleton<FireStoreService>(() => FireStoreService(),);
@@ -115,7 +119,7 @@ Future<void> setupDependencies() async {
 
   // ========================= Course Learning Feature =========================
   getIt.registerLazySingleton<CourseLearningRemoteDataSource>(
-    () => CourseLearningRemoteDataSourceImpl(defaultConnector: DefaultConnector.instance),
+    () => CourseLearningRemoteDataSourceImpl(apiService: getIt<ApiService>()),
   );
   getIt.registerLazySingleton<CourseLearningRepository>(
     () => CourseLearningRepositoryImpl(remoteDataSource: getIt<CourseLearningRemoteDataSource>()),
@@ -126,18 +130,20 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<GetLectureContentUseCase>(
     () => GetLectureContentUseCase(getIt<CourseLearningRepository>()),
   );
+  getIt.registerLazySingleton<UpdateLectureProgressUseCase>(
+    () => UpdateLectureProgressUseCase(getIt<CourseLearningRepository>()),
+  );
+
   getIt.registerFactory<CourseLearningCubit>(
     () => CourseLearningCubit(
       getCourseCurriculumUseCase: getIt<GetCourseCurriculumUseCase>(),
       getLectureContentUseCase: getIt<GetLectureContentUseCase>(),
+      updateLectureProgressUseCase: getIt<UpdateLectureProgressUseCase>(),
     ),
   );
-    () => ThemeCubit(themeLocalDataSource: getIt<ThemeLocalDataSource>(),
-  );
 
-  // ========================= Course Details Feature =========================
   getIt.registerLazySingleton<CourseDetailsRemoteDataSource>(
-    () => const CourseDetailsRemoteDataSourceImpl(),
+    () => CourseDetailsRemoteDataSourceImpl(apiService: getIt<ApiService>()),
   );
   getIt.registerLazySingleton<CourseDetailsRepository>(
     () => CourseDetailsRepositoryImpl(remoteDataSource: getIt<CourseDetailsRemoteDataSource>()),

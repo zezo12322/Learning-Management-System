@@ -53,18 +53,46 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   @override
   Future<List<RecommendedCourseModel>> getRecommendedCourses() async {
     try {
-      final response =
-          await DefaultConnector.instance.listPopularCourses().execute();
+      final enrolledResult = await DefaultConnector.instance.getMyEnrolledCourseCategories().execute();
+      final enrollments = enrolledResult.data.enrollments;
 
-      final data = response.data;
+      final Set<String> categoryIds = {};
+      final Set<String> excludeIds = {};
 
-      if (data.courses.isEmpty) {
-        return [];
+      for (var enrollment in enrollments) {
+        final course = enrollment.course;
+        if (course == null || course.deletedAt != null) continue;
+        
+        excludeIds.add(course.id);
+        if (course.category != null) {
+          categoryIds.add(course.category!.id);
+        }
       }
 
-      return data.courses
-          .map((e) => RecommendedCourseModel.fromPopularDataConnect(e))
+      if (categoryIds.isEmpty) {
+        final response = await DefaultConnector.instance.listPopularCourses().execute();
+        return response.data.courses
+            .map((e) => RecommendedCourseModel.fromPopularDataConnect(e))
+            .toList();
+      }
+
+      final recommendedResult = await DefaultConnector.instance.listRecommendedCourses(
+        categoryIds: categoryIds.toList(),
+        excludeIds: excludeIds.toList(),
+      ).execute();
+
+      final recommendedCourses = recommendedResult.data.courses
+          .map((e) => RecommendedCourseModel.fromDataConnect(e))
           .toList();
+
+      if (recommendedCourses.isEmpty) {
+        final response = await DefaultConnector.instance.listPopularCourses().execute();
+        return response.data.courses
+            .map((e) => RecommendedCourseModel.fromPopularDataConnect(e))
+            .toList();
+      }
+
+      return recommendedCourses;
     } catch (e) {
       throw ServerException(
         message: 'Failed to fetch recommended courses: ${e.toString()}',

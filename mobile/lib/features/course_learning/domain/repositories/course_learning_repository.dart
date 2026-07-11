@@ -16,12 +16,11 @@ abstract class CourseLearningRepository {
   //   required String lectureId,
   // });
 
-  // Future<Either<Failure, void>> updateLectureProgress({
-  //   required String lectureId,
-  //   required int lastWatchedSecond,
-  //   String? completedAtIso,
-  // });
-  //
+  Future<Either<Failure, void>> updateLectureProgress({
+    required String lectureId,
+    required int lastWatchedSecond,
+    bool completed = false,
+  });
   // Future<Either<Failure, bool>> getCourseAccess({
   //   required String courseId,
   // });

@@ -1,9 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
+import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 import 'package:optimatech_lms/core/config/firebase_options.dart';
 import 'package:optimatech_lms/core/helper_function/on_generate_route.dart';
 import 'package:optimatech_lms/core/services/bloc_observer_service.dart';
@@ -22,6 +27,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Firebase Emulators removed - connecting to production data
+  
   Bloc.observer = BlocObserverService();
   // Initialize Hive (Offline Storage)
   await Hive.initFlutter();

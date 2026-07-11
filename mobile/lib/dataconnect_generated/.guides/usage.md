@@ -1,6 +1,9 @@
 # Basic Usage
 
 ```dart
+DefaultConnector.instance.SyncUser(syncUserVariables).execute();
+DefaultConnector.instance.GetMe().execute();
+DefaultConnector.instance.UpdateMyProfile(updateMyProfileVariables).execute();
 DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
 DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
 DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
@@ -8,9 +11,6 @@ DefaultConnector.instance.InstructorCancelSession(instructorCancelSessionVariabl
 DefaultConnector.instance.SuperAdminCancelSession(superAdminCancelSessionVariables).execute();
 DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
 DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
-DefaultConnector.instance.AdminCreateCategory(adminCreateCategoryVariables).execute();
-DefaultConnector.instance.GetUserClaims(getUserClaimsVariables).execute();
-DefaultConnector.instance.MyCertificates().execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.UpdateMyProfile({ ... })
-.bio(...)
+await DefaultConnector.instance.AdminUpdateQuizOption({ ... })
+.text(...)
 .execute();
 ```
 

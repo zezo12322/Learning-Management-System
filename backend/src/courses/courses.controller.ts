@@ -33,44 +33,6 @@ export class CoursesController {
   // PUBLIC / STUDENT ROUTES
   // ==========================================
 
-  @Get('search')
-  search(@Query('q') searchQuery: string, @AuthToken() token: string) {
-    if (!searchQuery) {
-      throw new BadRequestException('Search query (q) is required');
-    }
-    return this.coursesService.searchCatalog(searchQuery, token);
-  }
-
-  @Get('categories')
-  getCategories(@AuthToken() token: string) {
-    return this.coursesService.getCategories(token);
-  }
-
-  // Most popular published courses (rating-aggregate ranked). Any signed-in user.
-  // Declared before ':courseId' so the static path isn't shadowed by the param route.
-  @Get('popular')
-  getPopular(@Query('limit') limit?: string) {
-    return this.coursesService.getPopular(limit ? Number(limit) : undefined);
-  }
-
-  // Personalized recommendations for the caller (falls back to popular).
-  @Get('recommended')
-  getRecommended(
-    @AuthToken() token: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.coursesService.getRecommended(
-      token,
-      limit ? Number(limit) : undefined,
-    );
-  }
-
-  // The caller's enrolled courses, ranked by completed-lesson count (desc).
-  @Get('continue-learning')
-  getContinueLearning(@AuthToken() token: string) {
-    return this.coursesService.getContinueLearning(token);
-  }
-
   // Descriptions of every uploaded video in a course. Access-gated in the service
   // (owner/admin or active enrollee see all; others get free-preview only).
   @Get(':courseId/videos')

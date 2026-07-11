@@ -152,7 +152,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
                                         : null,
                                   ),
                                   Gap(16.h),
-                                  CourseStatsCard(course: widget.course),
+                                  CourseStatsCard(course: widget.course, lessons: allLessons),
                                   Gap(20.h),
                                 ],
                                 CourseContentTabs(
