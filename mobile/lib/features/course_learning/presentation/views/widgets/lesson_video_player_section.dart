@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:easy_localization/easy_localization.dart' as esay;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/services/language_service.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
+import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
 import 'package:video_player/video_player.dart';
 
 class LessonVideoPlayerSection extends StatefulWidget {
@@ -22,6 +25,7 @@ class LessonVideoPlayerSection extends StatefulWidget {
 class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
+  Timer? _heartbeatTimer;
 
   bool _hasError = false;
   bool _isLoading = false;
@@ -48,7 +52,7 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
   }
 
   Future<void> _initializePlayer() async {
-    final url = widget.url.trim();
+    final url = widget.url;
 
     if (url.isEmpty) {
       if (mounted) {
@@ -75,6 +79,27 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         await controller.dispose();
         return;
       }
+
+      // Add a listener for video completion
+      controller.addListener(() {
+        if (!mounted) return;
+        final value = controller.value;
+        if (value.isInitialized && 
+            value.position >= value.duration && 
+            value.duration > Duration.zero) {
+          context.read<CourseLearningCubit>().markCurrentLectureAsCompleted();
+        }
+      });
+
+      // Start the heartbeat timer (e.g. every 10 seconds)
+      _heartbeatTimer?.cancel();
+      _heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        if (!mounted) return;
+        if (controller.value.isPlaying) {
+          final currentSecond = controller.value.position.inSeconds;
+          context.read<CourseLearningCubit>().syncLectureHeartbeat(currentSecond);
+        }
+      });
 
       final chewie = ChewieController(
         videoPlayerController: controller,
@@ -116,7 +141,9 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
           _hasError = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      print('Video player initialization error: $e');
+      print('Attempted URL: $url');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -126,13 +153,18 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
     }
   }
 
-  void _disposeControllers() async {
+  void _disposeControllers() {
+    _heartbeatTimer?.cancel();
     final chewie = _chewieController;
     final video = _videoPlayerController;
 
     _chewieController = null;
     _videoPlayerController = null;
 
+    if (video != null && video.value.isPlaying) {
+      video.pause();
+    }
+    
     chewie?.dispose();
     video?.dispose();
   }

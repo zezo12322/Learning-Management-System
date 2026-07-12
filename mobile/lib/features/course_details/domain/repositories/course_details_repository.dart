@@ -2,4 +2,5 @@ import 'package:optimatech_lms/features/course_details/domain/entities/course_cu
 
 abstract class CourseDetailsRepository {
   Future<CourseCurriculumEntity> getCourseCurriculum(String courseId);
+  Future<void> enrollInCourse(String courseId);
 }

@@ -14,11 +14,33 @@ class CourseDetailsLoading extends CourseDetailsState {}
 
 class CourseDetailsLoaded extends CourseDetailsState {
   final CourseCurriculumEntity curriculum;
+  final bool isEnrolling;
+  final bool enrollmentSuccess;
+  final String? enrollmentError;
 
-  const CourseDetailsLoaded(this.curriculum);
+  const CourseDetailsLoaded(
+    this.curriculum, {
+    this.isEnrolling = false,
+    this.enrollmentSuccess = false,
+    this.enrollmentError,
+  });
+
+  CourseDetailsLoaded copyWith({
+    CourseCurriculumEntity? curriculum,
+    bool? isEnrolling,
+    bool? enrollmentSuccess,
+    String? enrollmentError,
+  }) {
+    return CourseDetailsLoaded(
+      curriculum ?? this.curriculum,
+      isEnrolling: isEnrolling ?? this.isEnrolling,
+      enrollmentSuccess: enrollmentSuccess ?? this.enrollmentSuccess,
+      enrollmentError: enrollmentError,
+    );
+  }
 
   @override
-  List<Object?> get props => [curriculum];
+  List<Object?> get props => [curriculum, isEnrolling, enrollmentSuccess, enrollmentError];
 }
 
 class CourseDetailsError extends CourseDetailsState {

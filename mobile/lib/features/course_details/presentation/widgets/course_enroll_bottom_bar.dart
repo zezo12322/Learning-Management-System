@@ -8,10 +8,12 @@ class CourseEnrollBottomBar extends StatelessWidget {
     super.key,
     required this.price,
     this.onEnroll,
+    this.isEnrolling = false,
   });
 
   final double price;
   final VoidCallback? onEnroll;
+  final bool isEnrolling;
 
   @override
   Widget build(BuildContext context) {
@@ -114,24 +116,35 @@ class CourseEnrollBottomBar extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: onEnroll,
+                onTap: isEnrolling ? null : onEnroll,
                 borderRadius: BorderRadius.circular(14.r),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Enroll Now',
-                      style: TextStyles.labelLarge.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeights.semiBold,
+                    if (isEnrolling)
+                      SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.w,
+                        ),
+                      )
+                    else ...[
+                      Text(
+                        'Enroll Now',
+                        style: TextStyles.labelLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeights.semiBold,
+                        ),
                       ),
-                    ),
-                    Gap(6.w),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 18.sp,
-                      color: Colors.white,
-                    ),
+                      Gap(6.w),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 18.sp,
+                        color: Colors.white,
+                      ),
+                    ],
                   ],
                 ),
               ),

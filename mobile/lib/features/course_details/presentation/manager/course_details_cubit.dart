@@ -16,4 +16,17 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
       emit(CourseDetailsError(e.toString()));
     }
   }
+
+  Future<void> enrollInCourse(String courseId) async {
+    if (state is CourseDetailsLoaded) {
+      final currentState = state as CourseDetailsLoaded;
+      emit(currentState.copyWith(isEnrolling: true, enrollmentError: null, enrollmentSuccess: false));
+      try {
+        await repository.enrollInCourse(courseId);
+        emit(currentState.copyWith(isEnrolling: false, enrollmentSuccess: true));
+      } catch (e) {
+        emit(currentState.copyWith(isEnrolling: false, enrollmentError: e.toString()));
+      }
+    }
+  }
 }

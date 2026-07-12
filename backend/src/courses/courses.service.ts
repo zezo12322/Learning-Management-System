@@ -94,7 +94,8 @@ export class CoursesService {
         { courseId },
         authToken,
       );
-      return enrollmentData?.enrollments?.[0]?.status === 'ACTIVE';
+      const enrollmentStatus = enrollmentData?.enrollments?.[0]?.status;
+      return enrollmentStatus === 'ACTIVE' || enrollmentStatus === 'COMPLETED';
     }
   }
 

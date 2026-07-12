@@ -1,16 +1,16 @@
 # Basic Usage
 
 ```dart
-DefaultConnector.instance.SyncUser(syncUserVariables).execute();
-DefaultConnector.instance.GetMe().execute();
-DefaultConnector.instance.UpdateMyProfile(updateMyProfileVariables).execute();
-DefaultConnector.instance.InstructorDeleteCourse(instructorDeleteCourseVariables).execute();
-DefaultConnector.instance.SuperAdminDeleteCourse(superAdminDeleteCourseVariables).execute();
-DefaultConnector.instance.AdminCreateSession(adminCreateSessionVariables).execute();
-DefaultConnector.instance.InstructorCancelSession(instructorCancelSessionVariables).execute();
-DefaultConnector.instance.SuperAdminCancelSession(superAdminCancelSessionVariables).execute();
-DefaultConnector.instance.AdminCreateSubscriptionTier(adminCreateSubscriptionTierVariables).execute();
-DefaultConnector.instance.AdminDeprecateSubscriptionTier(adminDeprecateSubscriptionTierVariables).execute();
+DefaultConnector.instance.LogPayment(logPaymentVariables).execute();
+DefaultConnector.instance.AddPaymentItem(addPaymentItemVariables).execute();
+DefaultConnector.instance.MyPaymentHistory().execute();
+DefaultConnector.instance.GetPendingSubmissions().execute();
+DefaultConnector.instance.GetMyPendingSubmissions().execute();
+DefaultConnector.instance.AdminAddCourseInstructor(adminAddCourseInstructorVariables).execute();
+DefaultConnector.instance.AdminRemoveCourseInstructor(adminRemoveCourseInstructorVariables).execute();
+DefaultConnector.instance.GetCourseInstructors(getCourseInstructorsVariables).execute();
+DefaultConnector.instance.GetMissionForEnrollment(getMissionForEnrollmentVariables).execute();
+DefaultConnector.instance.SubmitMission(submitMissionVariables).execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await DefaultConnector.instance.AdminUpdateQuizOption({ ... })
-.text(...)
+await DefaultConnector.instance.UpdateEnrollmentStatus({ ... })
+.completedAt(...)
 .execute();
 ```
 
