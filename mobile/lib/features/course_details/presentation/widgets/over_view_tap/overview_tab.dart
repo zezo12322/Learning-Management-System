@@ -25,26 +25,23 @@ class OverviewTab extends StatelessWidget {
         ),
         Gap(8.h),
         Text(
-          // this return null always from the API, so we use a mock description as a fallback
-          // TODO: Update the API to return a proper description for the course
-          '${course.description ?? 'Master core concepts and practical workflows through real-world projects designed to build your expertise from the ground up.'} ',
+          course.description ?? 'No description available for this course.',
           style: TextStyles.bodySmall.copyWith(
             color: colorScheme.onSurfaceVariant,
             height: 1.55,
           ),
         ),
         Gap(16.h),
-        // TODO: Update the API to return a proper Language and Last Updated for the course
-        const CustomRowOverviewTab(
+        CustomRowOverviewTab(
           icon: Icons.language_rounded,
           label: 'Language',
-          value: 'English',
+          value: course.language.isNotEmpty ? course.language : 'English',
         ),
         Gap(8.h),
         const CustomRowOverviewTab(
           icon: Icons.update_rounded,
           label: 'Last Updated',
-          value: 'March 2025',
+          value: 'Recently', // TODO: FDC Course schema doesn't have an updatedAt field yet
         ),
         Gap(8.h),
         const CustomRowOverviewTab(
