@@ -8,13 +8,11 @@ class CurriculumLessonList extends StatelessWidget {
   const CurriculumLessonList({
     super.key,
     required this.lessons,
-    this.onLessonTap,
-    this.activeLessonId,
+    required this.onLessonTap,
   });
 
   final List<CourseLessonEntity> lessons;
-  final ValueChanged<CourseLessonEntity>? onLessonTap;
-  final String? activeLessonId;
+  final ValueChanged<CourseLessonEntity> onLessonTap;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +65,8 @@ class CurriculumLessonList extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 8.h),
             child: _LessonTile(
               lesson: lesson,
-              isActive: lesson.id == activeLessonId,
-              onTap: onLessonTap != null ? () => onLessonTap!(lesson) : null,
+              isActive: false,
+              onTap: onLessonTap != null ? () => onLessonTap(lesson) : null,
             ),
           ),
         ),

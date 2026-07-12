@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class CourseDetailsRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
+  Future<void> enrollInCourse(String courseId);
 }
 
 class CourseDetailsRemoteDataSourceImpl
@@ -27,6 +28,22 @@ class CourseDetailsRemoteDataSourceImpl
       return CourseCurriculumModel.fromJson(response.data, courseId);
     } catch (e) {
       throw Exception('Failed to fetch course curriculum: $e');
+    }
+  }
+
+  @override
+  Future<void> enrollInCourse(String courseId) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final token = await user.getIdToken();
+        if (token != null) {
+          apiService.setAuthToken(token);
+        }
+      }
+      await apiService.post('/api/v1/courses/$courseId/enroll', data: {});
+    } catch (e) {
+      throw Exception('Failed to enroll in course: $e');
     }
   }
 }

@@ -143,4 +143,15 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
       completed: true,
     );
   }
+
+  Future<void> syncLectureHeartbeat(int currentSecond) async {
+    final currentLectureId = state.currentLecture?.id;
+    if (currentLectureId == null) return;
+
+    await updateLectureProgressUseCase(
+      lectureId: currentLectureId,
+      lastWatchedSecond: currentSecond,
+      completed: false, // Don't aggressively mark as completed on heartbeat
+    );
+  }
 }

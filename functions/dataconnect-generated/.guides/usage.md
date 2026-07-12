@@ -14,38 +14,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { logPayment, addPaymentItem, myPaymentHistory, getPendingSubmissions, getMyPendingSubmissions, adminAddCourseInstructor, adminRemoveCourseInstructor, getCourseInstructors, enrollInCourse, enrollInMission } from '@dataconnect/functions-generated';
+import { myCertificates, verifyCertificate, listCategories, listPublishedCourses, searchPublishedCourses, listPopularCourses, listRecommendedCourses, getMyEnrolledCourseCategories, getMyContinueLearning, getCourseVideos } from '@dataconnect/functions-generated';
 
 
-// Operation LogPayment:  For variables, look at type LogPaymentVars in ../index.d.ts
-const { data } = await LogPayment(dataConnect, logPaymentVars);
+// Operation MyCertificates: 
+const { data } = await MyCertificates(dataConnect);
 
-// Operation AddPaymentItem:  For variables, look at type AddPaymentItemVars in ../index.d.ts
-const { data } = await AddPaymentItem(dataConnect, addPaymentItemVars);
+// Operation VerifyCertificate:  For variables, look at type VerifyCertificateVars in ../index.d.ts
+const { data } = await VerifyCertificate(dataConnect, verifyCertificateVars);
 
-// Operation MyPaymentHistory: 
-const { data } = await MyPaymentHistory(dataConnect);
+// Operation ListCategories: 
+const { data } = await ListCategories(dataConnect);
 
-// Operation GetPendingSubmissions: 
-const { data } = await GetPendingSubmissions(dataConnect);
+// Operation ListPublishedCourses: 
+const { data } = await ListPublishedCourses(dataConnect);
 
-// Operation GetMyPendingSubmissions: 
-const { data } = await GetMyPendingSubmissions(dataConnect);
+// Operation SearchPublishedCourses:  For variables, look at type SearchPublishedCoursesVars in ../index.d.ts
+const { data } = await SearchPublishedCourses(dataConnect, searchPublishedCoursesVars);
 
-// Operation AdminAddCourseInstructor:  For variables, look at type AdminAddCourseInstructorVars in ../index.d.ts
-const { data } = await AdminAddCourseInstructor(dataConnect, adminAddCourseInstructorVars);
+// Operation ListPopularCourses:  For variables, look at type ListPopularCoursesVars in ../index.d.ts
+const { data } = await ListPopularCourses(dataConnect, listPopularCoursesVars);
 
-// Operation AdminRemoveCourseInstructor:  For variables, look at type AdminRemoveCourseInstructorVars in ../index.d.ts
-const { data } = await AdminRemoveCourseInstructor(dataConnect, adminRemoveCourseInstructorVars);
+// Operation ListRecommendedCourses:  For variables, look at type ListRecommendedCoursesVars in ../index.d.ts
+const { data } = await ListRecommendedCourses(dataConnect, listRecommendedCoursesVars);
 
-// Operation GetCourseInstructors:  For variables, look at type GetCourseInstructorsVars in ../index.d.ts
-const { data } = await GetCourseInstructors(dataConnect, getCourseInstructorsVars);
+// Operation GetMyEnrolledCourseCategories: 
+const { data } = await GetMyEnrolledCourseCategories(dataConnect);
 
-// Operation EnrollInCourse:  For variables, look at type EnrollInCourseVars in ../index.d.ts
-const { data } = await EnrollInCourse(dataConnect, enrollInCourseVars);
+// Operation GetMyContinueLearning: 
+const { data } = await GetMyContinueLearning(dataConnect);
 
-// Operation EnrollInMission:  For variables, look at type EnrollInMissionVars in ../index.d.ts
-const { data } = await EnrollInMission(dataConnect, enrollInMissionVars);
+// Operation GetCourseVideos:  For variables, look at type GetCourseVideosVars in ../index.d.ts
+const { data } = await GetCourseVideos(dataConnect, getCourseVideosVars);
 
 
 ```
