@@ -45,9 +45,14 @@ docker compose up -d postgres redis
 firebase dataconnect:sdk:generate
 ```
 
-#### 4. تشغيل الـ API
+#### 4. إعداد وتشغيل الـ API (NestJS Backend)
+للبدء بتشغيل الباك إند، تأكد أولاً أنك قمت بنسخ ملف `.env.example` إلى `.env` ووضع المتغيرات الصحيحة.
+- إذا كنت تستخدم **Firebase Live/Production** (لا تستخدم محاكي Firebase)، يجب وضع مسار الـ Service Account Key الخاص بـ Firebase في `.env`.
+- إذا كنت تستخدم **Firebase Emulators**، سيتصل تلقائياً بالمحاكي المفتوح.
+
+لتشغيل الخادم:
 ```bash
-cd backend && npm install && npm run start:dev
+cd backend && npm install && npm run dev
 ```
 
 #### 5. تشغيل الـ Web
@@ -55,10 +60,21 @@ cd backend && npm install && npm run start:dev
 cd web && npm install && npm run dev
 ```
 
-#### 6. تشغيل الـ Mobile
+#### 6. تشغيل الـ Mobile (Flutter)
 ```bash
 cd mobile && flutter pub get && flutter run
 ```
+
+> **📱 لاختبار التطبيق على هاتف حقيقي (Physical Device):**
+> 1. تأكد أن الهاتف والكمبيوتر متصلان على نفس شبكة الـ WiFi.
+> 2. افتح ملف `mobile/lib/core/utils/constants.dart`.
+> 3. لا يمكن للهاتف التعرف على كلمة `localhost`، لذلك يجب استبدالها بـ **عنوان الـ IP المحلي لجهازك** (مثال: `192.168.1.100`).
+> ```dart
+>   static String get localhost {
+>     return '192.168.1.100'; // استبدل هذا برقم الـ IP الخاص بجهاز الكمبيوتر
+>   }
+> ```
+> 4. تأكد أيضاً من ضبط `useLocalBackend = true;` إذا كنت تشغل الـ NestJS محلياً، أو `useFirebaseEmulators = true;` إذا كنت تستخدم محاكي Firebase.
 
 #### أو تشغيل كل شيء مع Docker
 ```bash
