@@ -257,19 +257,20 @@ export class LecturesService {
         // Not an owner — fall through to the enrollment check.
       }
 
-      // Actively-enrolled students may view.
+      // Actively-enrolled or completed students may view.
       const enrollmentData = await this.dc.executeQuery(
         'GetUserEnrollmentForCourse',
         { courseId },
         authToken,
       );
-      if (enrollmentData?.enrollments?.[0]?.status === 'ACTIVE') {
+      const enrollmentStatus = enrollmentData?.enrollments?.[0]?.status;
+      if (enrollmentStatus === 'ACTIVE' || enrollmentStatus === 'COMPLETED') {
         return this.signLectureUrls(lecture);
       }
     }
 
     throw new ForbiddenException(
-      'You must be enrolled in this course to view this lecture',
+      'You must be enrolled in this course to view this lecture (Status check failed)',
     );
   }
 }
