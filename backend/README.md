@@ -6,6 +6,10 @@ This is the central backend API for the OptimaTech LMS platform, built with **Ne
 
 The backend is built as a **modular monolith** with 21 feature modules and 2 global modules. It connects to **Firebase Data Connect (PostgreSQL)** for data storage and **Firebase Storage** for media, using **Firebase Auth** for authentication.
 
+### ⚖️ SDK vs. REST API (Important)
+This backend is **not** intended for standard student data reads (like fetching course catalogs or curriculum). Client apps (Flutter/Web) should use the native **Firebase Data Connect SDK** for high-performance reads. 
+This NestJS API should be used exclusively for **Authoring, Heavy Compute, and Complex RBAC** operations that cannot be safely managed natively by the client.
+
 ### Key Components
 
 - **Firebase Gateway (`FirebaseModule`)**: Wraps the Firebase Admin SDK. Generates signed URLs for storage and acts as the gateway to the Data Connect REST API, executing GraphQL operations securely.
@@ -23,6 +27,15 @@ The backend is built as a **modular monolith** with 21 feature modules and 2 glo
 - Node.js 20+
 - npm (or pnpm)
 - Redis & PostgreSQL (provided via `docker-compose.yml` in the project root)
+- **Firebase CLI** (`firebase-tools`)
+
+### Initial Setup (Important)
+Because auto-generated Firebase Data Connect SDKs are intentionally ignored by Git to prevent merge conflicts, you **must** generate them locally before running the backend:
+```bash
+cd ../dataconnect
+firebase dataconnect:sdk:generate
+cd ../backend
+```
 
 ### Installation
 ```bash
