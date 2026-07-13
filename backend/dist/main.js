@@ -13,7 +13,7 @@ async function bootstrap() {
             enableImplicitConversion: true,
         },
     }));
-    const corsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173,http://localhost:8085,http://localhost:8086')
+    const corsOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173,http://localhost:8085,http://localhost:8086,http://localhost:8087')
         .split(',')
         .map((o) => o.trim())
         .filter(Boolean);

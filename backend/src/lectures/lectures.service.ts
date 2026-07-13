@@ -27,9 +27,10 @@ export class LecturesService {
 
   /** Replace stored private storage paths with short-lived signed read URLs (H2). */
   private async signLectureUrls(lecture: any): Promise<any> {
+    const videoUrl = await this.firebase.resolveReadUrl(lecture.videoUrl);
     return {
       ...lecture,
-      videoUrl: await this.firebase.resolveReadUrl(lecture.videoUrl),
+      videoUrl,
       transcriptUrl: await this.firebase.resolveReadUrl(lecture.transcriptUrl),
     };
   }
