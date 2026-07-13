@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
@@ -121,6 +122,7 @@ class _LectureVideoSection extends StatelessWidget {
         }
 
         final url = state.currentLecture?.videoUrl ?? '';
+
         return LessonVideoPlayerSection(
           key: ValueKey(url.isEmpty ? 'empty-video' : url),
           url: url,
