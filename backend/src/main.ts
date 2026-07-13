@@ -21,7 +21,7 @@ async function bootstrap() {
   // CORS_ORIGINS env var (comma-separated). If unset, default to localhost dev
   // origins rather than reflecting every origin.
   const corsOrigins = (
-    process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173'
+    process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173,http://localhost:8085,http://localhost:8086'
   )
     .split(',')
     .map((o) => o.trim())
