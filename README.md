@@ -39,17 +39,23 @@ cp .env.example .env
 docker compose up -d postgres redis
 ```
 
-#### 3. تشغيل الـ API
+#### 3. إنشاء كود Data Connect SDKs (مهم جداً)
+نظراً لأن ملفات الـ SDK الناتجة عن Data Connect يتم تجاهلها من Git (لتجنب التضارب)، **يجب** إنشاء الكود محلياً قبل تشغيل المنصة:
+```bash
+firebase dataconnect:sdk:generate
+```
+
+#### 4. تشغيل الـ API
 ```bash
 cd backend && npm install && npm run start:dev
 ```
 
-#### 4. تشغيل الـ Web
+#### 5. تشغيل الـ Web
 ```bash
 cd web && npm install && npm run dev
 ```
 
-#### 5. تشغيل الـ Mobile
+#### 6. تشغيل الـ Mobile
 ```bash
 cd mobile && flutter pub get && flutter run
 ```
@@ -85,6 +91,11 @@ docker compose --profile tools up -d
 - يحتوي النظام على 26 جدول (Schema) تغطي المستخدمين، الدورات، الاختبارات، المدفوعات، والاشتراكات.
 - عمليات الـ API (Queries & Mutations) مقسمة في مجلد `dataconnect/default/` (مثل `courses.gql`, `missions.gql`, `users.gql`).
 - يتم استدعاء هذه العمليات من NestJS Backend بصفة مشرف (Admin)، أو مباشرة من الواجهات الأمامية وفقاً للصلاحيات.
+
+### 4. قواعد توجيه البيانات (SDK vs. REST API)
+تعتمد المنصة على معمارية هجينة (Hybrid Architecture) لضمان أعلى أداء:
+- **استخدم FDC Client SDK مباشرة:** لجميع عمليات القراءة الخاصة بالطلاب (مثل تصفح الكورسات، المنهج، التقدم). هذا يضمن استجابة فورية (Zero Middleman Latency) وأمان تام عبر صلاحيات `@auth(level: USER)`.
+- **استخدم NestJS REST API:** لجميع عمليات التأليف (Authoring) الخاصة بالمعلمين، رفع الملفات، تحويل الفيديوهات (Transcoding)، والصلاحيات المعقدة (RBAC) التي تتطلب صلاحيات Admin لتخطي قيود Data Connect.
 
 ## 🔥 إعداد Firebase
 
