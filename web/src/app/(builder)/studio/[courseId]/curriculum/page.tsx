@@ -91,7 +91,7 @@ export default function CurriculumPage() {
         action={<div className="flex items-center gap-3">{notice && <span className="text-xs font-medium text-success">{notice}</span>}<Button onClick={addSection} loading={createSection.isPending}><Plus size={16} /> Add section</Button></div>}
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
         <Card className="p-4 sm:p-5">
           {course.isError && !isDemoMode && <div className="mb-4 rounded-input bg-error/10 p-3 text-xs text-error">Could not load the course curriculum.</div>}
           <div className="mb-4 flex items-center justify-between text-xs text-content-secondary">

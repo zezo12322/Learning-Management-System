@@ -95,7 +95,7 @@ export default function MediaPage() {
     <div className="space-y-6">
       <PageHeader title="Upload & processing" description="Add videos and resources, then track readiness before attaching them to lessons." />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
         <Card className="p-4 sm:p-5">
           <div
             onDragOver={(event) => { event.preventDefault(); setDragging(true) }}

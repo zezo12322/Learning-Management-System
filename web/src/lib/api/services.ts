@@ -222,7 +222,17 @@ export const coursesApi = {
 
 export const enrollmentApi = {
   enroll: (courseId: string) =>
-    apiClient.post<Enrollment>(`/courses/${courseId}/enroll`).then((response) => response.data),
+    apiClient.post(`/courses/${courseId}/enroll`).then((response): Enrollment => {
+      const raw = objectValue(response.data)
+      const inserted = objectValue(raw.enrollment_insert ?? raw.enrollmentInsert)
+      return {
+        id: stringValue(raw.id ?? inserted.id),
+        status: stringValue(raw.status, 'ACTIVE') as Enrollment['status'],
+        completedAt: typeof raw.completedAt === 'string' ? raw.completedAt : null,
+        alreadyEnrolled: Boolean(raw.alreadyEnrolled),
+        reactivated: Boolean(raw.reactivated),
+      }
+    }),
   get: (courseId: string) =>
     apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
 }
@@ -276,7 +286,7 @@ export const authoringApi = {
     apiClient.get(`/courses/${courseId}`).then((response) => mapAuthoringCourse(response.data).sections ?? []),
   createSection: (courseId: string, payload: { title: string }) =>
     apiClient.post(`/courses/${courseId}/sections`, payload).then((response) =>
-      mapSection(mutationEntity(response.data, ['section_insert', 'sectionInsert', 'section']), 0)
+      mapSection(mutationEntity(response.data, ['courseSection_insert', 'courseSectionInsert', 'section_insert', 'sectionInsert', 'section']), 0)
     ),
   updateSection: (courseId: string, sectionId: string, payload: { title: string }) =>
     apiClient.patch(`/courses/${courseId}/sections/${sectionId}`, payload).then((response) => response.data),
@@ -289,7 +299,7 @@ export const authoringApi = {
     sectionId: string,
     payload: { title: string; type: LectureType; duration?: number; isFreePreview?: boolean; content?: string }
   ) => apiClient.post(`/courses/${courseId}/sections/${sectionId}/lectures`, payload).then((response) =>
-    mapLecture(mutationEntity(response.data, ['lecture_insert', 'lectureInsert', 'lecture']), 0)
+    mapLecture(mutationEntity(response.data, ['courseLecture_insert', 'courseLectureInsert', 'lecture_insert', 'lectureInsert', 'lecture']), 0)
   ),
   updateLecture: (courseId: string, sectionId: string, lectureId: string, payload: Record<string, unknown>) =>
     apiClient.patch(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`, payload).then((response) => response.data),

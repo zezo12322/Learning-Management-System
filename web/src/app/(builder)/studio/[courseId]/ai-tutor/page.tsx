@@ -45,7 +45,7 @@ export default function AITutorPage() {
     <div className="space-y-6">
       <PageHeader title="AI Tutor test" description="Test grounded responses and recovery states before learners can access the tutor." />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_316px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_316px]">
         <Card className="p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div><h2 className="text-base font-semibold text-content">Tutor sandbox</h2><p className="mt-1 text-[10px] text-content-muted">Preview-only conversation</p></div>

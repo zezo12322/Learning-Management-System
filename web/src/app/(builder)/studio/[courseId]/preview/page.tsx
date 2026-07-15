@@ -58,7 +58,7 @@ export default function PreviewPage() {
         </Card>
       )}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_334px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_334px]">
         <Card className="overflow-hidden">
           <div className="grid gap-6 bg-brand-soft p-5 sm:p-7 lg:grid-cols-[220px_1fr] lg:items-center">
             <div className="flex aspect-video items-center justify-center rounded-card bg-surface">
