@@ -351,6 +351,70 @@ Courses the caller authored. **Response `200`:** array of course objects.
 ### `GET /courses/:courseId`
 Full admin view (includes sections/lectures). **Owner.** **Response `200`:** the full course object. `404` if not found / not owned.
 
+### `GET /courses/:courseId/overview`
+Instructor analytics for a single course — course details, content counts, enrollment breakdown, completion/progress stats and ratings. **Owner** (admins pass unconditionally). Aggregated server-side from a single privileged read, so it is cheap for the client to render a dashboard.
+
+- **Progress stats are scoped to "learners"** = enrollments with status `ACTIVE` or `COMPLETED`, deduped by user (a re-enrolled student counts once). A lecture counts as done only when its progress row is `completedAt`-stamped.
+- `averageCompletionPercent` = mean, over learners, of `completedLectures / totalLectures` (0–100, 2-dp).
+- `completionRatePercent` = `fullyCompletedLearners / activeLearners` (0–100, 2-dp), where a *fully-completed* learner has finished every lecture.
+- `enrollments.total` / `byStatus` count **raw** enrollment rows (re-enrollments included).
+- `content.totalQuizzes` = lectures of type `QUIZ`; `assignments` = the course's missions plus their submission breakdown.
+- `ratings.average` / `count` come from the denormalised course aggregate; `distribution` is the per-star (1–5) histogram.
+
+**Response `200`:**
+```json
+{
+  "course": {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "title": "Advanced Kubernetes",
+    "description": "Deep dive",
+    "price": 9900,
+    "status": "PUBLISHED",
+    "language": "en",
+    "level": "ADVANCED",
+    "thumbnail": "courses/…/thumb.png",
+    "tags": ["k8s", "devops"],
+    "category": { "id": "…", "name": "Cloud" },
+    "author": { "id": "uid-…", "name": "Sam", "email": "sam@x.io", "avatar": null },
+    "createdAt": "2026-01-01T00:00:00Z",
+    "updatedAt": "2026-02-01T00:00:00Z"
+  },
+  "instructors": [
+    { "id": "uid-…", "name": "Sam", "email": "sam@x.io", "avatar": null }
+  ],
+  "content": {
+    "totalSections": 4,
+    "totalLectures": 22,
+    "lecturesByType": { "VIDEO": 16, "READING": 4, "INTERACTIVE": 0, "QUIZ": 2 },
+    "totalQuizzes": 2,
+    "totalDurationSeconds": 13840
+  },
+  "assignments": {
+    "total": 1,
+    "submissions": {
+      "total": 12,
+      "byStatus": { "PENDING": 3, "GRADED": 8, "RETURNED": 1, "REJECTED": 0 }
+    }
+  },
+  "enrollments": {
+    "total": 57,
+    "byStatus": { "ACTIVE": 40, "COMPLETED": 12, "DROPPED": 4, "SUSPENDED": 1 }
+  },
+  "progress": {
+    "activeLearners": 52,
+    "averageCompletionPercent": 63.46,
+    "fullyCompletedLearners": 12,
+    "completionRatePercent": 23.08
+  },
+  "ratings": {
+    "average": 4.5,
+    "count": 20,
+    "distribution": { "1": 0, "2": 1, "3": 2, "4": 4, "5": 13 }
+  }
+}
+```
+**Errors:** `403` if the caller doesn't own the course; `404` if not found / soft-deleted.
+
 ### `PATCH /courses/:courseId`
 Update course. **Owner.** All fields optional; same shape as create plus `thumbnail?`.
 

@@ -11,6 +11,7 @@ import {
   UpdateCourseDto,
   UpdateCourseStatusDto,
   CourseStatus,
+  CourseOverview,
 } from './dto/course.dto';
 
 
@@ -221,4 +222,178 @@ export class CoursesService {
     );
     return data?.courseInstructors ?? [];
   }
+
+  // ==========================================
+  // INSTRUCTOR ANALYTICS
+  // ==========================================
+
+  /**
+   * Course-overview analytics for the owning instructor/admin: course details,
+   * content counts (sections/lectures/quizzes/assignments), enrollment breakdown,
+   * completion/progress statistics and ratings. Ownership is enforced upstream by
+   * CourseAccessGuard, so this runs AdminGetCourseOverview via the service account
+   * (NO_ACCESS) and reduces the raw rows into the summary the client consumes.
+   */
+  async getOverview(
+    courseId: string,
+    authToken: string,
+  ): Promise<CourseOverview> {
+    const data = await this.dc.executeQuery(
+      'AdminGetCourseOverview',
+      { courseId },
+      authToken,
+    );
+    const course = data?.course;
+    if (!course || course.deletedAt) {
+      throw new NotFoundException(`Course ${courseId} not found`);
+    }
+
+    const sections = course.sections ?? [];
+    const lectures = sections.flatMap((s: any) => s.lectures ?? []);
+
+    // Content counts.
+    const lecturesByType = {
+      VIDEO: 0,
+      READING: 0,
+      INTERACTIVE: 0,
+      QUIZ: 0,
+    };
+    let totalDurationSeconds = 0;
+    // Completed-lecture tally per student (only completedAt-stamped rows count).
+    const completedByUser = new Map<string, number>();
+    for (const lecture of lectures) {
+      if (lecture.type in lecturesByType) {
+        lecturesByType[lecture.type as keyof typeof lecturesByType] += 1;
+      }
+      totalDurationSeconds += lecture.duration ?? 0;
+      for (const p of lecture.progress ?? []) {
+        const userId = p.user?.id;
+        if (userId && p.completedAt) {
+          completedByUser.set(userId, (completedByUser.get(userId) ?? 0) + 1);
+        }
+      }
+    }
+    const totalLectures = lectures.length;
+
+    // Enrollment breakdown (raw rows, so re-enrollments are reflected in totals).
+    const enrollmentByStatus = {
+      ACTIVE: 0,
+      COMPLETED: 0,
+      DROPPED: 0,
+      SUSPENDED: 0,
+    };
+    for (const e of course.enrollments ?? []) {
+      if (e.status in enrollmentByStatus) {
+        enrollmentByStatus[e.status as keyof typeof enrollmentByStatus] += 1;
+      }
+    }
+    const totalEnrolled = (course.enrollments ?? []).length;
+
+    // Progress/completion — scoped to ACTIVE + COMPLETED learners, deduped by
+    // user id so a re-enrolled student isn't counted twice.
+    const learnerIds = new Set<string>();
+    for (const e of course.enrollments ?? []) {
+      if ((e.status === 'ACTIVE' || e.status === 'COMPLETED') && e.user?.id) {
+        learnerIds.add(e.user.id);
+      }
+    }
+    let progressSum = 0;
+    let fullyCompletedLearners = 0;
+    for (const id of learnerIds) {
+      const completed = completedByUser.get(id) ?? 0;
+      const pct = totalLectures > 0 ? completed / totalLectures : 0;
+      progressSum += pct;
+      if (totalLectures > 0 && completed >= totalLectures) {
+        fullyCompletedLearners += 1;
+      }
+    }
+    const activeLearners = learnerIds.size;
+    const averageCompletionPercent =
+      activeLearners > 0 ? round2((progressSum / activeLearners) * 100) : 0;
+    const completionRatePercent =
+      activeLearners > 0
+        ? round2((fullyCompletedLearners / activeLearners) * 100)
+        : 0;
+
+    // Assignments (missions) + submission breakdown.
+    const missions = course.missions ?? [];
+    const submissionByStatus = {
+      PENDING: 0,
+      GRADED: 0,
+      RETURNED: 0,
+      REJECTED: 0,
+    };
+    let totalSubmissions = 0;
+    for (const m of missions) {
+      for (const sub of m.submissions ?? []) {
+        totalSubmissions += 1;
+        if (sub.status in submissionByStatus) {
+          submissionByStatus[sub.status as keyof typeof submissionByStatus] += 1;
+        }
+      }
+    }
+
+    // Ratings — average/count from the denormalised cache; distribution from rows.
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const r of course.ratings ?? []) {
+      if (r.rating >= 1 && r.rating <= 5) {
+        distribution[r.rating as 1 | 2 | 3 | 4 | 5] += 1;
+      }
+    }
+
+    return {
+      course: {
+        id: course.id,
+        title: course.title,
+        description: course.description ?? null,
+        price: course.price,
+        status: course.status,
+        language: course.language,
+        level: course.level,
+        thumbnail: course.thumbnail ?? null,
+        tags: course.tags ?? [],
+        category: course.category ?? null,
+        author: course.author ?? null,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+      },
+      instructors: (course.instructors ?? [])
+        .map((i: any) => i.user)
+        .filter(Boolean),
+      content: {
+        totalSections: sections.length,
+        totalLectures,
+        lecturesByType,
+        totalQuizzes: lecturesByType.QUIZ,
+        totalDurationSeconds,
+      },
+      assignments: {
+        total: missions.length,
+        submissions: {
+          total: totalSubmissions,
+          byStatus: submissionByStatus,
+        },
+      },
+      enrollments: {
+        total: totalEnrolled,
+        byStatus: enrollmentByStatus,
+      },
+      progress: {
+        activeLearners,
+        averageCompletionPercent,
+        fullyCompletedLearners,
+        completionRatePercent,
+      },
+      ratings: {
+        average: course.avgRating ?? 0,
+        count: course.ratingCount ?? 0,
+        distribution,
+      },
+    };
+  }
+}
+
+/** Round to 2 decimal places (percentages are reported with 2-dp precision). */
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
 }
