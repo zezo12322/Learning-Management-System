@@ -14,15 +14,15 @@ import { StatusPill } from '@/components/workspace/StatusPill'
 export default function CatalogDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { isDemoMode } = useAuth()
-  const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list, enabled: !isDemoMode })
+  const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const curriculum = useQuery({ queryKey: ['catalog-curriculum', id], queryFn: () => catalogApi.curriculum(id), enabled: !isDemoMode })
   const enroll = useMutation({ mutationFn: () => enrollmentApi.enroll(id) })
-  const demoCourse = demoCourses.find((course) => course.id === id) ?? demoCourses[0]
+  const demoCourse = demoCourses.find((course) => course.id === id)
   const liveCourse = catalog.data?.find((course) => course.id === id)
-  const course = isDemoMode
+  const course = liveCourse ?? (isDemoMode && demoCourse
     ? { ...demoCourse, category: { name: demoCourse.category }, price: demoCourse.price ?? 0 }
-    : liveCourse
-  const sections = isDemoMode ? demoSections : (curriculum.data?.sections ?? [])
+    : undefined)
+  const sections = curriculum.data?.sections ?? (isDemoMode && demoCourse ? demoSections : [])
   const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
   const duration = Math.ceil(sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0) / 60)
 

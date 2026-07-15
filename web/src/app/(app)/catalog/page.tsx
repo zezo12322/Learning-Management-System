@@ -31,7 +31,7 @@ const demoCatalog: CourseCard[] = demoCourses
 export default function CatalogPage() {
   const { isDemoMode } = useAuth()
   const [search, setSearch] = useState('')
-  const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list, enabled: !isDemoMode })
+  const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const serverSearch = useQuery({
     queryKey: ['course-search', search.trim()],
     queryFn: () => coursesApi.search(search.trim()),
@@ -40,7 +40,10 @@ export default function CatalogPage() {
   const popular = useQuery({ queryKey: ['popular-courses'], queryFn: () => coursesApi.popular(6), enabled: !isDemoMode })
   const recommended = useQuery({ queryKey: ['recommended-courses'], queryFn: () => coursesApi.recommended(6), enabled: !isDemoMode })
   const continueLearning = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning, enabled: !isDemoMode })
-  const courses = useMemo(() => isDemoMode ? demoCatalog : (catalog.data ?? []), [catalog.data, isDemoMode])
+  const courses = useMemo(
+    () => catalog.data?.length ? catalog.data : (isDemoMode ? demoCatalog : []),
+    [catalog.data, isDemoMode]
+  )
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     if (!query) return courses
@@ -57,7 +60,7 @@ export default function CatalogPage() {
     <div className="space-y-6">
       <PageHeader title="Course catalog" description="Browse published learning experiences available to learners." />
       <Input icon={<Search size={17} />} placeholder="Search the catalog…" className="max-w-xl" value={search} onChange={(event) => setSearch(event.target.value)} />
-      {catalog.isError && !isDemoMode && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The catalog API could not be reached.</Card>}
+      {catalog.isError && <Card className="border-warning/20 bg-warning/10 p-4 text-sm text-warning">The live catalog could not be reached. Showing local preview data where available.</Card>}
       {!isDemoMode && !search && continueLearning.data?.length ? (
         <Card className="p-5">
           <div className="flex items-center justify-between"><h2 className="text-base font-semibold text-content">Continue learning</h2><span className="text-xs text-content-muted">Synced from your enrollments</span></div>

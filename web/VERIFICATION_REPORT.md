@@ -24,8 +24,9 @@ Verified on 2026-07-15 from branch `codex/web-mvp-ai-platform`.
 
 ## Remaining production blockers
 
-1. **Runtime environment is not configured**
-   - `web/.env.local` and `backend/.env` are absent, so Firebase authentication, Data Connect, storage, Redis, and real API flows cannot be exercised end to end.
+1. **Authenticated runtime setup is incomplete**
+   - The supplied backend credentials are sufficient for Firebase Admin and the public Data Connect catalog, but the project has no registered Firebase Web App and the supplied env has no Web API key.
+   - `web/.env.local` is intentionally absent, so the web remains in demo-auth mode. Redis is also unavailable locally, which blocks queue-backed flows.
 
 2. **Backend E2E test configuration fails before tests run**
    - `npm run test:e2e` cannot transform the ESM-only `uuid` package.
@@ -46,3 +47,13 @@ Verified on 2026-07-15 from branch `codex/web-mvp-ai-platform`.
 
 - Web: `http://localhost:5173`
 - Backend API when configured: `http://localhost:3000/api/v1`
+
+## Runtime validation with the supplied local credentials
+
+- The service-account JSON is valid and the backend initializes Firebase Admin successfully.
+- The backend is currently running on port `3000` with a process-only port override; the supplied env file requests `3001`, which is already occupied locally.
+- `GET /api/v1/health` returns `200`.
+- CORS allows `http://localhost:5173`.
+- The public catalog returns four live courses from Data Connect, and the web catalog renders those four records with no console errors.
+- The Firebase project currently has no registered Web App, so Firebase Web Auth configuration cannot be derived yet. Authenticated routes still need a Web App/API key and a signed-in user.
+- Redis is not available on `localhost:6379`, and the local Docker daemon did not respond. Queue-backed progress and transcoding flows are therefore not end-to-end verified.
