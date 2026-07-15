@@ -92,8 +92,8 @@ type Course @table(name: "courses") {
   # over CourseRating. The authoritative value is always derivable on-read via
   # GetCourseRatingsForSummary; these columns are a cache. Non-null defaults keep
   # the column migration non-destructive (existing rows backfill to 0).
-  avgRating: Float! @default(value: 0)
-  ratingCount: Int! @default(value: 0)
+  avgRating: Float! @default(value: 0) @index
+  ratingCount: Int! @default(value: 0) @index
   createdAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index
   deletedAt: Timestamp @index
@@ -237,7 +237,7 @@ type Enrollment @table(name: "enrollments") {
   course: Course @index 
   mission: Mission @index 
   status: EnrollmentStatus! @index
-  enrolledAt: Timestamp! @default(expr: "request.time")
+  enrolledAt: Timestamp! @default(expr: "request.time") @index
   completedAt: Timestamp @index
 }
 
@@ -266,7 +266,7 @@ type QuizAttempt @table(name: "quiz_attempts") {
   quiz: CourseQuiz! @index
   score: Float      
   passed: Boolean   
-  startedAt: Timestamp! @default(expr: "request.time")
+  startedAt: Timestamp! @default(expr: "request.time") @index
   completedAt: Timestamp @index
 }
 
@@ -282,7 +282,7 @@ type Session @table(name: "sessions") {
   title: String!
   hostUser: User      
   capacity: Int       
-  startTime: Timestamp!
+  startTime: Timestamp! @index
   endTime: Timestamp!
   type: SessionType!
   locationOrUrl: String!
