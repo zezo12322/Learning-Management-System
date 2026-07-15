@@ -47,6 +47,7 @@ mobile/**/ephemeral/
 # Secrets & Configs
 .env
 .env.*
+!web/.env.local.example
 *.local
 mobile/android/app/google-services.json
 mobile/ios/Runner/GoogleService-Info.plist

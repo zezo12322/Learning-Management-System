@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { ImagePlus, Info, Save } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
+import type { CourseLevel } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { FormField, SelectField } from '@/components/builder/FormField'
 import { ReadinessItem } from '@/components/builder/ReadinessItem'
@@ -16,21 +18,45 @@ import { Progress } from '@/components/ui/progress'
 
 export default function CourseSetupPage() {
   const { courseId } = useParams<{ courseId: string }>()
+  const router = useRouter()
   const { isDemoMode } = useAuth()
   const [title, setTitle] = useState(courseId === 'new' ? '' : 'UI/UX Design Fundamentals')
   const [description, setDescription] = useState('Master the fundamentals of user-centered design through research, wireframes, prototypes, and evidence-based critique.')
-  const [category, setCategory] = useState('Design')
+  const [categoryId, setCategoryId] = useState(process.env.NEXT_PUBLIC_DEFAULT_CATEGORY_ID ?? '')
   const [level, setLevel] = useState('BEGINNER')
   const [language, setLanguage] = useState('English')
   const [visibility, setVisibility] = useState('Private draft')
+  const [price, setPrice] = useState('0')
+  const [tags, setTags] = useState('')
   const [saved, setSaved] = useState(false)
+  const hydrated = useRef(false)
+  const course = useQuery({
+    queryKey: ['authoring-course', courseId],
+    queryFn: () => authoringApi.get(courseId),
+    enabled: !isDemoMode && courseId !== 'new',
+  })
+
+  useEffect(() => {
+    if (!course.data || hydrated.current) return
+    hydrated.current = true
+    setTitle(course.data.title)
+    setDescription(course.data.description)
+    setCategoryId(course.data.categoryId ?? '')
+    setLevel(course.data.level)
+    setLanguage(course.data.language)
+    setPrice(String(course.data.price ?? 0))
+    setTags((course.data.tags ?? []).join(', '))
+  }, [course.data])
 
   const save = useMutation({
     mutationFn: () =>
       courseId === 'new'
-        ? authoringApi.create({ title, description, category, level: level as 'BEGINNER', language, status: 'DRAFT' })
-        : authoringApi.update(courseId, { title, description, category, level: level as 'BEGINNER', language }),
-    onSuccess: () => setSaved(true),
+        ? authoringApi.create({ title, description, categoryId, level: level as CourseLevel, language, price: Number(price) || 0, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean) })
+        : authoringApi.update(courseId, { title, description, ...(categoryId ? { categoryId } : {}), level: level as CourseLevel, language, price: Number(price) || 0, tags: tags.split(',').map((tag) => tag.trim()).filter(Boolean) }),
+    onSuccess: (result) => {
+      setSaved(true)
+      if (courseId === 'new' && result.id) router.replace(`/studio/${result.id}/curriculum`)
+    },
   })
 
   const saveSetup = async () => {
@@ -39,10 +65,11 @@ export default function CourseSetupPage() {
       window.setTimeout(() => setSaved(false), 1800)
       return
     }
+    if (courseId === 'new' && !categoryId) return
     await save.mutateAsync()
   }
 
-  const readiness = [Boolean(title), Boolean(description), false, Boolean(category && level)]
+  const readiness = [Boolean(title), Boolean(description), false, Boolean(categoryId && level)]
   const readinessScore = Math.round((readiness.filter(Boolean).length / readiness.length) * 100)
 
   return (
@@ -70,10 +97,8 @@ export default function CourseSetupPage() {
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category" hint="Choose a catalog category.">
-                <SelectField value={category} onChange={(event) => setCategory(event.target.value)}>
-                  <option>Design</option><option>Research</option><option>Product</option><option>Engineering</option>
-                </SelectField>
+              <FormField label="Category ID" hint="Required until the backend exposes category listing.">
+                <Input value={categoryId} onChange={(event) => setCategoryId(event.target.value)} placeholder="Category UUID" />
               </FormField>
               <FormField label="Level" hint="Set learner expectations.">
                 <SelectField value={level} onChange={(event) => setLevel(event.target.value)}>
@@ -90,6 +115,12 @@ export default function CourseSetupPage() {
                   <option>Private draft</option><option>Unlisted</option><option>Public</option>
                 </SelectField>
               </FormField>
+              <FormField label="Price" hint="Stored in the backend's minor currency units.">
+                <Input type="number" min="0" value={price} onChange={(event) => setPrice(event.target.value)} />
+              </FormField>
+              <FormField label="Tags" hint="Comma-separated discovery tags.">
+                <Input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="design, research" />
+              </FormField>
             </div>
 
             <div className="flex items-start gap-3 rounded-input bg-secondary/10 p-4">
@@ -99,8 +130,9 @@ export default function CourseSetupPage() {
 
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
               {saved && <span className="text-xs font-medium text-success">Setup saved</span>}
-              {save.isError && <span className="text-xs font-medium text-error">Could not save setup</span>}
-              <Button onClick={saveSetup} loading={save.isPending}><Save size={16} /> Save setup</Button>
+              {save.isError && <span className="text-xs font-medium text-error">{apiErrorMessage(save.error, 'Could not save setup')}</span>}
+              {!isDemoMode && courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Category ID is required by the backend.</span>}
+              <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (!isDemoMode && courseId === 'new' && !categoryId)}><Save size={16} /> Save setup</Button>
             </div>
           </div>
         </Card>
@@ -112,7 +144,7 @@ export default function CourseSetupPage() {
             <span className="text-xs font-medium">Upload a 16:9 course cover</span>
           </button>
           <h3 className="mt-5 text-base font-semibold text-content">{title || 'Untitled course'}</h3>
-          <p className="mt-2 text-xs text-content-secondary">{category} · {level.toLowerCase()} · {language}</p>
+          <p className="mt-2 text-xs text-content-secondary">{course.data?.category ?? 'Category pending'} · {level.toLowerCase()} · {language}</p>
 
           <div className="mt-5 rounded-input bg-subtle p-4">
             <div className="flex items-center justify-between"><span className="text-xs font-semibold text-content">Setup readiness</span><span className="text-xs font-bold text-primary">{readinessScore}%</span></div>

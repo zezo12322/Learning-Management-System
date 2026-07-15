@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { BookOpen, Check, ChevronDown, Clock, Globe2, Play, Rocket } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
 import { demoSections } from '@/lib/demo-data'
+import { demoCourses } from '@/lib/demo-data'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { ReadinessItem } from '@/components/builder/ReadinessItem'
 import { StatusPill } from '@/components/workspace/StatusPill'
@@ -18,7 +19,20 @@ export default function PreviewPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const { isDemoMode } = useAuth()
   const [published, setPublished] = useState(false)
-  const [openSection, setOpenSection] = useState(demoSections[0].id)
+  const [openSection, setOpenSection] = useState(isDemoMode ? demoSections[0].id : '')
+  const courseQuery = useQuery({
+    queryKey: ['authoring-course', courseId],
+    queryFn: () => authoringApi.get(courseId),
+    enabled: !isDemoMode,
+  })
+  const course = isDemoMode ? demoCourses[0] : courseQuery.data
+  const sections = useMemo(() => isDemoMode ? demoSections : (course?.sections ?? []), [course?.sections, isDemoMode])
+  const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
+  const totalSeconds = sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0)
+
+  useEffect(() => {
+    if (!openSection && sections[0]) setOpenSection(sections[0].id)
+  }, [openSection, sections])
   const publish = useMutation({
     mutationFn: () => authoringApi.setStatus(courseId, 'PUBLISHED'),
     onSuccess: () => setPublished(true),
@@ -36,6 +50,8 @@ export default function PreviewPage() {
     <div className="space-y-6">
       <PageHeader title="Preview & publish" description="Review the learner experience and resolve required checks before publishing." />
 
+      {courseQuery.isError && !isDemoMode && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The course could not be loaded from the backend.</Card>}
+
       {published && (
         <Card className="border-success/20 bg-success/10 p-4 text-sm font-medium text-success">
           <span className="inline-flex items-center gap-2"><Check size={17} /> Course published successfully.</span>
@@ -49,13 +65,13 @@ export default function PreviewPage() {
               <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">UX</span>
             </div>
             <div>
-              <p className="text-[9px] font-semibold tracking-wide text-primary">DESIGN · BEGINNER</p>
-              <h1 className="mt-3 text-2xl font-bold tracking-tight text-content">UI/UX Design Fundamentals</h1>
-              <p className="mt-3 max-w-xl text-xs leading-5 text-content-secondary">Master user-centered design through research, wireframes, prototypes, and evidence-based critique.</p>
+              <p className="text-[9px] font-semibold tracking-wide text-primary">{course?.category?.toUpperCase() ?? 'UNCATEGORIZED'} · {course?.level ?? 'BEGINNER'}</p>
+              <h1 className="mt-3 text-2xl font-bold tracking-tight text-content">{course?.title ?? 'Loading course…'}</h1>
+              <p className="mt-3 max-w-xl text-xs leading-5 text-content-secondary">{course?.description || 'Add a course description before publishing.'}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <StatusPill tone="neutral" dot={false}><BookOpen size={12} /> 8 lessons</StatusPill>
-                <StatusPill tone="neutral" dot={false}><Clock size={12} /> 2h 40m</StatusPill>
-                <StatusPill tone="neutral" dot={false}><Globe2 size={12} /> English</StatusPill>
+                <StatusPill tone="neutral" dot={false}><BookOpen size={12} /> {lessonCount} lessons</StatusPill>
+                <StatusPill tone="neutral" dot={false}><Clock size={12} /> {Math.floor(totalSeconds / 3600)}h {Math.round((totalSeconds % 3600) / 60)}m</StatusPill>
+                <StatusPill tone="neutral" dot={false}><Globe2 size={12} /> {course?.language ?? 'Not set'}</StatusPill>
               </div>
             </div>
           </div>
@@ -66,7 +82,7 @@ export default function PreviewPage() {
             <p className="mt-1 text-[11px] text-content-secondary">Three sections guide learners from foundations to a tested prototype.</p>
 
             <div className="mt-5 space-y-3">
-              {demoSections.map((section, index) => {
+              {sections.map((section, index) => {
                 const open = openSection === section.id
                 return (
                   <div key={section.id} className="overflow-hidden rounded-input border border-border">

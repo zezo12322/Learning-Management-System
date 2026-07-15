@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Play, Plus } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
@@ -17,12 +17,34 @@ import { Card } from '@/components/ui/card'
 export default function CurriculumPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const { isDemoMode } = useAuth()
-  const [sections, setSections] = useState<AuthoringSection[]>(demoSections)
-  const [expanded, setExpanded] = useState<string>(demoSections[0].id)
+  const [sections, setSections] = useState<AuthoringSection[]>(isDemoMode ? demoSections : [])
+  const [expanded, setExpanded] = useState<string>(isDemoMode ? demoSections[0].id : '')
   const [notice, setNotice] = useState<string | null>(null)
+  const course = useQuery({
+    queryKey: ['authoring-course', courseId],
+    queryFn: () => authoringApi.get(courseId),
+    enabled: !isDemoMode,
+  })
+
+  useEffect(() => {
+    if (!course.data?.sections) return
+    setSections(course.data.sections)
+    setExpanded((current) => current || course.data.sections?.[0]?.id || '')
+  }, [course.data])
 
   const createSection = useMutation({
     mutationFn: (title: string) => authoringApi.createSection(courseId, { title }),
+  })
+  const createLecture = useMutation({
+    mutationFn: (sectionId: string) => authoringApi.createLecture(courseId, sectionId, {
+      title: 'Untitled lesson',
+      type: 'READING',
+      duration: 0,
+      isFreePreview: false,
+    }),
+  })
+  const reorderSections = useMutation({
+    mutationFn: (orderedIds: string[]) => authoringApi.reorderSections(courseId, orderedIds),
   })
 
   const addSection = async () => {
@@ -40,11 +62,22 @@ export default function CurriculumPage() {
   const moveSection = (index: number, direction: -1 | 1) => {
     const target = index + direction
     if (target < 0 || target >= sections.length) return
-    setSections((current) => {
-      const next = [...current]
-      ;[next[index], next[target]] = [next[target], next[index]]
-      return next.map((section, order) => ({ ...section, order: order + 1 }))
-    })
+    const next = [...sections]
+    ;[next[index], next[target]] = [next[target], next[index]]
+    const reordered = next.map((section, order) => ({ ...section, order: order + 1 }))
+    setSections(reordered)
+    if (!isDemoMode) reorderSections.mutate(reordered.map((section) => section.id))
+  }
+
+  const addLesson = async (sectionId: string) => {
+    const created = isDemoMode
+      ? { id: `lesson-${Date.now()}`, title: 'Untitled lesson', type: 'READING' as const, duration: 0, order: 1, isFreePreview: false }
+      : await createLecture.mutateAsync(sectionId)
+    setSections((current) => current.map((section) => section.id === sectionId
+      ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
+      : section))
+    setNotice('Lesson added')
+    window.setTimeout(() => setNotice(null), 1600)
   }
 
   const totalLessons = useMemo(() => sections.reduce((sum, section) => sum + section.lectures.length, 0), [sections])
@@ -60,6 +93,7 @@ export default function CurriculumPage() {
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
         <Card className="p-4 sm:p-5">
+          {course.isError && !isDemoMode && <div className="mb-4 rounded-input bg-error/10 p-3 text-xs text-error">Could not load the course curriculum.</div>}
           <div className="mb-4 flex items-center justify-between text-xs text-content-secondary">
             <span>{sections.length} sections · {totalLessons} lessons · {Math.floor(totalSeconds / 3600)}h {Math.round((totalSeconds % 3600) / 60)}m</span>
             <button onClick={() => setExpanded(expanded ? '' : sections[0]?.id)} className="font-semibold text-primary">{expanded ? 'Collapse all' : 'Expand first'}</button>
@@ -101,7 +135,8 @@ export default function CurriculumPage() {
                         )
                       })}
                       <button
-                        onClick={() => setSections((current) => current.map((item) => item.id === section.id ? { ...item, lectures: [...item.lectures, { id: `lesson-${Date.now()}`, title: 'Untitled lesson', type: 'ARTICLE', duration: 0, order: item.lectures.length + 1, isFreePreview: false }] } : item))}
+                        onClick={() => void addLesson(section.id)}
+                        disabled={createLecture.isPending}
                         className="flex w-full items-center justify-center gap-2 bg-subtle py-4 text-xs font-semibold text-primary"
                       >
                         <Plus size={15} /> Add lesson

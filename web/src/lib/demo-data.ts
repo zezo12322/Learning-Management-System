@@ -97,7 +97,7 @@ export const demoSections: AuthoringSection[] = [
     lectures: [
       { id: 'lesson-welcome', title: 'Welcome to the course', type: 'VIDEO', duration: 512, order: 1, isFreePreview: true },
       { id: 'lesson-hierarchy', title: 'Principles of visual hierarchy', type: 'VIDEO', duration: 1090, order: 2, isFreePreview: false },
-      { id: 'lesson-critique', title: 'Design critique checklist', type: 'ARTICLE', duration: 900, order: 3, isFreePreview: false },
+      { id: 'lesson-critique', title: 'Design critique checklist', type: 'READING', duration: 900, order: 3, isFreePreview: false },
     ],
   },
   {
@@ -106,7 +106,7 @@ export const demoSections: AuthoringSection[] = [
     order: 2,
     lectures: [
       { id: 'lesson-interviews', title: 'Planning user interviews', type: 'VIDEO', duration: 1080, order: 1, isFreePreview: false },
-      { id: 'lesson-synthesis', title: 'Synthesis and themes', type: 'ARTICLE', duration: 1200, order: 2, isFreePreview: false },
+      { id: 'lesson-synthesis', title: 'Synthesis and themes', type: 'READING', duration: 1200, order: 2, isFreePreview: false },
     ],
   },
   {

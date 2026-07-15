@@ -1,12 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { UploadCloud, FileCheck2, Info, Loader2, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { demoUploads } from '@/lib/demo-data'
 import type { UploadAsset, UploadAssetState } from '@/lib/types'
 import { uploadCourseAsset, type UploadPhase } from '@/lib/api/upload'
+import { authoringApi } from '@/lib/api/services'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { UploadFileRow } from '@/components/builder/UploadFileRow'
 import { StatusPill } from '@/components/workspace/StatusPill'
@@ -25,9 +27,20 @@ export default function MediaPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const { isDemoMode } = useAuth()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [assets, setAssets] = useState<UploadAsset[]>(demoUploads)
+  const [assets, setAssets] = useState<UploadAsset[]>(isDemoMode ? demoUploads : [])
+  const [lectureId, setLectureId] = useState('')
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const course = useQuery({
+    queryKey: ['authoring-course', courseId],
+    queryFn: () => authoringApi.get(courseId),
+    enabled: !isDemoMode,
+  })
+  const lectures = useMemo(() => course.data?.sections?.flatMap((section) => section.lectures) ?? [], [course.data])
+
+  useEffect(() => {
+    if (!lectureId && lectures[0]) setLectureId(lectures[0].id)
+  }, [lectureId, lectures])
 
   const updateAsset = (id: string, patch: Partial<UploadAsset>) =>
     setAssets((current) => current.map((asset) => (asset.id === id ? { ...asset, ...patch } : asset)))
@@ -46,7 +59,7 @@ export default function MediaPage() {
       state: 'QUEUED',
       progress: 5,
       mimeType: file.type || 'application/octet-stream',
-      lectureId: 'lesson-hierarchy',
+      lectureId: file.type.startsWith('image/') ? undefined : (lectureId || undefined),
     }
     setAssets((current) => [pending, ...current])
 
@@ -92,10 +105,21 @@ export default function MediaPage() {
           >
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface text-primary"><UploadCloud size={23} /></span>
             <h2 className="mt-4 text-base font-semibold text-content">Drop videos and resources here</h2>
-            <p className="mt-1 text-xs text-content-secondary">MP4, PDF, DOCX, PPTX · up to 4 GB per video</p>
+            <p className="mt-1 text-xs text-content-secondary">Video, course-cover image, or PDF transcript · up to 4 GB</p>
             <Button variant="outline" className="mt-4" onClick={() => inputRef.current?.click()}>Choose files</Button>
-            <input ref={inputRef} type="file" multiple accept="video/*,.pdf,.doc,.docx,.ppt,.pptx" className="hidden" onChange={(event) => pickFiles(event.target.files)} />
+            <input ref={inputRef} type="file" multiple accept="video/*,image/*,.pdf" className="hidden" onChange={(event) => pickFiles(event.target.files)} />
           </div>
+
+          {!isDemoMode && (
+            <div className="mt-4 rounded-input bg-subtle p-3">
+              <label className="text-xs font-semibold text-content" htmlFor="media-lecture">Attach videos and transcripts to</label>
+              <select id="media-lecture" value={lectureId} onChange={(event) => setLectureId(event.target.value)} className="mt-2 w-full rounded-input border border-border bg-surface px-3 py-2 text-xs text-content outline-none focus:border-primary">
+                <option value="">Select a lecture</option>
+                {lectures.map((lecture) => <option key={lecture.id} value={lecture.id}>{lecture.title}</option>)}
+              </select>
+              {!course.isLoading && lectures.length === 0 && <p className="mt-2 text-[11px] text-warning">Create a lecture before uploading video or transcript media. Course-cover images can still be uploaded.</p>}
+            </div>
+          )}
 
           {isDemoMode && (
             <div className="mt-4 flex items-start gap-2 rounded-input bg-brand-soft px-3 py-2 text-[11px] leading-5 text-primary">
@@ -139,7 +163,7 @@ export default function MediaPage() {
           <div className="mt-5 rounded-input bg-subtle p-4">
             <p className="text-xs font-semibold text-content">What happens next</p>
             <ol className="mt-3 space-y-3 text-[11px] text-content-secondary">
-              {['Request a signed upload URL', 'Upload bytes and confirm', 'Start video transcode', 'Poll status until ready'].map((step, index) => (
+              {['Request a signed upload URL', 'Upload bytes and confirm', 'Backend enqueues video transcode', 'Poll status until ready'].map((step, index) => (
                 <li key={step} className="flex gap-2"><span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-surface text-[9px] font-semibold text-primary">{index + 1}</span>{step}</li>
               ))}
             </ol>
