@@ -31,6 +31,14 @@ No backend source files were changed by this integration.
    - The public catalog list does not include `description` or `language`; those fields are available only from the curriculum response.
    - Adding them to the catalog query would avoid an authenticated detail request just to render catalog metadata.
 
+5. **User directory**
+   - The backend exposes self-service `/me` endpoints only; there is no admin/instructor endpoint for listing, searching, or viewing other users.
+   - The web profile page is therefore connected to the signed-in database user, but a real users-management page cannot be implemented yet.
+
+6. **Upload history**
+   - Signed upload and confirmation endpoints exist, but there is no endpoint that lists upload jobs or stored files across a course.
+   - The web can show media already attached to authenticated course lectures plus uploads made in the current browser session; a complete persistent upload-history view requires a backend list endpoint.
+
 ## Contracts the web now follows
 
 - Course status: `DRAFT | PUBLISHED | ARCHIVED` (`IN_REVIEW` is demo-only UI state).

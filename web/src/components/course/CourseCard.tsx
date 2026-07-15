@@ -38,7 +38,7 @@ export function CourseGridCard({ course }: { course: Course }) {
           <div className="flex items-center justify-between text-xs text-content-secondary">
             <span className="inline-flex items-center gap-1">
               <Users size={13} />
-              {formatCompact(course.ratingCount ?? 0)} طالب
+              {formatCompact(course.ratingCount ?? 0)} reviews
             </span>
             {course.level && <Badge tone="muted">{LEVEL_LABEL[course.level] ?? course.level}</Badge>}
           </div>
