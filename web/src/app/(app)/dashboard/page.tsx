@@ -1,105 +1,166 @@
 'use client'
 
 import Link from 'next/link'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpenCheck, GraduationCap, Plus, Users } from 'lucide-react'
+import { BookOpenCheck, MessageSquare, Plus, Star } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
-import { authoringApi } from '@/lib/api/services'
-import { demoCourses } from '@/lib/demo-data'
+import { authoringApi, catalogApi } from '@/lib/api/services'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { MetricCard } from '@/components/workspace/MetricCard'
 import { AIUnavailable } from '@/components/workspace/AIUnavailable'
 import { StatusPill } from '@/components/workspace/StatusPill'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 
 export default function DashboardPage() {
-  const { me, isDemoMode } = useAuth()
-  const coursesQuery = useQuery({
+  const { isDemoMode } = useAuth()
+  const catalogQuery = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
+  const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
     enabled: !isDemoMode,
   })
-  const courses = isDemoMode ? demoCourses : coursesQuery.data ?? []
+  const courses = useMemo(() => catalogQuery.data ?? [], [catalogQuery.data])
+  const firstAuthoringCourse = authoringQuery.data?.[0]
+  const totalReviews = useMemo(
+    () => courses.reduce((total, course) => total + (course.ratingCount ?? 0), 0),
+    [courses]
+  )
+  const averageRating = useMemo(() => {
+    if (!totalReviews) return null
+    const weightedTotal = courses.reduce(
+      (total, course) => total + (course.avgRating ?? 0) * (course.ratingCount ?? 0),
+      0
+    )
+    return weightedTotal / totalReviews
+  }, [courses, totalReviews])
+  const metricState = catalogQuery.isError ? 'error' : catalogQuery.isLoading ? 'loading' : 'live'
+  const metricValue = (value: string) => catalogQuery.isError ? 'Unavailable' : catalogQuery.isLoading ? 'Loading' : value
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Good morning, ${me?.name?.split(' ')[0] ?? 'Instructor'}`}
-        description="Here’s what needs your attention across courses and learners."
+        title="Workspace overview"
+        description="Live information returned by the connected LMS APIs."
         action={
-          <Link href="/studio/new/setup">
-            <Button><Plus size={16} /> Create course</Button>
-          </Link>
+          isDemoMode ? (
+            <Button disabled title="Firebase Web authentication is required to create a course"><Plus size={16} /> Create course</Button>
+          ) : (
+            <Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>
+          )
         }
       />
 
-      {coursesQuery.isError && !isDemoMode && (
+      {catalogQuery.isError && (
         <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
-          The course API is unavailable. Start the NestJS backend and verify NEXT_PUBLIC_API_URL.
+          The live catalog could not be loaded from the NestJS API. No preview data is being shown.
         </Card>
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
-        <MetricCard icon={BookOpenCheck} label="Published courses" value={String(courses.filter((course) => course.status === 'PUBLISHED').length)} change="+2 this month" />
-        <MetricCard icon={Users} label="Active learners" value="1,284" change="+12% this week" />
-        <MetricCard icon={GraduationCap} label="Completion rate" value="72%" change="+6% vs last month" />
+        <MetricCard
+          icon={BookOpenCheck}
+          label="Published courses"
+          value={metricValue(String(courses.length))}
+          detail={catalogQuery.isError ? 'The public catalog request failed' : 'Current records from the public catalog API'}
+          state={metricState}
+        />
+        <MetricCard
+          icon={MessageSquare}
+          label="Learner reviews"
+          value={metricValue(totalReviews.toLocaleString())}
+          detail={catalogQuery.isError ? 'The public catalog request failed' : 'Reviews attached to published courses'}
+          state={metricState}
+        />
+        <MetricCard
+          icon={Star}
+          label="Average rating"
+          value={metricValue(averageRating == null ? 'Not rated' : averageRating.toFixed(1))}
+          detail={catalogQuery.isError ? 'The public catalog request failed' : averageRating == null ? 'No learner ratings have been submitted' : 'Weighted by the number of reviews'}
+          state={metricState}
+        />
       </div>
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="p-5 sm:p-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-content">Continue building</h2>
-            <Link href="/courses" className="text-xs font-semibold text-primary">View all courses →</Link>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-content">Published catalog</h2>
+              <p className="mt-1 text-xs text-content-secondary">The latest courses returned by the backend.</p>
+            </div>
+            <Link href="/catalog" className="shrink-0 text-xs font-semibold text-primary">View catalog →</Link>
           </div>
-          <div className="space-y-3">
-            {courses.slice(0, 3).map((course, index) => (
-              <Link
-                key={course.id}
-                href={`/studio/${course.id}/setup`}
-                className={index === 0 ? 'flex items-center gap-4 rounded-input bg-brand-soft p-4' : 'flex items-center gap-4 rounded-input bg-subtle p-4'}
-              >
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface text-xs font-bold text-primary">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold text-content">{course.title}</span>
-                  <span className="mt-1 block text-[11px] text-content-secondary">{course.lessonCount} lessons · {course.updatedAt}</span>
-                  <Progress value={course.progress} className="mt-3 h-1.5" />
-                </span>
-                <StatusPill tone={course.status === 'PUBLISHED' ? 'success' : course.status === 'IN_REVIEW' ? 'warning' : 'info'}>
-                  {course.status === 'PUBLISHED' ? 'Ready' : course.status === 'IN_REVIEW' ? 'Needs review' : 'In progress'}
-                </StatusPill>
-              </Link>
-            ))}
-          </div>
+
+          {catalogQuery.isLoading ? (
+            <div className="rounded-input bg-subtle p-5 text-sm text-content-secondary">Loading published courses…</div>
+          ) : courses.length ? (
+            <div className="space-y-3">
+              {courses.slice(0, 3).map((course, index) => {
+                const initials = course.title
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((word) => word[0]?.toUpperCase())
+                  .join('')
+                const hasRatings = Boolean(course.ratingCount)
+                return (
+                  <Link
+                    key={course.id}
+                    href={`/catalog/${course.id}`}
+                    className={index === 0 ? 'flex items-center gap-4 rounded-input bg-brand-soft p-4' : 'flex items-center gap-4 rounded-input bg-subtle p-4'}
+                  >
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface text-xs font-bold text-primary">
+                      {initials}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold text-content">{course.title}</span>
+                      <span className="mt-1 block text-[11px] text-content-secondary">
+                        {[course.category?.name, course.level].filter(Boolean).join(' · ')}
+                      </span>
+                      <span className="mt-2 block text-[11px] text-content-muted">
+                        {hasRatings ? `${(course.avgRating ?? 0).toFixed(1)} rating · ${course.ratingCount} reviews` : 'No learner ratings yet'}
+                      </span>
+                    </span>
+                    <StatusPill tone="success">Published</StatusPill>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : !catalogQuery.isError ? (
+            <div className="rounded-input border border-dashed border-border p-8 text-center">
+              <p className="text-sm font-semibold text-content">No published courses</p>
+              <p className="mt-1 text-xs text-content-secondary">The catalog API returned an empty collection.</p>
+            </div>
+          ) : null}
         </Card>
 
         <Card className="flex flex-col p-5 sm:p-6">
           <div className="rounded-input bg-brand-soft p-4">
             <p className="text-[10px] font-semibold tracking-wide text-primary">AI COURSE STUDIO</p>
             <h2 className="mt-2 text-lg font-semibold text-content">Turn course content into learning assets</h2>
-            <p className="mt-2 text-xs leading-5 text-content-secondary">Outcomes, summaries, and quizzes remain reviewable.</p>
+            <p className="mt-2 text-xs leading-5 text-content-secondary">AI actions stay unavailable until the backend exposes a configured provider and chat contract.</p>
           </div>
-          <div className="mt-5">
-            <AIUnavailable compact />
-          </div>
-          <div className="mt-4 space-y-2 text-xs">
-            {[
-              ['Course sources', 'Ready'],
-              ['Provider credentials', 'Missing'],
-              ['Chat API contract', 'Missing'],
-            ].map(([label, state]) => (
-              <div key={label} className="flex items-center justify-between rounded-xl bg-subtle px-3 py-3">
-                <span className="text-content-secondary">{label}</span>
-                <span className={state === 'Ready' ? 'font-semibold text-success' : 'font-semibold text-warning'}>{state}</span>
-              </div>
-            ))}
-          </div>
-          <Link href="/studio/demo-course/ai-studio" className="mt-auto pt-4">
-            <Button fullWidth>Open AI Studio</Button>
-          </Link>
+          <div className="mt-5"><AIUnavailable compact /></div>
+
+          {firstAuthoringCourse ? (
+            <Link href={`/studio/${firstAuthoringCourse.id}/ai-studio`} className="mt-auto pt-5">
+              <Button fullWidth>Open {firstAuthoringCourse.title}</Button>
+            </Link>
+          ) : (
+            <div className="mt-auto pt-5">
+              <Button fullWidth disabled>
+                {authoringQuery.isLoading ? 'Loading authoring courses' : 'No authoring course available'}
+              </Button>
+              <p className="mt-2 text-center text-[11px] leading-4 text-content-muted">
+                {isDemoMode
+                  ? 'Firebase Web authentication is required to load instructor courses.'
+                  : authoringQuery.isError
+                    ? 'The instructor course API could not be loaded.'
+                    : 'Create an instructor course before opening AI Studio.'}
+              </p>
+            </div>
+          )}
         </Card>
       </div>
     </div>
