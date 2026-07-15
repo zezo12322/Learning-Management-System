@@ -2,7 +2,7 @@
 
 export type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
 export type EnrollmentStatus = 'ACTIVE' | 'COMPLETED' | 'DROPPED'
-export type LectureType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'PDF'
+export type LectureType = 'VIDEO' | 'READING' | 'INTERACTIVE' | 'QUIZ'
 export type Role = 'student' | 'instructor' | 'admin'
 
 export interface Category {
@@ -39,6 +39,9 @@ export interface Lecture {
   duration: number // seconds
   order: number
   isFreePreview: boolean
+  content?: string | null
+  videoUrl?: string | null
+  transcriptUrl?: string | null
 }
 
 export interface Section {
@@ -57,6 +60,8 @@ export interface RatingSummary {
 export interface Curriculum {
   id: string
   title: string
+  description?: string
+  language?: string
   sections: Section[]
   ratingSummary: RatingSummary
 }
@@ -133,6 +138,11 @@ export interface AuthoringCourse {
   durationMinutes: number
   students: number
   updatedAt: string
+  price?: number
+  tags?: string[]
+  thumbnail?: string | null
+  categoryId?: string
+  sections?: AuthoringSection[]
 }
 
 export interface AuthoringSection {
@@ -153,12 +163,12 @@ export interface UploadAsset {
 }
 
 export interface SignedUpload {
-  uploadId: string
-  uploadUrl?: string
-  signedUrl?: string
-  objectPath?: string
-  headers?: Record<string, string>
+  uploadUrl: string
+  downloadUrl: string
+  storagePath: string
 }
+
+export type UploadEntityType = 'COURSE_THUMBNAIL' | 'LECTURE_VIDEO' | 'LECTURE_TRANSCRIPT'
 
 export interface AIAvailability {
   available: boolean

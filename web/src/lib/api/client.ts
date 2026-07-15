@@ -4,7 +4,9 @@ import { getFirebaseAuth } from '@/lib/firebase'
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'
 const FIREBASE_AUTH_CONFIGURED = Boolean(
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 )
 
 export const apiClient = axios.create({
@@ -32,7 +34,7 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
+    if (error.response?.status === 401 && typeof window !== 'undefined' && FIREBASE_AUTH_CONFIGURED) {
       try {
         await getFirebaseAuth().signOut()
       } catch {

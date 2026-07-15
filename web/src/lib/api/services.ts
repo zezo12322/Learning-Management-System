@@ -1,120 +1,269 @@
 import { apiClient } from './client'
 import type {
-  Category,
-  ContinueLearningItem,
+  AuthoringCourse,
+  AuthoringSection,
   CourseCard,
+  CourseLevel,
   CourseProgress,
   Curriculum,
   Enrollment,
+  Lecture,
+  LectureType,
   Me,
   RatingSummary,
   Review,
-  AuthoringCourse,
-  AuthoringSection,
+  Role,
   SignedUpload,
+  UploadEntityType,
 } from '@/lib/types'
 
-// ---- Identity ----
+type JsonObject = Record<string, unknown>
+
+const objectValue = (value: unknown): JsonObject =>
+  value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonObject) : {}
+
+const stringValue = (value: unknown, fallback = '') =>
+  typeof value === 'string' ? value : fallback
+
+const numberValue = (value: unknown, fallback = 0) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback
+
+const arrayValue = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
+
+function mutationEntity(payload: unknown, keys: string[]): JsonObject {
+  const root = objectValue(payload)
+  for (const key of keys) {
+    const candidate = objectValue(root[key])
+    if (Object.keys(candidate).length) return candidate
+  }
+  return root
+}
+
+function mapLecture(value: unknown, index: number): Lecture {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled lesson'),
+    type: stringValue(raw.type, 'READING') as LectureType,
+    duration: numberValue(raw.duration),
+    order: numberValue(raw.order, index + 1),
+    isFreePreview: Boolean(raw.isFreePreview),
+    content: typeof raw.content === 'string' ? raw.content : null,
+    videoUrl: typeof raw.videoUrl === 'string' ? raw.videoUrl : null,
+    transcriptUrl: typeof raw.transcriptUrl === 'string' ? raw.transcriptUrl : null,
+  }
+}
+
+function mapSection(value: unknown, index: number): AuthoringSection {
+  const raw = objectValue(value)
+  const lectures = raw.adminLectures ?? raw.publishedLectures ?? raw.lectures
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled section'),
+    order: numberValue(raw.order, index + 1),
+    lectures: arrayValue(lectures).map(mapLecture),
+  }
+}
+
+function mapCourseCard(value: unknown): CourseCard {
+  const raw = objectValue(value)
+  const category = objectValue(raw.category)
+  const author = objectValue(raw.author)
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled course'),
+    description: stringValue(raw.description) || undefined,
+    price: numberValue(raw.price),
+    language: stringValue(raw.language) || undefined,
+    level: stringValue(raw.level, 'BEGINNER') as CourseLevel,
+    thumbnail: typeof raw.thumbnail === 'string' ? raw.thumbnail : null,
+    avgRating: numberValue(raw.avgRating),
+    ratingCount: numberValue(raw.ratingCount),
+    tags: arrayValue(raw.tags).filter((tag): tag is string => typeof tag === 'string'),
+    category: stringValue(category.name) ? { name: stringValue(category.name) } : undefined,
+    author: stringValue(author.name)
+      ? { name: stringValue(author.name), avatar: typeof author.avatar === 'string' ? author.avatar : null }
+      : undefined,
+  }
+}
+
+function mapAuthoringCourse(value: unknown): AuthoringCourse {
+  const raw = objectValue(value)
+  const category = objectValue(raw.category)
+  const sections = arrayValue(raw.adminSections ?? raw.sections).map(mapSection)
+  const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
+  const durationMinutes = Math.ceil(
+    sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0) / 60
+  )
+  const readiness = [raw.title, raw.description, raw.category, raw.level, raw.language]
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled course'),
+    description: stringValue(raw.description),
+    category: stringValue(category.name, 'Uncategorized'),
+    categoryId: stringValue(category.id) || undefined,
+    level: stringValue(raw.level, 'BEGINNER') as CourseLevel,
+    language: stringValue(raw.language, 'English'),
+    status: stringValue(raw.status, 'DRAFT') as AuthoringCourse['status'],
+    progress: Math.round((readiness.filter(Boolean).length / readiness.length) * 100),
+    lessonCount,
+    durationMinutes,
+    students: numberValue(raw.students),
+    updatedAt: stringValue(raw.updatedAt, 'Not available'),
+    price: numberValue(raw.price),
+    tags: arrayValue(raw.tags).filter((tag): tag is string => typeof tag === 'string'),
+    thumbnail: typeof raw.thumbnail === 'string' ? raw.thumbnail : null,
+    sections,
+  }
+}
+
+function mapMe(value: unknown): Me | null {
+  if (!value) return null
+  const raw = objectValue(value)
+  const profile = objectValue(raw.profile_on_user ?? raw.profile)
+  const roleRows = arrayValue(raw.userRoles_on_user ?? raw.roles)
+  const roles = roleRows
+    .map((item) => {
+      if (typeof item === 'string') return item.toLowerCase()
+      return stringValue(objectValue(objectValue(item).role).name).toLowerCase()
+    })
+    .filter((role): role is Role => ['student', 'instructor', 'admin'].includes(role))
+  return {
+    uid: stringValue(raw.id ?? raw.uid),
+    email: stringValue(raw.email),
+    name: stringValue(raw.name),
+    avatar: typeof raw.avatar === 'string' ? raw.avatar : null,
+    profile: {
+      bio: stringValue(profile.bio) || undefined,
+      company: stringValue(profile.company) || undefined,
+      phone: stringValue(profile.phone) || undefined,
+      preferences: objectValue(profile.syncedPreferences ?? profile.preferences),
+    },
+    roles,
+  }
+}
+
 export const meApi = {
-  get: () => apiClient.get<Me | null>('/me').then((r) => r.data),
+  get: () => apiClient.get('/me').then((response) => mapMe(response.data)),
   sync: (payload: { email: string; name: string; avatar?: string }) =>
-    apiClient.post('/me/sync', payload).then((r) => r.data),
+    apiClient.post('/me/sync', payload).then((response) => mapMe(response.data)),
   updateProfile: (payload: {
     bio?: string
     company?: string
     phone?: string
     preferences?: Record<string, unknown>
-  }) => apiClient.patch('/me/profile', payload).then((r) => r.data),
+  }) => apiClient.patch('/me/profile', payload).then((response) => response.data),
 }
 
-// ---- Discovery ----
 export const catalogApi = {
-  list: () => apiClient.get<CourseCard[]>('/catalog/courses').then((r) => r.data),
+  list: () => apiClient.get('/catalog/courses').then((response) => arrayValue(response.data).map(mapCourseCard)),
   curriculum: (courseId: string) =>
-    apiClient.get<Curriculum>(`/catalog/courses/${courseId}/curriculum`).then((r) => r.data),
+    apiClient.get(`/catalog/courses/${courseId}/curriculum`).then((response) => {
+      const raw = objectValue(response.data)
+      const summary = objectValue(raw.ratingSummary)
+      return {
+        id: stringValue(raw.id),
+        title: stringValue(raw.title, 'Untitled course'),
+        description: stringValue(raw.description) || undefined,
+        language: stringValue(raw.language) || undefined,
+        sections: arrayValue(raw.publishedSections ?? raw.sections).map(mapSection),
+        ratingSummary: {
+          average: numberValue(summary.average),
+          count: numberValue(summary.count),
+          distribution: objectValue(summary.distribution) as Record<string, number>,
+        },
+      } satisfies Curriculum
+    }),
 }
 
-export const coursesApi = {
-  categories: () => apiClient.get<Category[]>('/courses/categories').then((r) => r.data),
-  popular: (limit = 10) =>
-    apiClient.get<CourseCard[]>('/courses/popular', { params: { limit } }).then((r) => r.data),
-  recommended: (limit = 10) =>
-    apiClient.get<CourseCard[]>('/courses/recommended', { params: { limit } }).then((r) => r.data),
-  continueLearning: () =>
-    apiClient.get<ContinueLearningItem[]>('/courses/continue-learning').then((r) => r.data),
-  search: (q: string) =>
-    apiClient.get<CourseCard[]>('/courses/search', { params: { q } }).then((r) => r.data),
-}
-
-// ---- Enrollment ----
 export const enrollmentApi = {
   enroll: (courseId: string) =>
-    apiClient.post<Enrollment>(`/courses/${courseId}/enroll`).then((r) => r.data),
+    apiClient.post<Enrollment>(`/courses/${courseId}/enroll`).then((response) => response.data),
   get: (courseId: string) =>
-    apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((r) => r.data),
+    apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
 }
 
-// ---- Progress ----
 export const progressApi = {
   course: (courseId: string) =>
-    apiClient.get<CourseProgress>(`/courses/${courseId}/progress`).then((r) => r.data),
+    apiClient.get<CourseProgress>(`/courses/${courseId}/progress`).then((response) => response.data),
   lecture: (lectureId: string) =>
     apiClient
-      .get<{ lastWatchedSecond: number; completedAt: string | null }>(
-        `/lectures/${lectureId}/progress`
-      )
-      .then((r) => r.data),
+      .get<{ lastWatchedSecond: number; completedAt: string | null }>(`/lectures/${lectureId}/progress`)
+      .then((response) => response.data),
   heartbeat: (lectureId: string, lastWatchedSecond: number, watchedSeconds?: number) =>
-    apiClient
-      .post(`/lectures/${lectureId}/progress`, { lastWatchedSecond, watchedSeconds })
-      .then((r) => r.data),
+    apiClient.post(`/lectures/${lectureId}/progress`, { lastWatchedSecond, watchedSeconds }).then((response) => response.data),
   markComplete: (lectureId: string, lastWatchedSecond = 0) =>
-    apiClient
-      .put(`/lectures/${lectureId}/progress`, { lastWatchedSecond, completed: true })
-      .then((r) => r.data),
+    apiClient.put(`/lectures/${lectureId}/progress`, { lastWatchedSecond, completed: true }).then((response) => response.data),
 }
 
-// ---- Ratings ----
 export const ratingsApi = {
   summary: (courseId: string) =>
-    apiClient.get<RatingSummary>(`/courses/${courseId}/ratings/summary`).then((r) => r.data),
+    apiClient.get<RatingSummary>(`/courses/${courseId}/ratings/summary`).then((response) => response.data),
   list: (courseId: string, limit = 20, offset = 0) =>
-    apiClient
-      .get<Review[]>(`/courses/${courseId}/ratings`, { params: { limit, offset } })
-      .then((r) => r.data),
+    apiClient.get<Review[]>(`/courses/${courseId}/ratings`, { params: { limit, offset } }).then((response) => response.data),
 }
 
-// ---- Instructor authoring ----
-// These paths map to the existing NestJS course/section/lecture/upload modules.
+export type CourseWritePayload = {
+  title: string
+  description?: string
+  price: number
+  language: string
+  level: CourseLevel
+  categoryId: string
+  tags: string[]
+  thumbnail?: string
+}
+
 export const authoringApi = {
-  list: () => apiClient.get<AuthoringCourse[]>('/courses').then((r) => r.data),
-  get: (courseId: string) => apiClient.get<AuthoringCourse>(`/courses/${courseId}`).then((r) => r.data),
-  create: (payload: Partial<AuthoringCourse>) =>
-    apiClient.post<AuthoringCourse>('/courses', payload).then((r) => r.data),
-  update: (courseId: string, payload: Partial<AuthoringCourse>) =>
-    apiClient.patch<AuthoringCourse>(`/courses/${courseId}`, payload).then((r) => r.data),
-  setStatus: (courseId: string, status: AuthoringCourse['status']) =>
-    apiClient.patch<AuthoringCourse>(`/courses/${courseId}/status`, { status }).then((r) => r.data),
+  list: () => apiClient.get('/courses').then((response) => arrayValue(response.data).map(mapAuthoringCourse)),
+  get: (courseId: string) =>
+    apiClient.get(`/courses/${courseId}`).then((response) => mapAuthoringCourse(response.data)),
+  create: (payload: CourseWritePayload) =>
+    apiClient.post('/courses', payload).then((response) =>
+      mapAuthoringCourse(mutationEntity(response.data, ['course_insert', 'courseInsert', 'course']))
+    ),
+  update: (courseId: string, payload: Partial<CourseWritePayload>) =>
+    apiClient.patch(`/courses/${courseId}`, payload).then((response) =>
+      mapAuthoringCourse(mutationEntity(response.data, ['course_update', 'courseUpdate', 'course']))
+    ),
+  setStatus: (courseId: string, status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') =>
+    apiClient.patch(`/courses/${courseId}/status`, { status }).then((response) => response.data),
   curriculum: (courseId: string) =>
-    apiClient.get<AuthoringSection[]>(`/courses/${courseId}/curriculum`).then((r) => r.data),
+    apiClient.get(`/courses/${courseId}`).then((response) => mapAuthoringCourse(response.data).sections ?? []),
   createSection: (courseId: string, payload: { title: string }) =>
-    apiClient.post<AuthoringSection>(`/courses/${courseId}/sections`, payload).then((r) => r.data),
-  updateSection: (courseId: string, sectionId: string, payload: { title?: string; order?: number }) =>
-    apiClient.patch(`/courses/${courseId}/sections/${sectionId}`, payload).then((r) => r.data),
+    apiClient.post(`/courses/${courseId}/sections`, payload).then((response) =>
+      mapSection(mutationEntity(response.data, ['section_insert', 'sectionInsert', 'section']), 0)
+    ),
+  updateSection: (courseId: string, sectionId: string, payload: { title: string }) =>
+    apiClient.patch(`/courses/${courseId}/sections/${sectionId}`, payload).then((response) => response.data),
   deleteSection: (courseId: string, sectionId: string) =>
-    apiClient.delete(`/courses/${courseId}/sections/${sectionId}`).then((r) => r.data),
+    apiClient.delete(`/courses/${courseId}/sections/${sectionId}`).then((response) => response.data),
   reorderSections: (courseId: string, orderedIds: string[]) =>
-    apiClient.patch(`/courses/${courseId}/sections/reorder`, { orderedIds }).then((r) => r.data),
-  createLecture: (courseId: string, sectionId: string, payload: Record<string, unknown>) =>
-    apiClient.post(`/courses/${courseId}/sections/${sectionId}/lectures`, payload).then((r) => r.data),
+    apiClient.put(`/courses/${courseId}/sections/reorder`, { orderedIds }).then((response) => response.data),
+  createLecture: (
+    courseId: string,
+    sectionId: string,
+    payload: { title: string; type: LectureType; duration?: number; isFreePreview?: boolean; content?: string }
+  ) => apiClient.post(`/courses/${courseId}/sections/${sectionId}/lectures`, payload).then((response) =>
+    mapLecture(mutationEntity(response.data, ['lecture_insert', 'lectureInsert', 'lecture']), 0)
+  ),
   updateLecture: (courseId: string, sectionId: string, lectureId: string, payload: Record<string, unknown>) =>
-    apiClient.patch(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`, payload).then((r) => r.data),
-  signedUpload: (payload: { fileName: string; contentType: string; size: number; courseId: string }) =>
-    apiClient.post<SignedUpload>('/uploads/signed-url', payload).then((r) => r.data),
-  confirmUpload: (payload: { uploadId: string; objectPath?: string }) =>
-    apiClient.post('/uploads/confirm', payload).then((r) => r.data),
-  startTranscode: (courseId: string, lectureId: string) =>
-    apiClient.post(`/courses/${courseId}/lectures/${lectureId}/video/transcode`).then((r) => r.data),
+    apiClient.patch(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`, payload).then((response) => response.data),
+  signedUpload: (payload: {
+    entityType: UploadEntityType
+    courseId: string
+    lectureId?: string
+    filename: string
+    contentType: string
+  }) => apiClient.post<SignedUpload>('/uploads/signed-url', payload).then((response) => response.data),
+  confirmUpload: (payload: {
+    entityType: UploadEntityType
+    courseId: string
+    lectureId?: string
+    storagePath: string
+  }) => apiClient.post<{ downloadUrl: string; storagePath: string; transcode?: { status?: string } }>('/uploads/confirm', payload).then((response) => response.data),
+  startTranscode: (courseId: string, lectureId: string, sourcePath: string) =>
+    apiClient.post(`/courses/${courseId}/lectures/${lectureId}/video/transcode`, { sourcePath }).then((response) => response.data),
   transcodeStatus: (courseId: string, lectureId: string) =>
-    apiClient.get(`/courses/${courseId}/lectures/${lectureId}/video/transcode/status`).then((r) => r.data),
+    apiClient.get(`/courses/${courseId}/lectures/${lectureId}/video/transcode/status`).then((response) => response.data),
 }
