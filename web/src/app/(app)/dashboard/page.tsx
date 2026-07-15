@@ -47,7 +47,7 @@ export default function DashboardPage() {
         <MetricCard icon={GraduationCap} label="Completion rate" value="72%" change="+6% vs last month" />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-content">Continue building</h2>

@@ -81,7 +81,7 @@ export default function CourseSetupPage() {
     <div className="space-y-6">
       <PageHeader title="Course setup" description="Add the core information learners will see before enrolling." />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_336px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_336px]">
         <Card className="p-5 sm:p-6">
           <h2 className="text-lg font-semibold text-content">Course details</h2>
           <p className="mt-1 text-xs text-content-secondary">Use a clear title and concise positioning. You can refine this later.</p>

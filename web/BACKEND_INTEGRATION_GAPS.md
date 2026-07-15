@@ -12,7 +12,7 @@ No backend source files were changed by this integration.
 - Instructor course list, course detail, create, update, and publish status
 - Section create/update/delete/reorder and lecture creation
 - Enrollment, progress, ratings, signed uploads, upload confirmation, and transcoding status
-- Web dev/production server uses port `8085`; the backend keeps port `3000`
+- Web dev/production server uses port `5173`; the backend keeps port `3000`
 
 ## Backend work still required
 
@@ -43,6 +43,6 @@ No backend source files were changed by this integration.
 ## Runtime requirements
 
 - Backend: `http://localhost:3000/api/v1`
-- Web: `http://localhost:8085`
+- Web: `http://localhost:5173`
 - Firebase web environment variables are required to send a valid ID token.
 - The backend additionally needs its Firebase Admin, Data Connect, storage, Redis/transcoding, and database configuration before all connected flows can be exercised end to end.
