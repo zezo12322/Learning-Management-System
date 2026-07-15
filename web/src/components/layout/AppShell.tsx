@@ -8,6 +8,7 @@ import {
   BookOpen,
   Bot,
   UploadCloud,
+  UserRound,
   LayoutDashboard,
   LibraryBig,
   LogOut,
@@ -24,6 +25,8 @@ const BASE_NAV = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/courses', label: 'Courses', icon: BookOpen },
   { href: '/catalog', label: 'Catalog', icon: LibraryBig },
+  { href: '/uploads', label: 'Uploads', icon: UploadCloud },
+  { href: '/profile', label: 'Profile', icon: UserRound },
 ]
 
 function isActive(pathname: string, href: string) {
@@ -46,7 +49,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ? [
           ...BASE_NAV,
           { href: `/studio/${firstCourseId}/ai-studio`, label: 'AI Studio', icon: Bot },
-          { href: `/studio/${firstCourseId}/media`, label: 'Uploads', icon: UploadCloud },
         ]
       : BASE_NAV,
     [firstCourseId]
