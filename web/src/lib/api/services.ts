@@ -2,6 +2,8 @@ import { apiClient } from './client'
 import type {
   AuthoringCourse,
   AuthoringSection,
+  Category,
+  ContinueLearningItem,
   CourseCard,
   CourseLevel,
   CourseProgress,
@@ -174,6 +176,48 @@ export const catalogApi = {
         },
       } satisfies Curriculum
     }),
+}
+
+export const coursesApi = {
+  categories: () =>
+    apiClient.get('/courses/categories').then((response) =>
+      arrayValue(response.data).map((value): Category => {
+        const raw = objectValue(value)
+        return {
+          id: stringValue(raw.id),
+          name: stringValue(raw.name, 'Unnamed category'),
+          description: stringValue(raw.description) || undefined,
+        }
+      })
+    ),
+  popular: (limit = 10) =>
+    apiClient.get('/courses/popular', { params: { limit } }).then((response) =>
+      arrayValue(response.data).map(mapCourseCard)
+    ),
+  recommended: (limit = 10) =>
+    apiClient.get('/courses/recommended', { params: { limit } }).then((response) =>
+      arrayValue(response.data).map(mapCourseCard)
+    ),
+  continueLearning: () =>
+    apiClient.get('/courses/continue-learning').then((response) =>
+      arrayValue(response.data).map((value): ContinueLearningItem => {
+        const raw = objectValue(value)
+        return {
+          enrollmentId: stringValue(raw.enrollmentId),
+          status: stringValue(raw.status, 'ACTIVE') as ContinueLearningItem['status'],
+          enrolledAt: stringValue(raw.enrolledAt),
+          completedAt: typeof raw.completedAt === 'string' ? raw.completedAt : null,
+          course: mapCourseCard(raw.course),
+          totalLessons: numberValue(raw.totalLessons),
+          completedLessons: numberValue(raw.completedLessons),
+          percentage: numberValue(raw.percentage),
+        }
+      })
+    ),
+  search: (query: string) =>
+    apiClient.get('/courses/search', { params: { q: query } }).then((response) =>
+      arrayValue(response.data).map(mapCourseCard)
+    ),
 }
 
 export const enrollmentApi = {

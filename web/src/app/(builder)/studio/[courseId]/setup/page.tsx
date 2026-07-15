@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { ImagePlus, Info, Save } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { apiErrorMessage } from '@/lib/api/client'
-import { authoringApi } from '@/lib/api/services'
+import { authoringApi, coursesApi } from '@/lib/api/services'
 import type { CourseLevel } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { FormField, SelectField } from '@/components/builder/FormField'
@@ -34,6 +34,11 @@ export default function CourseSetupPage() {
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
     enabled: !isDemoMode && courseId !== 'new',
+  })
+  const categories = useQuery({
+    queryKey: ['course-categories'],
+    queryFn: coursesApi.categories,
+    enabled: !isDemoMode,
   })
 
   useEffect(() => {
@@ -97,8 +102,19 @@ export default function CourseSetupPage() {
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category ID" hint="Required until the backend exposes category listing.">
-                <Input value={categoryId} onChange={(event) => setCategoryId(event.target.value)} placeholder="Category UUID" />
+              <FormField label="Category" hint="Loaded from the backend category catalog.">
+                {isDemoMode ? (
+                  <SelectField value={categoryId || 'demo-design'} onChange={(event) => setCategoryId(event.target.value)}>
+                    <option value="demo-design">Design</option><option value="demo-research">Research</option><option value="demo-product">Product</option>
+                  </SelectField>
+                ) : categories.isError ? (
+                  <Input value={categoryId} onChange={(event) => setCategoryId(event.target.value)} placeholder="Category UUID" />
+                ) : (
+                  <SelectField value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
+                    <option value="">{categories.isLoading ? 'Loading categories…' : 'Select a category'}</option>
+                    {(categories.data ?? []).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                  </SelectField>
+                )}
               </FormField>
               <FormField label="Level" hint="Set learner expectations.">
                 <SelectField value={level} onChange={(event) => setLevel(event.target.value)}>
