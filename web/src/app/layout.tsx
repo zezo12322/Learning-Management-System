@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
-import { Cairo } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const cairo = Cairo({
-  subsets: ['arabic', 'latin'],
-  variable: '--font-cairo',
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-poppins',
 })
 
 export const metadata: Metadata = {
-  title: 'OptimaTech LMS - منصة التعلم',
-  description: 'منصة OptimaTech للتعلم والتطوير المهني',
+  title: 'Optima LMS — AI-native course workspace',
+  description: 'Create, upload, review, and publish structured learning experiences.',
 }
 
 export default function RootLayout({
@@ -19,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ar" dir="rtl">
-      <body className={`${cairo.variable} font-cairo antialiased`}>
+    <html lang="en" dir="ltr">
+      <body className={`${poppins.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
