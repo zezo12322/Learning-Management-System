@@ -37,6 +37,76 @@ query GetMyPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' 
   }
 }
 
+# Instructor course-overview analytics. NO_ACCESS: it aggregates every enrolled
+# student's progress plus enrollment/rating/submission data across the whole
+# course, so it must never be client-SDK reachable. Backend-only — run via the
+# service account after CourseAccessGuard verifies the caller owns the course.
+# CoursesService.getOverview reduces the raw rows below into the summary counts
+# (sections/lectures/quizzes/assignments, enrollment breakdown, progress and
+# completion stats, rating distribution). Only user ids are exposed here (no
+# names/emails of students), keeping the aggregate PII-light.
+query AdminGetCourseOverview($courseId: UUID!) @auth(level: NO_ACCESS) {
+  course(id: $courseId) {
+    id
+    title
+    description
+    price
+    status
+    language
+    level
+    thumbnail
+    tags
+    avgRating
+    ratingCount
+    createdAt
+    updatedAt
+    deletedAt
+    category { id name }
+    author { id name email avatar }
+    createdBy { id name }
+    instructors: courseInstructors_on_course {
+      user { id name email avatar }
+    }
+    sections: courseSections_on_course(
+      where: { deletedAt: { eq: null } }
+      orderBy: [{ order: ASC }]
+    ) {
+      id
+      title
+      order
+      lectures: courseLectures_on_section(
+        where: { deletedAt: { eq: null } }
+        orderBy: [{ order: ASC }]
+      ) {
+        id
+        type
+        duration
+        progress: lectureProgresses_on_lecture {
+          completedAt
+          user { id }
+        }
+      }
+    }
+    enrollments: enrollments_on_course {
+      status
+      enrolledAt
+      completedAt
+      user { id }
+    }
+    ratings: courseRatings_on_course {
+      rating
+    }
+    missions: missions_on_course(where: { deletedAt: { eq: null } }) {
+      id
+      title
+      difficulty
+      submissions: missionSubmissions_on_mission {
+        status
+      }
+    }
+  }
+}
+
 # RBAC hardening: NO_ACCESS — run only via the backend service account after
 # CourseAccessGuard verifies the caller owns the course. Role alone previously
 # let any instructor grant/revoke instructors on ANY course by id.

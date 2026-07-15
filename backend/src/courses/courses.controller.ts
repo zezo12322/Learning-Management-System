@@ -73,6 +73,19 @@ export class CoursesController {
     return this.coursesService.findOne(courseId, token);
   }
 
+  // Instructor course-overview analytics — course details, content counts,
+  // enrollment breakdown, completion/progress stats and ratings. Owner-scoped by
+  // CourseAccessGuard (admins pass unconditionally).
+  @Get(':courseId/overview')
+  @Roles('admin', 'instructor')
+  @UseGuards(CourseAccessGuard)
+  getOverview(
+    @Param('courseId') courseId: string,
+    @AuthToken() token: string,
+  ) {
+    return this.coursesService.getOverview(courseId, token);
+  }
+
   @Patch(':courseId')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
