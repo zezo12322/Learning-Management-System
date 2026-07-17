@@ -53,7 +53,7 @@ Widget buildPopularCoursesSection(
             final course = popularCourses[index];
             return PopularCourseCard(
               title: course.title,
-              studentCount: '0 ${'home.students'.tr()}',
+              studentCount: '${course.enrollmentCount} ${'home.students'.tr()}',
               rating: course.rating,
               headerColor:
                   _popularCardColors[index % _popularCardColors.length],
@@ -78,6 +78,7 @@ Widget buildPopularCoursesSection(
                       .toList(),
                   avgRating: course.rating,
                   ratingCount: course.ratingCount,
+                  enrollmentCount: course.enrollmentCount,
                 );
 
                 Navigator.push(
