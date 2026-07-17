@@ -39,7 +39,7 @@ export default function PreviewPage() {
     <div className="space-y-6">
       <PageHeader title="Preview & publish" description="Review the learner experience and resolve required checks before publishing." />
 
-      {courseQuery.isError && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The course could not be loaded from the backend.</Card>}
+      {courseQuery.isError && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The course could not be loaded. Try again in a moment.</Card>}
 
       {published && (
         <Card className="border-success/20 bg-success/10 p-4 text-sm font-medium text-success">

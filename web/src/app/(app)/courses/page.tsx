@@ -10,6 +10,7 @@ import { CourseWorkspaceCard } from '@/components/workspace/CourseWorkspaceCard'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { apiErrorStatus } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
 
 type Filter = 'ALL' | 'DRAFT' | 'PUBLISHED'
@@ -34,18 +35,21 @@ export default function CoursesPage() {
     { label: 'Drafts', value: authoringCourses.filter((course) => course.status === 'DRAFT').length, icon: FileEdit, tone: 'bg-subtle text-content-secondary' },
     { label: 'Published', value: authoringCourses.filter((course) => course.status === 'PUBLISHED').length, icon: CheckCircle2, tone: 'bg-success/10 text-success' },
   ]
+  const accessDenied = apiErrorStatus(authoringQuery.error) === 403
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Courses"
-        description="Create, organize, and publish your database-backed courses."
+        description="Create, organize, and publish your courses."
         action={<Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>}
       />
 
       {authoringQuery.isError && (
         <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
-          Could not load courses from the API. No local course data is being substituted.
+          {accessDenied
+            ? 'Your account needs administrator or instructor access to manage courses.'
+            : 'We could not load your courses. Try again in a moment.'}
         </Card>
       )}
 
@@ -54,7 +58,7 @@ export default function CoursesPage() {
           <Card key={stat.label} className="flex items-center gap-3 p-4">
             <span className={cn('flex h-11 w-11 items-center justify-center rounded-xl', stat.tone)}><stat.icon size={18} /></span>
             <div>
-              <p className="text-xl font-bold text-content">{authoringQuery.isLoading ? '…' : authoringQuery.isError ? 'Unavailable' : stat.value}</p>
+              <p className="text-xl font-bold text-content">{authoringQuery.isLoading ? '…' : authoringQuery.isError ? '—' : stat.value}</p>
               <p className="text-xs text-content-secondary">{stat.label}</p>
             </div>
           </Card>
@@ -73,17 +77,17 @@ export default function CoursesPage() {
             </button>
           ))}
         </div>
-        <Input className="w-full sm:ms-auto sm:w-72" value={search} onChange={(event) => setSearch(event.target.value)} icon={<Search size={16} />} placeholder="Search database courses…" />
+        <Input className="w-full sm:ms-auto sm:w-72" value={search} onChange={(event) => setSearch(event.target.value)} icon={<Search size={16} />} placeholder="Search courses…" />
       </div>
 
       {authoringQuery.isLoading ? (
-        <Card className="py-16 text-center text-sm text-content-secondary">Loading courses from the API…</Card>
+        <Card className="py-16 text-center text-sm text-content-secondary">Loading courses…</Card>
       ) : filteredAuthoring.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredAuthoring.map((course, index) => <CourseWorkspaceCard key={course.id} course={course} featured={index === 1} />)}
         </div>
       ) : !authoringQuery.isError ? (
-        <Card className="py-16 text-center text-sm text-content-secondary">No instructor courses match this view.</Card>
+        <Card className="py-16 text-center text-sm text-content-secondary">No courses match this view.</Card>
       ) : null}
     </div>
   )
