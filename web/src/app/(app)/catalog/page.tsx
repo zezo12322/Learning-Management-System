@@ -4,64 +4,37 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpen, Search, Star, UserRound } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { catalogApi, coursesApi } from '@/lib/api/services'
-import { demoCourses } from '@/lib/demo-data'
-import type { CourseCard } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { StatusPill } from '@/components/workspace/StatusPill'
 
-const demoCatalog: CourseCard[] = demoCourses
-  .filter((course) => course.status === 'PUBLISHED')
-  .map((course) => ({
-    id: course.id,
-    title: course.title,
-    description: course.description,
-    price: course.price ?? 0,
-    language: course.language,
-    level: course.level,
-    avgRating: 4.8,
-    ratingCount: course.students,
-    category: { name: course.category },
-    author: { name: 'Optima Academy' },
-  }))
-
 export default function CatalogPage() {
-  const { isDemoMode } = useAuth()
   const [search, setSearch] = useState('')
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const serverSearch = useQuery({
     queryKey: ['course-search', search.trim()],
     queryFn: () => coursesApi.search(search.trim()),
-    enabled: !isDemoMode && search.trim().length > 0,
+    enabled: search.trim().length > 0,
   })
-  const popular = useQuery({ queryKey: ['popular-courses'], queryFn: () => coursesApi.popular(6), enabled: !isDemoMode })
-  const recommended = useQuery({ queryKey: ['recommended-courses'], queryFn: () => coursesApi.recommended(6), enabled: !isDemoMode })
-  const continueLearning = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning, enabled: !isDemoMode })
-  const courses = useMemo(
-    () => catalog.data?.length ? catalog.data : (isDemoMode ? demoCatalog : []),
-    [catalog.data, isDemoMode]
-  )
+  const popular = useQuery({ queryKey: ['popular-courses'], queryFn: () => coursesApi.popular(6) })
+  const recommended = useQuery({ queryKey: ['recommended-courses'], queryFn: () => coursesApi.recommended(6) })
+  const continueLearning = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning })
+  const courses = useMemo(() => catalog.data ?? [], [catalog.data])
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     if (!query) return courses
-    if (!isDemoMode) return serverSearch.data ?? []
-    return courses.filter((course) =>
-      [course.title, course.description, course.category?.name, course.author?.name]
-        .filter(Boolean)
-        .some((value) => value!.toLowerCase().includes(query))
-    )
-  }, [courses, isDemoMode, search, serverSearch.data])
+    return serverSearch.data ?? []
+  }, [courses, search, serverSearch.data])
   const featured = recommended.data?.length ? recommended.data : (popular.data ?? [])
 
   return (
     <div className="space-y-6">
       <PageHeader title="Course catalog" description="Browse published learning experiences available to learners." />
       <Input icon={<Search size={17} />} placeholder="Search the catalog…" className="max-w-xl" value={search} onChange={(event) => setSearch(event.target.value)} />
-      {catalog.isError && <Card className="border-warning/20 bg-warning/10 p-4 text-sm text-warning">The live catalog could not be reached. Showing local preview data where available.</Card>}
-      {!isDemoMode && !search && continueLearning.data?.length ? (
+      {catalog.isError && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The live catalog could not be reached.</Card>}
+      {!search && continueLearning.data?.length ? (
         <Card className="p-5">
           <div className="flex items-center justify-between"><h2 className="text-base font-semibold text-content">Continue learning</h2><span className="text-xs text-content-muted">Synced from your enrollments</span></div>
           <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -75,7 +48,7 @@ export default function CatalogPage() {
           </div>
         </Card>
       ) : null}
-      {!isDemoMode && !search && featured.length ? (
+      {!search && featured.length ? (
         <div>
           <h2 className="mb-3 text-base font-semibold text-content">{recommended.data?.length ? 'Recommended for you' : 'Popular courses'}</h2>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">

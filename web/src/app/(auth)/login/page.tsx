@@ -16,30 +16,50 @@ import { Button } from '@/components/ui/button'
 const schema = z.object({
   email: z.string().email('Enter a valid email address.'),
   password: z.string().min(1, 'Password is required.'),
+  remember: z.boolean(),
 })
 type FormValues = z.infer<typeof schema>
 
 export default function LoginPage() {
-  const { login, loginWithGoogle, isDemoMode } = useAuth()
+  const { login, loginWithGoogle, resetPassword, configurationError } = useAuth()
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { email: isDemoMode ? 'zeyad@optima.demo' : '', password: isDemoMode ? 'optima-demo' : '' },
+    defaultValues: { email: '', password: '', remember: true },
   })
 
   const onSubmit = async (values: FormValues) => {
     setError(null)
+    setNotice(null)
     try {
-      await login(values.email, values.password)
+      await login(values.email, values.password, values.remember)
       router.push('/dashboard')
     } catch {
       setError('We could not sign you in. Check your email and password.')
+    }
+  }
+
+  const requestPasswordReset = async () => {
+    const email = getValues('email').trim()
+    setError(null)
+    setNotice(null)
+    if (!z.string().email().safeParse(email).success) {
+      setError('Enter your email address first, then request a password reset.')
+      return
+    }
+    try {
+      await resetPassword(email)
+      setNotice('Password reset instructions were sent if an account exists for this email.')
+    } catch {
+      setError('We could not send password reset instructions right now.')
     }
   }
 
@@ -66,16 +86,17 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold tracking-tight text-content">Welcome back</h2>
         <p className="mb-7 mt-2 text-sm text-content-secondary">Sign in to continue building and publishing courses.</p>
 
-        {isDemoMode && (
-          <div className="mb-5 flex items-start gap-2 rounded-input bg-brand-soft px-3 py-2.5 text-xs text-primary">
+        {configurationError && (
+          <div className="mb-5 flex items-start gap-2 rounded-input bg-error/10 px-3 py-2.5 text-xs text-error">
             <ShieldCheck size={16} className="mt-0.5 shrink-0" />
-            Demo mode is active because Firebase environment variables are not configured.
+            Authentication configuration is unavailable. Contact the workspace administrator.
           </div>
         )}
 
         {error && <div className="mb-4 rounded-input bg-error/10 px-3 py-2 text-sm text-error">{error}</div>}
+        {notice && <div className="mb-4 rounded-input bg-success/10 px-3 py-2 text-sm text-success">{notice}</div>}
 
-        <Button variant="outline" fullWidth size="lg" onClick={googleLogin}>
+        <Button variant="outline" fullWidth size="lg" onClick={googleLogin} disabled={configurationError}>
           <span className="mr-1 text-base font-bold">G</span> Continue with Google
         </Button>
 
@@ -93,7 +114,14 @@ export default function LoginPage() {
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="#" className="mb-1 text-xs font-semibold text-primary">Forgot password?</Link>
+              <button
+                type="button"
+                onClick={requestPasswordReset}
+                disabled={configurationError}
+                className="mb-1 text-xs font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Forgot password?
+              </button>
             </div>
             <Input
               id="password"
@@ -112,11 +140,11 @@ export default function LoginPage() {
           </div>
 
           <label className="flex items-center gap-2 text-xs text-content-secondary">
-            <input type="checkbox" className="h-4 w-4 rounded border-border text-primary focus:ring-primary" />
+            <input type="checkbox" className="h-4 w-4 rounded border-border text-primary focus:ring-primary" {...register('remember')} />
             Remember me
           </label>
 
-          <Button type="submit" fullWidth size="lg" loading={isSubmitting}>
+          <Button type="submit" fullWidth size="lg" loading={isSubmitting} disabled={configurationError}>
             Sign in <ArrowRight size={17} />
           </Button>
         </form>

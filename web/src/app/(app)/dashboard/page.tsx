@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpenCheck, MessageSquare, Plus, Star } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi, catalogApi } from '@/lib/api/services'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { MetricCard } from '@/components/workspace/MetricCard'
@@ -14,12 +13,10 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default function DashboardPage() {
-  const { isDemoMode } = useAuth()
   const catalogQuery = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
-    enabled: !isDemoMode,
   })
   const courses = useMemo(() => catalogQuery.data ?? [], [catalogQuery.data])
   const firstAuthoringCourse = authoringQuery.data?.[0]
@@ -43,13 +40,7 @@ export default function DashboardPage() {
       <PageHeader
         title="Workspace overview"
         description="Live information returned by the connected LMS APIs."
-        action={
-          isDemoMode ? (
-            <Button disabled title="Firebase Web authentication is required to create a course"><Plus size={16} /> Create course</Button>
-          ) : (
-            <Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>
-          )
-        }
+        action={<Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>}
       />
 
       {catalogQuery.isError && (
@@ -139,7 +130,7 @@ export default function DashboardPage() {
           <div className="rounded-input bg-brand-soft p-4">
             <p className="text-[10px] font-semibold tracking-wide text-primary">AI COURSE STUDIO</p>
             <h2 className="mt-2 text-lg font-semibold text-content">Turn course content into learning assets</h2>
-            <p className="mt-2 text-xs leading-5 text-content-secondary">AI actions stay unavailable until the backend exposes a configured provider and chat contract.</p>
+            <p className="mt-2 text-xs leading-5 text-content-secondary">AI course generation and tutoring are planned for a future release.</p>
           </div>
           <div className="mt-5"><AIUnavailable compact /></div>
 
@@ -153,11 +144,9 @@ export default function DashboardPage() {
                 {authoringQuery.isLoading ? 'Loading authoring courses' : 'No authoring course available'}
               </Button>
               <p className="mt-2 text-center text-[11px] leading-4 text-content-muted">
-                {isDemoMode
-                  ? 'Firebase Web authentication is required to load instructor courses.'
-                  : authoringQuery.isError
-                    ? 'The instructor course API could not be loaded.'
-                    : 'Create an instructor course before opening AI Studio.'}
+                {authoringQuery.isError
+                  ? 'The instructor course API could not be loaded.'
+                  : 'Create an instructor course before opening AI Studio.'}
               </p>
             </div>
           )}

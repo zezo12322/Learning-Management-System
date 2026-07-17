@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, HelpCircle, Save } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import { authoringApi } from '@/lib/api/services'
 import { Button } from '@/components/ui/button'
 import { PageSpinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
@@ -29,6 +31,11 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
   const { loading, isAuthenticated } = useAuth()
   const [saved, setSaved] = useState('All changes saved')
   const active = activeStep(pathname)
+  const course = useQuery({
+    queryKey: ['authoring-course', courseId],
+    queryFn: () => authoringApi.get(courseId),
+    enabled: courseId !== 'new' && isAuthenticated,
+  })
 
   useEffect(() => {
     if (!loading && !isAuthenticated) router.replace('/login')
@@ -56,8 +63,8 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
           <Link href="/courses" className="hidden items-center gap-1 text-xs font-medium text-content-secondary sm:flex"><ArrowLeft size={15} /> Courses</Link>
           <span className="hidden h-7 w-px bg-border sm:block" />
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-content">{courseId === 'new' ? 'Untitled course' : 'UI/UX Design Fundamentals'}</p>
-            <p className="text-[10px] text-content-muted">Draft · {saved}</p>
+            <p className="truncate text-xs font-semibold text-content">{courseId === 'new' ? 'New course' : course.data?.title ?? (course.isLoading ? 'Loading course…' : 'Course')}</p>
+            <p className="text-[10px] text-content-muted">{course.data?.status ?? 'DRAFT'} · {saved}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

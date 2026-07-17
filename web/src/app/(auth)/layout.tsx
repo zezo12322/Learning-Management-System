@@ -8,16 +8,16 @@ import { useAuth } from '@/lib/auth/AuthProvider'
 const VALUE_POINTS = [
   { icon: BookOpen, title: 'Course builder', body: 'Structure sections, lessons, and resources.' },
   { icon: UploadCloud, title: 'Reliable video flow', body: 'Track upload and transcoding end to end.' },
-  { icon: Bot, title: 'Grounded AI', body: 'Generate and test against approved course sources.' },
+  { icon: Bot, title: 'AI tools', body: 'Course generation and tutor experiences are coming soon.' },
 ]
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isDemoMode, loading } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && isAuthenticated && !isDemoMode) router.replace('/dashboard')
-  }, [loading, isAuthenticated, isDemoMode, router])
+    if (!loading && isAuthenticated) router.replace('/dashboard')
+  }, [loading, isAuthenticated, router])
 
   return (
     <div className="grid min-h-screen bg-surface lg:grid-cols-[minmax(520px,43%)_1fr]">
@@ -31,12 +31,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="relative mt-24 max-w-lg">
-          <p className="text-xs font-semibold tracking-[0.14em] text-primary-200">THE AI-NATIVE LMS</p>
+          <p className="text-xs font-semibold tracking-[0.14em] text-primary-200">THE COMPLETE LMS WORKSPACE</p>
           <h1 className="mt-6 text-[44px] font-bold leading-[1.45] tracking-tight">
             Build courses faster.<br />Teach with confidence.
           </h1>
           <p className="mt-5 max-w-md text-base leading-7 text-primary-100">
-            Create, upload, and publish structured learning experiences—with grounded AI tools ready when your provider is connected.
+            Create, upload, and publish structured learning experiences. AI tools will be introduced in a future release.
           </p>
 
           <div className="mt-12 space-y-4">

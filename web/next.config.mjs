@@ -1,13 +1,18 @@
+import { fileURLToPath } from 'node:url'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  outputFileTracingRoot: fileURLToPath(new URL('.', import.meta.url)),
   // Firebase's Node build pulls in `undici`, whose private-class-field syntax
   // webpack can't parse. Mark these external so Node loads them natively during
   // the server compile of client components.
-  experimental: {
-    serverComponentsExternalPackages: ['firebase', '@firebase/auth', '@firebase/functions', 'undici'],
-  },
+  serverExternalPackages: ['firebase', '@firebase/auth', '@firebase/functions', 'undici'],
   images: {
+    // Keep the temporary Workers deployment inside the free tier by serving
+    // source images directly instead of using Cloudflare Images transforms.
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
       { protocol: 'https', hostname: 'storage.googleapis.com' },
@@ -31,6 +36,9 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
         ],
       },
     ]
@@ -38,3 +46,7 @@ const nextConfig = {
 }
 
 export default nextConfig
+
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
+
+initOpenNextCloudflareForDev()

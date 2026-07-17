@@ -13,7 +13,6 @@ import {
   LibraryBig,
   LogOut,
   Plus,
-  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
@@ -35,13 +34,13 @@ function isActive(pathname: string, href: string) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { me, roles, loading, isAuthenticated, isDemoMode, logout } = useAuth()
+  const { me, roles, loading, isAuthenticated, logout } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
-    enabled: !isDemoMode && isAuthenticated,
+    enabled: isAuthenticated,
   })
   const firstCourseId = authoringQuery.data?.[0]?.id
   const nav = useMemo(
@@ -54,15 +53,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     [firstCourseId]
   )
   const currentLabel = nav.find((item) => isActive(pathname, item.href))?.label ?? 'Workspace'
-  const accountName = isDemoMode ? 'Local preview' : me?.name || 'Account'
-  const accountRole = isDemoMode
-    ? 'Authentication not configured'
-    : roles.length
-      ? roles.map((role) => role[0].toUpperCase() + role.slice(1)).join(', ')
-      : 'User'
+  const accountName = me?.name || 'Account'
+  const accountRole = roles.length
+    ? roles.map((role) => role[0].toUpperCase() + role.slice(1)).join(', ')
+    : 'User'
   const accountSummary = (
     <>
-      <Avatar src={isDemoMode ? null : me?.avatar} name={accountName} size={38} />
+      <Avatar src={me?.avatar} name={accountName} size={38} />
       <span className="hidden text-left md:block">
         <span className="block text-xs font-semibold text-content">{accountName}</span>
         <span className="block text-[10px] text-content-muted">{accountRole}</span>
@@ -113,18 +110,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="space-y-3">
-          {isDemoMode ? (
-            <div className="rounded-input bg-subtle px-3 py-3 text-center text-[11px] leading-4 text-content-secondary">
-              Sign in with Firebase to create courses
-            </div>
-          ) : (
-            <Link
-              href="/studio/new/setup"
-              className="flex h-11 items-center justify-center gap-2 rounded-input bg-primary text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
-            >
-              <Plus size={17} /> New course
-            </Link>
-          )}
+          <Link
+            href="/studio/new/setup"
+            className="flex h-11 items-center justify-center gap-2 rounded-input bg-primary text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
+          >
+            <Plus size={17} /> New course
+          </Link>
           <button
             onClick={signOut}
             className="flex h-10 w-full items-center gap-3 rounded-input px-3 text-sm text-content-secondary transition-colors hover:bg-subtle hover:text-error"
@@ -143,20 +134,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-content">{currentLabel}</p>
-            <p className="mt-0.5 text-[11px] text-content-muted">{isDemoMode ? 'Live public API data' : 'Instructor workspace'}</p>
+            <p className="mt-0.5 text-[11px] text-content-muted">Instructor workspace</p>
           </div>
 
           <div className="flex items-center gap-3">
-            {isDemoMode && (
-              <span className="hidden items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold text-primary sm:inline-flex">
-                <Sparkles size={12} /> Public API preview
-              </span>
-            )}
-            {isDemoMode ? (
-              <div className="flex items-center gap-2.5">{accountSummary}</div>
-            ) : (
-              <Link href="/profile" className="flex items-center gap-2.5">{accountSummary}</Link>
-            )}
+            <Link href="/profile" className="flex items-center gap-2.5">{accountSummary}</Link>
           </div>
         </header>
 

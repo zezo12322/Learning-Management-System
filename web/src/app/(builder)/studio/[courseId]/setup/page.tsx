@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ImagePlus, Info, Save } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi, coursesApi } from '@/lib/api/services'
 import type { CourseLevel } from '@/lib/types'
@@ -19,9 +18,8 @@ import { Progress } from '@/components/ui/progress'
 export default function CourseSetupPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const router = useRouter()
-  const { isDemoMode } = useAuth()
-  const [title, setTitle] = useState(courseId === 'new' ? '' : 'UI/UX Design Fundamentals')
-  const [description, setDescription] = useState('Master the fundamentals of user-centered design through research, wireframes, prototypes, and evidence-based critique.')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   const [categoryId, setCategoryId] = useState(process.env.NEXT_PUBLIC_DEFAULT_CATEGORY_ID ?? '')
   const [level, setLevel] = useState('BEGINNER')
   const [language, setLanguage] = useState('English')
@@ -33,12 +31,11 @@ export default function CourseSetupPage() {
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
-    enabled: !isDemoMode && courseId !== 'new',
+    enabled: courseId !== 'new',
   })
   const categories = useQuery({
     queryKey: ['course-categories'],
     queryFn: coursesApi.categories,
-    enabled: !isDemoMode,
   })
 
   useEffect(() => {
@@ -65,11 +62,6 @@ export default function CourseSetupPage() {
   })
 
   const saveSetup = async () => {
-    if (isDemoMode) {
-      setSaved(true)
-      window.setTimeout(() => setSaved(false), 1800)
-      return
-    }
     if (courseId === 'new' && !categoryId) return
     await save.mutateAsync()
   }
@@ -103,11 +95,7 @@ export default function CourseSetupPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Category" hint="Loaded from the backend category catalog.">
-                {isDemoMode ? (
-                  <SelectField value={categoryId || 'demo-design'} onChange={(event) => setCategoryId(event.target.value)}>
-                    <option value="demo-design">Design</option><option value="demo-research">Research</option><option value="demo-product">Product</option>
-                  </SelectField>
-                ) : categories.isError ? (
+                {categories.isError ? (
                   <Input value={categoryId} onChange={(event) => setCategoryId(event.target.value)} placeholder="Category UUID" />
                 ) : (
                   <SelectField value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
@@ -147,8 +135,8 @@ export default function CourseSetupPage() {
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
               {saved && <span className="text-xs font-medium text-success">Setup saved</span>}
               {save.isError && <span className="text-xs font-medium text-error">{apiErrorMessage(save.error, 'Could not save setup')}</span>}
-              {!isDemoMode && courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Category ID is required by the backend.</span>}
-              <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (!isDemoMode && courseId === 'new' && !categoryId)}><Save size={16} /> Save setup</Button>
+              {courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Category ID is required by the backend.</span>}
+              <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (courseId === 'new' && !categoryId)}><Save size={16} /> Save setup</Button>
             </div>
           </div>
         </Card>

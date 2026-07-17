@@ -1,2 +1,5 @@
 src/dataconnect-generated/**
 .next/**
+.open-next/**
+next-env.d.ts
+cloudflare-env.d.ts

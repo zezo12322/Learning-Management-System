@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Play, Plus } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
-import { demoSections } from '@/lib/demo-data'
 import type { AuthoringSection } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { ReadinessItem } from '@/components/builder/ReadinessItem'
@@ -16,14 +14,12 @@ import { Card } from '@/components/ui/card'
 
 export default function CurriculumPage() {
   const { courseId } = useParams<{ courseId: string }>()
-  const { isDemoMode } = useAuth()
-  const [sections, setSections] = useState<AuthoringSection[]>(isDemoMode ? demoSections : [])
-  const [expanded, setExpanded] = useState<string>(isDemoMode ? demoSections[0].id : '')
+  const [sections, setSections] = useState<AuthoringSection[]>([])
+  const [expanded, setExpanded] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
-    enabled: !isDemoMode,
   })
 
   useEffect(() => {
@@ -49,12 +45,8 @@ export default function CurriculumPage() {
 
   const addSection = async () => {
     const title = `New section ${sections.length + 1}`
-    if (!isDemoMode) {
-      const created = await createSection.mutateAsync(title)
-      setSections((current) => [...current, { ...created, lectures: created.lectures ?? [] }])
-    } else {
-      setSections((current) => [...current, { id: `section-${Date.now()}`, title, order: current.length + 1, lectures: [] }])
-    }
+    const created = await createSection.mutateAsync(title)
+    setSections((current) => [...current, { ...created, lectures: created.lectures ?? [] }])
     setNotice('Section added')
     window.setTimeout(() => setNotice(null), 1600)
   }
@@ -66,13 +58,11 @@ export default function CurriculumPage() {
     ;[next[index], next[target]] = [next[target], next[index]]
     const reordered = next.map((section, order) => ({ ...section, order: order + 1 }))
     setSections(reordered)
-    if (!isDemoMode) reorderSections.mutate(reordered.map((section) => section.id))
+    reorderSections.mutate(reordered.map((section) => section.id))
   }
 
   const addLesson = async (sectionId: string) => {
-    const created = isDemoMode
-      ? { id: `lesson-${Date.now()}`, title: 'Untitled lesson', type: 'READING' as const, duration: 0, order: 1, isFreePreview: false }
-      : await createLecture.mutateAsync(sectionId)
+    const created = await createLecture.mutateAsync(sectionId)
     setSections((current) => current.map((section) => section.id === sectionId
       ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
       : section))
@@ -93,7 +83,7 @@ export default function CurriculumPage() {
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
         <Card className="p-4 sm:p-5">
-          {course.isError && !isDemoMode && <div className="mb-4 rounded-input bg-error/10 p-3 text-xs text-error">Could not load the course curriculum.</div>}
+          {course.isError && <div className="mb-4 rounded-input bg-error/10 p-3 text-xs text-error">Could not load the course curriculum.</div>}
           <div className="mb-4 flex items-center justify-between text-xs text-content-secondary">
             <span>{sections.length} sections · {totalLessons} lessons · {Math.floor(totalSeconds / 3600)}h {Math.round((totalSeconds % 3600) / 60)}m</span>
             <button onClick={() => setExpanded(expanded ? '' : sections[0]?.id)} className="font-semibold text-primary">{expanded ? 'Collapse all' : 'Expand first'}</button>

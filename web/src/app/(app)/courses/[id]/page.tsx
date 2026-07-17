@@ -58,6 +58,7 @@ export default function CourseDetailsPage() {
   const totalLessons = lectures.length
   const totalSeconds = lectures.reduce((s, l) => s + (l.duration ?? 0), 0)
   const isEnrolled = enrollment.data?.status === 'ACTIVE' || enrollment.data?.status === 'COMPLETED'
+  const isPaid = (meta?.price ?? 0) > 0
   const summary = curriculum.data?.ratingSummary
 
   const enroll = useMutation({
@@ -212,6 +213,10 @@ export default function CourseDetailsPage() {
           {isEnrolled ? (
             <Button size="lg" onClick={() => router.push(`/learn/${id}`)}>
               <CheckCircle2 size={18} /> متابعة التعلّم
+            </Button>
+          ) : isPaid ? (
+            <Button size="lg" disabled>
+              الدفع قريبًا
             </Button>
           ) : (
             <Button

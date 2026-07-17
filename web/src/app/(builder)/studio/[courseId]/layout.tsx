@@ -1,11 +1,12 @@
 import { BuilderShell } from '@/components/layout/BuilderShell'
 
-export default function StudioLayout({
+export default async function StudioLayout({
   children,
   params,
 }: {
   children: React.ReactNode
-  params: { courseId: string }
+  params: Promise<{ courseId: string }>
 }) {
-  return <BuilderShell courseId={params.courseId}>{children}</BuilderShell>
+  const { courseId } = await params
+  return <BuilderShell courseId={courseId}>{children}</BuilderShell>
 }
