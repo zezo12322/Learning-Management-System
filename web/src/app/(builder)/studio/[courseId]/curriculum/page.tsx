@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Play, Plus } from 'lucide-react'
+import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Pencil, Play, Plus, Trash2 } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
 import type { AuthoringSection } from '@/lib/types'
@@ -24,6 +24,10 @@ export default function CurriculumPage() {
   const [lessonTitle, setLessonTitle] = useState('')
   const [lessonContent, setLessonContent] = useState('')
   const [lessonError, setLessonError] = useState<string | null>(null)
+  const [editingSectionId, setEditingSectionId] = useState('')
+  const [sectionTitle, setSectionTitle] = useState('')
+  const [deleteSectionId, setDeleteSectionId] = useState('')
+  const [sectionError, setSectionError] = useState<string | null>(null)
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
@@ -37,6 +41,13 @@ export default function CurriculumPage() {
 
   const createSection = useMutation({
     mutationFn: (title: string) => authoringApi.createSection(courseId, { title }),
+  })
+  const updateSection = useMutation({
+    mutationFn: ({ sectionId, title }: { sectionId: string; title: string }) =>
+      authoringApi.updateSection(courseId, sectionId, { title }),
+  })
+  const deleteSection = useMutation({
+    mutationFn: (sectionId: string) => authoringApi.deleteSection(courseId, sectionId),
   })
   const createLecture = useMutation({
     mutationFn: ({ sectionId, title, content }: { sectionId: string; title: string; content: string }) => authoringApi.createLecture(courseId, sectionId, {
@@ -58,6 +69,76 @@ export default function CurriculumPage() {
     void queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
     setNotice('Section added')
     window.setTimeout(() => setNotice(null), 1600)
+  }
+
+  const startEditingSection = (section: AuthoringSection) => {
+    setExpanded(section.id)
+    setEditingSectionId(section.id)
+    setSectionTitle(section.title)
+    setDeleteSectionId('')
+    setSectionError(null)
+    updateSection.reset()
+  }
+
+  const cancelEditingSection = () => {
+    setEditingSectionId('')
+    setSectionTitle('')
+    setSectionError(null)
+    updateSection.reset()
+  }
+
+  const saveSection = async (sectionId: string) => {
+    const title = sectionTitle.trim()
+    if (!title) {
+      setSectionError('Enter a section title before saving it.')
+      return
+    }
+
+    setSectionError(null)
+    try {
+      await updateSection.mutateAsync({ sectionId, title })
+      setSections((current) => current.map((section) =>
+        section.id === sectionId ? { ...section, title } : section
+      ))
+      await queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
+      cancelEditingSection()
+      setNotice('Section updated')
+      window.setTimeout(() => setNotice(null), 1600)
+    } catch (error) {
+      setSectionError(apiErrorMessage(error, 'The section could not be updated. Try again.'))
+    }
+  }
+
+  const requestSectionDelete = (sectionId: string) => {
+    setExpanded(sectionId)
+    setDeleteSectionId(sectionId)
+    setEditingSectionId('')
+    setSectionTitle('')
+    setSectionError(null)
+    deleteSection.reset()
+  }
+
+  const cancelSectionDelete = () => {
+    setDeleteSectionId('')
+    setSectionError(null)
+    deleteSection.reset()
+  }
+
+  const removeSection = async (sectionId: string) => {
+    setSectionError(null)
+    try {
+      await deleteSection.mutateAsync(sectionId)
+      const remainingSections = sections.filter((section) => section.id !== sectionId)
+      setSections(remainingSections)
+      setExpanded((current) => current === sectionId ? remainingSections[0]?.id ?? '' : current)
+      if (lessonSectionId === sectionId) closeLessonForm()
+      setDeleteSectionId('')
+      await queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
+      setNotice('Section deleted')
+      window.setTimeout(() => setNotice(null), 1600)
+    } catch (error) {
+      setSectionError(apiErrorMessage(error, 'The section could not be deleted. Try again.'))
+    }
   }
 
   const moveSection = (index: number, direction: -1 | 1) => {
@@ -145,11 +226,70 @@ export default function CurriculumPage() {
                       <button onClick={() => moveSection(sectionIndex, -1)} className="rounded-lg p-2 text-content-muted hover:bg-surface hover:text-content" aria-label="Move section up"><ChevronUp size={15} /></button>
                       <button onClick={() => moveSection(sectionIndex, 1)} className="rounded-lg p-2 text-content-muted hover:bg-surface hover:text-content" aria-label="Move section down"><ChevronDown size={15} /></button>
                     </div>
+                    <button
+                      onClick={() => startEditingSection(section)}
+                      disabled={updateSection.isPending || deleteSection.isPending}
+                      className="rounded-lg p-2 text-content-muted hover:bg-surface hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label={`Edit ${section.title}`}
+                    >
+                      <Pencil size={15} />
+                    </button>
+                    <button
+                      onClick={() => requestSectionDelete(section.id)}
+                      disabled={updateSection.isPending || deleteSection.isPending}
+                      className="rounded-lg p-2 text-content-muted hover:bg-error/10 hover:text-error disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label={`Delete ${section.title}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
                     <button onClick={() => setExpanded(open ? '' : section.id)} className="rounded-lg p-2 text-primary" aria-label="Toggle section">{open ? <ChevronUp size={17} /> : <ChevronDown size={17} />}</button>
                   </div>
 
                   {open && (
                     <div className="divide-y divide-border">
+                      {editingSectionId === section.id && (
+                        <div className="space-y-3 bg-subtle p-4">
+                          <div>
+                            <label htmlFor={`section-title-${section.id}`} className="text-xs font-semibold text-content">Section title</label>
+                            <Input
+                              id={`section-title-${section.id}`}
+                              value={sectionTitle}
+                              onChange={(event) => setSectionTitle(event.target.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') void saveSection(section.id)
+                                if (event.key === 'Escape') cancelEditingSection()
+                              }}
+                              className="mt-2"
+                              maxLength={120}
+                              autoFocus
+                            />
+                          </div>
+                          {sectionError && <p className="rounded-input bg-error/10 px-3 py-2 text-xs text-error">{sectionError}</p>}
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={cancelEditingSection} disabled={updateSection.isPending}>Cancel</Button>
+                            <Button size="sm" onClick={() => void saveSection(section.id)} loading={updateSection.isPending}>Save changes</Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {deleteSectionId === section.id && (
+                        <div className="space-y-3 bg-error/5 p-4">
+                          <div>
+                            <p className="text-sm font-semibold text-content">Delete “{section.title}”?</p>
+                            <p className="mt-1 text-xs leading-5 text-content-secondary">
+                              This removes the section and its {section.lectures.length} {section.lectures.length === 1 ? 'lesson' : 'lessons'} from the course. This action cannot be undone.
+                            </p>
+                          </div>
+                          {sectionError && <p className="rounded-input bg-error/10 px-3 py-2 text-xs text-error">{sectionError}</p>}
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={cancelSectionDelete} disabled={deleteSection.isPending}>Cancel</Button>
+                            <Button variant="danger" size="sm" onClick={() => void removeSection(section.id)} loading={deleteSection.isPending}>
+                              <Trash2 size={14} /> Delete section
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       {section.lectures.map((lecture) => {
                         const ready = lecture.type === 'VIDEO' ? Boolean(lecture.videoUrl) : Boolean(lecture.content)
                         return (
