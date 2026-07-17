@@ -96,6 +96,7 @@ Widget buildRecommendedCoursesSection(
                         .toList(),
                     avgRating: course.rating,
                     ratingCount: course.ratingCount,
+                    enrollmentCount: course.enrollmentCount,
                   );
 
                   Navigator.push(
