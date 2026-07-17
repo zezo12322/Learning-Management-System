@@ -7,6 +7,7 @@ pglite-debug.log
 /dataconnect/.dataconnect
 **/dataconnect-admin-generated/
 learning-management-syst-3cc3a-firebase-adminsdk-fbsvc-c8e63b4d9f.json
+**/firebase-service-account*.json
 
 # AI / Agents
 /.agents
