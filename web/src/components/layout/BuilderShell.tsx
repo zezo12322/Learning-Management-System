@@ -37,10 +37,9 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
     enabled: courseId !== 'new' && isAuthenticated,
   })
   const sections = course.data?.sections ?? []
-  const totalLessons = sections.reduce((total, section) => total + section.lectures.length, 0)
   const curriculumReady = sections.length > 0 &&
     sections.every((section) => Boolean(section.title.trim())) &&
-    totalLessons > 0
+    sections.every((section) => section.lectures.length > 0)
   const canContinue = active !== 1 || curriculumReady
 
   useEffect(() => {
@@ -82,11 +81,16 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={saveDraft}><Save size={15} /> <span className="hidden sm:inline">Save draft</span></Button>
           {active === 4 ? (
-            <Button size="sm" disabled={!curriculumReady} title={!curriculumReady ? 'Complete the curriculum before publishing' : undefined}>
+            <Button
+              size="sm"
+              disabled={!curriculumReady}
+              title={!curriculumReady ? 'Add at least one lesson to every section before publishing' : undefined}
+              onClick={() => document.getElementById('publish-course')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+            >
               Publish course <ArrowRight size={15} />
             </Button>
           ) : !canContinue ? (
-            <Button size="sm" disabled title="Add a section and at least one lesson to continue">
+            <Button size="sm" disabled title="Add at least one lesson to every section to continue">
               Continue <ArrowRight size={15} />
             </Button>
           ) : (

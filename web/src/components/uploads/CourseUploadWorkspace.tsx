@@ -32,6 +32,9 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
     enabled: Boolean(courseId),
   })
   const lectures = useMemo(() => course.data?.sections?.flatMap((section) => section.lectures) ?? [], [course.data])
+  const sectionByLecture = useMemo(() => new Map(
+    (course.data?.sections ?? []).flatMap((section) => section.lectures.map((lecture) => [lecture.id, section.id] as const))
+  ), [course.data?.sections])
   const storedAssets = useMemo<UploadAsset[]>(() => lectures.flatMap((lecture) => {
     const result: UploadAsset[] = []
     if (lecture.videoUrl) result.push({
@@ -97,6 +100,12 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
         file,
         onPhase: (phase) => updateAsset(id, phaseToState(phase)),
       })
+      if (file.type.startsWith('video/') && pending.lectureId) {
+        const sectionId = sectionByLecture.get(pending.lectureId)
+        if (!sectionId) throw new Error('The selected lesson could not be matched to its section.')
+        await authoringApi.updateLecture(courseId, sectionId, pending.lectureId, { type: 'VIDEO' })
+        await course.refetch()
+      }
     } catch (uploadError) {
       updateAsset(id, { state: 'ERROR', progress: 36 })
       setError(uploadError instanceof Error ? uploadError.message : 'The upload failed.')
