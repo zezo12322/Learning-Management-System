@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, CheckCircle2, LockKeyhole, LogOut, Save, ShieldCheck, UserRound } from 'lucide-react'
+import { BookOpen, CheckCircle2, LogOut, Save, ShieldCheck, UserRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { apiErrorMessage } from '@/lib/api/client'
@@ -16,15 +16,15 @@ import { Label } from '@/components/ui/label'
 import { StatusPill } from '@/components/workspace/StatusPill'
 
 export default function ProfilePage() {
-  const { me, isDemoMode, logout, refreshMe } = useAuth()
+  const { me, logout, refreshMe } = useAuth()
   const router = useRouter()
   const queryClient = useQueryClient()
   const [bio, setBio] = useState('')
   const [company, setCompany] = useState('')
   const [phone, setPhone] = useState('')
-  const profileQuery = useQuery({ queryKey: ['me'], queryFn: meApi.get, enabled: !isDemoMode })
-  const coursesQuery = useQuery({ queryKey: ['authoring-courses'], queryFn: authoringApi.list, enabled: !isDemoMode })
-  const user = profileQuery.data ?? (!isDemoMode ? me : null)
+  const profileQuery = useQuery({ queryKey: ['me'], queryFn: meApi.get })
+  const coursesQuery = useQuery({ queryKey: ['authoring-courses'], queryFn: authoringApi.list })
+  const user = profileQuery.data ?? me
 
   useEffect(() => {
     setBio(user?.profile?.bio ?? '')
@@ -40,23 +40,6 @@ export default function ProfilePage() {
     },
   })
   const signOut = async () => { await logout(); router.push('/login') }
-
-  if (isDemoMode) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="User profile" description="Identity and personal workspace settings." />
-        <Card className="mx-auto max-w-2xl p-6 sm:p-8">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-warning/10 text-warning"><LockKeyhole size={24} /></span>
-          <h2 className="mt-5 text-xl font-bold text-content">Profile data is protected</h2>
-          <p className="mt-2 text-sm leading-6 text-content-secondary">The backend provides real <code>GET /me</code> and <code>PATCH /me/profile</code> endpoints, but this Firebase project does not yet have a Web App configuration. No sample user is shown.</p>
-          <div className="mt-5 rounded-input bg-subtle p-4 text-xs leading-5 text-content-secondary">
-            Once Firebase Web authentication is configured, this page will load the signed-in database user and allow bio, company, and phone updates.
-          </div>
-          <Button variant="outline" className="mt-6" onClick={signOut}><LogOut size={16} /> Sign out of preview</Button>
-        </Card>
-      </div>
-    )
-  }
 
   if (profileQuery.isLoading && !user) return <Card className="p-8 text-sm text-content-secondary">Loading the signed-in user…</Card>
   if (profileQuery.isError || !user) return <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">The signed-in database user could not be loaded.</Card>

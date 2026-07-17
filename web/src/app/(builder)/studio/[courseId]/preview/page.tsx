@@ -4,10 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { BookOpen, Check, ChevronDown, Clock, Globe2, Play, Rocket } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
-import { demoSections } from '@/lib/demo-data'
-import { demoCourses } from '@/lib/demo-data'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { ReadinessItem } from '@/components/builder/ReadinessItem'
 import { StatusPill } from '@/components/workspace/StatusPill'
@@ -17,16 +14,14 @@ import { Progress } from '@/components/ui/progress'
 
 export default function PreviewPage() {
   const { courseId } = useParams<{ courseId: string }>()
-  const { isDemoMode } = useAuth()
   const [published, setPublished] = useState(false)
-  const [openSection, setOpenSection] = useState(isDemoMode ? demoSections[0].id : '')
+  const [openSection, setOpenSection] = useState('')
   const courseQuery = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
-    enabled: !isDemoMode,
   })
-  const course = isDemoMode ? demoCourses[0] : courseQuery.data
-  const sections = useMemo(() => isDemoMode ? demoSections : (course?.sections ?? []), [course?.sections, isDemoMode])
+  const course = courseQuery.data
+  const sections = useMemo(() => course?.sections ?? [], [course?.sections])
   const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
   const totalSeconds = sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0)
 
@@ -38,19 +33,13 @@ export default function PreviewPage() {
     onSuccess: () => setPublished(true),
   })
 
-  const publishCourse = async () => {
-    if (isDemoMode) {
-      setPublished(true)
-      return
-    }
-    await publish.mutateAsync()
-  }
+  const publishCourse = async () => { await publish.mutateAsync() }
 
   return (
     <div className="space-y-6">
       <PageHeader title="Preview & publish" description="Review the learner experience and resolve required checks before publishing." />
 
-      {courseQuery.isError && !isDemoMode && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The course could not be loaded from the backend.</Card>}
+      {courseQuery.isError && <Card className="border-error/20 bg-error/10 p-4 text-sm text-error">The course could not be loaded from the backend.</Card>}
 
       {published && (
         <Card className="border-success/20 bg-success/10 p-4 text-sm font-medium text-success">

@@ -10,7 +10,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Optima LMS — AI-native course workspace',
+  title: 'Optima LMS — Course management workspace',
   description: 'Create, upload, review, and publish structured learning experiences.',
 }
 

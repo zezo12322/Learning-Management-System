@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { FileCheck2, Loader2, LockKeyhole, RefreshCw, UploadCloud } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
+import { FileCheck2, Loader2, RefreshCw, UploadCloud } from 'lucide-react'
 import type { UploadAsset, UploadAssetState } from '@/lib/types'
 import { uploadCourseAsset, type UploadPhase } from '@/lib/api/upload'
 import { authoringApi } from '@/lib/api/services'
@@ -21,7 +20,6 @@ function phaseToState(phase: UploadPhase): { state: UploadAssetState; progress: 
 }
 
 export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
-  const { isDemoMode } = useAuth()
   const inputRef = useRef<HTMLInputElement>(null)
   const filesRef = useRef(new Map<string, File>())
   const [sessionAssets, setSessionAssets] = useState<UploadAsset[]>([])
@@ -31,7 +29,7 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
-    enabled: !isDemoMode && Boolean(courseId),
+    enabled: Boolean(courseId),
   })
   const lectures = useMemo(() => course.data?.sections?.flatMap((section) => section.lectures) ?? [], [course.data])
   const storedAssets = useMemo<UploadAsset[]>(() => lectures.flatMap((lecture) => {
@@ -72,10 +70,6 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
     setSessionAssets((current) => current.map((asset) => asset.id === id ? { ...asset, ...patch } : asset))
 
   const processFile = async (file: File, existingId?: string) => {
-    if (isDemoMode) {
-      setError('Firebase Web authentication is required before files can be uploaded.')
-      return
-    }
     setError(null)
     if (file.size > 4 * 1024 * 1024 * 1024) {
       setError('Files must be 4 GB or smaller.')
@@ -110,7 +104,7 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
   }
 
   const pickFiles = (files: FileList | null) => {
-    if (!files || isDemoMode) return
+    if (!files) return
     Array.from(files).forEach((file) => void processFile(file))
   }
   const counts = (state: UploadAssetState) => assets.filter((asset) => asset.state === state).length
@@ -118,15 +112,9 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_302px]">
       <Card className="p-4 sm:p-5">
-        {isDemoMode && (
-          <div className="mb-4 flex items-start gap-3 rounded-input bg-warning/10 p-4 text-sm text-warning">
-            <LockKeyhole size={18} className="mt-0.5 shrink-0" />
-            <div><p className="font-semibold">Upload requires an authenticated instructor</p><p className="mt-1 text-xs leading-5 text-content-secondary">The real signed-upload endpoints are connected, but Firebase Web authentication is not configured in this local environment.</p></div>
-          </div>
-        )}
         {course.isError && <div className="mb-4 rounded-input bg-error/10 p-3 text-xs text-error">The selected instructor course could not be loaded.</div>}
         <div
-          onDragOver={(event) => { event.preventDefault(); if (!isDemoMode) setDragging(true) }}
+          onDragOver={(event) => { event.preventDefault(); setDragging(true) }}
           onDragLeave={() => setDragging(false)}
           onDrop={(event) => { event.preventDefault(); setDragging(false); pickFiles(event.dataTransfer.files) }}
           className={dragging ? 'flex min-h-48 flex-col items-center justify-center rounded-card border border-dashed border-primary bg-primary-100 p-6 text-center' : 'flex min-h-48 flex-col items-center justify-center rounded-card border border-dashed border-primary bg-brand-soft p-6 text-center'}
@@ -134,20 +122,18 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface text-primary"><UploadCloud size={23} /></span>
           <h2 className="mt-4 text-base font-semibold text-content">Drop videos and resources here</h2>
           <p className="mt-1 text-xs text-content-secondary">Video, course-cover image, or PDF transcript · up to 4 GB</p>
-          <Button variant="outline" className="mt-4" disabled={isDemoMode || course.isLoading || course.isError} onClick={() => inputRef.current?.click()}>Choose files</Button>
-          <input ref={inputRef} type="file" multiple accept="video/*,image/*,.pdf" disabled={isDemoMode} className="hidden" onChange={(event) => pickFiles(event.target.files)} />
+          <Button variant="outline" className="mt-4" disabled={course.isLoading || course.isError} onClick={() => inputRef.current?.click()}>Choose files</Button>
+          <input ref={inputRef} type="file" multiple accept="video/*,image/*,.pdf" className="hidden" onChange={(event) => pickFiles(event.target.files)} />
         </div>
 
-        {!isDemoMode && (
-          <div className="mt-4 rounded-input bg-subtle p-3">
-            <label className="text-xs font-semibold text-content" htmlFor={`media-lecture-${courseId}`}>Attach videos and transcripts to</label>
-            <select id={`media-lecture-${courseId}`} value={lectureId} onChange={(event) => setLectureId(event.target.value)} className="mt-2 w-full rounded-input border border-border bg-surface px-3 py-2 text-xs text-content outline-none focus:border-primary">
-              <option value="">Select a lecture</option>
-              {lectures.map((lecture) => <option key={lecture.id} value={lecture.id}>{lecture.title}</option>)}
-            </select>
-            {!course.isLoading && lectures.length === 0 && <p className="mt-2 text-[11px] text-warning">Create a lecture before uploading video or transcript media. Course-cover images can still be uploaded.</p>}
-          </div>
-        )}
+        <div className="mt-4 rounded-input bg-subtle p-3">
+          <label className="text-xs font-semibold text-content" htmlFor={`media-lecture-${courseId}`}>Attach videos and transcripts to</label>
+          <select id={`media-lecture-${courseId}`} value={lectureId} onChange={(event) => setLectureId(event.target.value)} className="mt-2 w-full rounded-input border border-border bg-surface px-3 py-2 text-xs text-content outline-none focus:border-primary">
+            <option value="">Select a lecture</option>
+            {lectures.map((lecture) => <option key={lecture.id} value={lecture.id}>{lecture.title}</option>)}
+          </select>
+          {!course.isLoading && lectures.length === 0 && <p className="mt-2 text-[11px] text-warning">Create a lecture before uploading video or transcript media. Course-cover images can still be uploaded.</p>}
+        </div>
         {error && <div className="mt-4 rounded-input bg-error/10 px-3 py-2 text-xs text-error">{error}</div>}
 
         <div className="mt-6 flex items-center justify-between"><h2 className="text-sm font-semibold text-content">Course media</h2><span className="text-[11px] text-content-muted">{assets.length} files</span></div>

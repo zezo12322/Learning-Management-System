@@ -9,9 +9,13 @@ import {
   type ReactNode,
 } from 'react'
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  setPersistence,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   signOut as fbSignOut,
   type User as FirebaseUser,
 } from 'firebase/auth'
@@ -25,10 +29,11 @@ interface AuthContextValue {
   me: Me | null
   roles: Role[]
   loading: boolean
-  isDemoMode: boolean
+  configurationError: boolean
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, remember?: boolean) => Promise<void>
   loginWithGoogle: () => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   register: (data: {
     name: string
     email: string
@@ -47,23 +52,13 @@ const firebaseConfigured = Boolean(
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 )
 
-const demoMe: Me = {
-  uid: 'demo-instructor',
-  email: 'zeyad@optima.demo',
-  name: 'Zeyad Elshreef',
-  roles: ['instructor'],
-  profile: { company: 'Optima Learning' },
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [me, setMe] = useState<Me | null>(null)
   const [loading, setLoading] = useState(true)
-  const [demoAuthenticated, setDemoAuthenticated] = useState(firebaseConfigured ? false : true)
 
   useEffect(() => {
     if (!firebaseConfigured) {
-      setMe(demoMe)
       setLoading(false)
       return
     }
@@ -86,22 +81,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsub()
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, remember = true) => {
     if (!firebaseConfigured) {
-      setDemoAuthenticated(true)
-      setMe({ ...demoMe, email: email || demoMe.email })
-      return
+      throw new Error('Firebase Web authentication is not configured.')
     }
-    await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
+    const auth = getFirebaseAuth()
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence)
+    await signInWithEmailAndPassword(auth, email, password)
   }
 
   const loginWithGoogle = async () => {
     if (!firebaseConfigured) {
-      setDemoAuthenticated(true)
-      setMe(demoMe)
-      return
+      throw new Error('Firebase Web authentication is not configured.')
     }
-    await signInWithPopup(getFirebaseAuth(), googleProvider)
+    await signInWithRedirect(getFirebaseAuth(), googleProvider)
+  }
+
+  const resetPassword = async (email: string) => {
+    if (!firebaseConfigured) {
+      throw new Error('Firebase Web authentication is not configured.')
+    }
+    await sendPasswordResetEmail(getFirebaseAuth(), email)
   }
 
   const register = async (data: {
@@ -111,9 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     nationalId: string
   }) => {
     if (!firebaseConfigured) {
-      setDemoAuthenticated(true)
-      setMe({ ...demoMe, name: data.name, email: data.email })
-      return
+      throw new Error('Firebase Web authentication is not configured.')
     }
     // registerStudent is deployed to europe-west3 (see backend/API_DOCUMENTATION §22).
     await callCloudFunction('registerStudent', 'europe-west3', data)
@@ -122,20 +120,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    if (!firebaseConfigured) {
-      setDemoAuthenticated(false)
-      setMe(null)
-      return
-    }
+    if (!firebaseConfigured) return
     await fbSignOut(getFirebaseAuth())
     setMe(null)
   }
 
   const refreshMe = async () => {
-    if (!firebaseConfigured) {
-      setMe(demoMe)
-      return
-    }
+    if (!firebaseConfigured) return
     if (getFirebaseAuth().currentUser) setMe(await meApi.get())
   }
 
@@ -145,15 +136,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       me,
       roles: me?.roles ?? [],
       loading,
-      isDemoMode: !firebaseConfigured,
-      isAuthenticated: firebaseConfigured ? Boolean(firebaseUser) : demoAuthenticated,
+      configurationError: !firebaseConfigured,
+      isAuthenticated: Boolean(firebaseUser),
       login,
       loginWithGoogle,
+      resetPassword,
       register,
       logout,
       refreshMe,
     }),
-    [firebaseUser, me, loading, demoAuthenticated]
+    [firebaseUser, me, loading]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

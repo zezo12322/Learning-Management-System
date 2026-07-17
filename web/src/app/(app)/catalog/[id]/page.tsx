@@ -4,25 +4,19 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { ArrowLeft, BookOpen, CheckCircle2, Clock, Globe2, PlayCircle } from 'lucide-react'
-import { useAuth } from '@/lib/auth/AuthProvider'
 import { catalogApi, enrollmentApi } from '@/lib/api/services'
-import { demoCourses, demoSections } from '@/lib/demo-data'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StatusPill } from '@/components/workspace/StatusPill'
 
 export default function CatalogDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const { isDemoMode } = useAuth()
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
-  const curriculum = useQuery({ queryKey: ['catalog-curriculum', id], queryFn: () => catalogApi.curriculum(id), enabled: !isDemoMode })
+  const curriculum = useQuery({ queryKey: ['catalog-curriculum', id], queryFn: () => catalogApi.curriculum(id) })
   const enroll = useMutation({ mutationFn: () => enrollmentApi.enroll(id) })
-  const demoCourse = demoCourses.find((course) => course.id === id)
-  const liveCourse = catalog.data?.find((course) => course.id === id)
-  const course = liveCourse ?? (isDemoMode && demoCourse
-    ? { ...demoCourse, category: { name: demoCourse.category }, price: demoCourse.price ?? 0 }
-    : undefined)
-  const sections = curriculum.data?.sections ?? (isDemoMode && demoCourse ? demoSections : [])
+  const course = catalog.data?.find((item) => item.id === id)
+  const isPaid = (course?.price ?? 0) > 0
+  const sections = curriculum.data?.sections ?? []
   const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
   const duration = Math.ceil(sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0) / 60)
 
@@ -44,13 +38,13 @@ export default function CatalogDetailPage() {
               <span className="inline-flex items-center gap-1"><Clock size={15} /> {duration} minutes</span>
               <span className="inline-flex items-center gap-1"><Globe2 size={15} /> {curriculum.data?.language || course.language || 'Not specified'}</span>
             </div>
-            <Button className="mt-6" onClick={() => isDemoMode ? undefined : enroll.mutate()} loading={enroll.isPending}><PlayCircle size={17} /> {enroll.isSuccess ? 'Enrolled' : 'Enroll now'}</Button>
+            <Button className="mt-6" onClick={() => enroll.mutate()} loading={enroll.isPending} disabled={isPaid || enroll.isSuccess}><PlayCircle size={17} /> {isPaid ? 'Payments coming soon' : enroll.isSuccess ? 'Enrolled' : 'Enroll now'}</Button>
           </div>
         </div>
       </Card>
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <Card className="p-6"><h2 className="text-lg font-semibold text-content">Course curriculum</h2><div className="mt-5 space-y-3">{sections.map((section) => <div key={section.id} className="rounded-input bg-subtle p-4"><p className="flex gap-2 text-sm font-semibold text-content"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-success" /> {section.title}</p><p className="mt-1 pl-6 text-xs text-content-secondary">{section.lectures.length} lessons</p></div>)}</div></Card>
-        <Card className="h-fit p-6"><h2 className="text-lg font-semibold text-content">Course access</h2><p className="mt-2 text-sm text-content-secondary">Published and ready for enrollment.</p><Button fullWidth className="mt-5" onClick={() => isDemoMode ? undefined : enroll.mutate()} loading={enroll.isPending} disabled={enroll.isSuccess}>{enroll.isSuccess ? 'Enrollment active' : 'Enroll now'}</Button>{enroll.isError && <p className="mt-2 text-xs text-error">Enrollment failed. Sign in and try again.</p>}</Card>
+        <Card className="h-fit p-6"><h2 className="text-lg font-semibold text-content">Course access</h2><p className="mt-2 text-sm text-content-secondary">{isPaid ? 'Secure online payments are coming soon.' : 'Published and ready for enrollment.'}</p><Button fullWidth className="mt-5" onClick={() => enroll.mutate()} loading={enroll.isPending} disabled={isPaid || enroll.isSuccess}>{isPaid ? 'Payments coming soon' : enroll.isSuccess ? 'Enrollment active' : 'Enroll now'}</Button>{enroll.isError && <p className="mt-2 text-xs text-error">Enrollment failed. Please try again.</p>}</Card>
       </div>
     </div>
   )
