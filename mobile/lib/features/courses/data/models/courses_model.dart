@@ -12,6 +12,7 @@ class CourseModel {
   final Author author;
   final double avgRating;
   final int ratingCount;
+  final int enrollmentCount;
 
   const CourseModel({
     required this.id,
@@ -24,6 +25,7 @@ class CourseModel {
     required this.author,
     required this.avgRating,
     required this.ratingCount,
+    required this.enrollmentCount,
   });
 
   factory CourseModel.fromConnectorResult(
@@ -43,6 +45,7 @@ class CourseModel {
       ),
       avgRating: result.avgRating.toDouble(),
       ratingCount: result.ratingCount,
+      enrollmentCount: result.activeEnrollments.length,
     );
   }
 
@@ -62,6 +65,7 @@ class CourseModel {
       ),
       avgRating: (json['avgRating'] as num).toDouble(),
       ratingCount: json['ratingCount'] as int,
+      enrollmentCount: json['enrollmentCount'] as int? ?? 0,
     );
   }
 
@@ -77,6 +81,7 @@ class CourseModel {
       'author': author.toJson(),
       'avgRating': avgRating,
       'ratingCount': ratingCount,
+      'enrollmentCount': enrollmentCount,
     };
   }
 
@@ -99,6 +104,7 @@ class CourseModel {
       ],
       avgRating: avgRating,
       ratingCount: ratingCount,
+      enrollmentCount: enrollmentCount,
     );
   }
 }
