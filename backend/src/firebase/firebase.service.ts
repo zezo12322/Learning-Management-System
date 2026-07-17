@@ -11,11 +11,34 @@ export class FirebaseService implements OnModuleInit {
   constructor(private configService: ConfigService) {}
 
   onModuleInit() {
+    const encodedServiceAccount = this.configService.get<string>(
+      'FIREBASE_SERVICE_ACCOUNT_BASE64',
+    );
     const credentialPath =
       this.configService.get<string>('GOOGLE_APPLICATION_CREDENTIALS') || '';
 
+    let credential;
+    if (encodedServiceAccount) {
+      try {
+        const serviceAccount = JSON.parse(
+          Buffer.from(encodedServiceAccount, 'base64').toString('utf8'),
+        );
+        credential = cert(serviceAccount);
+      } catch {
+        throw new Error(
+          'FIREBASE_SERVICE_ACCOUNT_BASE64 must contain a valid base64-encoded Firebase service account JSON document',
+        );
+      }
+    } else if (credentialPath) {
+      credential = cert(credentialPath);
+    } else {
+      throw new Error(
+        'Firebase credentials are missing. Set FIREBASE_SERVICE_ACCOUNT_BASE64 or GOOGLE_APPLICATION_CREDENTIALS.',
+      );
+    }
+
     this.firebaseApp = initializeApp({
-      credential: cert(credentialPath),
+      credential,
       storageBucket: this.configService.get<string>(
         'FIREBASE_STORAGE_BUCKET',
         'learning-management-syst-3cc3a.firebasestorage.app',
