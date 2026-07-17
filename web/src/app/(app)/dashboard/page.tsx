@@ -33,19 +33,19 @@ export default function DashboardPage() {
     return weightedTotal / totalReviews
   }, [courses, totalReviews])
   const metricState = catalogQuery.isError ? 'error' : catalogQuery.isLoading ? 'loading' : 'live'
-  const metricValue = (value: string) => catalogQuery.isError ? 'Unavailable' : catalogQuery.isLoading ? 'Loading' : value
+  const metricValue = (value: string) => catalogQuery.isError ? '—' : catalogQuery.isLoading ? '…' : value
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Workspace overview"
-        description="Live information returned by the connected LMS APIs."
+        description="Manage your courses and review current learning activity."
         action={<Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>}
       />
 
       {catalogQuery.isError && (
         <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
-          The live catalog could not be loaded from the NestJS API. No preview data is being shown.
+          We could not load your course overview. Try again in a moment.
         </Card>
       )}
 
@@ -54,21 +54,21 @@ export default function DashboardPage() {
           icon={BookOpenCheck}
           label="Published courses"
           value={metricValue(String(courses.length))}
-          detail={catalogQuery.isError ? 'The public catalog request failed' : 'Current records from the public catalog API'}
+          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : 'Courses currently available to learners'}
           state={metricState}
         />
         <MetricCard
           icon={MessageSquare}
           label="Learner reviews"
           value={metricValue(totalReviews.toLocaleString())}
-          detail={catalogQuery.isError ? 'The public catalog request failed' : 'Reviews attached to published courses'}
+          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : 'Reviews submitted across published courses'}
           state={metricState}
         />
         <MetricCard
           icon={Star}
           label="Average rating"
           value={metricValue(averageRating == null ? 'Not rated' : averageRating.toFixed(1))}
-          detail={catalogQuery.isError ? 'The public catalog request failed' : averageRating == null ? 'No learner ratings have been submitted' : 'Weighted by the number of reviews'}
+          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : averageRating == null ? 'No learner ratings have been submitted' : 'Weighted by the number of reviews'}
           state={metricState}
         />
       </div>
@@ -78,7 +78,7 @@ export default function DashboardPage() {
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-content">Published catalog</h2>
-              <p className="mt-1 text-xs text-content-secondary">The latest courses returned by the backend.</p>
+              <p className="mt-1 text-xs text-content-secondary">The latest courses available to learners.</p>
             </div>
             <Link href="/catalog" className="shrink-0 text-xs font-semibold text-primary">View catalog →</Link>
           </div>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
           ) : !catalogQuery.isError ? (
             <div className="rounded-input border border-dashed border-border p-8 text-center">
               <p className="text-sm font-semibold text-content">No published courses</p>
-              <p className="mt-1 text-xs text-content-secondary">The catalog API returned an empty collection.</p>
+              <p className="mt-1 text-xs text-content-secondary">Publish a course to make it available in the catalog.</p>
             </div>
           ) : null}
         </Card>
@@ -141,12 +141,12 @@ export default function DashboardPage() {
           ) : (
             <div className="mt-auto pt-5">
               <Button fullWidth disabled>
-                {authoringQuery.isLoading ? 'Loading authoring courses' : 'No authoring course available'}
+                {authoringQuery.isLoading ? 'Loading courses' : 'No course available'}
               </Button>
               <p className="mt-2 text-center text-[11px] leading-4 text-content-muted">
                 {authoringQuery.isError
-                  ? 'The instructor course API could not be loaded.'
-                  : 'Create an instructor course before opening AI Studio.'}
+                  ? 'Your courses could not be loaded.'
+                  : 'Create a course before opening AI Studio.'}
               </p>
             </div>
           )}

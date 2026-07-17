@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { getFirebaseAuth } from '@/lib/firebase'
 
 const API_BASE_URL =
@@ -30,10 +30,32 @@ apiClient.interceptors.request.use(async (config) => {
   return config
 })
 
-// Global error handling: sign out on 401.
+type RetriableRequestConfig = InternalAxiosRequestConfig & {
+  _authRetry?: boolean
+}
+
+// Refresh newly assigned roles once before surfacing an authorization error.
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const request = error.config as RetriableRequestConfig | undefined
+
+    if (
+      error.response?.status === 403 &&
+      request &&
+      !request._authRetry &&
+      typeof window !== 'undefined' &&
+      FIREBASE_AUTH_CONFIGURED
+    ) {
+      const user = getFirebaseAuth().currentUser
+      if (user) {
+        request._authRetry = true
+        const token = await user.getIdToken(true)
+        request.headers.Authorization = `Bearer ${token}`
+        return apiClient.request(request)
+      }
+    }
+
     if (error.response?.status === 401 && typeof window !== 'undefined' && FIREBASE_AUTH_CONFIGURED) {
       try {
         await getFirebaseAuth().signOut()
@@ -49,7 +71,14 @@ apiClient.interceptors.response.use(
 )
 
 type ApiErrorPayload = {
-  response?: { data?: { message?: string | string[] } }
+  response?: { status?: number; data?: { message?: string | string[] } }
+}
+
+export function apiErrorStatus(error: unknown): number | undefined {
+  if (typeof error === 'object' && error && 'response' in error) {
+    return (error as ApiErrorPayload).response?.status
+  }
+  return undefined
 }
 
 /** Normalize an axios error into a human-readable message. */

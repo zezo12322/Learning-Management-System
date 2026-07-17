@@ -52,9 +52,17 @@ const firebaseConfigured = Boolean(
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 )
 
+const knownRoles: Role[] = ['admin', 'instructor', 'student']
+
+function readClaimRoles(value: unknown): Role[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((role): role is Role => knownRoles.includes(role as Role))
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [me, setMe] = useState<Me | null>(null)
+  const [claimRoles, setClaimRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -67,6 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setFirebaseUser(user)
       if (user) {
         try {
+          // Pick up role changes made while this browser session was active.
+          const token = await user.getIdTokenResult(true)
+          setClaimRoles(readClaimRoles(token.claims.roles))
           // Provision the row (idempotent) then load profile + roles.
           await meApi.sync({ email: user.email ?? '', name: user.displayName ?? 'مستخدم', avatar: user.photoURL ?? undefined })
           setMe(await meApi.get())
@@ -75,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         setMe(null)
+        setClaimRoles([])
       }
       setLoading(false)
     })
@@ -123,18 +135,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!firebaseConfigured) return
     await fbSignOut(getFirebaseAuth())
     setMe(null)
+    setClaimRoles([])
   }
 
   const refreshMe = async () => {
     if (!firebaseConfigured) return
-    if (getFirebaseAuth().currentUser) setMe(await meApi.get())
+    const user = getFirebaseAuth().currentUser
+    if (user) {
+      const token = await user.getIdTokenResult(true)
+      setClaimRoles(readClaimRoles(token.claims.roles))
+      setMe(await meApi.get())
+    }
   }
+
+  const roles = useMemo(
+    () => Array.from(new Set([...(me?.roles ?? []), ...claimRoles])),
+    [me?.roles, claimRoles]
+  )
 
   const value = useMemo<AuthContextValue>(
     () => ({
       firebaseUser,
       me,
-      roles: me?.roles ?? [],
+      roles,
       loading,
       configurationError: !firebaseConfigured,
       isAuthenticated: Boolean(firebaseUser),
@@ -145,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       refreshMe,
     }),
-    [firebaseUser, me, loading]
+    [firebaseUser, me, roles, loading]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

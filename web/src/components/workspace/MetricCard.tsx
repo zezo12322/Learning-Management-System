@@ -3,9 +3,9 @@ import { Card } from '@/components/ui/card'
 import { StatusPill, type StatusTone } from '@/components/workspace/StatusPill'
 
 const states: Record<'live' | 'loading' | 'error', { label: string; tone: StatusTone }> = {
-  live: { label: 'Live API', tone: 'success' },
-  loading: { label: 'Loading', tone: 'info' },
-  error: { label: 'API error', tone: 'danger' },
+  live: { label: 'Up to date', tone: 'success' },
+  loading: { label: 'Updating', tone: 'info' },
+  error: { label: 'Needs attention', tone: 'danger' },
 }
 
 export function MetricCard({

@@ -94,9 +94,9 @@ export default function CourseSetupPage() {
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category" hint="Loaded from the backend category catalog.">
+              <FormField label="Category" hint="Choose the topic that best fits this course.">
                 {categories.isError ? (
-                  <Input value={categoryId} onChange={(event) => setCategoryId(event.target.value)} placeholder="Category UUID" />
+                  <div className="rounded-input bg-error/10 px-4 py-3 text-xs text-error">Categories could not be loaded. Try again in a moment.</div>
                 ) : (
                   <SelectField value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
                     <option value="">{categories.isLoading ? 'Loading categories…' : 'Select a category'}</option>
@@ -119,7 +119,7 @@ export default function CourseSetupPage() {
                   <option>Private draft</option><option>Unlisted</option><option>Public</option>
                 </SelectField>
               </FormField>
-              <FormField label="Price" hint="Stored in the backend's minor currency units.">
+              <FormField label="Price" hint="Enter the amount learners will pay.">
                 <Input type="number" min="0" value={price} onChange={(event) => setPrice(event.target.value)} />
               </FormField>
               <FormField label="Tags" hint="Comma-separated discovery tags.">
@@ -135,7 +135,7 @@ export default function CourseSetupPage() {
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
               {saved && <span className="text-xs font-medium text-success">Setup saved</span>}
               {save.isError && <span className="text-xs font-medium text-error">{apiErrorMessage(save.error, 'Could not save setup')}</span>}
-              {courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Category ID is required by the backend.</span>}
+              {courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Choose a category before continuing.</span>}
               <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (courseId === 'new' && !categoryId)}><Save size={16} /> Save setup</Button>
             </div>
           </div>

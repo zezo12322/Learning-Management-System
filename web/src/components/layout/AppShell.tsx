@@ -57,6 +57,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const accountRole = roles.length
     ? roles.map((role) => role[0].toUpperCase() + role.slice(1)).join(', ')
     : 'User'
+  const workspaceLabel = roles.includes('admin')
+    ? 'Admin workspace'
+    : roles.includes('instructor')
+      ? 'Instructor workspace'
+      : 'Learning workspace'
   const accountSummary = (
     <>
       <Avatar src={me?.avatar} name={accountName} size={38} />
@@ -134,7 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-content">{currentLabel}</p>
-            <p className="mt-0.5 text-[11px] text-content-muted">Instructor workspace</p>
+            <p className="mt-0.5 text-[11px] text-content-muted">{workspaceLabel}</p>
           </div>
 
           <div className="flex items-center gap-3">
