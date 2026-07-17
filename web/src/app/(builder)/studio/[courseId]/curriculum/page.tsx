@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Play, Plus } from 'lucide-react'
 import { authoringApi } from '@/lib/api/services'
 import type { AuthoringSection } from '@/lib/types'
@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/card'
 
 export default function CurriculumPage() {
   const { courseId } = useParams<{ courseId: string }>()
+  const queryClient = useQueryClient()
   const [sections, setSections] = useState<AuthoringSection[]>([])
   const [expanded, setExpanded] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
@@ -47,6 +48,7 @@ export default function CurriculumPage() {
     const title = `New section ${sections.length + 1}`
     const created = await createSection.mutateAsync(title)
     setSections((current) => [...current, { ...created, lectures: created.lectures ?? [] }])
+    void queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
     setNotice('Section added')
     window.setTimeout(() => setNotice(null), 1600)
   }
@@ -66,6 +68,7 @@ export default function CurriculumPage() {
     setSections((current) => current.map((section) => section.id === sectionId
       ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
       : section))
+    void queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
     setNotice('Lesson added')
     window.setTimeout(() => setNotice(null), 1600)
   }
@@ -150,8 +153,9 @@ export default function CurriculumPage() {
           <div className="mt-5 rounded-input bg-brand-soft p-4">
             <p className="text-xs font-semibold text-primary">Curriculum checks</p>
             <div className="mt-3 space-y-2">
-              <ReadinessItem label="Every section has a title" complete={sections.every((section) => Boolean(section.title))} />
-              <ReadinessItem label="At least one lesson" complete={sections.every((section) => section.lectures.length > 0)} />
+              <ReadinessItem label="At least one section" complete={sections.length > 0} />
+              <ReadinessItem label="Every section has a title" complete={sections.length > 0 && sections.every((section) => Boolean(section.title.trim()))} />
+              <ReadinessItem label="At least one lesson" complete={totalLessons > 0} />
               <ReadinessItem label="Media can process later" complete value="Allowed" />
             </div>
           </div>

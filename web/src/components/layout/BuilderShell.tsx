@@ -36,10 +36,22 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
     queryFn: () => authoringApi.get(courseId),
     enabled: courseId !== 'new' && isAuthenticated,
   })
+  const sections = course.data?.sections ?? []
+  const totalLessons = sections.reduce((total, section) => total + section.lectures.length, 0)
+  const curriculumReady = sections.length > 0 &&
+    sections.every((section) => Boolean(section.title.trim())) &&
+    totalLessons > 0
+  const canContinue = active !== 1 || curriculumReady
 
   useEffect(() => {
     if (!loading && !isAuthenticated) router.replace('/login')
   }, [loading, isAuthenticated, router])
+
+  useEffect(() => {
+    if (courseId !== 'new' && course.data && active > 1 && !curriculumReady) {
+      router.replace(`/studio/${courseId}/curriculum`)
+    }
+  }, [active, course.data, courseId, curriculumReady, router])
 
   const nextHref = useMemo(() => {
     if (pathname.includes('/ai-studio')) return `/studio/${courseId}/ai-tutor`
@@ -70,7 +82,13 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={saveDraft}><Save size={15} /> <span className="hidden sm:inline">Save draft</span></Button>
           {active === 4 ? (
-            <Button size="sm">Publish course <ArrowRight size={15} /></Button>
+            <Button size="sm" disabled={!curriculumReady} title={!curriculumReady ? 'Complete the curriculum before publishing' : undefined}>
+              Publish course <ArrowRight size={15} />
+            </Button>
+          ) : !canContinue ? (
+            <Button size="sm" disabled title="Add a section and at least one lesson to continue">
+              Continue <ArrowRight size={15} />
+            </Button>
           ) : (
             <Link href={nextHref}><Button size="sm">Continue <ArrowRight size={15} /></Button></Link>
           )}
@@ -80,16 +98,26 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
       <div className="border-b border-border bg-surface px-4 py-3 lg:hidden">
         <div className="no-scrollbar flex gap-2 overflow-x-auto">
           {STEPS.map((step, index) => (
-            <Link
-              key={step.key}
-              href={`/studio/${courseId}/${step.key}`}
-              className={cn(
-                'shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium',
-                index === active ? 'bg-primary text-white' : index < active ? 'bg-success/10 text-success' : 'bg-subtle text-content-secondary'
-              )}
-            >
-              {index < active ? '✓ ' : `${index + 1}. `}{step.label}
-            </Link>
+            index > 1 && !curriculumReady ? (
+              <span
+                key={step.key}
+                aria-disabled="true"
+                className="shrink-0 cursor-not-allowed rounded-full bg-subtle px-3 py-1.5 text-[11px] font-medium text-content-muted opacity-60"
+              >
+                {index + 1}. {step.label}
+              </span>
+            ) : (
+              <Link
+                key={step.key}
+                href={`/studio/${courseId}/${step.key}`}
+                className={cn(
+                  'shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium',
+                  index === active ? 'bg-primary text-white' : index < active ? 'bg-success/10 text-success' : 'bg-subtle text-content-secondary'
+                )}
+              >
+                {index < active ? '✓ ' : `${index + 1}. `}{step.label}
+              </Link>
+            )
           ))}
         </div>
       </div>
@@ -107,12 +135,9 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
             {STEPS.map((step, index) => {
               const selected = index === active
               const complete = index < active
-              return (
-                <Link
-                  key={step.key}
-                  href={`/studio/${courseId}/${step.key}`}
-                  className={cn('flex items-center gap-3 rounded-input px-2.5 py-3 transition-colors', selected ? 'bg-brand-soft' : 'hover:bg-subtle')}
-                >
+              const locked = index > 1 && !curriculumReady
+              const content = (
+                <>
                   <span className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-semibold',
                     selected ? 'bg-primary text-white' : complete ? 'bg-success/10 text-success' : 'bg-subtle text-content-secondary'
@@ -123,6 +148,28 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
                     <span className={cn('block text-xs font-semibold', selected ? 'text-primary' : 'text-content')}>{step.label}</span>
                     <span className="block text-[10px] text-content-muted">{step.description}</span>
                   </span>
+                </>
+              )
+
+              if (locked) {
+                return (
+                  <span
+                    key={step.key}
+                    aria-disabled="true"
+                    className="flex cursor-not-allowed items-center gap-3 rounded-input px-2.5 py-3 opacity-50"
+                  >
+                    {content}
+                  </span>
+                )
+              }
+
+              return (
+                <Link
+                  key={step.key}
+                  href={`/studio/${courseId}/${step.key}`}
+                  className={cn('flex items-center gap-3 rounded-input px-2.5 py-3 transition-colors', selected ? 'bg-brand-soft' : 'hover:bg-subtle')}
+                >
+                  {content}
                 </Link>
               )
             })}
