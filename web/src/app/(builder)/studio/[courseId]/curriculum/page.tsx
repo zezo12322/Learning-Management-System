@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Play, Plus } from 'lucide-react'
+import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
 import type { AuthoringSection } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
@@ -11,6 +12,7 @@ import { ReadinessItem } from '@/components/builder/ReadinessItem'
 import { StatusPill } from '@/components/workspace/StatusPill'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 
 export default function CurriculumPage() {
   const { courseId } = useParams<{ courseId: string }>()
@@ -18,6 +20,10 @@ export default function CurriculumPage() {
   const [sections, setSections] = useState<AuthoringSection[]>([])
   const [expanded, setExpanded] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
+  const [lessonSectionId, setLessonSectionId] = useState('')
+  const [lessonTitle, setLessonTitle] = useState('')
+  const [lessonContent, setLessonContent] = useState('')
+  const [lessonError, setLessonError] = useState<string | null>(null)
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
@@ -33,9 +39,10 @@ export default function CurriculumPage() {
     mutationFn: (title: string) => authoringApi.createSection(courseId, { title }),
   })
   const createLecture = useMutation({
-    mutationFn: (sectionId: string) => authoringApi.createLecture(courseId, sectionId, {
-      title: 'Untitled lesson',
+    mutationFn: ({ sectionId, title, content }: { sectionId: string; title: string; content: string }) => authoringApi.createLecture(courseId, sectionId, {
+      title,
       type: 'READING',
+      content,
       duration: 0,
       isFreePreview: false,
     }),
@@ -63,14 +70,44 @@ export default function CurriculumPage() {
     reorderSections.mutate(reordered.map((section) => section.id))
   }
 
+  const openLessonForm = (sectionId: string) => {
+    setExpanded(sectionId)
+    setLessonSectionId(sectionId)
+    setLessonTitle('')
+    setLessonContent('')
+    setLessonError(null)
+    createLecture.reset()
+  }
+
+  const closeLessonForm = () => {
+    setLessonSectionId('')
+    setLessonTitle('')
+    setLessonContent('')
+    setLessonError(null)
+    createLecture.reset()
+  }
+
   const addLesson = async (sectionId: string) => {
-    const created = await createLecture.mutateAsync(sectionId)
-    setSections((current) => current.map((section) => section.id === sectionId
-      ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
-      : section))
-    void queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
-    setNotice('Lesson added')
-    window.setTimeout(() => setNotice(null), 1600)
+    const title = lessonTitle.trim()
+    const content = lessonContent.trim()
+    if (!title || !content) {
+      setLessonError('Enter a lesson title and content before adding it.')
+      return
+    }
+
+    setLessonError(null)
+    try {
+      const created = await createLecture.mutateAsync({ sectionId, title, content })
+      setSections((current) => current.map((section) => section.id === sectionId
+        ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
+        : section))
+      await queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
+      closeLessonForm()
+      setNotice('Lesson added')
+      window.setTimeout(() => setNotice(null), 1600)
+    } catch (error) {
+      setLessonError(apiErrorMessage(error, 'The lesson could not be added. Try again.'))
+    }
   }
 
   const totalLessons = useMemo(() => sections.reduce((sum, section) => sum + section.lectures.length, 0), [sections])
@@ -113,8 +150,8 @@ export default function CurriculumPage() {
 
                   {open && (
                     <div className="divide-y divide-border">
-                      {section.lectures.map((lecture, lectureIndex) => {
-                        const status = lectureIndex === 0 ? 'Ready' : lectureIndex === 1 ? 'Processing' : 'Draft'
+                      {section.lectures.map((lecture) => {
+                        const ready = lecture.type === 'VIDEO' ? Boolean(lecture.videoUrl) : Boolean(lecture.content)
                         return (
                           <div key={lecture.id} className="flex items-center gap-3 px-3 py-4 sm:px-4">
                             <GripVertical size={15} className="shrink-0 text-content-muted" />
@@ -122,18 +159,49 @@ export default function CurriculumPage() {
                               {lecture.type === 'VIDEO' ? <Play size={14} /> : <FileText size={14} />}
                             </span>
                             <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-content">{lecture.title}</span><span className="mt-1 block text-[10px] text-content-muted">{lecture.type.toLowerCase()} · {Math.round(lecture.duration / 60)} min</span></span>
-                            <StatusPill tone={status === 'Ready' ? 'success' : status === 'Processing' ? 'info' : 'warning'}>{status}</StatusPill>
+                            <StatusPill tone={ready ? 'success' : 'warning'}>{ready ? 'Ready' : lecture.type === 'VIDEO' ? 'Needs media' : 'Draft'}</StatusPill>
                             <button className="p-1.5 text-content-muted"><MoreHorizontal size={16} /></button>
                           </div>
                         )
                       })}
-                      <button
-                        onClick={() => void addLesson(section.id)}
-                        disabled={createLecture.isPending}
-                        className="flex w-full items-center justify-center gap-2 bg-subtle py-4 text-xs font-semibold text-primary"
-                      >
-                        <Plus size={15} /> Add lesson
-                      </button>
+                      {lessonSectionId === section.id ? (
+                        <div className="space-y-3 bg-subtle p-4">
+                          <div>
+                            <label htmlFor={`lesson-title-${section.id}`} className="text-xs font-semibold text-content">Lesson title</label>
+                            <Input
+                              id={`lesson-title-${section.id}`}
+                              value={lessonTitle}
+                              onChange={(event) => setLessonTitle(event.target.value)}
+                              placeholder="Enter the lesson title"
+                              className="mt-2"
+                              maxLength={120}
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor={`lesson-content-${section.id}`} className="text-xs font-semibold text-content">Lesson content</label>
+                            <textarea
+                              id={`lesson-content-${section.id}`}
+                              value={lessonContent}
+                              onChange={(event) => setLessonContent(event.target.value)}
+                              placeholder="Write the lesson content"
+                              rows={4}
+                              className="mt-2 w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm leading-6 text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                            />
+                          </div>
+                          {lessonError && <p className="rounded-input bg-error/10 px-3 py-2 text-xs text-error">{lessonError}</p>}
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={closeLessonForm} disabled={createLecture.isPending}>Cancel</Button>
+                            <Button size="sm" onClick={() => void addLesson(section.id)} loading={createLecture.isPending}>Add lesson</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => openLessonForm(section.id)}
+                          className="flex w-full items-center justify-center gap-2 bg-subtle py-4 text-xs font-semibold text-primary"
+                        >
+                          <Plus size={15} /> Add lesson
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -155,7 +223,7 @@ export default function CurriculumPage() {
             <div className="mt-3 space-y-2">
               <ReadinessItem label="At least one section" complete={sections.length > 0} />
               <ReadinessItem label="Every section has a title" complete={sections.length > 0 && sections.every((section) => Boolean(section.title.trim()))} />
-              <ReadinessItem label="At least one lesson" complete={totalLessons > 0} />
+              <ReadinessItem label="Every section has a lesson" complete={sections.length > 0 && sections.every((section) => section.lectures.length > 0)} />
               <ReadinessItem label="Media can process later" complete value="Allowed" />
             </div>
           </div>
