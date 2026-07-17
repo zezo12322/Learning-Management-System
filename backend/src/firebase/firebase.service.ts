@@ -74,7 +74,7 @@ export class FirebaseService implements OnModuleInit {
   }
 
   // Get the default storage bucket
-  getBucket() {
+  getBucket(): any {
     return getStorage(this.firebaseApp).bucket();
   }
 
