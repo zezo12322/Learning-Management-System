@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   BookOpen,
   Bot,
+  Bookmark,
   UploadCloud,
   UserRound,
   LayoutDashboard,
@@ -24,6 +25,7 @@ const BASE_NAV = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/courses', label: 'Courses', icon: BookOpen },
   { href: '/catalog', label: 'Catalog', icon: LibraryBig },
+  { href: '/saved', label: 'Saved', icon: Bookmark },
   { href: '/uploads', label: 'Uploads', icon: UploadCloud },
   { href: '/profile', label: 'Profile', icon: UserRound },
 ]
