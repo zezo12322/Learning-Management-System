@@ -1247,6 +1247,95 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       }
     }
   `,
+
+  // --- Payments (Paymob) ---
+  // All payment writes run as the service account: payment rows must be
+  // trustworthy (a client-inserted row could fabricate a "paid" state), and the
+  // webhook that finalizes them carries no user token. See PaymentsService.
+  GetCourseForPaymentAdmin: /* GraphQL */ `
+    query GetCourseForPaymentAdmin($courseId: UUID!) {
+      course(id: $courseId) {
+        id
+        title
+        price
+        status
+        deletedAt
+      }
+    }
+  `,
+
+  LogPaymentAdmin: /* GraphQL */ `
+    mutation LogPaymentAdmin(
+      $id: UUID!
+      $userId: String!
+      $gateway: PaymentGateway!
+      $referenceId: String!
+      $amount: Int!
+      $currency: String!
+      $customerEmailSnapshot: String!
+    ) {
+      payment_insert(
+        data: {
+          id: $id
+          userId: $userId
+          customerEmailSnapshot: $customerEmailSnapshot
+          gateway: $gateway
+          status: PENDING
+          referenceId: $referenceId
+          amount: $amount
+          currency: $currency
+        }
+      )
+    }
+  `,
+
+  AddPaymentItemAdmin: /* GraphQL */ `
+    mutation AddPaymentItemAdmin(
+      $paymentId: UUID!
+      $targetType: PaymentItemTarget!
+      $courseId: UUID
+      $price: Int!
+    ) {
+      paymentItem_insert(
+        data: {
+          paymentId: $paymentId
+          targetType: $targetType
+          courseId: $courseId
+          priceAtPurchase: $price
+        }
+      )
+    }
+  `,
+
+  GetPaymentByReferenceAdmin: /* GraphQL */ `
+    query GetPaymentByReferenceAdmin($referenceId: String!) {
+      payments(where: { referenceId: { eq: $referenceId } }) {
+        id
+        status
+        user {
+          id
+        }
+        paymentItems: paymentItems_on_payment {
+          targetType
+          course {
+            id
+          }
+        }
+      }
+    }
+  `,
+
+  UpdatePaymentStatusAdmin: /* GraphQL */ `
+    mutation UpdatePaymentStatusAdmin(
+      $referenceId: String!
+      $status: PaymentStatus!
+    ) {
+      payment_updateMany(
+        where: { referenceId: { eq: $referenceId } }
+        data: { status: $status, updatedAt_expr: "request.time" }
+      )
+    }
+  `,
 };
 
 /**

@@ -29,7 +29,8 @@ coverage/
 backend/node_modules/
 backend/dist/
 backend/.env
-backend/.env.* 
+backend/.env.*
+!backend/.env.example
 
 # Flutter / Mobile
 mobile/.dart_tool/
@@ -47,6 +48,7 @@ mobile/**/ephemeral/
 # Secrets & Configs
 .env
 .env.*
+!.env.example
 *.local
 mobile/android/app/google-services.json
 mobile/ios/Runner/GoogleService-Info.plist

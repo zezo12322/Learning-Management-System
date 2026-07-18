@@ -2,6 +2,8 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
@@ -13,9 +15,15 @@ import { DataConnectService } from '../firebase/dataconnect.service';
  * than inserting a duplicate, since the schema has no uniqueness on
  * (user, course/mission) yet — see the DB constraint follow-up.
  *
- * NOTE: paid-course gating (price > 0 ⇒ requires a completed payment) is not
- * enforced here because the payment flow is not yet implemented; revisit when
- * payments land.
+ * Paid-course gating (price > 0): direct self-enrollment is refused with 402 so
+ * paid content cannot be accessed for free. The purchase path is
+ * POST /payments/checkout, and the Paymob webhook activates the enrollment via
+ * the service account (PaymentsService) — that path does NOT go through this
+ * method, so this gate does not block a genuinely-paid activation.
+ *
+ * (Known limitation: a learner who paid, enrolled, then DROPPED cannot
+ * re-enroll through this endpoint while the course stays paid — reactivation of
+ * an already-purchased course is a follow-up once payment history lookup lands.)
  */
 @Injectable()
 export class EnrollmentService {
@@ -33,6 +41,15 @@ export class EnrollmentService {
     }
     if (course.status !== 'PUBLISHED') {
       throw new BadRequestException('Course is not open for enrollment');
+    }
+
+    // Paid courses cannot be self-enrolled for free — direct the client to
+    // checkout. The payment webhook activates enrollment out-of-band.
+    if (typeof course.price === 'number' && course.price > 0) {
+      throw new HttpException(
+        'This course requires payment. Start checkout via POST /payments/checkout.',
+        HttpStatus.PAYMENT_REQUIRED,
+      );
     }
 
     const existingData = await this.dc.executeQuery(
