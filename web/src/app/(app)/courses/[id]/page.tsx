@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { catalogApi, enrollmentApi, ratingsApi } from '@/lib/api/services'
 import { apiErrorMessage } from '@/lib/api/client'
+import { useT } from '@/lib/i18n'
 import type { CourseCard } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -24,13 +25,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { RatingStars } from '@/components/common/RatingStars'
 import { formatCompact, formatDuration, formatPrice, cn } from '@/lib/utils'
 
-const LEVEL_LABEL: Record<string, string> = {
-  BEGINNER: 'مبتدئ',
-  INTERMEDIATE: 'متوسط',
-  ADVANCED: 'متقدم',
-}
-
 export default function CourseDetailsPage() {
+  const t = useT()
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const qc = useQueryClient()
@@ -81,7 +77,7 @@ export default function CourseDetailsPage() {
   }
 
   if (curriculum.isError) {
-    return <p className="py-12 text-center text-content-secondary">تعذّر تحميل الدورة.</p>
+    return <p className="py-12 text-center text-content-secondary">{t('courseDetail.loadError')}</p>
   }
 
   return (
@@ -91,7 +87,7 @@ export default function CourseDetailsPage() {
         <button
           onClick={() => router.back()}
           className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30"
-          aria-label="رجوع"
+          aria-label={t('courseDetail.back')}
         >
           <ArrowRight size={18} />
         </button>
@@ -112,7 +108,7 @@ export default function CourseDetailsPage() {
               <span className="text-white/80">({formatCompact(summary.count)})</span>
             </span>
           )}
-          <span className="text-white/80">{totalLessons} درس</span>
+          <span className="text-white/80">{totalLessons} {t('courseDetail.lessons')}</span>
         </div>
       </div>
 
@@ -122,26 +118,26 @@ export default function CourseDetailsPage() {
           <Avatar src={meta.author.avatar} name={meta.author.name} size={48} />
           <div>
             <p className="font-semibold text-content">{meta.author.name}</p>
-            <p className="text-xs text-content-secondary">مدرّب الدورة</p>
+            <p className="text-xs text-content-secondary">{t('courseDetail.instructor')}</p>
           </div>
         </Card>
       )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile icon={<Clock size={18} />} value={formatDuration(Math.round(totalSeconds / 60))} label="المدة" />
-        <StatTile icon={<PlayCircle size={18} />} value={totalLessons} label="درس" />
+        <StatTile icon={<Clock size={18} />} value={formatDuration(Math.round(totalSeconds / 60))} label={t('courseDetail.duration')} />
+        <StatTile icon={<PlayCircle size={18} />} value={totalLessons} label={t('courseDetail.lessons')} />
         <StatTile
           icon={<BarChart3 size={18} />}
-          value={LEVEL_LABEL[meta?.level ?? ''] ?? '—'}
-          label="المستوى"
+          value={meta?.level ? t(`level.${meta.level}`, meta.level) : '—'}
+          label={t('courseDetail.level')}
         />
-        <StatTile icon={<Award size={18} />} value="نعم" label="شهادة" />
+        <StatTile icon={<Award size={18} />} value={t('courseDetail.yes')} label={t('courseDetail.certificate')} />
       </div>
 
       {/* Curriculum */}
       <section>
-        <h2 className="mb-3 text-title-sm font-bold text-content">محتوى الدورة</h2>
+        <h2 className="mb-3 text-title-sm font-bold text-content">{t('courseDetail.curriculum')}</h2>
         <Card className="divide-y divide-border">
           {curriculum.data?.sections.map((section) => (
             <div key={section.id} className="p-4">
@@ -165,7 +161,7 @@ export default function CourseDetailsPage() {
                         {idx + 1}. {lecture.title}
                       </span>
                       {lecture.isFreePreview && !isEnrolled && (
-                        <Badge tone="info">معاينة</Badge>
+                        <Badge tone="info">{t('common.preview')}</Badge>
                       )}
                       <span className="text-xs text-content-secondary">
                         {formatDuration(Math.round((lecture.duration ?? 0) / 60))}
@@ -183,7 +179,7 @@ export default function CourseDetailsPage() {
       {reviews.data && reviews.data.length > 0 && (
         <section>
           <h2 className="mb-3 text-title-sm font-bold text-content">
-            التقييمات {summary?.count ? `(${formatCompact(summary.count)})` : ''}
+            {t('courseDetail.reviews')} {summary?.count ? `(${formatCompact(summary.count)})` : ''}
           </h2>
           <div className="space-y-3">
             {reviews.data.map((r, i) => (
@@ -206,17 +202,17 @@ export default function CourseDetailsPage() {
           <div>
             {meta && (
               <p className="text-xl font-bold text-content">
-                {meta.price > 0 ? formatPrice(meta.price / 100) : 'مجاني'}
+                {meta.price > 0 ? formatPrice(meta.price / 100) : t('courseDetail.free')}
               </p>
             )}
           </div>
           {isEnrolled ? (
             <Button size="lg" onClick={() => router.push(`/learn/${id}`)}>
-              <CheckCircle2 size={18} /> متابعة التعلّم
+              <CheckCircle2 size={18} /> {t('courseDetail.continue')}
             </Button>
           ) : isPaid ? (
             <Button size="lg" disabled>
-              الدفع قريبًا
+              {t('courseDetail.paymentSoon')}
             </Button>
           ) : (
             <Button
@@ -224,13 +220,13 @@ export default function CourseDetailsPage() {
               loading={enroll.isPending}
               onClick={() => enroll.mutate()}
             >
-              التسجيل الآن
+              {t('courseDetail.enrollNow')}
             </Button>
           )}
         </div>
         {enroll.isError && (
           <p className="mx-auto mt-2 max-w-5xl text-xs text-error">
-            {apiErrorMessage(enroll.error, 'تعذّر التسجيل في الدورة.')}
+            {apiErrorMessage(enroll.error, t('courseDetail.enrollError'))}
           </p>
         )}
       </div>

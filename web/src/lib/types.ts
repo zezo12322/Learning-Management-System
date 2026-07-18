@@ -175,3 +175,58 @@ export interface AIAvailability {
   reason?: 'NOT_CONFIGURED' | 'UNREACHABLE'
   provider?: string
 }
+
+// ── Quizzes (authoring) ──────────────────────────────────────────────
+export interface QuizOption {
+  id?: string
+  text: string
+  isCorrect: boolean
+}
+
+export interface QuizQuestion {
+  id: string
+  questionText: string
+  points: number
+  explanation?: string
+  order: number
+  options: QuizOption[]
+}
+
+export interface QuizSettings {
+  passingScore: number
+  maxAttempts: number
+  timeLimitMinutes?: number
+}
+
+export interface Quiz extends QuizSettings {
+  id: string
+  lectureId: string
+  questions: QuizQuestion[]
+}
+
+// ── Quizzes (taking) ─────────────────────────────────────────────────
+export interface TakeOption {
+  id: string
+  text: string
+}
+
+export interface TakeQuestion {
+  id: string
+  questionText: string
+  points: number
+  options: TakeOption[]
+}
+
+export interface TakeQuiz {
+  id: string
+  timeLimitMinutes?: number
+  questions: TakeQuestion[]
+}
+
+export interface QuizResult {
+  score: number
+  passed: boolean
+  totalQuestions: number
+  correctCount: number
+  answeredCount: number
+}

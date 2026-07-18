@@ -17,6 +17,13 @@ import type {
   Role,
   SignedUpload,
   UploadEntityType,
+  Quiz,
+  QuizOption,
+  QuizQuestion,
+  QuizResult,
+  QuizSettings,
+  TakeQuestion,
+  TakeQuiz,
 } from '@/lib/types'
 
 type JsonObject = Record<string, unknown>
@@ -320,4 +327,156 @@ export const authoringApi = {
     apiClient.post(`/courses/${courseId}/lectures/${lectureId}/video/transcode`, { sourcePath }).then((response) => response.data),
   transcodeStatus: (courseId: string, lectureId: string) =>
     apiClient.get(`/courses/${courseId}/lectures/${lectureId}/video/transcode/status`).then((response) => response.data),
+}
+
+// ── Quiz authoring ───────────────────────────────────────────────────
+function mapQuizOption(value: unknown): QuizOption {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id) || undefined,
+    text: stringValue(raw.text),
+    isCorrect: Boolean(raw.isCorrect),
+  }
+}
+
+function mapQuizQuestion(value: unknown, index: number): QuizQuestion {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id),
+    questionText: stringValue(raw.questionText),
+    points: numberValue(raw.points, 1),
+    explanation: stringValue(raw.explanation) || undefined,
+    order: numberValue(raw.order, index + 1),
+    options: arrayValue(raw.adminOptions ?? raw.options).map(mapQuizOption),
+  }
+}
+
+function mapQuiz(value: unknown): Quiz {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id),
+    lectureId: stringValue(objectValue(raw.lecture).id),
+    passingScore: numberValue(raw.passingScore),
+    maxAttempts: numberValue(raw.maxAttempts, 1),
+    timeLimitMinutes:
+      typeof raw.timeLimitMinutes === 'number' ? raw.timeLimitMinutes : undefined,
+    questions: arrayValue(raw.adminQuestions ?? raw.questions).map(mapQuizQuestion),
+  }
+}
+
+export interface QuestionInput {
+  questionText: string
+  points?: number
+  explanation?: string
+  options: QuizOption[]
+}
+
+export const quizApi = {
+  /** Load a quiz (settings + questions + options) by id — authoring view. */
+  get: (courseId: string, quizId: string) =>
+    apiClient
+      .get(`/courses/${courseId}/quizzes/${quizId}`)
+      .then((response) => mapQuiz(response.data)),
+
+  /** Create the quiz shell on a QUIZ-type lecture; returns the new quiz id. */
+  create: (courseId: string, lectureId: string, settings: QuizSettings) =>
+    apiClient
+      .post(`/courses/${courseId}/lectures/${lectureId}/quiz`, settings)
+      .then((response) =>
+        stringValue(
+          mutationEntity(response.data, [
+            'courseQuiz_insert',
+            'courseQuizInsert',
+            'quiz_insert',
+            'quiz',
+          ]).id,
+        ),
+      ),
+
+  updateSettings: (courseId: string, quizId: string, settings: Partial<QuizSettings>) =>
+    apiClient
+      .patch(`/courses/${courseId}/quizzes/${quizId}`, settings)
+      .then((response) => response.data),
+
+  createQuestion: (courseId: string, quizId: string, question: QuestionInput) =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/questions`, question)
+      .then((response) => response.data),
+
+  updateQuestion: (
+    courseId: string,
+    quizId: string,
+    questionId: string,
+    question: Partial<QuestionInput>,
+  ) =>
+    apiClient
+      .patch(
+        `/courses/${courseId}/quizzes/${quizId}/questions/${questionId}`,
+        question,
+      )
+      .then((response) => response.data),
+
+  deleteQuestion: (courseId: string, quizId: string, questionId: string) =>
+    apiClient
+      .delete(`/courses/${courseId}/quizzes/${quizId}/questions/${questionId}`)
+      .then((response) => response.data),
+
+  // ── taking (student / preview) ──
+  /** Student-safe view: questions + options with NO correct-answer flags. */
+  getForTaking: (courseId: string, quizId: string): Promise<TakeQuiz> =>
+    apiClient.get(`/courses/${courseId}/quizzes/${quizId}/questions`).then((response) => {
+      const raw = objectValue(response.data)
+      return {
+        id: stringValue(raw.id),
+        timeLimitMinutes:
+          typeof raw.timeLimitMinutes === 'number' ? raw.timeLimitMinutes : undefined,
+        questions: arrayValue(raw.takeQuestions ?? raw.questions).map(
+          (q, i): TakeQuestion => {
+            const rawQ = objectValue(q)
+            return {
+              id: stringValue(rawQ.id),
+              questionText: stringValue(rawQ.questionText),
+              points: numberValue(rawQ.points, 1),
+              options: arrayValue(rawQ.takeOptions ?? rawQ.options).map((o) => {
+                const rawO = objectValue(o)
+                return { id: stringValue(rawO.id), text: stringValue(rawO.text) }
+              }),
+            }
+          },
+        ),
+      }
+    }),
+
+  startAttempt: (courseId: string, quizId: string): Promise<string> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts`)
+      .then((response) =>
+        stringValue(
+          mutationEntity(response.data, ['quizAttempt_insert', 'quizAttemptInsert', 'attempt']).id,
+        ),
+      ),
+
+  submitAnswer: (
+    courseId: string,
+    quizId: string,
+    attemptId: string,
+    body: { questionId: string; selectedOptionId: string },
+  ) =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/answers`, body)
+      .then((response) => response.data),
+
+  finishAttempt: (courseId: string, quizId: string, attemptId: string): Promise<QuizResult> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/finish`)
+      .then((response) => {
+        const raw = objectValue(response.data)
+        return {
+          score: numberValue(raw.score),
+          passed: Boolean(raw.passed),
+          totalQuestions: numberValue(raw.totalQuestions),
+          correctCount: numberValue(raw.correctCount),
+          answeredCount: numberValue(raw.answeredCount),
+        }
+      }),
 }

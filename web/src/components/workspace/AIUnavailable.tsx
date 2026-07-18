@@ -1,15 +1,19 @@
+'use client'
+
 import { Bot, Clock3 } from 'lucide-react'
+import { useT } from '@/lib/i18n'
 import { Card } from '@/components/ui/card'
 
 export function AIUnavailable({ compact = false }: { compact?: boolean }) {
+  const t = useT()
   if (compact) {
     return (
       <div className="rounded-input bg-brand-soft p-3">
         <p className="flex items-center gap-2 text-xs font-semibold text-primary">
-          <Clock3 size={14} /> Coming soon
+          <Clock3 size={14} /> {t('ai.comingSoon')}
         </p>
         <p className="mt-1 text-[11px] leading-5 text-content-secondary">
-          AI course generation and tutoring will arrive in a future release.
+          {t('ai.comingSoonBody')}
         </p>
       </div>
     )
@@ -22,9 +26,9 @@ export function AIUnavailable({ compact = false }: { compact?: boolean }) {
           <Bot size={21} />
         </span>
         <div>
-          <p className="text-base font-semibold text-content">AI tools are coming soon</p>
+          <p className="text-base font-semibold text-content">{t('ai.title')}</p>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-content-secondary">
-            Course generation and tutor conversations are not part of this release. No AI request or sample response is shown.
+            {t('ai.body')}
           </p>
         </div>
       </div>
