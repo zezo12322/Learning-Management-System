@@ -73,6 +73,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> sendPasswordReset({required String email}) async {
+    try {
+      await firebaseAuthService.sendPasswordResetEmail(email: email);
+      return right(unit);
+    } on CustomExceptions catch (e) {
+      return left(ServerFailure(e.message));
+    } catch (e) {
+      return left(ServerFailure('auth.error.genericError'.tr()));
+    }
+  }
+
+  @override
   Future<bool> getRememberMeState() {
     return authLocalDataSources.getRememberMeState();
   }
