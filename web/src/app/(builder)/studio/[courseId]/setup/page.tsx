@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { ImagePlus, Info, Save } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi, coursesApi } from '@/lib/api/services'
+import { useT } from '@/lib/i18n'
 import type { CourseLevel } from '@/lib/types'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { FormField, SelectField } from '@/components/builder/FormField'
@@ -16,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 
 export default function CourseSetupPage() {
+  const t = useT()
   const { courseId } = useParams<{ courseId: string }>()
   const router = useRouter()
   const [title, setTitle] = useState('')
@@ -71,19 +73,19 @@ export default function CourseSetupPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Course setup" description="Add the core information learners will see before enrolling." />
+      <PageHeader title={t('builder.setup.title')} description={t('builder.setup.subtitle')} />
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_336px]">
         <Card className="p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-content">Course details</h2>
-          <p className="mt-1 text-xs text-content-secondary">Use a clear title and concise positioning. You can refine this later.</p>
+          <h2 className="text-lg font-semibold text-content">{t('builder.setup.detailsTitle')}</h2>
+          <p className="mt-1 text-xs text-content-secondary">{t('builder.setup.detailsSubtitle')}</p>
 
           <div className="mt-6 space-y-5">
-            <FormField label="Course title" hint="Keep it under 70 characters.">
-              <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. UI/UX Design Fundamentals" maxLength={70} />
+            <FormField label={t('builder.setup.titleLabel')} hint={t('builder.setup.titleHint')}>
+              <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t('builder.setup.titlePlaceholder')} maxLength={70} />
             </FormField>
 
-            <FormField label="Short description" hint={`${description.length}/240 characters`}>
+            <FormField label={t('builder.setup.descLabel')} hint={`${description.length}/240 ${t('builder.setup.characters')}`}>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -94,70 +96,70 @@ export default function CourseSetupPage() {
             </FormField>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormField label="Category" hint="Choose the topic that best fits this course.">
+              <FormField label={t('builder.setup.categoryLabel')} hint={t('builder.setup.categoryHint')}>
                 {categories.isError ? (
-                  <div className="rounded-input bg-error/10 px-4 py-3 text-xs text-error">Categories could not be loaded. Try again in a moment.</div>
+                  <div className="rounded-input bg-error/10 px-4 py-3 text-xs text-error">{t('builder.setup.categoriesError')}</div>
                 ) : (
                   <SelectField value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-                    <option value="">{categories.isLoading ? 'Loading categories…' : 'Select a category'}</option>
+                    <option value="">{categories.isLoading ? t('builder.setup.loadingCategories') : t('builder.setup.selectCategory')}</option>
                     {(categories.data ?? []).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                   </SelectField>
                 )}
               </FormField>
-              <FormField label="Level" hint="Set learner expectations.">
+              <FormField label={t('builder.setup.levelLabel')} hint={t('builder.setup.levelHint')}>
                 <SelectField value={level} onChange={(event) => setLevel(event.target.value)}>
-                  <option value="BEGINNER">Beginner</option><option value="INTERMEDIATE">Intermediate</option><option value="ADVANCED">Advanced</option>
+                  <option value="BEGINNER">{t('level.BEGINNER')}</option><option value="INTERMEDIATE">{t('level.INTERMEDIATE')}</option><option value="ADVANCED">{t('level.ADVANCED')}</option>
                 </SelectField>
               </FormField>
-              <FormField label="Language" hint="Primary course language.">
+              <FormField label={t('builder.setup.languageLabel')} hint={t('builder.setup.languageHint')}>
                 <SelectField value={language} onChange={(event) => setLanguage(event.target.value)}>
                   <option>English</option><option>Arabic</option><option>French</option>
                 </SelectField>
               </FormField>
-              <FormField label="Visibility" hint="Change when ready to publish.">
+              <FormField label={t('builder.setup.visibilityLabel')} hint={t('builder.setup.visibilityHint')}>
                 <SelectField value={visibility} onChange={(event) => setVisibility(event.target.value)}>
                   <option>Private draft</option><option>Unlisted</option><option>Public</option>
                 </SelectField>
               </FormField>
-              <FormField label="Price" hint="Enter the amount learners will pay.">
+              <FormField label={t('builder.setup.priceLabel')} hint={t('builder.setup.priceHint')}>
                 <Input type="number" min="0" value={price} onChange={(event) => setPrice(event.target.value)} />
               </FormField>
-              <FormField label="Tags" hint="Comma-separated discovery tags.">
-                <Input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="design, research" />
+              <FormField label={t('builder.setup.tagsLabel')} hint={t('builder.setup.tagsHint')}>
+                <Input value={tags} onChange={(event) => setTags(event.target.value)} placeholder={t('builder.setup.tagsPlaceholder')} />
               </FormField>
             </div>
 
             <div className="flex items-start gap-3 rounded-input bg-secondary/10 p-4">
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface text-secondary"><Info size={15} /></span>
-              <div><p className="text-xs font-semibold text-content">Autosaved draft</p><p className="mt-1 text-[11px] leading-5 text-content-secondary">Changes stay private until you complete preview and publish.</p></div>
+              <div><p className="text-xs font-semibold text-content">{t('builder.setup.autosaved')}</p><p className="mt-1 text-[11px] leading-5 text-content-secondary">{t('builder.setup.autosavedBody')}</p></div>
             </div>
 
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
-              {saved && <span className="text-xs font-medium text-success">Setup saved</span>}
-              {save.isError && <span className="text-xs font-medium text-error">{apiErrorMessage(save.error, 'Could not save setup')}</span>}
-              {courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">Choose a category before continuing.</span>}
-              <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (courseId === 'new' && !categoryId)}><Save size={16} /> Save setup</Button>
+              {saved && <span className="text-xs font-medium text-success">{t('builder.setup.saved')}</span>}
+              {save.isError && <span className="text-xs font-medium text-error">{apiErrorMessage(save.error, t('builder.setup.saveError'))}</span>}
+              {courseId === 'new' && !categoryId && <span className="text-xs font-medium text-warning">{t('builder.setup.chooseCategory')}</span>}
+              <Button onClick={saveSetup} loading={save.isPending} disabled={!title || (courseId === 'new' && !categoryId)}><Save size={16} /> {t('builder.setup.saveButton')}</Button>
             </div>
           </div>
         </Card>
 
         <Card className="h-fit p-5">
-          <h2 className="text-base font-semibold text-content">Course card preview</h2>
+          <h2 className="text-base font-semibold text-content">{t('builder.setup.previewTitle')}</h2>
           <button className="mt-5 flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card bg-brand-soft text-content-secondary transition-colors hover:bg-primary-100">
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface text-primary"><ImagePlus size={22} /></span>
-            <span className="text-xs font-medium">Upload a 16:9 course cover</span>
+            <span className="text-xs font-medium">{t('builder.setup.uploadCover')}</span>
           </button>
-          <h3 className="mt-5 text-base font-semibold text-content">{title || 'Untitled course'}</h3>
-          <p className="mt-2 text-xs text-content-secondary">{course.data?.category ?? 'Category pending'} · {level.toLowerCase()} · {language}</p>
+          <h3 className="mt-5 text-base font-semibold text-content">{title || t('builder.setup.untitled')}</h3>
+          <p className="mt-2 text-xs text-content-secondary">{course.data?.category ?? t('builder.setup.categoryPending')} · {t(`level.${level}`, level.toLowerCase())} · {language}</p>
 
           <div className="mt-5 rounded-input bg-subtle p-4">
-            <div className="flex items-center justify-between"><span className="text-xs font-semibold text-content">Setup readiness</span><span className="text-xs font-bold text-primary">{readinessScore}%</span></div>
+            <div className="flex items-center justify-between"><span className="text-xs font-semibold text-content">{t('builder.setup.readiness')}</span><span className="text-xs font-bold text-primary">{readinessScore}%</span></div>
             <Progress value={readinessScore} className="mt-3 h-1.5" />
             <div className="mt-4 space-y-2">
-              <ReadinessItem label="Title" complete={readiness[0]} />
-              <ReadinessItem label="Description" complete={readiness[1]} />
-              <ReadinessItem label="Cover image" complete={readiness[2]} />
-              <ReadinessItem label="Category & level" complete={readiness[3]} />
+              <ReadinessItem label={t('builder.setup.readinessTitle')} complete={readiness[0]} />
+              <ReadinessItem label={t('builder.setup.readinessDesc')} complete={readiness[1]} />
+              <ReadinessItem label={t('builder.setup.readinessCover')} complete={readiness[2]} />
+              <ReadinessItem label={t('builder.setup.readinessCategoryLevel')} complete={readiness[3]} />
             </div>
           </div>
         </Card>

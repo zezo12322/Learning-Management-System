@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, CheckCircle2, Lock, PlayCircle, FileText } from 'lucide-react'
 import { catalogApi, enrollmentApi, progressApi } from '@/lib/api/services'
+import { useT } from '@/lib/i18n'
 import type { Lecture } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,7 @@ import { PageSpinner } from '@/components/ui/spinner'
 import { formatDuration, cn } from '@/lib/utils'
 
 export default function LearnPage() {
+  const t = useT()
   const { courseId } = useParams<{ courseId: string }>()
   const qc = useQueryClient()
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -59,9 +61,9 @@ export default function LearnPage() {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <Lock size={40} className="text-content-secondary" />
-        <p className="text-content-secondary">يجب التسجيل في الدورة أولاً.</p>
+        <p className="text-content-secondary">{t('learn.mustEnroll')}</p>
         <Link href={`/courses/${courseId}`}>
-          <Button>الذهاب لصفحة الدورة</Button>
+          <Button>{t('learn.goToCourse')}</Button>
         </Link>
       </div>
     )
@@ -82,12 +84,12 @@ export default function LearnPage() {
       {progress.data && (
         <Card className="p-4">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-semibold text-content">تقدّمك في الدورة</span>
+            <span className="font-semibold text-content">{t('learn.yourProgress')}</span>
             <span className="font-bold text-primary">{progress.data.overallPercentage}%</span>
           </div>
           <Progress value={progress.data.overallPercentage} />
           <p className="mt-2 text-xs text-content-secondary">
-            {progress.data.completedLectures} من {progress.data.totalLectures} درس مكتمل
+            {progress.data.completedLectures} {t('learn.of')} {progress.data.totalLectures} {t('learn.lessonsComplete')}
           </p>
         </Card>
       )}
@@ -98,8 +100,8 @@ export default function LearnPage() {
           <Card className="flex aspect-video items-center justify-center bg-content/90 text-white">
             <div className="text-center">
               <PlayCircle size={56} className="mx-auto mb-2 opacity-80" />
-              <p className="text-sm opacity-80">{active?.title ?? 'اختر درساً'}</p>
-              <p className="mt-1 text-xs opacity-50">مشغّل الفيديو الآمن قيد الإعداد</p>
+              <p className="text-sm opacity-80">{active?.title ?? t('learn.selectLesson')}</p>
+              <p className="mt-1 text-xs opacity-50">{t('learn.playerComingSoon')}</p>
             </div>
           </Card>
 
@@ -117,7 +119,7 @@ export default function LearnPage() {
                   loading={complete.isPending}
                   onClick={() => complete.mutate(active.id)}
                 >
-                  <CheckCircle2 size={16} /> إتمام الدرس
+                  <CheckCircle2 size={16} /> {t('learn.completeLesson')}
                 </Button>
               </div>
             </Card>
@@ -154,6 +156,7 @@ function LessonRow({
   active: boolean
   onClick: () => void
 }) {
+  const t = useT()
   return (
     <button
       onClick={onClick}
@@ -164,7 +167,7 @@ function LessonRow({
     >
       {lecture.type === 'VIDEO' ? <PlayCircle size={16} /> : <FileText size={16} />}
       <span className="flex-1 truncate">{lecture.title}</span>
-      {lecture.isFreePreview && <Badge tone="info">معاينة</Badge>}
+      {lecture.isFreePreview && <Badge tone="info">{t('common.preview')}</Badge>}
       <span className="text-xs text-content-secondary">
         {formatDuration(Math.round((lecture.duration ?? 0) / 60))}
       </span>
