@@ -97,3 +97,4 @@ dataconnect_generated/
 
 # CI/CD
 .github/
+functions/lib/
