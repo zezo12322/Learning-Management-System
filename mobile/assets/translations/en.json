@@ -74,6 +74,15 @@
       "no_account": "Don't have an account?",
       "register": "Register"
     },
+    "forgot_password_screen": {
+      "title": "Forgot Password",
+      "heading": "Reset your password",
+      "subtitle": "Enter the email linked to your account and we'll send you a reset link.",
+      "send_btn": "Send reset link",
+      "success_title": "Check your email",
+      "success_message": "If an account exists for {}, a password reset link is on its way.",
+      "back_to_login": "Back to login"
+    },
     "signup_screen": {
       "create_account": "Create\nAccount",
       "subtitle": "Join Optima and start your\nlearning journey today",
