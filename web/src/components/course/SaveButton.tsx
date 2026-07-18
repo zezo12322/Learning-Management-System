@@ -3,6 +3,7 @@
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toggleSavedCourse, useIsCourseSaved } from '@/lib/saved'
+import { useT } from '@/lib/i18n'
 
 /**
  * Bookmark toggle for a course. Safe to render inside a <Link> (a course card):
@@ -18,13 +19,15 @@ export function SaveButton({
   size?: number
 }) {
   const saved = useIsCourseSaved(courseId)
+  const t = useT()
+  const label = saved ? t('save.remove') : t('save.add')
 
   return (
     <button
       type="button"
       aria-pressed={saved}
-      aria-label={saved ? 'إزالة من المحفوظات' : 'حفظ الدورة'}
-      title={saved ? 'إزالة من المحفوظات' : 'حفظ الدورة'}
+      aria-label={label}
+      title={label}
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()

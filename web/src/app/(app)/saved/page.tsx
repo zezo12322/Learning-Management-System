@@ -5,11 +5,13 @@ import { useQuery } from '@tanstack/react-query'
 import { Bookmark } from 'lucide-react'
 import { catalogApi } from '@/lib/api/services'
 import { useSavedCourseIds, clearSavedCourses } from '@/lib/saved'
+import { useT } from '@/lib/i18n'
 import { CourseGridCard } from '@/components/course/CourseCard'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SavedPage() {
   const savedIds = useSavedCourseIds()
+  const t = useT()
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
 
   const savedCourses = useMemo(() => {
@@ -22,14 +24,14 @@ export default function SavedPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-title-md font-bold text-content">الدورات المحفوظة</h1>
+        <h1 className="text-title-md font-bold text-content">{t('saved.title')}</h1>
         {savedIds.length > 0 && (
           <button
             type="button"
             onClick={clearSavedCourses}
             className="text-xs font-semibold text-content-secondary hover:text-content"
           >
-            مسح الكل
+            {t('saved.clearAll')}
           </button>
         )}
       </div>
@@ -37,8 +39,8 @@ export default function SavedPage() {
       {savedIds.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center text-content-secondary">
           <Bookmark size={40} />
-          <p>لا توجد دورات محفوظة بعد.</p>
-          <p className="text-xs">اضغط على أيقونة الحفظ على أي دورة لإضافتها هنا.</p>
+          <p>{t('saved.empty')}</p>
+          <p className="text-xs">{t('saved.emptyHint')}</p>
         </div>
       ) : catalog.isLoading ? (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
@@ -49,7 +51,7 @@ export default function SavedPage() {
       ) : savedCourses.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center text-content-secondary">
           <Bookmark size={40} />
-          <p>الدورات المحفوظة لم تعد متاحة في الكتالوج.</p>
+          <p>{t('saved.gone')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">

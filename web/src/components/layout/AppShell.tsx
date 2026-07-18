@@ -19,15 +19,17 @@ import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
 import { PageSpinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
+import { useI18n } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 const BASE_NAV = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/courses', label: 'Courses', icon: BookOpen },
-  { href: '/catalog', label: 'Catalog', icon: LibraryBig },
-  { href: '/saved', label: 'Saved', icon: Bookmark },
-  { href: '/uploads', label: 'Uploads', icon: UploadCloud },
-  { href: '/profile', label: 'Profile', icon: UserRound },
+  { href: '/dashboard', label: 'nav.overview', icon: LayoutDashboard },
+  { href: '/courses', label: 'nav.courses', icon: BookOpen },
+  { href: '/catalog', label: 'nav.catalog', icon: LibraryBig },
+  { href: '/saved', label: 'nav.saved', icon: Bookmark },
+  { href: '/uploads', label: 'nav.uploads', icon: UploadCloud },
+  { href: '/profile', label: 'nav.profile', icon: UserRound },
 ]
 
 function isActive(pathname: string, href: string) {
@@ -37,6 +39,7 @@ function isActive(pathname: string, href: string) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { me, roles, loading, isAuthenticated, logout } = useAuth()
+  const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
   const authoringQuery = useQuery({
@@ -49,21 +52,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     () => firstCourseId
       ? [
           ...BASE_NAV,
-          { href: `/studio/${firstCourseId}/ai-studio`, label: 'AI Studio', icon: Bot },
+          { href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot },
         ]
       : BASE_NAV,
     [firstCourseId]
   )
-  const currentLabel = nav.find((item) => isActive(pathname, item.href))?.label ?? 'Workspace'
+  const currentLabel = t(nav.find((item) => isActive(pathname, item.href))?.label ?? 'workspace.default')
   const accountName = me?.name || 'Account'
   const accountRole = roles.length
     ? roles.map((role) => role[0].toUpperCase() + role.slice(1)).join(', ')
     : 'User'
   const workspaceLabel = roles.includes('admin')
-    ? 'Admin workspace'
+    ? t('workspace.admin')
     : roles.includes('instructor')
-      ? 'Instructor workspace'
-      : 'Learning workspace'
+      ? t('workspace.instructor')
+      : t('workspace.learning')
   const accountSummary = (
     <>
       <Avatar src={me?.avatar} name={accountName} size={38} />
@@ -110,7 +113,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <item.icon size={19} strokeWidth={1.8} />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1">{t(item.label)}</span>
               </Link>
             )
           })}
@@ -127,7 +130,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={signOut}
             className="flex h-10 w-full items-center gap-3 rounded-input px-3 text-sm text-content-secondary transition-colors hover:bg-subtle hover:text-error"
           >
-            <LogOut size={18} /> Sign out
+            <LogOut size={18} /> {t('nav.signOut')}
           </button>
         </div>
       </aside>
@@ -145,6 +148,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher className="hidden sm:inline-flex" />
             <Link href="/profile" className="flex items-center gap-2.5">{accountSummary}</Link>
           </div>
         </header>
@@ -165,7 +169,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               )}
             >
               <item.icon size={19} />
-              {item.label}
+              {t(item.label)}
             </Link>
           )
         })}
