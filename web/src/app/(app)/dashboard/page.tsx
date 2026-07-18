@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpenCheck, MessageSquare, Plus, Star } from 'lucide-react'
 import { authoringApi, catalogApi } from '@/lib/api/services'
+import { useT } from '@/lib/i18n'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { MetricCard } from '@/components/workspace/MetricCard'
 import { AIUnavailable } from '@/components/workspace/AIUnavailable'
@@ -13,6 +14,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default function DashboardPage() {
+  const t = useT()
   const catalogQuery = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
@@ -38,37 +40,37 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Workspace overview"
-        description="Manage your courses and review current learning activity."
-        action={<Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>}
+        title={t('dashboard.title')}
+        description={t('dashboard.subtitle')}
+        action={<Link href="/studio/new/setup"><Button><Plus size={16} /> {t('common.createCourse')}</Button></Link>}
       />
 
       {catalogQuery.isError && (
         <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
-          We could not load your course overview. Try again in a moment.
+          {t('dashboard.loadError')}
         </Card>
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard
           icon={BookOpenCheck}
-          label="Published courses"
+          label={t('dashboard.metric.published')}
           value={metricValue(String(courses.length))}
-          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : 'Courses currently available to learners'}
+          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : t('dashboard.metric.publishedDetail')}
           state={metricState}
         />
         <MetricCard
           icon={MessageSquare}
-          label="Learner reviews"
+          label={t('dashboard.metric.reviews')}
           value={metricValue(totalReviews.toLocaleString())}
-          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : 'Reviews submitted across published courses'}
+          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : t('dashboard.metric.reviewsDetail')}
           state={metricState}
         />
         <MetricCard
           icon={Star}
-          label="Average rating"
-          value={metricValue(averageRating == null ? 'Not rated' : averageRating.toFixed(1))}
-          detail={catalogQuery.isError ? 'Course data is temporarily unavailable' : averageRating == null ? 'No learner ratings have been submitted' : 'Weighted by the number of reviews'}
+          label={t('dashboard.metric.rating')}
+          value={metricValue(averageRating == null ? t('dashboard.metric.notRated') : averageRating.toFixed(1))}
+          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : averageRating == null ? t('dashboard.metric.noRatings') : t('dashboard.metric.ratingDetail')}
           state={metricState}
         />
       </div>
@@ -77,14 +79,14 @@ export default function DashboardPage() {
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-content">Published catalog</h2>
-              <p className="mt-1 text-xs text-content-secondary">The latest courses available to learners.</p>
+              <h2 className="text-lg font-semibold text-content">{t('dashboard.catalogTitle')}</h2>
+              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.catalogSubtitle')}</p>
             </div>
-            <Link href="/catalog" className="shrink-0 text-xs font-semibold text-primary">View catalog →</Link>
+            <Link href="/catalog" className="shrink-0 text-xs font-semibold text-primary">{t('dashboard.viewCatalog')} →</Link>
           </div>
 
           {catalogQuery.isLoading ? (
-            <div className="rounded-input bg-subtle p-5 text-sm text-content-secondary">Loading published courses…</div>
+            <div className="rounded-input bg-subtle p-5 text-sm text-content-secondary">{t('dashboard.loadingCourses')}</div>
           ) : courses.length ? (
             <div className="space-y-3">
               {courses.slice(0, 3).map((course, index) => {
@@ -110,43 +112,43 @@ export default function DashboardPage() {
                         {[course.category?.name, course.level].filter(Boolean).join(' · ')}
                       </span>
                       <span className="mt-2 block text-[11px] text-content-muted">
-                        {hasRatings ? `${(course.avgRating ?? 0).toFixed(1)} rating · ${course.ratingCount} reviews` : 'No learner ratings yet'}
+                        {hasRatings ? `${(course.avgRating ?? 0).toFixed(1)} ${t('dashboard.ratingLabel')} · ${course.ratingCount} ${t('common.reviews')}` : t('dashboard.noRatingsYet')}
                       </span>
                     </span>
-                    <StatusPill tone="success">Published</StatusPill>
+                    <StatusPill tone="success">{t('common.published')}</StatusPill>
                   </Link>
                 )
               })}
             </div>
           ) : !catalogQuery.isError ? (
             <div className="rounded-input border border-dashed border-border p-8 text-center">
-              <p className="text-sm font-semibold text-content">No published courses</p>
-              <p className="mt-1 text-xs text-content-secondary">Publish a course to make it available in the catalog.</p>
+              <p className="text-sm font-semibold text-content">{t('dashboard.noPublished')}</p>
+              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.noPublishedHint')}</p>
             </div>
           ) : null}
         </Card>
 
         <Card className="flex flex-col p-5 sm:p-6">
           <div className="rounded-input bg-brand-soft p-4">
-            <p className="text-[10px] font-semibold tracking-wide text-primary">AI COURSE STUDIO</p>
-            <h2 className="mt-2 text-lg font-semibold text-content">Turn course content into learning assets</h2>
-            <p className="mt-2 text-xs leading-5 text-content-secondary">AI course generation and tutoring are planned for a future release.</p>
+            <p className="text-[10px] font-semibold tracking-wide text-primary">{t('dashboard.aiStudioEyebrow')}</p>
+            <h2 className="mt-2 text-lg font-semibold text-content">{t('dashboard.aiStudioTitle')}</h2>
+            <p className="mt-2 text-xs leading-5 text-content-secondary">{t('dashboard.aiStudioBody')}</p>
           </div>
           <div className="mt-5"><AIUnavailable compact /></div>
 
           {firstAuthoringCourse ? (
             <Link href={`/studio/${firstAuthoringCourse.id}/ai-studio`} className="mt-auto pt-5">
-              <Button fullWidth>Open {firstAuthoringCourse.title}</Button>
+              <Button fullWidth>{t('common.open')} {firstAuthoringCourse.title}</Button>
             </Link>
           ) : (
             <div className="mt-auto pt-5">
               <Button fullWidth disabled>
-                {authoringQuery.isLoading ? 'Loading courses' : 'No course available'}
+                {authoringQuery.isLoading ? t('dashboard.loadingCoursesBtn') : t('dashboard.noCourseAvailable')}
               </Button>
               <p className="mt-2 text-center text-[11px] leading-4 text-content-muted">
                 {authoringQuery.isError
-                  ? 'Your courses could not be loaded.'
-                  : 'Create a course before opening AI Studio.'}
+                  ? t('dashboard.coursesLoadError')
+                  : t('dashboard.createBeforeAi')}
               </p>
             </div>
           )}
