@@ -59,7 +59,19 @@ export function CourseUploadWorkspace({ courseId }: { courseId: string }) {
     })
     return result
   }), [lectures, t])
-  const assets = useMemo(() => [...sessionAssets, ...storedAssets], [sessionAssets, storedAssets])
+  const assets = useMemo(() => {
+    // Once a lecture's uploaded video is stored (videoUrl present), the READY
+    // stored-video asset supersedes the session asset — which otherwise lingers
+    // at PROCESSING since the client doesn't await transcoding. Drop the
+    // superseded session video so the same lecture isn't shown twice.
+    const lecturesWithStoredVideo = new Set(
+      lectures.filter((lecture) => lecture.videoUrl).map((lecture) => lecture.id)
+    )
+    const liveSession = sessionAssets.filter(
+      (asset) => !(asset.lectureId && asset.mimeType?.startsWith('video/') && lecturesWithStoredVideo.has(asset.lectureId))
+    )
+    return [...liveSession, ...storedAssets]
+  }, [sessionAssets, storedAssets, lectures])
 
   useEffect(() => {
     setLectureId('')
