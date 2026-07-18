@@ -13,6 +13,7 @@ class CourseEntity {
   final bool isBookmarked;
   final double avgRating;
   final int ratingCount;
+  final int enrollmentCount;
 
   const CourseEntity({
     required this.id,
@@ -29,6 +30,7 @@ class CourseEntity {
     this.isBookmarked = false,
     required this.avgRating,
     required this.ratingCount,
+    this.enrollmentCount = 0,
   });
 }
 
