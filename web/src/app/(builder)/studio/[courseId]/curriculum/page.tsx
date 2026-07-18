@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, FileText, GripVertical, MoreHorizontal, Pencil, Play, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, FileText, GripVertical, ListChecks, MoreHorizontal, Pencil, Play, Plus, Trash2 } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
 import type { AuthoringSection } from '@/lib/types'
@@ -23,6 +24,7 @@ export default function CurriculumPage() {
   const [lessonSectionId, setLessonSectionId] = useState('')
   const [lessonTitle, setLessonTitle] = useState('')
   const [lessonContent, setLessonContent] = useState('')
+  const [lessonType, setLessonType] = useState<'READING' | 'QUIZ'>('READING')
   const [lessonError, setLessonError] = useState<string | null>(null)
   const [editingSectionId, setEditingSectionId] = useState('')
   const [sectionTitle, setSectionTitle] = useState('')
@@ -50,10 +52,10 @@ export default function CurriculumPage() {
     mutationFn: (sectionId: string) => authoringApi.deleteSection(courseId, sectionId),
   })
   const createLecture = useMutation({
-    mutationFn: ({ sectionId, title, content }: { sectionId: string; title: string; content: string }) => authoringApi.createLecture(courseId, sectionId, {
+    mutationFn: ({ sectionId, title, content, type }: { sectionId: string; title: string; content: string; type: 'READING' | 'QUIZ' }) => authoringApi.createLecture(courseId, sectionId, {
       title,
-      type: 'READING',
-      content,
+      type,
+      content: type === 'QUIZ' ? '' : content,
       duration: 0,
       isFreePreview: false,
     }),
@@ -156,6 +158,7 @@ export default function CurriculumPage() {
     setLessonSectionId(sectionId)
     setLessonTitle('')
     setLessonContent('')
+    setLessonType('READING')
     setLessonError(null)
     createLecture.reset()
   }
@@ -164,6 +167,7 @@ export default function CurriculumPage() {
     setLessonSectionId('')
     setLessonTitle('')
     setLessonContent('')
+    setLessonType('READING')
     setLessonError(null)
     createLecture.reset()
   }
@@ -171,14 +175,14 @@ export default function CurriculumPage() {
   const addLesson = async (sectionId: string) => {
     const title = lessonTitle.trim()
     const content = lessonContent.trim()
-    if (!title || !content) {
+    if (!title || (lessonType === 'READING' && !content)) {
       setLessonError('Enter a lesson title and content before adding it.')
       return
     }
 
     setLessonError(null)
     try {
-      const created = await createLecture.mutateAsync({ sectionId, title, content })
+      const created = await createLecture.mutateAsync({ sectionId, title, content, type: lessonType })
       setSections((current) => current.map((section) => section.id === sectionId
         ? { ...section, lectures: [...section.lectures, { ...created, order: section.lectures.length + 1 }] }
         : section))
@@ -296,10 +300,15 @@ export default function CurriculumPage() {
                           <div key={lecture.id} className="flex items-center gap-3 px-3 py-4 sm:px-4">
                             <GripVertical size={15} className="shrink-0 text-content-muted" />
                             <span className={lecture.type === 'VIDEO' ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary' : 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-subtle text-content-secondary'}>
-                              {lecture.type === 'VIDEO' ? <Play size={14} /> : <FileText size={14} />}
+                              {lecture.type === 'VIDEO' ? <Play size={14} /> : lecture.type === 'QUIZ' ? <ListChecks size={14} /> : <FileText size={14} />}
                             </span>
                             <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-content">{lecture.title}</span><span className="mt-1 block text-[10px] text-content-muted">{lecture.type.toLowerCase()} · {Math.round(lecture.duration / 60)} min</span></span>
-                            <StatusPill tone={ready ? 'success' : 'warning'}>{ready ? 'Ready' : lecture.type === 'VIDEO' ? 'Needs media' : 'Draft'}</StatusPill>
+                            {lecture.type === 'QUIZ' && (
+                              <Link href={`/quiz/${courseId}/${lecture.id}`} className="inline-flex shrink-0 items-center gap-1 rounded-input border border-border px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-brand-soft">
+                                <ListChecks size={13} /> Manage quiz
+                              </Link>
+                            )}
+                            <StatusPill tone={ready ? 'success' : 'warning'}>{ready ? 'Ready' : lecture.type === 'VIDEO' ? 'Needs media' : lecture.type === 'QUIZ' ? 'Quiz' : 'Draft'}</StatusPill>
                             <button className="p-1.5 text-content-muted"><MoreHorizontal size={16} /></button>
                           </div>
                         )
@@ -318,16 +327,39 @@ export default function CurriculumPage() {
                             />
                           </div>
                           <div>
-                            <label htmlFor={`lesson-content-${section.id}`} className="text-xs font-semibold text-content">Lesson content</label>
-                            <textarea
-                              id={`lesson-content-${section.id}`}
-                              value={lessonContent}
-                              onChange={(event) => setLessonContent(event.target.value)}
-                              placeholder="Write the lesson content"
-                              rows={4}
-                              className="mt-2 w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm leading-6 text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                            />
+                            <span className="text-xs font-semibold text-content">Lesson type</span>
+                            <div className="mt-2 flex gap-2">
+                              {(['READING', 'QUIZ'] as const).map((t) => (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  onClick={() => setLessonType(t)}
+                                  className={lessonType === t
+                                    ? 'rounded-input border border-primary bg-brand-soft px-3 py-1.5 text-xs font-semibold text-primary'
+                                    : 'rounded-input border border-border px-3 py-1.5 text-xs font-semibold text-content-secondary'}
+                                >
+                                  {t === 'READING' ? 'Reading' : 'Quiz'}
+                                </button>
+                              ))}
+                            </div>
                           </div>
+                          {lessonType === 'READING' ? (
+                            <div>
+                              <label htmlFor={`lesson-content-${section.id}`} className="text-xs font-semibold text-content">Lesson content</label>
+                              <textarea
+                                id={`lesson-content-${section.id}`}
+                                value={lessonContent}
+                                onChange={(event) => setLessonContent(event.target.value)}
+                                placeholder="Write the lesson content"
+                                rows={4}
+                                className="mt-2 w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm leading-6 text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                              />
+                            </div>
+                          ) : (
+                            <p className="rounded-input bg-brand-soft px-3 py-2 text-xs text-content-secondary">
+                              After adding this quiz lesson, open “Manage quiz” to build its questions.
+                            </p>
+                          )}
                           {lessonError && <p className="rounded-input bg-error/10 px-3 py-2 text-xs text-error">{lessonError}</p>}
                           <div className="flex justify-end gap-2">
                             <Button variant="outline" size="sm" onClick={closeLessonForm} disabled={createLecture.isPending}>Cancel</Button>
