@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react'
 import { quizApi } from '@/lib/api/services'
 import { apiErrorMessage } from '@/lib/api/client'
+import { useT } from '@/lib/i18n'
 import { getCachedQuizId } from '@/lib/quizCache'
 import type { QuizResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ import { PageSpinner } from '@/components/ui/spinner'
 type Phase = 'intro' | 'taking' | 'result'
 
 export default function TakeQuizPage() {
+  const t = useT()
   const params = useParams<{ courseId: string; lectureId: string }>()
   const courseId = params.courseId
   const lectureId = params.lectureId
@@ -53,7 +55,7 @@ export default function TakeQuizPage() {
       setAttemptId(id)
       setPhase('taking')
     } catch (e) {
-      setError(apiErrorMessage(e, 'Could not start the attempt.'))
+      setError(apiErrorMessage(e, t('quizTake.startError')))
     } finally {
       setBusy(false)
     }
@@ -77,7 +79,7 @@ export default function TakeQuizPage() {
       setResult(res)
       setPhase('result')
     } catch (e) {
-      setError(apiErrorMessage(e, 'Could not submit the quiz.'))
+      setError(apiErrorMessage(e, t('quizTake.submitError')))
     } finally {
       setBusy(false)
     }
@@ -89,24 +91,23 @@ export default function TakeQuizPage() {
         href={`/quiz/${courseId}/${lectureId}`}
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-content-secondary hover:text-content"
       >
-        <ArrowLeft size={15} /> Back to editor
+        <ArrowLeft size={15} /> {t('quizTake.backToEditor')}
       </Link>
 
       {!ready ? (
         <PageSpinner />
       ) : !quizId ? (
         <Card className="space-y-2 p-6 text-center">
-          <h1 className="text-base font-semibold text-content">Quiz not available here</h1>
+          <h1 className="text-base font-semibold text-content">{t('quizTake.notAvailable')}</h1>
           <p className="text-sm text-content-secondary">
-            This preview needs the quiz id, which is only known on the device that created the
-            quiz. Full student access needs the backend to expose the quiz per lecture.
+            {t('quizTake.notAvailableBody')}
           </p>
         </Card>
       ) : quizQuery.isLoading ? (
         <PageSpinner />
       ) : quizQuery.isError || !quizQuery.data ? (
         <Card className="p-6 text-center text-sm text-content-secondary">
-          {apiErrorMessage(quizQuery.error, 'This quiz could not be loaded.')}
+          {apiErrorMessage(quizQuery.error, t('quizTake.loadError'))}
         </Card>
       ) : phase === 'result' && result ? (
         <ResultView result={result} onRetake={() => {
@@ -117,14 +118,14 @@ export default function TakeQuizPage() {
         }} />
       ) : phase === 'intro' ? (
         <Card className="space-y-4 p-6 text-center">
-          <h1 className="text-title-md font-bold text-content">Ready to start?</h1>
+          <h1 className="text-title-md font-bold text-content">{t('quizTake.readyToStart')}</h1>
           <p className="text-sm text-content-secondary">
-            {questions.length} question{questions.length === 1 ? '' : 's'}
-            {quizQuery.data.timeLimitMinutes ? ` · ${quizQuery.data.timeLimitMinutes} min` : ''}
+            {questions.length} {questions.length === 1 ? t('quizTake.question') : t('quizTake.questions')}
+            {quizQuery.data.timeLimitMinutes ? ` · ${quizQuery.data.timeLimitMinutes} ${t('quizTake.min')}` : ''}
           </p>
           {error && <p className="text-sm text-error">{error}</p>}
           <Button loading={busy} onClick={start} disabled={questions.length === 0}>
-            Start attempt
+            {t('quizTake.startAttempt')}
           </Button>
         </Card>
       ) : (
@@ -161,10 +162,10 @@ export default function TakeQuizPage() {
           {error && <p className="text-sm text-error">{error}</p>}
           <div className="flex items-center justify-between">
             <span className="text-xs text-content-secondary">
-              {answeredCount}/{questions.length} answered
+              {answeredCount}/{questions.length} {t('quizTake.answered')}
             </span>
             <Button loading={busy} onClick={submit}>
-              Submit quiz
+              {t('quizTake.submitQuiz')}
             </Button>
           </div>
         </div>
@@ -174,6 +175,7 @@ export default function TakeQuizPage() {
 }
 
 function ResultView({ result, onRetake }: { result: QuizResult; onRetake: () => void }) {
+  const t = useT()
   return (
     <Card className="space-y-4 p-8 text-center">
       {result.passed ? (
@@ -183,17 +185,17 @@ function ResultView({ result, onRetake }: { result: QuizResult; onRetake: () => 
       )}
       <div>
         <h1 className="text-title-md font-bold text-content">
-          {result.passed ? 'Passed' : 'Not passed'}
+          {result.passed ? t('quizTake.passed') : t('quizTake.notPassed')}
         </h1>
         <p className="mt-1 text-3xl font-bold text-content">{Math.round(result.score)}%</p>
       </div>
       <div className="flex justify-center gap-2">
         <Badge tone={result.passed ? 'success' : 'warning'}>
-          {result.correctCount}/{result.totalQuestions} correct
+          {result.correctCount}/{result.totalQuestions} {t('quizTake.correct')}
         </Badge>
       </div>
       <Button variant="outline" onClick={onRetake}>
-        Retake
+        {t('quizTake.retake')}
       </Button>
     </Card>
   )
