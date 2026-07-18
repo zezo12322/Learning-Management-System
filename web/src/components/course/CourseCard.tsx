@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { RatingStars } from '@/components/common/RatingStars'
 import { CourseThumbnail } from './CourseThumbnail'
+import { SaveButton } from './SaveButton'
 import { formatCompact } from '@/lib/utils'
 
 const LEVEL_LABEL: Record<string, string> = {
@@ -16,35 +17,39 @@ const LEVEL_LABEL: Record<string, string> = {
 /** Vertical card used in grids and carousels (Popular Courses). */
 export function CourseGridCard({ course }: { course: Course }) {
   return (
-    <Link href={`/courses/${course.id}`} className="block">
-      <Card hover className="group overflow-hidden">
-        <div className="relative">
-          <CourseThumbnail
-            src={course.thumbnail}
-            seed={course.id}
-            label={course.title}
-            className="h-32 w-full"
-          />
-          {course.avgRating != null && (
-            <span className="absolute end-2 top-2 rounded-full bg-white/95 px-2 py-0.5 text-xs font-bold text-content shadow">
-              <RatingStars value={course.avgRating} size={11} />
-            </span>
-          )}
-        </div>
-        <div className="space-y-2 p-3">
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-content">
-            {course.title}
-          </h3>
-          <div className="flex items-center justify-between text-xs text-content-secondary">
-            <span className="inline-flex items-center gap-1">
-              <Users size={13} />
-              {formatCompact(course.ratingCount ?? 0)} reviews
-            </span>
-            {course.level && <Badge tone="muted">{LEVEL_LABEL[course.level] ?? course.level}</Badge>}
+    <div className="relative">
+      {/* Sibling of the link (not nested) so the bookmark button is valid markup */}
+      <SaveButton courseId={course.id} className="absolute start-2 top-2 z-10" />
+      <Link href={`/courses/${course.id}`} className="block">
+        <Card hover className="group overflow-hidden">
+          <div className="relative">
+            <CourseThumbnail
+              src={course.thumbnail}
+              seed={course.id}
+              label={course.title}
+              className="h-32 w-full"
+            />
+            {course.avgRating != null && (
+              <span className="absolute end-2 top-2 rounded-full bg-white/95 px-2 py-0.5 text-xs font-bold text-content shadow">
+                <RatingStars value={course.avgRating} size={11} />
+              </span>
+            )}
           </div>
-        </div>
-      </Card>
-    </Link>
+          <div className="space-y-2 p-3">
+            <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold text-content">
+              {course.title}
+            </h3>
+            <div className="flex items-center justify-between text-xs text-content-secondary">
+              <span className="inline-flex items-center gap-1">
+                <Users size={13} />
+                {formatCompact(course.ratingCount ?? 0)} reviews
+              </span>
+              {course.level && <Badge tone="muted">{LEVEL_LABEL[course.level] ?? course.level}</Badge>}
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </div>
   )
 }
 
