@@ -3,12 +3,18 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 /** Parse the raw Firebase ID token from an HTTP request. */
 export function extractBearerToken(req: any): string {
   const header = req?.headers?.authorization;
-  if (typeof header !== 'string') {
-    return '';
+  if (typeof header === 'string') {
+    const match = header.match(/^Bearer\s+(.+)$/i);
+    if (match) return match[1].trim();
   }
 
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  return match ? match[1].trim() : '';
+  // Fallback to query parameter for video streaming (Flutter Web / HTML5 video tags cannot send headers)
+  const queryToken = req?.query?.token;
+  if (typeof queryToken === 'string' && queryToken.trim().length > 0) {
+    return queryToken.trim();
+  }
+
+  return '';
 }
 
 /**

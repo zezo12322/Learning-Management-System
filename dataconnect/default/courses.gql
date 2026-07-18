@@ -30,6 +30,7 @@ query ListPublishedCourses @auth(level: PUBLIC, insecureReason: "Safe for public
     ratingCount
     category { name }
     author { name avatar }
+    activeEnrollments: enrollments_on_course { id }
   }
 }
 
@@ -51,6 +52,7 @@ query SearchPublishedCourses($searchQuery: String!) @auth(level: PUBLIC, insecur
     tags
     category { name }
     author { name avatar }
+    activeEnrollments: enrollments_on_course { id }
   }
 }
 
@@ -78,6 +80,7 @@ query ListPopularCourses($limit: Int) @auth(level: PUBLIC, insecureReason: "Popu
     ratingCount
     category { name }
     author { name avatar }
+    activeEnrollments: enrollments_on_course { id }
   }
 }
 
@@ -113,6 +116,7 @@ query ListRecommendedCourses(
     ratingCount
     category { name }
     author { name avatar }
+    activeEnrollments: enrollments_on_course { id }
   }
 }
 

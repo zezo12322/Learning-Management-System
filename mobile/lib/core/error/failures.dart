@@ -1,4 +1,7 @@
 abstract class Failure {
+  // failure message
+  // example: { "statusCode": 400, "message": ["rating must not be greater than 5"], "error": "Bad Request" }
+  // TODO: add more detailed error messages
   final String message;
   const Failure(this.message);
 }

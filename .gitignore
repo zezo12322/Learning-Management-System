@@ -1,35 +1,48 @@
 # Firebase & DataConnect
 firebase.exe
 firebase-debug.log
+firebase-debug.*.log
 dataconnect-debug.log
 pglite-debug.log
-/.firebase
+firestore-debug.log
+.firebase/
 /dataconnect/.dataconnect
-**/dataconnect-admin-generated/
+dataconnect-generated/
+dataconnect-admin-generated/
 learning-management-syst-3cc3a-firebase-adminsdk-fbsvc-c8e63b4d9f.json
+firebase-service-account.json
 
 # AI / Agents
 /.agents
 /.gemini
 
-# Node.js (Web & API)
+# Node.js (Web, API, Functions)
 node_modules/
 .npm/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-api/dist/
+lerna-debug.log*
+logs/
+*.log
+dist/
+build/
+
 web/.next/
 web/out/
 web/.turbo/
 coverage/
+.nyc_output/
 .eslintcache
 *.tsbuildinfo
-backend/node_modules/
-backend/dist/
-backend/.env
-backend/.env.* 
+.temp
+.tmp
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Flutter / Mobile
 mobile/.dart_tool/
@@ -48,6 +61,7 @@ mobile/**/ephemeral/
 .env
 .env.*
 *.local
+.secret.local
 mobile/android/app/google-services.json
 mobile/ios/Runner/GoogleService-Info.plist
 
@@ -58,10 +72,29 @@ mobile/ios/Runner/GoogleService-Info.plist
 Thumbs.db
 ehthumbs.db
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 *~
+# Generated SDKs
+dataconnect_generated/
+
+# IDE
+*.iml
+
+# CI/CD
+.github/
+functions/lib/

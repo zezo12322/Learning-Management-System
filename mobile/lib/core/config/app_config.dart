@@ -11,7 +11,7 @@ class AppConfig {
   static String get apiBaseUrl {
     switch (_environment) {
       case Environment.development:
-        return 'http://localhost:3001/api/v1';
+        return 'https://learning-management-system-production-a97c.up.railway.app/api/v1';
       case Environment.staging:
         return 'https://api-staging.optimatech.io/api/v1';
       case Environment.production:

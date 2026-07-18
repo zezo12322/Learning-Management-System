@@ -915,6 +915,93 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       }
     }
   `,
+
+  // Instructor course-overview analytics (CoursesService.getOverview reduces
+  // these raw rows into the summary counts). NO_ACCESS in the connector; run via
+  // the service account after CourseAccessGuard verifies ownership.
+  AdminGetCourseOverview: /* GraphQL */ `
+    query AdminGetCourseOverview($courseId: UUID!) {
+      course(id: $courseId) {
+        id
+        title
+        description
+        price
+        status
+        language
+        level
+        thumbnail
+        tags
+        avgRating
+        ratingCount
+        createdAt
+        updatedAt
+        deletedAt
+        category {
+          id
+          name
+        }
+        author {
+          id
+          name
+          email
+          avatar
+        }
+        createdBy {
+          id
+          name
+        }
+        instructors: courseInstructors_on_course {
+          user {
+            id
+            name
+            email
+            avatar
+          }
+        }
+        sections: courseSections_on_course(
+          where: { deletedAt: { eq: null } }
+          orderBy: [{ order: ASC }]
+        ) {
+          id
+          title
+          order
+          lectures: courseLectures_on_section(
+            where: { deletedAt: { eq: null } }
+            orderBy: [{ order: ASC }]
+          ) {
+            id
+            type
+            duration
+            progress: lectureProgresses_on_lecture {
+              completedAt
+              user {
+                id
+              }
+            }
+          }
+        }
+        enrollments: enrollments_on_course {
+          status
+          enrolledAt
+          completedAt
+          user {
+            id
+          }
+        }
+        ratings: courseRatings_on_course {
+          rating
+        }
+        missions: missions_on_course(where: { deletedAt: { eq: null } }) {
+          id
+          title
+          difficulty
+          submissions: missionSubmissions_on_mission {
+            status
+          }
+        }
+      }
+    }
+  `,
   GetSubmissionForGrading: /* GraphQL */ `
     query GetSubmissionForGrading($submissionId: UUID!) {
       missionSubmission(id: $submissionId) {
@@ -1323,6 +1410,7 @@ export const FORCE_ADMIN_OPERATIONS: ReadonlySet<string> = new Set([
   'AdminGetCourse',
   'AdminGetMission',
   'GetCourseInstructors',
+  'AdminGetCourseOverview',
   'GetSubmissionForGrading',
   // Student-taking write path (formerly @auth USER, directly client-callable)
   'StartQuizAttempt',

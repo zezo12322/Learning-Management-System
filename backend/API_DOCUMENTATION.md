@@ -41,6 +41,24 @@ Common statuses: `400` validation · `401` missing/expired token · `403` wrong 
 
 ---
 
+## 0.5. SDK vs. REST API Routing Guidelines
+
+Our application uses a hybrid architecture combining Firebase Data Connect (FDC) client SDKs with this NestJS backend. To optimize performance and reduce server load, client applications (Flutter, Web) MUST follow these routing rules:
+
+### 1. Use the FDC Client SDK natively (Skip NestJS)
+For all **Public & Student Data-Reading Operations**, use the generated FDC SDK (`mobile/lib/dataconnect_generated`). FDC securely processes these queries with zero middleman latency via `@auth(level: PUBLIC)` or `@auth(level: USER)`.
+- **Discovery:** Fetching popular courses, recommended courses, course catalogs.
+- **Curriculum:** Loading course details, sections, and lecture metadata.
+- **Progress:** Fetching user enrollments and completed lectures.
+
+### 2. Use this NestJS REST API
+For all **Authoring, Heavy Compute, and Complex RBAC**, use the endpoints documented in this file. The backend connects to Postgres using a privileged Admin SDK to bypass `NO_ACCESS` limits on mutations.
+- **Instructor Authoring:** Creating courses, uploading videos, editing quizzes (requires deep relational ownership checks).
+- **Multimedia:** Video transcoding triggers, HLS streaming key retrieval, and chunked file uploads.
+- **High-Frequency Writes:** Video progress playback heartbeats.
+
+---
+
 ## 1. Health
 
 ### `GET /health`
@@ -268,7 +286,7 @@ Returns an empty array if the caller isn't enrolled in anything.
 
 ### `GET /courses/:courseId/videos`
 Descriptions of every **uploaded video lecture** in a course (`type: VIDEO`), grouped-flat across sections in curriculum order. **User**, access-gated.
-The `description` is each video lecture's descriptive copy. Access mirrors the curriculum: the course **owner/admin or an active enrollee** sees every description; any other caller sees the video list but gets `description: null` for non-free-preview videos (paid copy is withheld, free-preview descriptions are always shown).
+The `description` is each video lecture's descriptive copy. Access mirrors the curriculum: the course **owner/admin or an active/completed enrollee** sees every description; any other caller sees the video list but gets `description: null` for non-free-preview videos (paid copy is withheld, free-preview descriptions are always shown).
 **Response `200`:**
 ```json
 {
@@ -332,6 +350,70 @@ Courses the caller authored. **Response `200`:** array of course objects.
 
 ### `GET /courses/:courseId`
 Full admin view (includes sections/lectures). **Owner.** **Response `200`:** the full course object. `404` if not found / not owned.
+
+### `GET /courses/:courseId/overview`
+Instructor analytics for a single course — course details, content counts, enrollment breakdown, completion/progress stats and ratings. **Owner** (admins pass unconditionally). Aggregated server-side from a single privileged read, so it is cheap for the client to render a dashboard.
+
+- **Progress stats are scoped to "learners"** = enrollments with status `ACTIVE` or `COMPLETED`, deduped by user (a re-enrolled student counts once). A lecture counts as done only when its progress row is `completedAt`-stamped.
+- `averageCompletionPercent` = mean, over learners, of `completedLectures / totalLectures` (0–100, 2-dp).
+- `completionRatePercent` = `fullyCompletedLearners / activeLearners` (0–100, 2-dp), where a *fully-completed* learner has finished every lecture.
+- `enrollments.total` / `byStatus` count **raw** enrollment rows (re-enrollments included).
+- `content.totalQuizzes` = lectures of type `QUIZ`; `assignments` = the course's missions plus their submission breakdown.
+- `ratings.average` / `count` come from the denormalised course aggregate; `distribution` is the per-star (1–5) histogram.
+
+**Response `200`:**
+```json
+{
+  "course": {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "title": "Advanced Kubernetes",
+    "description": "Deep dive",
+    "price": 9900,
+    "status": "PUBLISHED",
+    "language": "en",
+    "level": "ADVANCED",
+    "thumbnail": "courses/…/thumb.png",
+    "tags": ["k8s", "devops"],
+    "category": { "id": "…", "name": "Cloud" },
+    "author": { "id": "uid-…", "name": "Sam", "email": "sam@x.io", "avatar": null },
+    "createdAt": "2026-01-01T00:00:00Z",
+    "updatedAt": "2026-02-01T00:00:00Z"
+  },
+  "instructors": [
+    { "id": "uid-…", "name": "Sam", "email": "sam@x.io", "avatar": null }
+  ],
+  "content": {
+    "totalSections": 4,
+    "totalLectures": 22,
+    "lecturesByType": { "VIDEO": 16, "READING": 4, "INTERACTIVE": 0, "QUIZ": 2 },
+    "totalQuizzes": 2,
+    "totalDurationSeconds": 13840
+  },
+  "assignments": {
+    "total": 1,
+    "submissions": {
+      "total": 12,
+      "byStatus": { "PENDING": 3, "GRADED": 8, "RETURNED": 1, "REJECTED": 0 }
+    }
+  },
+  "enrollments": {
+    "total": 57,
+    "byStatus": { "ACTIVE": 40, "COMPLETED": 12, "DROPPED": 4, "SUSPENDED": 1 }
+  },
+  "progress": {
+    "activeLearners": 52,
+    "averageCompletionPercent": 63.46,
+    "fullyCompletedLearners": 12,
+    "completionRatePercent": 23.08
+  },
+  "ratings": {
+    "average": 4.5,
+    "count": 20,
+    "distribution": { "1": 0, "2": 1, "3": 2, "4": 4, "5": 13 }
+  }
+}
+```
+**Errors:** `403` if the caller doesn't own the course; `404` if not found / soft-deleted.
 
 ### `PATCH /courses/:courseId`
 Update course. **Owner.** All fields optional; same shape as create plus `thumbnail?`.
@@ -425,7 +507,7 @@ Move a lecture to another section.
 **Body:** `{ "targetSectionId": "<uuid>", "targetOrder": 2 }` (`targetOrder` ≥1) → **`200`** `{ "success": true }`
 
 ### `GET /lectures/:lectureId`
-**Student-facing** lecture content. **User**, access-gated (owner/admin or active enrollee).
+**Student-facing** lecture content. **User**, access-gated (owner/admin or active/completed enrollee).
 
 **Response `200`:**
 ```json
@@ -642,7 +724,7 @@ Student-safe view (**no `isCorrect`**). Render the quiz from this.
 #### `POST /courses/:courseId/quizzes/:quizId/attempts`
 Start an attempt.
 **Response `201`:** `{ "quizAttempt_insert": { "id": "attempt-uuid" } }`
-**Errors:** `403` no active enrollment / max attempts exceeded · `400` an attempt is already in progress.
+**Errors:** `403` no active/completed enrollment / max attempts exceeded · `400` an attempt is already in progress.
 
 #### `POST …/attempts/:attemptId/answers`
 Submit one answer.
@@ -755,9 +837,9 @@ Same fields, optional. → **`200`** `{ "missionMicroLesson_update": { "id": "�
 **Response `201`:** `{ "missionTemplate_insert": { "id": "…", "fileUrl": "…" } }`
 
 ### `GET /missions/:missionId/templates`
-**User**, access-gated: the mission's owner/admin **or** a caller with an `ACTIVE` enrollment in the mission. `fileUrl` is a short-lived signed read URL.
+**User**, access-gated: the mission's owner/admin **or** a caller with an `ACTIVE` or `COMPLETED` enrollment in the mission. `fileUrl` is a short-lived signed read URL.
 **Response `200`:** array of `{ id, title, fileUrl, fileType }`.
-**Errors:** `403` if the caller neither owns the mission nor has an active enrollment.
+**Errors:** `403` if the caller neither owns the mission nor has an active/completed enrollment.
 
 ### `DELETE /missions/:missionId/templates/:templateId`
 **Instructor/Admin, owner.** → **`200`** `{ "missionTemplate_delete": { … } }`
@@ -789,7 +871,7 @@ Same fields, optional. → **`200`** `{ "rubricCriterion_update": { "id": "…" 
 **User (student), enrolled.** Upload the file first (§18), then submit its URL.
 **Body:** `{ "fileUrl": "https://…/deliverable.pdf" }` (required, ≤2000 chars).
 **Response `201`:** `{ "missionSubmission_insert": { "id": "…" } }`
-**Errors:** `403` if not actively enrolled in the mission.
+**Errors:** `403` if not actively or completely enrolled in the mission.
 
 ### `GET /me/submissions`
 **User.** My submissions + scores + feedback.
@@ -907,7 +989,7 @@ Because nothing is public, playback is a short, guarded handshake between the pl
 **Lifetimes (defaults):** signed segment URLs and the `kt` key token both live **6 hours** (`STREAM_URL_TTL_MINUTES=360`). The Firebase ID token lives **1 hour** — so for long sessions the player must use a *fresh* Firebase token on the key request (Firebase SDKs auto-refresh; just call `getIdToken()` at request time, §19.5).
 
 ### 19.2 `GET /lectures/:lectureId/stream/manifest?v=<variant>`
-**User** — access-gated: allowed if the lecture is a free preview, **or** the caller owns/admins the course, **or** the caller has an `ACTIVE` enrollment.
+**User** — access-gated: allowed if the lecture is a free preview, **or** the caller owns/admins the course, **or** the caller has an `ACTIVE` or `COMPLETED` enrollment.
 
 - **Query:** `v` (optional) selects a sub-playlist/variant for adaptive-bitrate masters. **You never build this yourself** — the master playlist the API returns already contains the correct `?v=…` URLs; the player follows them automatically.
 - **Response `200`** — headers `Content-Type: application/vnd.apple.mpegurl`, `Cache-Control: no-store`. Body is the rewritten `.m3u8` text. **Give this URL to an HLS-capable player; do not parse it yourself.**
