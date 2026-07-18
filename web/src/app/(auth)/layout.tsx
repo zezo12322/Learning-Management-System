@@ -4,15 +4,17 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { BookOpen, Bot, Check, UploadCloud } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import { useT } from '@/lib/i18n'
 
 const VALUE_POINTS = [
-  { icon: BookOpen, title: 'Course builder', body: 'Structure sections, lessons, and resources.' },
-  { icon: UploadCloud, title: 'Reliable video flow', body: 'Track upload and transcoding end to end.' },
-  { icon: Bot, title: 'AI tools', body: 'Course generation and tutor experiences are coming soon.' },
+  { icon: BookOpen, titleKey: 'auth.value.builder.title', bodyKey: 'auth.value.builder.body' },
+  { icon: UploadCloud, titleKey: 'auth.value.video.title', bodyKey: 'auth.value.video.body' },
+  { icon: Bot, titleKey: 'auth.value.ai.title', bodyKey: 'auth.value.ai.body' },
 ]
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth()
+  const t = useT()
   const router = useRouter()
 
   useEffect(() => {
@@ -31,23 +33,23 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="relative mt-24 max-w-lg">
-          <p className="text-xs font-semibold tracking-[0.14em] text-primary-200">THE COMPLETE LMS WORKSPACE</p>
+          <p className="text-xs font-semibold tracking-[0.14em] text-primary-200">{t('auth.hero.eyebrow')}</p>
           <h1 className="mt-6 text-[44px] font-bold leading-[1.45] tracking-tight">
-            Build courses faster.<br />Teach with confidence.
+            {t('auth.hero.title1')}<br />{t('auth.hero.title2')}
           </h1>
           <p className="mt-5 max-w-md text-base leading-7 text-primary-100">
-            Create, upload, and publish structured learning experiences. AI tools will be introduced in a future release.
+            {t('auth.hero.subtitle')}
           </p>
 
           <div className="mt-12 space-y-4">
             {VALUE_POINTS.map((item) => (
-              <div key={item.title} className="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+              <div key={item.titleKey} className="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
                   <item.icon size={19} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-primary-100">{item.body}</p>
+                  <p className="text-sm font-semibold">{t(item.titleKey)}</p>
+                  <p className="mt-1 text-xs text-primary-100">{t(item.bodyKey)}</p>
                 </div>
                 <Check size={16} className="ml-auto text-primary-200" />
               </div>
@@ -55,7 +57,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        <p className="relative mt-auto text-xs text-primary-200">Built for instructors, reviewers, and learners.</p>
+        <p className="relative mt-auto text-xs text-primary-200">{t('auth.hero.footer')}</p>
       </section>
 
       <section className="flex min-h-screen items-center justify-center bg-surface px-5 py-10 sm:px-10">
