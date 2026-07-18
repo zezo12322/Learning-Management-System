@@ -11,6 +11,7 @@ dataconnect-generated/
 dataconnect-admin-generated/
 learning-management-syst-3cc3a-firebase-adminsdk-fbsvc-c8e63b4d9f.json
 firebase-service-account.json
+**/firebase-service-account*.json
 
 # AI / Agents
 /.agents
@@ -30,6 +31,9 @@ dist/
 build/
 
 web/.next/
+web/.open-next/
+web/.wrangler/
+web/cloudflare-env.d.ts
 web/out/
 web/.turbo/
 coverage/
@@ -60,6 +64,7 @@ mobile/**/ephemeral/
 # Secrets & Configs
 .env
 .env.*
+!web/.env.local.example
 *.local
 .secret.local
 mobile/android/app/google-services.json
