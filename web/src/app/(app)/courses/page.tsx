@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Clock3, FileEdit, Plus, Search } from 'lucide-react'
 import { authoringApi } from '@/lib/api/services'
+import { useT } from '@/lib/i18n'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { CourseWorkspaceCard } from '@/components/workspace/CourseWorkspaceCard'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils'
 type Filter = 'ALL' | 'DRAFT' | 'PUBLISHED'
 
 export default function CoursesPage() {
+  const t = useT()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('ALL')
   const authoringQuery = useQuery({
@@ -31,25 +33,25 @@ export default function CoursesPage() {
     [authoringCourses, filter, normalizedSearch]
   )
   const stats = [
-    { label: 'Total courses', value: authoringCourses.length, icon: Clock3, tone: 'bg-brand-soft text-primary' },
-    { label: 'Drafts', value: authoringCourses.filter((course) => course.status === 'DRAFT').length, icon: FileEdit, tone: 'bg-subtle text-content-secondary' },
-    { label: 'Published', value: authoringCourses.filter((course) => course.status === 'PUBLISHED').length, icon: CheckCircle2, tone: 'bg-success/10 text-success' },
+    { label: t('courses.totalCourses'), value: authoringCourses.length, icon: Clock3, tone: 'bg-brand-soft text-primary' },
+    { label: t('courses.drafts'), value: authoringCourses.filter((course) => course.status === 'DRAFT').length, icon: FileEdit, tone: 'bg-subtle text-content-secondary' },
+    { label: t('courses.published'), value: authoringCourses.filter((course) => course.status === 'PUBLISHED').length, icon: CheckCircle2, tone: 'bg-success/10 text-success' },
   ]
   const accessDenied = apiErrorStatus(authoringQuery.error) === 403
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Courses"
-        description="Create, organize, and publish your courses."
-        action={<Link href="/studio/new/setup"><Button><Plus size={16} /> Create course</Button></Link>}
+        title={t('courses.title')}
+        description={t('courses.subtitle')}
+        action={<Link href="/studio/new/setup"><Button><Plus size={16} /> {t('common.createCourse')}</Button></Link>}
       />
 
       {authoringQuery.isError && (
         <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
           {accessDenied
-            ? 'Your account needs administrator or instructor access to manage courses.'
-            : 'We could not load your courses. Try again in a moment.'}
+            ? t('courses.accessDenied')
+            : t('courses.loadError')}
         </Card>
       )}
 
@@ -73,21 +75,21 @@ export default function CoursesPage() {
               onClick={() => setFilter(item)}
               className={cn('rounded-full px-4 py-2 text-xs font-medium transition-colors', filter === item ? 'bg-brand-soft text-primary ring-1 ring-primary' : 'bg-surface text-content-secondary ring-1 ring-border')}
             >
-              {item === 'ALL' ? 'All courses' : item === 'DRAFT' ? 'Drafts' : 'Published'}
+              {item === 'ALL' ? t('courses.allCourses') : item === 'DRAFT' ? t('courses.drafts') : t('courses.published')}
             </button>
           ))}
         </div>
-        <Input className="w-full sm:ms-auto sm:w-72" value={search} onChange={(event) => setSearch(event.target.value)} icon={<Search size={16} />} placeholder="Search courses…" />
+        <Input className="w-full sm:ms-auto sm:w-72" value={search} onChange={(event) => setSearch(event.target.value)} icon={<Search size={16} />} placeholder={t('courses.searchPlaceholder')} />
       </div>
 
       {authoringQuery.isLoading ? (
-        <Card className="py-16 text-center text-sm text-content-secondary">Loading courses…</Card>
+        <Card className="py-16 text-center text-sm text-content-secondary">{t('courses.loading')}</Card>
       ) : filteredAuthoring.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredAuthoring.map((course, index) => <CourseWorkspaceCard key={course.id} course={course} featured={index === 1} />)}
         </div>
       ) : !authoringQuery.isError ? (
-        <Card className="py-16 text-center text-sm text-content-secondary">No courses match this view.</Card>
+        <Card className="py-16 text-center text-sm text-content-secondary">{t('courses.noMatch')}</Card>
       ) : null}
     </div>
   )

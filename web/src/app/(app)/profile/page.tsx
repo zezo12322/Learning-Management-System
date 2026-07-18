@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi, meApi } from '@/lib/api/services'
+import { useT } from '@/lib/i18n'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import { Label } from '@/components/ui/label'
 import { StatusPill } from '@/components/workspace/StatusPill'
 
 export default function ProfilePage() {
+  const t = useT()
   const { me, logout, refreshMe } = useAuth()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -41,20 +43,20 @@ export default function ProfilePage() {
   })
   const signOut = async () => { await logout(); router.push('/login') }
 
-  if (profileQuery.isLoading && !user) return <Card className="p-8 text-sm text-content-secondary">Loading the signed-in user…</Card>
-  if (profileQuery.isError || !user) return <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">The signed-in database user could not be loaded.</Card>
+  if (profileQuery.isLoading && !user) return <Card className="p-8 text-sm text-content-secondary">{t('profile.loadingUser')}</Card>
+  if (profileQuery.isError || !user) return <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">{t('profile.loadError')}</Card>
 
   const authoredCourses = coursesQuery.data ?? []
   const publishedCourses = authoredCourses.filter((course) => course.status === 'PUBLISHED').length
   const profileStats = [
-    { icon: BookOpen, value: coursesQuery.isLoading ? '…' : coursesQuery.isError ? 'Unavailable' : authoredCourses.length, label: 'Authored courses' },
-    { icon: CheckCircle2, value: coursesQuery.isLoading ? '…' : coursesQuery.isError ? 'Unavailable' : publishedCourses, label: 'Published' },
-    { icon: ShieldCheck, value: user.roles.length, label: 'Assigned roles' },
+    { icon: BookOpen, value: coursesQuery.isLoading ? '…' : coursesQuery.isError ? t('profile.unavailable') : authoredCourses.length, label: t('profile.stat.authored') },
+    { icon: CheckCircle2, value: coursesQuery.isLoading ? '…' : coursesQuery.isError ? t('profile.unavailable') : publishedCourses, label: t('profile.stat.published') },
+    { icon: ShieldCheck, value: user.roles.length, label: t('profile.stat.roles') },
   ]
 
   return (
     <div className="space-y-6">
-      <PageHeader title="User profile" description="Manage the signed-in database user and instructor profile." />
+      <PageHeader title={t('profile.title')} description={t('profile.subtitle')} />
       <div className="grid gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
         <Card className="h-fit p-6 text-center">
           <Avatar src={user.avatar} name={user.name} size={92} className="mx-auto" />
@@ -62,10 +64,10 @@ export default function ProfilePage() {
           <p className="mt-1 text-sm text-content-secondary">{user.email}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
             {user.roles.map((role) => <StatusPill key={role} tone="brand">{role}</StatusPill>)}
-            {!user.roles.length && <StatusPill tone="neutral">No role assigned</StatusPill>}
+            {!user.roles.length && <StatusPill tone="neutral">{t('profile.noRole')}</StatusPill>}
           </div>
-          <div className="mt-5 rounded-input bg-subtle p-3 text-left text-[11px] text-content-secondary"><span className="font-semibold text-content">User ID</span><span className="mt-1 block break-all">{user.uid}</span></div>
-          <Button variant="outline" fullWidth className="mt-6" onClick={signOut}><LogOut size={16} /> Sign out</Button>
+          <div className="mt-5 rounded-input bg-subtle p-3 text-left text-[11px] text-content-secondary"><span className="font-semibold text-content">{t('profile.userId')}</span><span className="mt-1 block break-all">{user.uid}</span></div>
+          <Button variant="outline" fullWidth className="mt-6" onClick={signOut}><LogOut size={16} /> {t('nav.signOut')}</Button>
         </Card>
 
         <div className="space-y-5">
@@ -76,17 +78,17 @@ export default function ProfilePage() {
           </div>
 
           <Card className="p-5 sm:p-6">
-            <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-primary"><UserRound size={19} /></span><div><h2 className="text-lg font-semibold text-content">Profile details</h2><p className="text-xs text-content-secondary">Saved to the current user record.</p></div></div>
+            <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-primary"><UserRound size={19} /></span><div><h2 className="text-lg font-semibold text-content">{t('profile.detailsTitle')}</h2><p className="text-xs text-content-secondary">{t('profile.detailsSubtitle')}</p></div></div>
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              <div><Label>Full name</Label><Input value={user.name} disabled /></div>
-              <div><Label>Email address</Label><Input value={user.email} disabled /></div>
-              <div><Label htmlFor="profile-company">Company</Label><Input id="profile-company" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
-              <div><Label htmlFor="profile-phone">Phone</Label><Input id="profile-phone" value={phone} onChange={(event) => setPhone(event.target.value)} /></div>
-              <div className="sm:col-span-2"><Label htmlFor="profile-bio">Bio</Label><textarea id="profile-bio" value={bio} onChange={(event) => setBio(event.target.value)} rows={5} className="w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary" /></div>
+              <div><Label>{t('reg.fullName')}</Label><Input value={user.name} disabled /></div>
+              <div><Label>{t('auth.email')}</Label><Input value={user.email} disabled /></div>
+              <div><Label htmlFor="profile-company">{t('profile.company')}</Label><Input id="profile-company" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
+              <div><Label htmlFor="profile-phone">{t('profile.phone')}</Label><Input id="profile-phone" value={phone} onChange={(event) => setPhone(event.target.value)} /></div>
+              <div className="sm:col-span-2"><Label htmlFor="profile-bio">{t('profile.bio')}</Label><textarea id="profile-bio" value={bio} onChange={(event) => setBio(event.target.value)} rows={5} className="w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary" /></div>
             </div>
-            {updateProfile.isError && <p className="mt-4 text-xs text-error">{apiErrorMessage(updateProfile.error, 'Profile update failed.')}</p>}
-            {updateProfile.isSuccess && <p className="mt-4 text-xs text-success">Profile saved to the database.</p>}
-            <div className="mt-5 flex justify-end"><Button loading={updateProfile.isPending} onClick={() => updateProfile.mutate()}><Save size={16} /> Save profile</Button></div>
+            {updateProfile.isError && <p className="mt-4 text-xs text-error">{apiErrorMessage(updateProfile.error, t('profile.updateFailed'))}</p>}
+            {updateProfile.isSuccess && <p className="mt-4 text-xs text-success">{t('profile.saveSuccess')}</p>}
+            <div className="mt-5 flex justify-end"><Button loading={updateProfile.isPending} onClick={() => updateProfile.mutate()}><Save size={16} /> {t('profile.save')}</Button></div>
           </Card>
         </div>
       </div>
