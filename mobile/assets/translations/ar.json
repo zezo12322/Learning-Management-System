@@ -1,5 +1,5 @@
 {
-  "app_name": "الطلب الذكي بالـ QR",
+  "app_name": "OptimaTech",
   "common": {
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -13,7 +13,20 @@
     "search": "بحث",
     "close": "إغلاق",
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "error_widget": {
+      "title": "حدث خطأ ما",
+      "default_message": "يرجى المحاولة مره اخرى",
+      "retry_button": "إعادة المحاولة"
+    },
+    "dialog": {
+      "error_title": "خطأ",
+      "success_title": "نجح",
+      "warning_title": "تحذير",
+      "ok": "حسناً",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء"
+    }
   },
   "errors": {
     "network": "لا يوجد اتصال بالإنترنت. تحقق من الشبكة.",
@@ -35,18 +48,238 @@
       "email_required": "البريد الإلكتروني مطلوب",
       "email_not_match": "من فضلك أدخل بريد إلكتروني صحيح",
       "password_required": "الرقم السري مطلوب",
-      "password_length": "الرقم السري يجب أن يكون 6 أحرف على الأقل"
+      "password_length": "الرقم السري يجب أن يكون 6 أحرف على الأقل",
+      "full_name_required": "الاسم الكامل مطلوب",
+      "full_name_length": "يجب أن يتكون الاسم من 3 أحرف على الأقل",
+      "phone_required": "رقم الهاتف مطلوب",
+      "phone_not_match": "يرجى إدخال رقم هاتف صحيح",
+      "confirm_password_required": "يرجى تأكيد كلمة المرور",
+      "passwords_not_match": "كلمتا المرور غير متطابقتين"
     },
     "password_hint": "أدخل كلمة المرور",
     "show_password": "اظهر كلمه المرور",
-    "hide_password": "اخفاء كلمه المرور"
+    "hide_password": "اخفاء كلمه المرور",
+    "login_screen": {
+      "welcome": "أهلاً\nبعودتك!",
+      "subtitle": "سجّل دخولك لمواصلة\nرحلتك التعليمية.",
+      "email_label": "البريد الإلكتروني",
+      "email_hint": "alex@example.com",
+      "password_label": "كلمة المرور",
+      "password_hint": "أدخل كلمة المرور",
+      "remember_me": "تذكّرني",
+      "forgot_password": "نسيت كلمة المرور؟",
+      "login_btn": "تسجيل الدخول",
+      "or_continue": "أو تابع بـ",
+      "google_btn": "المتابعة بـ Google",
+      "no_account": "ليس لديك حساب؟",
+      "register": "إنشاء حساب"
+    },
+    "signup_screen": {
+      "create_account": "إنشاء\nحساب",
+      "subtitle": "انضم إلى Optima وابدأ\nرحلتك التعليمية اليوم",
+      "full_name": "الاسم الكامل",
+      "enter_full_name": "أدخل اسمك الكامل",
+      "email": "البريد الإلكتروني",
+      "enter_email": "أدخل بريدك الإلكتروني",
+      "phone_number": "رقم الهاتف",
+      "enter_phone_number": "أدخل رقم هاتفك",
+      "password": "كلمة المرور",
+      "create_password": "أنشئ كلمة مرور",
+      "confirm_password": "تأكيد كلمة المرور",
+      "confirm_your_password": "أعد إدخال كلمة المرور",
+      "agree_terms": "أوافق على ",
+      "terms_of_service": "شروط الاستخدام",
+      "and": " و ",
+      "privacy_policy": "سياسة الخصوصية.",
+      "create_account_button": "إنشاء حساب",
+      "already_have_account": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول",
+      "success": "تم انشاء الحساب بنجاح."
+    },
+    "error":{
+      "weakPassword": "كلمة المرور ضعيفة جدًا.",
+      "emailAlreadyInUse": "الحساب موجود بالفعل لهذا البريد الإلكتروني.",
+      "networkError": "تأكد من اتصالك بالإنترنت.",
+      "genericError": "هناك خطأ ما، حاول مرة أخري.",
+      "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
+      "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى.",
+      "accept_terms_required": "accept terms is required"
+    }
   },
   "home": {
-    "welcome": "أهلاً بك"
+    "welcome": "أهلاً بعودتك",
+    "continue_learning": "أكمل التعلّم",
+    "popular_courses": "الكورسات الشائعة",
+    "recommended_courses": "كورسات مقترحة لك",
+    "keep_learning_recommendations": "استمر في التعلم للحصول على اقتراحات مخصصة",
+    "assignments_missions": "التكليفات / المهام",
+    "view_all": "عرض الكل",
+    "in_progress": "قيد التقدم",
+    "students": "طالب",
+    "lessons": "دروس",
+    "of_lessons": "{completed} من {total} دروس",
+    "min_left": "متبقي {time}",
+    "min": "دقيقة",
+    "inProgress": "جاري الدراسة",
+    "error_title": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "assignments": {
+      "available": "متاحة",
+      "submitted": "تم التسليم",
+      "graded": "تم التقييم",
+      "empty": "لا توجد تكليفات",
+      "available_desc": "مفتوحة للتسليم",
+      "submitted_desc": "بانتظار المراجعة",
+      "graded_desc": "عرض الملاحظات",
+      "empty_desc": "أنت منجز كل شيء"
+    }
+  },
+  "nav_bar": {
+    "home": "الرئيسية",
+    "courses": "الكورسات",
+    "wishlist": "المفضلة",
+    "profile": "الملف الشخصي"
   },
   "navigation": {
     "not_found": "الصفحة غير موجودة",
     "not_found_msg": "المسار الذي طلبته غير موجود.",
     "go_home": "الذهاب للرئيسية"
+  },
+  "course_details": {
+    "you_might_also_like": "قد يعجبك أيضاً"
+  },
+  "courses": {
+    "title": "الكورسات",
+    "searchHint": "ابحث عن كورسات أو دروس أو اختبارات...",
+    "categories": {
+      "title": "التصنيفات",
+      "viewAll": "عرض الكل",
+      "empty": "لا توجد تصنيفات"
+    },
+    "list": {
+      "empty": "لا توجد كورسات",
+      "lessonsCount": "{count} درس"
+    },
+    "filters": {
+      "all": "الكل",
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "status": {
+      "inProgress": "قيد التقدم",
+      "completed": "مكتمل",
+      "popular": "الأكثر شيوعًا",
+      "new": "جديد"
+    },
+    "errors": {
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "filterSheet": {
+      "title": "تصفية",
+      "courseStatus": "حالة الكورس",
+      "sortBy": "الترتيب حسب",
+      "reset": "إعادة تعيين",
+      "apply": "تطبيق"
+    },
+    "sort": {
+      "newest": "الأحدث",
+      "oldest": "الأقدم",
+      "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
+      "priceHighToLow": "السعر: من الأعلى إلى الأقل"
+    }
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "common": {
+      "edit": "تعديل",
+      "view_all": "عرض الكل"
+    },
+    "header": {
+      "role": "طالب",
+      "joined": "انضم في {}",
+      "stats": {
+        "courses": "الكورسات المسجل بها",
+        "courses_subtitle": "تعلّم نشط",
+        "hours": "ساعات التعلّم",
+        "hours_subtitle": "+12 هذا الأسبوع",
+        "assessments": "التقييمات المكتملة",
+        "assessments_subtitle": "متوسط 85%",
+        "certificates": "الشهادات المكتسبة",
+        "certificates_subtitle": "استمر!"
+      }
+    },
+    "sections": {
+      "user_information": "معلومات المستخدم",
+      "learning_statistics": "إحصائيات التعلّم",
+      "certificates": "الشهادات",
+      "completed_courses": "الكورسات المكتملة",
+      "settings": "الإعدادات"
+    },
+    "info": {
+      "full_name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "location": "الموقع",
+      "birth_date": "تاريخ الميلاد"
+    },
+    "statistics": {
+      "hours": "ساعات التعلّم",
+      "hours_subtitle": "+12 هذا الأسبوع",
+      "courses": "الكورسات المسجل بها",
+      "courses_subtitle": "تعلّم نشط",
+      "certificates": "الشهادات",
+      "certificates_subtitle": "مكتملة",
+      "assessments": "التقييمات",
+      "assessments_subtitle": "متوسط 85%"
+    },
+    "certificates": {
+      "issued_on": "تم الإصدار في {date}",
+      "verified": "موثقة"
+    },
+    "completed_courses": {
+      "completed_on": "اكتمل في {date}",
+      "completed": "مكتمل"
+    },
+    "settings": {
+      "account": "إعدادات الحساب",
+      "notifications": "تفضيلات الإشعارات",
+      "privacy": "الخصوصية والأمان",
+      "help": "المساعدة والدعم",
+      "logout": "تسجيل الخروج",
+      "logout_dialog": "تسجيل الخروج؟",
+      "log_out_confirmation": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+      "language": "اللغة",
+      "select_language": "اختر اللغة",
+      "change_Theme": " تغيير المظهر",
+      "select_theme": "اختر المظهر"
+    }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "فشل تحميل الدرس، يرجى المحاولة مرة أخرى لاحقًا.",
+      "error_playing": "خطأ في تشغيل الفيديو"
+    },
+    "actions": {
+      "previous": "السابق",
+      "mark_complete": "إكمال الدرس",
+      "next": "التالي"
+    },
+    "tabs": {
+      "curriculum": "المحتوى",
+      "notes": "الملاحظات",
+      "resources": "الموارد",
+      "discussion": "النقاش"
+    },
+    "curriculum": {
+      "title": "محتوى الدورة",
+      "lessons_count": "{count} درس",
+      "now_playing": "يتم تشغيله الآن"
+    },
+    "about": {
+      "title": "حول هذا الدرس",
+      "description": "تعرّف على أساليب مختلفة لبحث المستخدم وكيف تختار الأنسب لمشروعك."
+    }
   }
 }

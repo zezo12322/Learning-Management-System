@@ -132,7 +132,8 @@ export class StreamingService {
       { courseId },
       token,
     );
-    return enrollment?.enrollments?.[0]?.status === 'ACTIVE';
+    const enrollmentStatus = enrollment?.enrollments?.[0]?.status;
+    return enrollmentStatus === 'ACTIVE' || enrollmentStatus === 'COMPLETED';
   }
 
   /**

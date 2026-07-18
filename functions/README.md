@@ -38,8 +38,17 @@ functions/
 ## 💻 Developer Guide
 
 ### Prerequisites
-Make sure you have installed the project dependencies:
+Make sure you have installed the project dependencies and the Firebase CLI.
+
+> **⚠️ CRITICAL SETUP STEP:** The auto-generated Firebase Data Connect SDKs are intentionally **ignored** by Git to prevent merge conflicts. Before you build or deploy these functions, you **must** generate the SDK locally!
+
 ```bash
+# 1. Generate the SDKs
+cd ../dataconnect
+firebase dataconnect:sdk:generate
+cd ../functions
+
+# 2. Install dependencies
 npm install
 ```
 

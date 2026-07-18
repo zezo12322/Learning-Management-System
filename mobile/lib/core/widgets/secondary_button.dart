@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 
 class SecondaryButton extends StatelessWidget {
@@ -21,7 +22,7 @@ class SecondaryButton extends StatelessWidget {
         foregroundColor: context.theme.colorScheme.primary,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           side: BorderSide(
             color: context.theme.colorScheme.primary,
             width: 1.5,
