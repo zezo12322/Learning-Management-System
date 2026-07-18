@@ -24,7 +24,10 @@ class CourseDetailsRemoteDataSourceImpl
           apiService.setAuthToken(token);
         }
       }
-      final response = await apiService.get('/api/v1/catalog/courses/$courseId/curriculum');
+      final formattedCourseId = courseId.length == 32 && !courseId.contains('-')
+          ? '${courseId.substring(0, 8)}-${courseId.substring(8, 12)}-${courseId.substring(12, 16)}-${courseId.substring(16, 20)}-${courseId.substring(20)}'
+          : courseId;
+      final response = await apiService.get('/catalog/courses/$formattedCourseId/curriculum');
       return CourseCurriculumModel.fromJson(response.data, courseId);
     } catch (e) {
       throw Exception('Failed to fetch course curriculum: $e');
@@ -41,7 +44,10 @@ class CourseDetailsRemoteDataSourceImpl
           apiService.setAuthToken(token);
         }
       }
-      await apiService.post('/api/v1/courses/$courseId/enroll', data: {});
+      final formattedCourseId = courseId.length == 32 && !courseId.contains('-')
+          ? '${courseId.substring(0, 8)}-${courseId.substring(8, 12)}-${courseId.substring(12, 16)}-${courseId.substring(16, 20)}-${courseId.substring(20)}'
+          : courseId;
+      await apiService.post('/courses/$formattedCourseId/enroll', data: {});
     } catch (e) {
       throw Exception('Failed to enroll in course: $e');
     }

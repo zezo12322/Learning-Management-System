@@ -30,7 +30,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
     try{
       await _setAuthToken();
       // NestJS route: GET /api/v1/catalog/courses/:courseId/curriculum
-      final response = await apiService.get('/api/v1/catalog/courses/$courseId/curriculum');
+      final response = await apiService.get('/catalog/courses/$courseId/curriculum');
       return CourseCurriculumModel.fromJson(response.data);
     } catch (e){
       throw CustomExceptions(message: 'Failed to fetch Course Curriculum: $e');
@@ -42,7 +42,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
     try {
       await _setAuthToken();
       // NestJS route: GET /api/v1/lectures/:lectureId
-      final response = await apiService.get('/api/v1/lectures/$lectureId');
+      final response = await apiService.get('/lectures/$lectureId');
       return LectureContentModel.fromJson(response.data);
     } catch (e) {
       throw CustomExceptions(message: 'Failed to fetch Lecture Content: $e');
@@ -54,7 +54,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
     try {
       await _setAuthToken();
       // NestJS route: PUT /api/v1/lectures/:lectureId/progress
-      await apiService.put('/api/v1/lectures/$lectureId/progress', data: {
+      await apiService.put('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
         'completed': completed,
       });

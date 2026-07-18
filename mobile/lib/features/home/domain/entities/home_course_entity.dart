@@ -15,6 +15,8 @@ class HomeCourseEntity extends Equatable {
   final String language;
   final int ratingCount;
 
+  final int enrollmentCount;
+
   // Curriculum Safety
   final List<CourseSectionEntity>? sections;
   final List<CourseLessonEntity>? lessons;
@@ -32,6 +34,7 @@ class HomeCourseEntity extends Equatable {
     this.courseStatus = 'PUBLISHED',
     this.language = '',
     required this.ratingCount,
+    this.enrollmentCount = 0,
     this.sections,
     this.lessons,
   });
@@ -49,6 +52,7 @@ class HomeCourseEntity extends Equatable {
         courseStatus,
         language,
         ratingCount,
+        enrollmentCount,
         sections,
         lessons,
       ];
