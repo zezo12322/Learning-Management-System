@@ -13,7 +13,7 @@ export async function callCloudFunction<T>(
   data: unknown
 ): Promise<T> {
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-  if (!projectId) throw new Error('Firebase project id غير مضبوط')
+  if (!projectId) throw new Error('Firebase project id is not configured')
 
   const url = `https://${region}-${projectId}.cloudfunctions.net/${name}`
   const res = await fetch(url, {
@@ -27,7 +27,7 @@ export async function callCloudFunction<T>(
     error?: { message?: string }
   }
   if (!res.ok || json?.error) {
-    throw new Error(json?.error?.message || 'تعذّر تنفيذ الطلب')
+    throw new Error(json?.error?.message || 'The request could not be completed')
   }
   return json.result as T
 }

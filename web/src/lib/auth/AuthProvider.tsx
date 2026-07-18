@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const token = await user.getIdTokenResult(true)
           setClaimRoles(readClaimRoles(token.claims.roles))
           // Provision the row (idempotent) then load profile + roles.
-          await meApi.sync({ email: user.email ?? '', name: user.displayName ?? 'مستخدم', avatar: user.photoURL ?? undefined })
+          await meApi.sync({ email: user.email ?? '', name: user.displayName || user.email?.split('@')[0] || 'User', avatar: user.photoURL ?? undefined })
           setMe(await meApi.get())
         } catch {
           setMe(null)
