@@ -24,7 +24,7 @@ export default function CurriculumPage() {
   const [lessonSectionId, setLessonSectionId] = useState('')
   const [lessonTitle, setLessonTitle] = useState('')
   const [lessonContent, setLessonContent] = useState('')
-  const [lessonType, setLessonType] = useState<'READING' | 'QUIZ'>('READING')
+  const [lessonType, setLessonType] = useState<'READING' | 'VIDEO' | 'QUIZ'>('READING')
   const [lessonError, setLessonError] = useState<string | null>(null)
   const [editingSectionId, setEditingSectionId] = useState('')
   const [sectionTitle, setSectionTitle] = useState('')
@@ -52,10 +52,10 @@ export default function CurriculumPage() {
     mutationFn: (sectionId: string) => authoringApi.deleteSection(courseId, sectionId),
   })
   const createLecture = useMutation({
-    mutationFn: ({ sectionId, title, content, type }: { sectionId: string; title: string; content: string; type: 'READING' | 'QUIZ' }) => authoringApi.createLecture(courseId, sectionId, {
+    mutationFn: ({ sectionId, title, content, type }: { sectionId: string; title: string; content: string; type: 'READING' | 'VIDEO' | 'QUIZ' }) => authoringApi.createLecture(courseId, sectionId, {
       title,
       type,
-      content: type === 'QUIZ' ? '' : content,
+      content: type === 'READING' ? content : '',
       duration: 0,
       isFreePreview: false,
     }),
@@ -329,7 +329,7 @@ export default function CurriculumPage() {
                           <div>
                             <span className="text-xs font-semibold text-content">Lesson type</span>
                             <div className="mt-2 flex gap-2">
-                              {(['READING', 'QUIZ'] as const).map((t) => (
+                              {(['READING', 'VIDEO', 'QUIZ'] as const).map((t) => (
                                 <button
                                   key={t}
                                   type="button"
@@ -338,7 +338,7 @@ export default function CurriculumPage() {
                                     ? 'rounded-input border border-primary bg-brand-soft px-3 py-1.5 text-xs font-semibold text-primary'
                                     : 'rounded-input border border-border px-3 py-1.5 text-xs font-semibold text-content-secondary'}
                                 >
-                                  {t === 'READING' ? 'Reading' : 'Quiz'}
+                                  {t === 'READING' ? 'Reading' : t === 'VIDEO' ? 'Video' : 'Quiz'}
                                 </button>
                               ))}
                             </div>
@@ -355,6 +355,10 @@ export default function CurriculumPage() {
                                 className="mt-2 w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm leading-6 text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                               />
                             </div>
+                          ) : lessonType === 'VIDEO' ? (
+                            <p className="rounded-input bg-brand-soft px-3 py-2 text-xs text-content-secondary">
+                              After adding this video lesson, upload its video from the <span className="font-semibold text-primary">Media</span> step.
+                            </p>
                           ) : (
                             <p className="rounded-input bg-brand-soft px-3 py-2 text-xs text-content-secondary">
                               After adding this quiz lesson, open “Manage quiz” to build its questions.

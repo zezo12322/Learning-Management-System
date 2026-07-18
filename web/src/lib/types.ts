@@ -203,3 +203,30 @@ export interface Quiz extends QuizSettings {
   lectureId: string
   questions: QuizQuestion[]
 }
+
+// ── Quizzes (taking) ─────────────────────────────────────────────────
+export interface TakeOption {
+  id: string
+  text: string
+}
+
+export interface TakeQuestion {
+  id: string
+  questionText: string
+  points: number
+  options: TakeOption[]
+}
+
+export interface TakeQuiz {
+  id: string
+  timeLimitMinutes?: number
+  questions: TakeQuestion[]
+}
+
+export interface QuizResult {
+  score: number
+  passed: boolean
+  totalQuestions: number
+  correctCount: number
+  answeredCount: number
+}

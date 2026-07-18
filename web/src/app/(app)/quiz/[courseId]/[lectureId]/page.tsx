@@ -57,11 +57,21 @@ export default function QuizEditorPage() {
         <ArrowLeft size={15} /> Back to curriculum
       </Link>
 
-      <div>
-        <h1 className="text-title-md font-bold text-content">Quiz editor</h1>
-        <p className="text-sm text-content-secondary">
-          Build the quiz for this lesson — settings, questions and answer options.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-title-md font-bold text-content">Quiz editor</h1>
+          <p className="text-sm text-content-secondary">
+            Build the quiz for this lesson — settings, questions and answer options.
+          </p>
+        </div>
+        {quizId && quizQuery.data && quizQuery.data.questions.length > 0 && (
+          <Link
+            href={`/quiz/${courseId}/${lectureId}/take`}
+            className="shrink-0 rounded-input border border-border px-3 py-1.5 text-xs font-semibold text-primary hover:bg-brand-soft"
+          >
+            Preview as student
+          </Link>
+        )}
       </div>
 
       {!ready ? (
