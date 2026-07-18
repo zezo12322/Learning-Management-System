@@ -1,5 +1,5 @@
 {
-  "app_name": "QR Smart Ordering",
+  "app_name": "OptimaTech",
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -13,7 +13,20 @@
     "search": "Search",
     "close": "Close",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "error_widget": {
+      "title": "Something went wrong",
+      "default_message": "Please try again",
+      "retry_button": "Retry"
+    },
+    "dialog": {
+      "error_title": "Error",
+      "success_title": "Success",
+      "warning_title": "Warning",
+      "ok": "OK",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    }
   },
   "errors": {
     "network": "No internet connection. Please check your network.",
@@ -35,19 +48,242 @@
       "email_required": "Email is required",
       "email_not_match": "Please enter a valid email address",
       "password_required": "Password is required",
-      "password_length": "Password must be at least 6 characters long"
+      "password_length": "Password must be at least 6 characters long",
+      "full_name_required": "Full name is required",
+      "full_name_length": "Full name must be at least 3 characters",
+      "phone_required": "Phone number is required",
+      "phone_not_match": "Please enter a valid phone number",
+      "confirm_password_required": "Please confirm your password",
+      "passwords_not_match": "Passwords do not match"
     },
     "password_hint": "Enter The Password",
     "show_password": "show password",
-    "hide_password": "show_password"
-
+    "hide_password": "show_password",
+    "login_screen": {
+      "welcome": "Welcome\nback!",
+      "subtitle": "Sign in to continue your\nlearning journey.",
+      "email_label": "Email Address",
+      "email_hint": "alex@example.com",
+      "password_label": "Password",
+      "password_hint": "Enter your password",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot Password?",
+      "login_btn": "Login",
+      "or_continue": "or continue with",
+      "google_btn": "Continue with Google",
+      "no_account": "Don't have an account?",
+      "register": "Register"
+    },
+    "signup_screen": {
+      "create_account": "Create\nAccount",
+      "subtitle": "Join Optima and start your\nlearning journey today",
+      "full_name": "Full Name",
+      "enter_full_name": "Enter your full name",
+      "email": "Email",
+      "enter_email": "Enter your email",
+      "phone_number": "Phone Number",
+      "enter_phone_number": "Enter your phone number",
+      "password": "Password",
+      "create_password": "Create a password",
+      "confirm_password": "Confirm Password",
+      "confirm_your_password": "Confirm your password",
+      "agree_terms": "I agree to the ",
+      "terms_of_service": "Terms of Service",
+      "and": " and ",
+      "privacy_policy": "Privacy Policy.",
+      "create_account_button": "Create Account",
+      "already_have_account": "Already have an account?",
+      "login": "Login",
+      "success": "The Account is created successfully."
+    },
+    "error":{
+      "weakPassword": "The password provided is too weak.",
+      "emailAlreadyInUse": "An account already exists for that email.",
+      "networkError": "Please check your internet connection.",
+      "genericError": "Something went wrong, please try again.",
+      "invalidEmailOrPassword": "Invalid email or password.",
+      "invalidCredential": "Incorrect email or password. Please try again.",
+      "accept_terms_required": "accept terms is required"
+    }
   },
   "home": {
-    "welcome": "Welcome back"
+    "welcome": "Welcome back",
+    "continue_learning": "Continue Learning",
+    "popular_courses": "Popular Courses",
+    "recommended_courses": "Recommended Courses",
+    "keep_learning_recommendations": "Keep learning to get tailored recommendations",
+    "assignments_missions": "Assignments / Missions",
+    "view_all": "View all",
+    "in_progress": "In Progress",
+    "students": "students",
+    "lessons": "lessons",
+    "of_lessons": "{completed} of {total} lessons",
+    "min_left": "{time} left",
+    "min": "min",
+    "inProgress": "In Progress",
+    "error_title": "Something went wrong",
+    "retry": "Try Again",
+    "assignments": {
+      "available": "Available",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "empty": "No Assignments",
+      "available_desc": "Open for submission",
+      "submitted_desc": "Awaiting review",
+      "graded_desc": "View feedback",
+      "empty_desc": "You are all caught up"
+    }
+  },
+  "nav_bar": {
+    "home": "Home",
+    "courses": "Courses",
+    "wishlist": "Wishlist",
+    "profile": "Profile"
   },
   "navigation": {
     "not_found": "Page Not Found",
     "not_found_msg": "The route you requested does not exist.",
     "go_home": "Go to Home"
+  },
+  "course_details": {
+    "you_might_also_like": "You might also like"
+  },
+  "courses": {
+    "title": "Courses",
+    "searchHint": "Search for courses, lessons, quizzes...",
+    "categories": {
+      "title": "Categories",
+      "viewAll": "View all",
+      "empty": "No categories found"
+    },
+    "list": {
+      "empty": "No courses found",
+      "lessonsCount": "{count} Lessons"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "errors": {
+      "unexpected": "Unexpected error occurred"
+    },
+    "filterSheet": {
+      "title": "Filter",
+      "courseStatus": "Course status",
+      "sortBy": "Sort by",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low"
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist"
+
+  },
+  "profile": {
+    "title": "My Profile",
+    "common": {
+      "edit": "Edit",
+      "view_all": "View All"
+    },
+    "header": {
+      "role": "Student",
+      "joined": "Joined {}",
+      "stats": {
+        "courses": "Courses Enrolled",
+        "courses_subtitle": "Active learning",
+        "hours": "Hours Learned",
+        "hours_subtitle": "+12 this week",
+        "assessments": "Assessments Completed",
+        "assessments_subtitle": "85% average score",
+        "certificates": "Certificates Earned",
+        "certificates_subtitle": "Keep it up!"
+      }
+    },
+    "sections": {
+      "user_information": "User Information",
+      "learning_statistics": "Learning Statistics",
+      "certificates": "Certificates",
+      "completed_courses": "Completed Courses",
+      "settings": "Settings"
+    },
+    "info": {
+      "full_name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "location": "Location",
+      "birth_date": "Date of Birth"
+    },
+    "statistics": {
+      "hours": "Hours Learned",
+      "hours_subtitle": "+12 this week",
+      "courses": "Courses Enrolled",
+      "courses_subtitle": "Active learning",
+      "certificates": "Certificates",
+      "certificates_subtitle": "Completed",
+      "assessments": "Assessments",
+      "assessments_subtitle": "85% Average"
+    },
+    "certificates": {
+      "issued_on": "Issued on {date}",
+      "verified": "Verified"
+    },
+    "completed_courses": {
+      "completed_on": "Completed on {date}",
+      "completed": "Completed"
+    },
+    "settings": {
+      "account": "Account Settings",
+      "notifications": "Notification Preferences",
+      "privacy": "Privacy & Security",
+      "help": "Help & Support",
+      "logout": "Logout",
+      "logout_dialog": "Logout?",
+      "log_out_confirmation": "Are you sure you want to log out?",
+      "language": "Language",
+      "select_language": "Select Language",
+      "change_Theme": "Change Theme",
+      "select_theme": "Select Theme"
+    }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "Failed to load the lesson, please try again later.",
+      "error_playing": "Error playing video"
+    },
+    "actions": {
+      "previous": "Previous",
+      "mark_complete": "Mark Complete",
+      "next": "Next"
+    },
+    "tabs": {
+      "curriculum": "Curriculum",
+      "notes": "Notes",
+      "resources": "Resources",
+      "discussion": "Discussion"
+    },
+    "curriculum": {
+      "title": "Course Curriculum",
+      "lessons_count": "{count} Lessons",
+      "now_playing": "Now Playing"
+    },
+    "about": {
+      "title": "About this lesson",
+      "description": "Learn different user research methods and how to choose the right one for your project."
+    }
   }
 }

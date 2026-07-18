@@ -39,20 +39,42 @@ cp .env.example .env
 docker compose up -d postgres redis
 ```
 
-#### 3. تشغيل الـ API
+#### 3. إنشاء كود Data Connect SDKs (مهم جداً)
+نظراً لأن ملفات الـ SDK الناتجة عن Data Connect يتم تجاهلها من Git (لتجنب التضارب)، **يجب** إنشاء الكود محلياً قبل تشغيل المنصة:
 ```bash
-cd backend && npm install && npm run start:dev
+firebase dataconnect:sdk:generate
 ```
 
-#### 4. تشغيل الـ Web
+#### 4. إعداد وتشغيل الـ API (NestJS Backend)
+للبدء بتشغيل الباك إند، تأكد أولاً أنك قمت بنسخ ملف `.env.example` إلى `.env` ووضع المتغيرات الصحيحة.
+- إذا كنت تستخدم **Firebase Live/Production** (لا تستخدم محاكي Firebase)، يجب وضع مسار الـ Service Account Key الخاص بـ Firebase في `.env`.
+- إذا كنت تستخدم **Firebase Emulators**، سيتصل تلقائياً بالمحاكي المفتوح.
+
+لتشغيل الخادم:
+```bash
+cd backend && npm install && npm run dev
+```
+
+#### 5. تشغيل الـ Web
 ```bash
 cd web && npm install && npm run dev
 ```
 
-#### 5. تشغيل الـ Mobile
+#### 6. تشغيل الـ Mobile (Flutter)
 ```bash
 cd mobile && flutter pub get && flutter run
 ```
+
+> **📱 لاختبار التطبيق على هاتف حقيقي (Physical Device):**
+> 1. تأكد أن الهاتف والكمبيوتر متصلان على نفس شبكة الـ WiFi.
+> 2. افتح ملف `mobile/lib/core/utils/constants.dart`.
+> 3. لا يمكن للهاتف التعرف على كلمة `localhost`، لذلك يجب استبدالها بـ **عنوان الـ IP المحلي لجهازك** (مثال: `192.168.1.100`).
+> ```dart
+>   static String get localhost {
+>     return '192.168.1.100'; // استبدل هذا برقم الـ IP الخاص بجهاز الكمبيوتر
+>   }
+> ```
+> 4. تأكد أيضاً من ضبط `useLocalBackend = true;` إذا كنت تشغل الـ NestJS محلياً، أو `useFirebaseEmulators = true;` إذا كنت تستخدم محاكي Firebase.
 
 #### أو تشغيل كل شيء مع Docker
 ```bash
@@ -85,6 +107,11 @@ docker compose --profile tools up -d
 - يحتوي النظام على 26 جدول (Schema) تغطي المستخدمين، الدورات، الاختبارات، المدفوعات، والاشتراكات.
 - عمليات الـ API (Queries & Mutations) مقسمة في مجلد `dataconnect/default/` (مثل `courses.gql`, `missions.gql`, `users.gql`).
 - يتم استدعاء هذه العمليات من NestJS Backend بصفة مشرف (Admin)، أو مباشرة من الواجهات الأمامية وفقاً للصلاحيات.
+
+### 4. قواعد توجيه البيانات (SDK vs. REST API)
+تعتمد المنصة على معمارية هجينة (Hybrid Architecture) لضمان أعلى أداء:
+- **استخدم FDC Client SDK مباشرة:** لجميع عمليات القراءة الخاصة بالطلاب (مثل تصفح الكورسات، المنهج، التقدم). هذا يضمن استجابة فورية (Zero Middleman Latency) وأمان تام عبر صلاحيات `@auth(level: USER)`.
+- **استخدم NestJS REST API:** لجميع عمليات التأليف (Authoring) الخاصة بالمعلمين، رفع الملفات، تحويل الفيديوهات (Transcoding)، والصلاحيات المعقدة (RBAC) التي تتطلب صلاحيات Admin لتخطي قيود Data Connect.
 
 ## 🔥 إعداد Firebase
 

@@ -1,12 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 /// Firebase Service - طبقة مركزية للتعامل مع Firebase
 class FirebaseService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseStorage _storage = FirebaseStorage.instance;
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
@@ -14,14 +12,6 @@ class FirebaseService {
   static FirebaseAuth get auth => _auth;
   static Stream<User?> get authStateChanges => _auth.authStateChanges();
   static User? get currentUser => _auth.currentUser;
-
-  // Firestore
-  static FirebaseFirestore get firestore => _firestore;
-  static CollectionReference get users => _firestore.collection('users');
-  static CollectionReference get courses => _firestore.collection('courses');
-  static CollectionReference get missions => _firestore.collection('missions');
-  static CollectionReference get notifications =>
-      _firestore.collection('notifications');
 
   // Storage
   static FirebaseStorage get storage => _storage;

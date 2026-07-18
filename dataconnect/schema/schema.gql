@@ -28,12 +28,12 @@ type User @table(name: "users") {
   name: String!
   avatar: String
   encryptedNationalId: String
-  createdAt: Timestamp! @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time") @index
   lastLogin: Timestamp
 }
 
 type Profile @table(name: "profiles", key: ["user"]) {
-  user: User! 
+  user: User! @index 
   bio: String
   company: String
   phone: String
@@ -53,7 +53,7 @@ type Permission @table(name: "permissions") {
 }
 
 type UserRole @table(name: "user_roles", key: ["user", "role"]) {
-  user: User! 
+  user: User! @index 
   role: Role!
 }
 
@@ -79,55 +79,55 @@ type Course @table(name: "courses") {
   title: String!
   description: String
   price: Int! 
-  status: CourseStatus!
+  status: CourseStatus! @index
   language: String!
   level: CourseLevel!
   thumbnail: String
   category: Category!
   tags: [String!]!
-  author: User!
+  author: User! @index
   createdBy: User!
   # Denormalised rating aggregate, recomputed by RatingsService on every rating
   # write. Lets catalog/recommendation cards show a star score without an N+1
   # over CourseRating. The authoritative value is always derivable on-read via
   # GetCourseRatingsForSummary; these columns are a cache. Non-null defaults keep
   # the column migration non-destructive (existing rows backfill to 0).
-  avgRating: Float! @default(value: 0)
-  ratingCount: Int! @default(value: 0)
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp
+  avgRating: Float! @default(value: 0) @index
+  ratingCount: Int! @default(value: 0) @index
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  deletedAt: Timestamp @index
 }
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
-  course: Course!
-  user: User! 
+  course: Course! @index
+  user: User! @index 
 }
 
 type CourseSection @table(name: "course_sections") {
   id: UUID! @default(expr: "uuidV4()")
-  course: Course!
+  course: Course! @index
   title: String!
-  order: Int!
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp
+  order: Int! @index
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  deletedAt: Timestamp @index
 }
 
 type CourseLecture @table(name: "course_lectures") {
   id: UUID! @default(expr: "uuidV4()")
-  section: CourseSection!
+  section: CourseSection! @index
   title: String!
-  type: LectureType!
+  type: LectureType! @index
   videoUrl: String
   content: String     
   duration: Int
   transcriptUrl: String
   isFreePreview: Boolean!
-  order: Int!
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp
+  order: Int! @index
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  deletedAt: Timestamp @index
 }
 
 # ==========================================
@@ -135,29 +135,29 @@ type CourseLecture @table(name: "course_lectures") {
 # ==========================================
 type CourseQuiz @table(name: "course_quizzes") {
   id: UUID! @default(expr: "uuidV4()")
-  lecture: CourseLecture! @unique
+  lecture: CourseLecture! @index @unique
   passingScore: Float!
   maxAttempts: Int!
   timeLimitMinutes: Int
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
 }
 
 type QuizQuestion @table(name: "quiz_questions") {
   id: UUID! @default(expr: "uuidV4()")
-  quiz: CourseQuiz!
+  quiz: CourseQuiz! @index
   questionText: String!
-  order: Int!         
+  order: Int! @index         
   points: Float! @default(expr: "1.0") 
   explanation: String 
-  deletedAt: Timestamp
+  deletedAt: Timestamp @index
 }
 
 type QuizOption @table(name: "quiz_options") { 
   id: UUID! @default(expr: "uuidV4()")
   question: QuizQuestion!
   text: String!
-  order: Int!
+  order: Int! @index
   isCorrect: Boolean! @default(expr: "false") 
 }
 
@@ -166,34 +166,34 @@ type QuizOption @table(name: "quiz_options") {
 # ==========================================
 type Mission @table(name: "missions") {
   id: UUID! @default(expr: "uuidV4()")
-  course: Course 
+  course: Course @index 
   title: String!
   scenarioDescription: String!
   durationMinutes: Int!
   category: Category! 
   difficulty: MissionDifficulty! 
   skillsTested: [String!]!
-  author: User!        
+  author: User! @index        
   createdBy: User!     
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  deletedAt: Timestamp @index
 }
 
 type MissionMicroLesson @table(name: "mission_micro_lessons") {
   id: UUID! @default(expr: "uuidV4()")
-  mission: Mission!
+  mission: Mission! @index
   title: String!
-  type: LectureType!
+  type: LectureType! @index
   assetUrl: String 
   content: String
   durationSeconds: Int 
-  order: Int!
+  order: Int! @index
 }
 
 type MissionTemplate @table(name: "mission_templates") {
   id: UUID! @default(expr: "uuidV4()")
-  mission: Mission!
+  mission: Mission! @index
   title: String!
   fileUrl: String!
   fileType: String!
@@ -201,24 +201,24 @@ type MissionTemplate @table(name: "mission_templates") {
 
 type RubricCriterion @table(name: "rubric_criteria") {
   id: UUID! @default(expr: "uuidV4()")
-  mission: Mission!
+  mission: Mission! @index
   criterionName: String!
   description: String
   maxPoints: Float!
-  order: Int! 
+  order: Int! @index 
 }
 
 type MissionSubmission @table(name: "mission_submissions") {
   id: UUID! @default(expr: "uuidV4()")
-  mission: Mission!
-  student: User! 
+  mission: Mission! @index
+  student: User! @index 
   grader: User 
   fileUrl: String!
   feedback: String
-  status: SubmissionStatus! @default(expr: "'PENDING'") 
+  status: SubmissionStatus! @default(expr: "'PENDING'") @index 
   attemptNumber: Int! @default(expr: "1") 
-  submittedAt: Timestamp! @default(expr: "request.time") 
-  updatedAt: Timestamp! @default(expr: "request.time")
+  submittedAt: Timestamp! @default(expr: "request.time") @index 
+  updatedAt: Timestamp! @default(expr: "request.time") @index
 }
 
 type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["submission", "criterion"]) {
@@ -232,42 +232,42 @@ type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["sub
 # ==========================================
 type Enrollment @table(name: "enrollments") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! 
-  targetType: EnrollmentTarget! 
-  course: Course 
-  mission: Mission 
-  status: EnrollmentStatus!
-  enrolledAt: Timestamp! @default(expr: "request.time")
-  completedAt: Timestamp
+  user: User! @index 
+  targetType: EnrollmentTarget! @index 
+  course: Course @index 
+  mission: Mission @index 
+  status: EnrollmentStatus! @index
+  enrolledAt: Timestamp! @default(expr: "request.time") @index
+  completedAt: Timestamp @index
 }
 
 type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) {
-  user: User!
-  lecture: CourseLecture!
+  user: User! @index
+  lecture: CourseLecture! @index
   lastWatchedSecond: Int!
-  completedAt: Timestamp
+  completedAt: Timestamp @index
 }
 
 # One rating per (user, course). The composite key enforces that uniqueness at
 # the database level and lets the write path use a single upsert (create-or-edit),
 # mirroring LectureProgress.
 type CourseRating @table(name: "course_ratings", key: ["user", "course"]) {
-  user: User!
-  course: Course!
+  user: User! @index
+  course: Course! @index
   rating: Int!          # 1–5 stars
   review: String        # optional free-text review
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
 }
 
 type QuizAttempt @table(name: "quiz_attempts") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! 
-  quiz: CourseQuiz!
+  user: User! @index 
+  quiz: CourseQuiz! @index
   score: Float      
   passed: Boolean   
-  startedAt: Timestamp! @default(expr: "request.time")
-  completedAt: Timestamp
+  startedAt: Timestamp! @default(expr: "request.time") @index
+  completedAt: Timestamp @index
 }
 
 type QuizAttemptAnswer @table(name: "quiz_attempt_answers", key: ["attempt", "question"]) {
@@ -278,23 +278,23 @@ type QuizAttemptAnswer @table(name: "quiz_attempt_answers", key: ["attempt", "qu
 
 type Session @table(name: "sessions") {
   id: UUID! @default(expr: "uuidV4()")
-  course: Course!
+  course: Course! @index
   title: String!
   hostUser: User      
   capacity: Int       
-  startTime: Timestamp!
+  startTime: Timestamp! @index
   endTime: Timestamp!
   type: SessionType!
   locationOrUrl: String!
   qrCodeHash: String
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
-  deletedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  deletedAt: Timestamp @index
 }
 
 type Attendance @table(name: "attendance") {
   id: UUID! @default(expr: "uuidV4()")
-  student: User! 
+  student: User! @index 
   session: Session!
   status: AttendanceStatus!
   method: AttendanceMethod!
@@ -306,11 +306,11 @@ type Attendance @table(name: "attendance") {
 # ==========================================
 type Certificate @table(name: "certificates") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! 
+  user: User! @index 
   targetType: CertificateTarget! 
-  course: Course
-  mission: Mission
-  issuedAt: Timestamp! @default(expr: "request.time")
+  course: Course @index
+  mission: Mission @index
+  issuedAt: Timestamp! @default(expr: "request.time") @index
   expiresAt: Timestamp           
   verificationHash: String! @unique
   assetUrl: String!
@@ -332,7 +332,7 @@ type Payment @table(name: "payments") {
   id: UUID! @default(expr: "uuidV4()")
   
   # 1. Relation is now optional (User instead of User!) and implicitly uses SET_NULL
-  user: User 
+  user: User @index
   
   # 2. Static Snapshot: Store this at checkout so you never lose the audit trail!
   #    Default '' makes the column migration non-destructive (existing rows get
@@ -341,19 +341,19 @@ type Payment @table(name: "payments") {
   customerEmailSnapshot: String! @default(expr: "''")
   
   gateway: PaymentGateway!
-  status: PaymentStatus!
+  status: PaymentStatus! @index
   amount: Int!               
   currency: String! @default(expr: "'EGP'") 
   referenceId: String! @unique
-  createdAt: Timestamp! @default(expr: "request.time")
-  updatedAt: Timestamp! @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
 }
 
 type UserSubscription @table(name: "user_subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
   
   # Subscriptions are kept for historical metrics, but the user link is severed
-  user: User 
+  user: User @index
   
   tier: SubscriptionTier!
   payment: Payment           
@@ -369,8 +369,8 @@ type PaymentItem @table(name: "payment_items") {
   id: UUID! @default(expr: "uuidV4()")
   payment: Payment!
   targetType: PaymentItemTarget! 
-  course: Course
-  mission: Mission
+  course: Course @index
+  mission: Mission @index
   subscriptionTier: SubscriptionTier 
   priceAtPurchase: Int! 
 }
