@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { Users } from 'lucide-react'
 import type { CourseCard as Course } from '@/lib/types'
@@ -6,16 +8,12 @@ import { Badge } from '@/components/ui/badge'
 import { RatingStars } from '@/components/common/RatingStars'
 import { CourseThumbnail } from './CourseThumbnail'
 import { SaveButton } from './SaveButton'
+import { useT } from '@/lib/i18n'
 import { formatCompact } from '@/lib/utils'
-
-const LEVEL_LABEL: Record<string, string> = {
-  BEGINNER: 'مبتدئ',
-  INTERMEDIATE: 'متوسط',
-  ADVANCED: 'متقدم',
-}
 
 /** Vertical card used in grids and carousels (Popular Courses). */
 export function CourseGridCard({ course }: { course: Course }) {
+  const t = useT()
   return (
     <div className="relative">
       {/* Sibling of the link (not nested) so the bookmark button is valid markup */}
@@ -42,9 +40,9 @@ export function CourseGridCard({ course }: { course: Course }) {
             <div className="flex items-center justify-between text-xs text-content-secondary">
               <span className="inline-flex items-center gap-1">
                 <Users size={13} />
-                {formatCompact(course.ratingCount ?? 0)} reviews
+                {formatCompact(course.ratingCount ?? 0)} {t('common.reviews')}
               </span>
-              {course.level && <Badge tone="muted">{LEVEL_LABEL[course.level] ?? course.level}</Badge>}
+              {course.level && <Badge tone="muted">{t(`level.${course.level}`, course.level)}</Badge>}
             </div>
           </div>
         </Card>
@@ -63,6 +61,7 @@ export function CourseListRow({
   progress?: number
   statusBadge?: { label: string; tone: 'primary' | 'success' | 'warning' | 'info' }
 }) {
+  const t = useT()
   return (
     <Link href={`/courses/${course.id}`} className="block">
       <Card hover className="flex gap-3 p-3">
@@ -85,7 +84,7 @@ export function CourseListRow({
               {course.avgRating != null && (
                 <RatingStars value={course.avgRating} size={12} count={course.ratingCount} />
               )}
-              {course.level && <span>{LEVEL_LABEL[course.level] ?? course.level}</span>}
+              {course.level && <span>{t(`level.${course.level}`, course.level)}</span>}
             </div>
           </div>
           {progress != null && (
