@@ -161,7 +161,7 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             Gap(4.w),
                             Flexible(
                               child: Text(
-                                '0 Students',
+                                '${_formatCount(widget.course.enrollmentCount)} Students',
                                 style: TextStyles.labelSmall.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),

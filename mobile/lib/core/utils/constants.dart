@@ -6,10 +6,10 @@ abstract class AppConstants{
 
   /// Set to true to point the app to your local NestJS backend (localhost:3001).
   /// Set to false to use the production API.
-  static const bool useLocalBackend = true;
+  static const bool useLocalBackend = false;
 
   /// Your Production API URL goes here!
-  static const String prodApiUrl = 'https://api.your-production-url.com';
+  static const String prodApiUrl = 'https://learning-management-system-production-a97c.up.railway.app/api/v1';
 
   static String get localhost {
     if (defaultTargetPlatform == TargetPlatform.android) {

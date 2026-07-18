@@ -68,6 +68,7 @@ class EnrolledCourseModel {
         ),
         avgRating: 0.0,
         ratingCount: 0,
+        enrollmentCount: 0,
       ),
       totalLessons: totalLessons,
       completedLessons: completedLessons,
