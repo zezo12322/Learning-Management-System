@@ -20,7 +20,10 @@ import type {
   Quiz,
   QuizOption,
   QuizQuestion,
+  QuizResult,
   QuizSettings,
+  TakeQuestion,
+  TakeQuiz,
 } from '@/lib/types'
 
 type JsonObject = Record<string, unknown>
@@ -417,4 +420,63 @@ export const quizApi = {
     apiClient
       .delete(`/courses/${courseId}/quizzes/${quizId}/questions/${questionId}`)
       .then((response) => response.data),
+
+  // ── taking (student / preview) ──
+  /** Student-safe view: questions + options with NO correct-answer flags. */
+  getForTaking: (courseId: string, quizId: string): Promise<TakeQuiz> =>
+    apiClient.get(`/courses/${courseId}/quizzes/${quizId}/questions`).then((response) => {
+      const raw = objectValue(response.data)
+      return {
+        id: stringValue(raw.id),
+        timeLimitMinutes:
+          typeof raw.timeLimitMinutes === 'number' ? raw.timeLimitMinutes : undefined,
+        questions: arrayValue(raw.takeQuestions ?? raw.questions).map(
+          (q, i): TakeQuestion => {
+            const rawQ = objectValue(q)
+            return {
+              id: stringValue(rawQ.id),
+              questionText: stringValue(rawQ.questionText),
+              points: numberValue(rawQ.points, 1),
+              options: arrayValue(rawQ.takeOptions ?? rawQ.options).map((o) => {
+                const rawO = objectValue(o)
+                return { id: stringValue(rawO.id), text: stringValue(rawO.text) }
+              }),
+            }
+          },
+        ),
+      }
+    }),
+
+  startAttempt: (courseId: string, quizId: string): Promise<string> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts`)
+      .then((response) =>
+        stringValue(
+          mutationEntity(response.data, ['quizAttempt_insert', 'quizAttemptInsert', 'attempt']).id,
+        ),
+      ),
+
+  submitAnswer: (
+    courseId: string,
+    quizId: string,
+    attemptId: string,
+    body: { questionId: string; selectedOptionId: string },
+  ) =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/answers`, body)
+      .then((response) => response.data),
+
+  finishAttempt: (courseId: string, quizId: string, attemptId: string): Promise<QuizResult> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/finish`)
+      .then((response) => {
+        const raw = objectValue(response.data)
+        return {
+          score: numberValue(raw.score),
+          passed: Boolean(raw.passed),
+          totalQuestions: numberValue(raw.totalQuestions),
+          correctCount: numberValue(raw.correctCount),
+          answeredCount: numberValue(raw.answeredCount),
+        }
+      }),
 }
