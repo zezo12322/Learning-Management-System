@@ -431,7 +431,7 @@ export const quizApi = {
         timeLimitMinutes:
           typeof raw.timeLimitMinutes === 'number' ? raw.timeLimitMinutes : undefined,
         questions: arrayValue(raw.takeQuestions ?? raw.questions).map(
-          (q, i): TakeQuestion => {
+          (q): TakeQuestion => {
             const rawQ = objectValue(q)
             return {
               id: stringValue(rawQ.id),
