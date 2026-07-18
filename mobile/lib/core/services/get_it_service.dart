@@ -6,6 +6,7 @@ import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_i
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/forgot_password_cubit/forgot_password_cubit.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/datasources/course_learning_remote_datasource.dart';
 import 'package:optimatech_lms/features/course_learning/data/repositories/course_learning_repository_impl.dart';
@@ -64,6 +65,9 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<SignupCubit>(
     () => SignupCubit(authRepository: getIt<AuthRepository>()),
+  );
+  getIt.registerFactory<ForgotPasswordCubit>(
+    () => ForgotPasswordCubit(authRepository: getIt<AuthRepository>()),
   );
 
   // ========================= Home Feature =========================
