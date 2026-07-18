@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Check, Plus, Trash2, X } from 'lucide-react'
 import { quizApi, type QuestionInput } from '@/lib/api/services'
 import { apiErrorMessage } from '@/lib/api/client'
+import { useT } from '@/lib/i18n'
 import { getCachedQuizId, setCachedQuizId } from '@/lib/quizCache'
 import type { Quiz, QuizQuestion, QuizSettings } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { PageSpinner } from '@/components/ui/spinner'
 
 export default function QuizEditorPage() {
+  const t = useT()
   const params = useParams<{ courseId: string; lectureId: string }>()
   const courseId = params.courseId
   const lectureId = params.lectureId
@@ -54,14 +56,14 @@ export default function QuizEditorPage() {
         href={`/studio/${courseId}/curriculum`}
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-content-secondary hover:text-content"
       >
-        <ArrowLeft size={15} /> Back to curriculum
+        <ArrowLeft size={15} /> {t('quizEditor.backToCurriculum')}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-title-md font-bold text-content">Quiz editor</h1>
+          <h1 className="text-title-md font-bold text-content">{t('quizEditor.title')}</h1>
           <p className="text-sm text-content-secondary">
-            Build the quiz for this lesson — settings, questions and answer options.
+            {t('quizEditor.subtitle')}
           </p>
         </div>
         {quizId && quizQuery.data && quizQuery.data.questions.length > 0 && (
@@ -69,7 +71,7 @@ export default function QuizEditorPage() {
             href={`/quiz/${courseId}/${lectureId}/take`}
             className="shrink-0 rounded-input border border-border px-3 py-1.5 text-xs font-semibold text-primary hover:bg-brand-soft"
           >
-            Preview as student
+            {t('quizEditor.previewAsStudent')}
           </Link>
         )}
       </div>
@@ -79,7 +81,7 @@ export default function QuizEditorPage() {
       ) : !quizId ? (
         <CreateQuizForm
           pending={createQuiz.isPending}
-          error={createQuiz.isError ? apiErrorMessage(createQuiz.error, 'Could not create the quiz.') : null}
+          error={createQuiz.isError ? apiErrorMessage(createQuiz.error, t('quizEditor.createError')) : null}
           onCreate={(settings) => createQuiz.mutate(settings)}
         />
       ) : quizQuery.isLoading ? (
@@ -87,7 +89,7 @@ export default function QuizEditorPage() {
       ) : quizQuery.isError || !quizQuery.data ? (
         <Card className="space-y-3 p-6 text-center">
           <p className="text-sm text-content-secondary">
-            {apiErrorMessage(quizQuery.error, 'This quiz could not be loaded.')}
+            {apiErrorMessage(quizQuery.error, t('quizEditor.loadError'))}
           </p>
           <Button
             variant="outline"
@@ -96,7 +98,7 @@ export default function QuizEditorPage() {
               createQuiz.reset()
             }}
           >
-            Start over
+            {t('quizEditor.startOver')}
           </Button>
         </Card>
       ) : (
@@ -120,6 +122,7 @@ function CreateQuizForm({
   pending: boolean
   error: string | null
 }) {
+  const t = useT()
   const [passingScore, setPassingScore] = useState(60)
   const [maxAttempts, setMaxAttempts] = useState(3)
   const [timeLimit, setTimeLimit] = useState('')
@@ -127,8 +130,8 @@ function CreateQuizForm({
   return (
     <Card className="space-y-4 p-6">
       <div>
-        <h2 className="text-base font-semibold text-content">Create the quiz</h2>
-        <p className="text-xs text-content-secondary">Set the grading rules, then add questions.</p>
+        <h2 className="text-base font-semibold text-content">{t('quizEditor.createTitle')}</h2>
+        <p className="text-xs text-content-secondary">{t('quizEditor.createSubtitle')}</p>
       </div>
       <SettingsFields
         passingScore={passingScore}
@@ -149,7 +152,7 @@ function CreateQuizForm({
           })
         }
       >
-        Create quiz
+        {t('quizEditor.createButton')}
       </Button>
     </Card>
   )
@@ -165,6 +168,7 @@ function QuizBody({
   courseId: string
   onChanged: () => void
 }) {
+  const t = useT()
   const [adding, setAdding] = useState(false)
 
   const updateSettings = useMutation({
@@ -187,8 +191,8 @@ function QuizBody({
     <div className="space-y-6">
       <Card className="space-y-4 p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-content">Settings</h2>
-          <Badge tone="muted">{quiz.questions.length} questions</Badge>
+          <h2 className="text-base font-semibold text-content">{t('quizEditor.settings')}</h2>
+          <Badge tone="muted">{quiz.questions.length} {t('quizEditor.questions')}</Badge>
         </div>
         <SettingsFields
           passingScore={passingScore}
@@ -210,12 +214,12 @@ function QuizBody({
               })
             }
           >
-            Save settings
+            {t('quizEditor.saveSettings')}
           </Button>
-          {updateSettings.isSuccess && <span className="text-xs text-success">Saved</span>}
+          {updateSettings.isSuccess && <span className="text-xs text-success">{t('quizEditor.saved')}</span>}
           {updateSettings.isError && (
             <span className="text-xs text-error">
-              {apiErrorMessage(updateSettings.error, 'Could not save.')}
+              {apiErrorMessage(updateSettings.error, t('quizEditor.saveError'))}
             </span>
           )}
         </div>
@@ -223,17 +227,17 @@ function QuizBody({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-content">Questions</h2>
+          <h2 className="text-base font-semibold text-content">{t('quizEditor.questionsHeading')}</h2>
           {!adding && (
             <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
-              <Plus size={15} /> Add question
+              <Plus size={15} /> {t('quizEditor.addQuestion')}
             </Button>
           )}
         </div>
 
         {quiz.questions.length === 0 && !adding && (
           <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-content-secondary">
-            No questions yet. Add the first one.
+            {t('quizEditor.noQuestions')}
           </p>
         )}
 
@@ -251,7 +255,7 @@ function QuizBody({
         {adding && (
           <QuestionForm
             submitting={createQuestion.isPending}
-            error={createQuestion.isError ? apiErrorMessage(createQuestion.error, 'Could not add the question.') : null}
+            error={createQuestion.isError ? apiErrorMessage(createQuestion.error, t('quizEditor.addError')) : null}
             onCancel={() => setAdding(false)}
             onSubmit={(q) => createQuestion.mutate(q)}
           />
@@ -275,6 +279,7 @@ function QuestionCard({
   quizId: string
   onChanged: () => void
 }) {
+  const t = useT()
   const [editing, setEditing] = useState(false)
 
   const updateQuestion = useMutation({
@@ -294,7 +299,7 @@ function QuestionCard({
       <QuestionForm
         initial={question}
         submitting={updateQuestion.isPending}
-        error={updateQuestion.isError ? apiErrorMessage(updateQuestion.error, 'Could not save the question.') : null}
+        error={updateQuestion.isError ? apiErrorMessage(updateQuestion.error, t('quizEditor.saveQuestionError')) : null}
         onCancel={() => setEditing(false)}
         onSubmit={(q) => updateQuestion.mutate(q)}
       />
@@ -308,18 +313,18 @@ function QuestionCard({
           <span className="text-content-secondary">{index + 1}.</span> {question.questionText}
         </p>
         <div className="flex shrink-0 items-center gap-2">
-          <Badge tone="muted">{question.points} pt</Badge>
+          <Badge tone="muted">{question.points} {t('quizEditor.pt')}</Badge>
           <button
             type="button"
-            aria-label="Edit question"
+            aria-label={t('quizEditor.editQuestion')}
             onClick={() => setEditing(true)}
             className="text-content-secondary hover:text-content"
           >
-            Edit
+            {t('quizEditor.edit')}
           </button>
           <button
             type="button"
-            aria-label="Delete question"
+            aria-label={t('quizEditor.deleteQuestion')}
             onClick={() => deleteQuestion.mutate()}
             className="text-content-secondary hover:text-error"
           >
@@ -345,11 +350,11 @@ function QuestionCard({
       </ul>
       {question.explanation && (
         <p className="rounded-lg bg-surface-hover p-2 text-xs text-content-secondary">
-          Explanation: {question.explanation}
+          {t('quizEditor.explanationLabel')}: {question.explanation}
         </p>
       )}
       {deleteQuestion.isError && (
-        <p className="text-xs text-error">{apiErrorMessage(deleteQuestion.error, 'Could not delete.')}</p>
+        <p className="text-xs text-error">{apiErrorMessage(deleteQuestion.error, t('quizEditor.deleteError'))}</p>
       )}
     </Card>
   )
@@ -371,6 +376,7 @@ function QuestionForm({
   submitting: boolean
   error: string | null
 }) {
+  const t = useT()
   const [text, setText] = useState(initial?.questionText ?? '')
   const [points, setPoints] = useState(initial?.points ?? 1)
   const [explanation, setExplanation] = useState(initial?.explanation ?? '')
@@ -394,9 +400,9 @@ function QuestionForm({
   const submit = () => {
     const cleanText = text.trim()
     const filled = options.map((o) => ({ ...o, text: o.text.trim() })).filter((o) => o.text)
-    if (!cleanText) return setLocalError('Enter the question text.')
-    if (filled.length < 2) return setLocalError('Provide at least two answer options.')
-    if (correct >= filled.length) return setLocalError('Choose which option is correct.')
+    if (!cleanText) return setLocalError(t('quizEditor.errQuestionText'))
+    if (filled.length < 2) return setLocalError(t('quizEditor.errTwoOptions'))
+    if (correct >= filled.length) return setLocalError(t('quizEditor.errChooseCorrect'))
     setLocalError(null)
     onSubmit({
       questionText: cleanText,
@@ -409,12 +415,12 @@ function QuestionForm({
   return (
     <Card className="space-y-4 border-primary/40 p-4">
       <div className="space-y-1.5">
-        <Label htmlFor="q-text">Question</Label>
-        <Input id="q-text" value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. What does HTTP stand for?" />
+        <Label htmlFor="q-text">{t('quizEditor.question')}</Label>
+        <Input id="q-text" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('quizEditor.questionPlaceholder')} />
       </div>
 
       <div className="space-y-2">
-        <Label>Answer options (select the correct one)</Label>
+        <Label>{t('quizEditor.answerOptions')}</Label>
         {options.map((option, i) => (
           <div key={i} className="flex items-center gap-2">
             <input
@@ -422,18 +428,18 @@ function QuestionForm({
               name="correct-option"
               checked={correct === i}
               onChange={() => setCorrect(i)}
-              aria-label={`Mark option ${i + 1} correct`}
+              aria-label={`${t('quizEditor.markOption')} ${i + 1} ${t('quizEditor.correct')}`}
               className="h-4 w-4 accent-primary"
             />
             <Input
               value={option.text}
               onChange={(e) => setOptionText(i, e.target.value)}
-              placeholder={`Option ${i + 1}`}
+              placeholder={`${t('quizEditor.option')} ${i + 1}`}
             />
             {options.length > 2 && (
               <button
                 type="button"
-                aria-label={`Remove option ${i + 1}`}
+                aria-label={`${t('quizEditor.removeOption')} ${i + 1}`}
                 onClick={() => removeOption(i)}
                 className="shrink-0 text-content-secondary hover:text-error"
               >
@@ -443,13 +449,13 @@ function QuestionForm({
           </div>
         ))}
         <Button type="button" size="sm" variant="ghost" onClick={addOption}>
-          <Plus size={14} /> Add option
+          <Plus size={14} /> {t('quizEditor.addOption')}
         </Button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="q-points">Points</Label>
+          <Label htmlFor="q-points">{t('quizEditor.points')}</Label>
           <Input
             id="q-points"
             type="number"
@@ -459,7 +465,7 @@ function QuestionForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="q-exp">Explanation (optional)</Label>
+          <Label htmlFor="q-exp">{t('quizEditor.explanationOptional')}</Label>
           <Input id="q-exp" value={explanation} onChange={(e) => setExplanation(e.target.value)} />
         </div>
       </div>
@@ -468,10 +474,10 @@ function QuestionForm({
 
       <div className="flex items-center gap-2">
         <Button size="sm" loading={submitting} onClick={submit}>
-          {initial ? 'Save question' : 'Add question'}
+          {initial ? t('quizEditor.saveQuestion') : t('quizEditor.addQuestion')}
         </Button>
         <Button size="sm" variant="ghost" onClick={onCancel}>
-          Cancel
+          {t('common.cancel')}
         </Button>
       </div>
     </Card>
@@ -494,10 +500,11 @@ function SettingsFields({
   setMaxAttempts: (n: number) => void
   setTimeLimit: (s: string) => void
 }) {
+  const t = useT()
   return (
     <div className="grid gap-3 sm:grid-cols-3">
       <div className="space-y-1.5">
-        <Label htmlFor="passing">Passing score (%)</Label>
+        <Label htmlFor="passing">{t('quizEditor.passingScore')}</Label>
         <Input
           id="passing"
           type="number"
@@ -508,7 +515,7 @@ function SettingsFields({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="attempts">Max attempts</Label>
+        <Label htmlFor="attempts">{t('quizEditor.maxAttempts')}</Label>
         <Input
           id="attempts"
           type="number"
@@ -518,7 +525,7 @@ function SettingsFields({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="time">Time limit (min, optional)</Label>
+        <Label htmlFor="time">{t('quizEditor.timeLimit')}</Label>
         <Input
           id="time"
           type="number"
