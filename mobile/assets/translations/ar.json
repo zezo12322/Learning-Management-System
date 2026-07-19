@@ -199,6 +199,9 @@
       "priceHighToLow": "السعر: من الأعلى إلى الأقل"
     }
   },
+  "wishlist": {
+    "title": "المفضلة"
+  },
   "profile": {
     "title": "ملفي الشخصي",
     "common": {
