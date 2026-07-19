@@ -200,7 +200,8 @@
     }
   },
   "wishlist": {
-    "title": "المفضلة"
+    "title": "المفضلة",
+    "empty": "أضف كورساتك المفضّلة إلى قائمتك"
   },
   "profile": {
     "title": "ملفي الشخصي",
@@ -267,7 +268,10 @@
       "language": "اللغة",
       "select_language": "اختر اللغة",
       "change_Theme": " تغيير المظهر",
-      "select_theme": "اختر المظهر"
+      "select_theme": "اختر المظهر",
+      "theme_system": "تلقائي (النظام)",
+      "theme_light": "الوضع الفاتح",
+      "theme_dark": "الوضع الغامق"
     }
   },
   "lesson_learning": {

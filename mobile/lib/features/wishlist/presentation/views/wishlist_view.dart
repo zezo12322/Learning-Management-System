@@ -34,8 +34,8 @@ class _WishlistViewState extends State<WishlistView> {
           Gap(16.w),
         ],
       ),
-      body: const Center(
-        child: Text('Please add your favorite courses to the wishlist'),
+      body: Center(
+        child: Text('wishlist.empty'.tr()),
       ),
     );
   }
