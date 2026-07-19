@@ -43,17 +43,17 @@ class ProfileView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ProfileHeaderCard(),
+              // NOTE: these sections are intentionally NOT const. `'key'.tr()` is
+              // context-less, so const widgets don't rebuild on a live language
+              // switch (they'd show stale text until navigation). Keeping them
+              // non-const lets them re-translate when the locale changes.
+              ProfileHeaderCard(),
               Gap(24.h),
-              const ProfileInfoSection(),
-              // Gap(24.h),
-              // const ProfileStatisticsSection(),
+              ProfileInfoSection(),
               Gap(24.h),
-              const ProfileCertificatesSection(),
-              // Gap(24.h),
-              // const ProfileCompletedCoursesSection(),
+              ProfileCertificatesSection(),
               Gap(24.h),
-              const ProfileSettingsSection(),
+              ProfileSettingsSection(),
               Gap(24.h),
             ],
           ),

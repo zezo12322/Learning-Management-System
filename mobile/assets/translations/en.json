@@ -249,7 +249,9 @@
     },
     "certificates": {
       "issued_on": "Issued on {date}",
-      "verified": "Verified"
+      "verified": "Verified",
+      "empty": "No certificates earned yet.",
+      "load_error": "Failed to load certificates"
     },
     "completed_courses": {
       "completed_on": "Completed on {date}",
