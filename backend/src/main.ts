@@ -17,17 +17,23 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS for known frontend origins only (M8). Configure via the
-  // CORS_ORIGINS env var (comma-separated). If unset, default to localhost dev
-  // origins rather than reflecting every origin.
-  const corsOrigins = (
-    process.env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:5173,http://localhost:8085,http://localhost:8086,http://localhost:8087'
-  )
+  // Enable CORS for known frontend origins (M8). Explicit production origins are
+  // configured via the CORS_ORIGINS env var (comma-separated). Any localhost /
+  // 127.0.0.1 origin (any port) is always allowed so browser-based dev/testing
+  // (Next.js web, Flutter web) works without reconfiguring per port. Requests
+  // with no Origin header (native mobile apps, curl, server-to-server) pass too.
+  const corsOrigins = (process.env.CORS_ORIGINS ?? '')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
+  const localhostOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
   app.enableCors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (!origin || localhostOrigin.test(origin) || corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+    },
     credentials: true,
   });
 
