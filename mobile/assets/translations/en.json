@@ -294,5 +294,21 @@
       "title": "About this lesson",
       "description": "Learn different user research methods and how to choose the right one for your project."
     }
+  },
+  "quiz": {
+    "title": "Quiz",
+    "empty": "This quiz has no questions yet.",
+    "error_title": "Couldn't load the quiz",
+    "question_of": "Question {} of {}",
+    "answered": "{}/{} answered",
+    "points": "{} pts",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "result_title": "Quiz Result",
+    "score_of": "{}/{}",
+    "passed": "Passed",
+    "failed": "Keep practicing",
+    "back": "Back"
   }
 }

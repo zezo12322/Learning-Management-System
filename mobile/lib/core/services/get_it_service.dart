@@ -41,6 +41,10 @@ import 'package:optimatech_lms/features/course_details/data/data_source/course_d
 import 'package:optimatech_lms/features/course_details/data/repositories/course_details_repository_impl.dart';
 import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_cubit.dart';
+import 'package:optimatech_lms/features/quiz/data/datasources/quiz_remote_datasource.dart';
+import 'package:optimatech_lms/features/quiz/data/repositories/quiz_repository_impl.dart';
+import 'package:optimatech_lms/features/quiz/domain/repositories/quiz_repository.dart';
+import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -154,5 +158,16 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<CourseDetailsCubit>(
     () => CourseDetailsCubit(getIt<CourseDetailsRepository>()),
+  );
+
+  // ========================= Quiz Feature =========================
+  getIt.registerLazySingleton<QuizRemoteDataSource>(
+    () => QuizRemoteDataSourceImpl(apiService: getIt<ApiService>()),
+  );
+  getIt.registerLazySingleton<QuizRepository>(
+    () => QuizRepositoryImpl(remoteDataSource: getIt<QuizRemoteDataSource>()),
+  );
+  getIt.registerFactory<QuizCubit>(
+    () => QuizCubit(getIt<QuizRepository>()),
   );
 }
