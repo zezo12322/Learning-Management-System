@@ -39,7 +39,7 @@ void buildChangeThemeDialog(BuildContext context) {
                         context.read<ThemeCubit>().setTheme(value);
                       }
                     },
-                    child: const Text('System'),
+                    child: Text('profile.settings.theme_system'.tr()),
                   ),
 
                   RadioMenuButton<ThemeMode>(
@@ -50,7 +50,7 @@ void buildChangeThemeDialog(BuildContext context) {
                         context.read<ThemeCubit>().setTheme(value);
                       }
                     },
-                    child: const Text('Light Theme'),
+                    child: Text('profile.settings.theme_light'.tr()),
                   ),
 
                   RadioMenuButton<ThemeMode>(
@@ -62,7 +62,7 @@ void buildChangeThemeDialog(BuildContext context) {
                         //Navigator.pop(dialogContext);
                       }
                     },
-                    child: const Text('Dark Theme'),
+                    child: Text('profile.settings.theme_dark'.tr()),
                   ),
 
                   Gap(10.h),
