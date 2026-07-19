@@ -248,7 +248,9 @@
     },
     "certificates": {
       "issued_on": "تم الإصدار في {date}",
-      "verified": "موثقة"
+      "verified": "موثقة",
+      "empty": "لا توجد شهادات بعد.",
+      "load_error": "فشل تحميل الشهادات"
     },
     "completed_courses": {
       "completed_on": "اكتمل في {date}",

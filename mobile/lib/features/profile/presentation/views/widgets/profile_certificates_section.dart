@@ -30,7 +30,7 @@ class ProfileCertificatesSection extends StatelessWidget {
             }
 
             if (snapshot.hasError) {
-              return Text('Failed to load certificates');
+              return Text('profile.certificates.load_error'.tr());
             }
 
             final certificates = snapshot.data?.data.certificates ?? [];
@@ -40,7 +40,7 @@ class ProfileCertificatesSection extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 20.h),
                 child: Center(
                   child: Text(
-                    'No certificates earned yet.',
+                    'profile.certificates.empty'.tr(),
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
