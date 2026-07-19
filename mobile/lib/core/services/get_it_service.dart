@@ -45,6 +45,7 @@ import 'package:optimatech_lms/features/quiz/data/datasources/quiz_remote_dataso
 import 'package:optimatech_lms/features/quiz/data/repositories/quiz_repository_impl.dart';
 import 'package:optimatech_lms/features/quiz/domain/repositories/quiz_repository.dart';
 import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_cubit.dart';
+import 'package:optimatech_lms/features/notifications/presentation/manager/notifications_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -170,4 +171,7 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<QuizCubit>(
     () => QuizCubit(getIt<QuizRepository>()),
   );
+
+  // ========================= Notifications Feature =========================
+  getIt.registerFactory<NotificationsCubit>(() => NotificationsCubit());
 }
