@@ -200,8 +200,8 @@
     }
   },
   "wishlist": {
-    "title": "Wishlist"
-
+    "title": "Wishlist",
+    "empty": "Please add your favorite courses to the wishlist"
   },
   "profile": {
     "title": "My Profile",
@@ -268,7 +268,10 @@
       "language": "Language",
       "select_language": "Select Language",
       "change_Theme": "Change Theme",
-      "select_theme": "Select Theme"
+      "select_theme": "Select Theme",
+      "theme_system": "System",
+      "theme_light": "Light Theme",
+      "theme_dark": "Dark Theme"
     }
   },
   "lesson_learning": {
