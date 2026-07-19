@@ -4,6 +4,8 @@ import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart
 import 'package:optimatech_lms/features/auth/presentation/views/sign_up_view.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:optimatech_lms/features/quiz/presentation/views/quiz_view.dart';
+import 'package:optimatech_lms/features/notifications/presentation/views/notifications_view.dart';
+import 'package:optimatech_lms/features/ai_tutor/presentation/views/ai_tutor_view.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/views/course_learning_view.dart';
 import 'package:optimatech_lms/features/course_details/presentation/views/course_details_view.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/courses_view.dart';
@@ -25,6 +27,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case QuizView.routeName:
       final args = settings.arguments as QuizViewArgs;
       return MaterialPageRoute(builder: (_) => QuizView(args: args));
+    case NotificationsView.routeName:
+      return MaterialPageRoute(builder: (_) => const NotificationsView());
+    case AiTutorView.routeName:
+      return MaterialPageRoute(builder: (_) => const AiTutorView());
     case HomeView.routeName:
       return MaterialPageRoute(builder: (_) => const HomeView());
     case CoursesView.routeName:

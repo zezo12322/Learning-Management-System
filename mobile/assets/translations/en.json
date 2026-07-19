@@ -310,5 +310,16 @@
     "passed": "Passed",
     "failed": "Keep practicing",
     "back": "Back"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "empty_hint": "You're all caught up. New updates will show up here."
+  },
+  "ai_tutor": {
+    "title": "AI Tutor",
+    "coming_soon": "AI Tutor is coming soon",
+    "coming_soon_body": "Ask questions about your lessons and get answers grounded in the course content — we're putting the finishing touches on it.",
+    "disclaimer": "Powered by AI"
   }
 }
