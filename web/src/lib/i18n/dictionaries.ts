@@ -210,6 +210,8 @@ const en: Dict = {
   'learn.lessonsComplete': 'lessons completed',
   'learn.selectLesson': 'Select a lesson',
   'learn.playerComingSoon': 'The secure video player is being set up',
+  'learn.reading': 'Reading',
+  'learn.readingEmpty': 'This lesson has no content yet.',
   'learn.completeLesson': 'Complete lesson',
 
   // Profile
@@ -707,6 +709,8 @@ const ar: Dict = {
   'learn.lessonsComplete': 'درس مكتمل',
   'learn.selectLesson': 'اختر درساً',
   'learn.playerComingSoon': 'مشغّل الفيديو الآمن قيد الإعداد',
+  'learn.reading': 'قراءة',
+  'learn.readingEmpty': 'لا يوجد محتوى لهذا الدرس بعد.',
   'learn.completeLesson': 'إتمام الدرس',
 
   // Profile
