@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../utils/constants.dart';
@@ -20,15 +21,20 @@ class ApiService {
       ),
     );
 
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-      )
-    );
+    // Network logging is DEBUG-ONLY. In release builds this interceptor is not
+    // attached, so the Authorization bearer token and request/response bodies
+    // (PII, quiz answers, progress) are never written to logcat. Even in debug,
+    // request headers are omitted so the token doesn't leak into shared logs.
+    if (kDebugMode) {
+      // requestHeader/responseHeader default to false — deliberately left off so
+      // the Authorization bearer token is never logged. responseBody defaults to
+      // true (kept); requestBody enabled for debugging payloads.
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestBody: true,
+        ),
+      );
+    }
   }
 
   Future<Response> get(String endpoint) async {
