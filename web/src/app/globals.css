@@ -2,12 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+@layer base {
+  :root {
+    /* Light theme — mirrors mobile AppColors (light) */
+    --color-primary: 79 70 229; /* #4F46E5 */
+    --color-secondary: 14 165 233; /* #0EA5E9 */
+    --color-background: 248 250 252; /* #F8FAFC */
+    --color-surface: 255 255 255; /* #FFFFFF */
+    --color-surface-hover: 248 250 252; /* #F8FAFC */
+    --color-subtle: 241 245 249; /* #F1F5F9 */
+    --color-brand-soft: 238 242 255; /* #EEF2FF */
+    --color-border: 226 232 240; /* #E2E8F0 */
+    --color-border-strong: 203 213 225; /* #CBD5E1 */
+    --color-text-primary: 15 23 42; /* #0F172A */
+    --color-text-secondary: 100 116 139; /* #64748B */
+    --color-text-muted: 148 163 184; /* #94A3B8 */
+  }
 
-:root {
-  --font-cairo: 'Cairo', sans-serif;
+  .dark {
+    /* Dark theme — mirrors mobile AppColors (dark) */
+    --color-primary: 99 102 241; /* #6366F1 */
+    --color-secondary: 56 189 248; /* #38BDF8 */
+    --color-background: 15 23 42; /* #0F172A */
+    --color-surface: 30 41 59; /* #1E293B */
+    --color-surface-hover: 51 65 85; /* #334155 */
+    --color-subtle: 30 41 59; /* #1E293B */
+    --color-brand-soft: 49 46 129; /* #312E81 */
+    --color-border: 51 65 85; /* #334155 */
+    --color-border-strong: 71 85 105; /* #475569 */
+    --color-text-primary: 248 250 252; /* #F8FAFC */
+    --color-text-secondary: 148 163 184; /* #94A3B8 */
+    --color-text-muted: 100 116 139; /* #64748B */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-content antialiased;
+    min-height: 100vh;
+    font-family: var(--font-poppins), 'Poppins', sans-serif;
+  }
+
+  ::selection {
+    background: rgb(var(--color-primary) / 0.18);
+  }
+
+  /* Thin, on-brand scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--color-text-secondary) / 0.5);
+  }
 }
 
-body {
-  font-family: var(--font-cairo);
+@layer utilities {
+  .gradient-primary {
+    background-image: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  }
+  .panel-grid {
+    background-image: radial-gradient(circle at 1px 1px, rgb(99 102 241 / 0.12) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
