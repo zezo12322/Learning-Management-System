@@ -1,8 +1,26 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { getFirebaseAuth } from '@/lib/firebase'
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'
+// NEXT_PUBLIC_* is inlined at build time. If it's missing we must NOT bake an
+// `http://localhost` default into a shipped bundle (every call would hit the
+// wrong host over plaintext and fail with no obvious cause). In production,
+// surface the misconfig loudly and fall back to a same-origin relative path; in
+// dev, the localhost default is convenient and expected.
+function resolveApiBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_URL
+  if (configured) return configured
+  if (process.env.NODE_ENV === 'production') {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[config] NEXT_PUBLIC_API_URL is not set at build time — API requests will fail. ' +
+        'Set it in the deploy environment.',
+    )
+    return '/api/v1'
+  }
+  return 'http://localhost:3000/api/v1'
+}
+
+const API_BASE_URL = resolveApiBaseUrl()
 const FIREBASE_AUTH_CONFIGURED = Boolean(
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
     process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
