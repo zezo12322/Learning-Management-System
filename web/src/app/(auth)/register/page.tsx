@@ -51,7 +51,10 @@ export default function RegisterPage() {
       <h1 className="text-3xl font-bold tracking-tight text-content">{t('reg.title')}</h1>
       <p className="mb-6 mt-2 text-sm text-content-secondary">{t('reg.subtitle')}</p>
       {error && <div className="mb-4 rounded-input bg-error/10 px-3 py-2 text-xs text-error">{error}</div>}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* method="post" so a pre-hydration native submit sends fields in the
+          request body, not the URL query string (avoids leaking password /
+          nationalId into history & logs). preventDefault still applies once hydrated. */}
+      <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div><Label htmlFor="name">{t('reg.fullName')}</Label><Input id="name" icon={<User size={17} />} invalid={!!errors.name} {...register('name')} />{errors.name && <p className="mt-1 text-xs text-error">{errors.name.message}</p>}</div>
         <div><Label htmlFor="email">{t('auth.email')}</Label><Input id="email" type="email" icon={<Mail size={17} />} placeholder="you@example.com" invalid={!!errors.email} {...register('email')} />{errors.email && <p className="mt-1 text-xs text-error">{errors.email.message}</p>}</div>
         <div><Label htmlFor="nationalId">{t('reg.nationalId')}</Label><Input id="nationalId" inputMode="numeric" maxLength={14} icon={<CreditCard size={17} />} invalid={!!errors.nationalId} {...register('nationalId')} />{errors.nationalId && <p className="mt-1 text-xs text-error">{errors.nationalId.message}</p>}</div>
