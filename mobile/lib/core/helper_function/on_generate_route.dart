@@ -25,7 +25,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ForgotPasswordView.routeName:
       return MaterialPageRoute(builder: (_) => const ForgotPasswordView());
     case QuizView.routeName:
-      final args = settings.arguments as QuizViewArgs;
+      final args = settings.arguments;
+      if (args is! QuizViewArgs) return _badArgsRoute(settings);
       return MaterialPageRoute(builder: (_) => QuizView(args: args));
     case NotificationsView.routeName:
       return MaterialPageRoute(builder: (_) => const NotificationsView());
@@ -36,10 +37,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case CoursesView.routeName:
       return MaterialPageRoute(builder: (_) => const CoursesView());
     case CourseLearningView.routeName:
-      final courseId = settings.arguments as String;
+      final courseId = settings.arguments;
+      if (courseId is! String) return _badArgsRoute(settings);
       return MaterialPageRoute(builder: (_) => CourseLearningView(courseId: courseId,));
     case CourseDetailsView.routeName:
-      final course = settings.arguments as CourseEntity;
+      final course = settings.arguments;
+      if (course is! CourseEntity) return _badArgsRoute(settings);
       return MaterialPageRoute(
         builder: (_) => CourseDetailsView(course: course),
       );
@@ -49,4 +52,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       debugPrint('⚠️ Unknown route: ${settings.name}');
       return MaterialPageRoute(builder: (_) => const NotFoundView());
   }
+}
+
+/// Falls back to NotFoundView when a route is pushed with a missing or
+/// wrong-typed argument, instead of throwing an uncaught cast error that
+/// crashes the app.
+Route<dynamic> _badArgsRoute(RouteSettings settings) {
+  debugPrint(
+    '⚠️ Route "${settings.name}" got invalid arguments: ${settings.arguments.runtimeType}',
+  );
+  return MaterialPageRoute(builder: (_) => const NotFoundView());
 }
