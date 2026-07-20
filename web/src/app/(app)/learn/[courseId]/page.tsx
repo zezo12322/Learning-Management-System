@@ -95,15 +95,28 @@ export default function LearnPage() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        {/* Player area */}
+        {/* Player / content area — READING lessons show their text content;
+            other types show the media player region. */}
         <div className="space-y-4">
-          <Card className="flex aspect-video items-center justify-center bg-content/90 text-white">
-            <div className="text-center">
-              <PlayCircle size={56} className="mx-auto mb-2 opacity-80" />
-              <p className="text-sm opacity-80">{active?.title ?? t('learn.selectLesson')}</p>
-              <p className="mt-1 text-xs opacity-50">{t('learn.playerComingSoon')}</p>
-            </div>
-          </Card>
+          {active?.type === 'READING' ? (
+            <Card className="p-6">
+              <div className="mb-3 flex items-center gap-2 text-primary">
+                <FileText size={18} />
+                <h2 className="font-semibold">{t('learn.reading')}</h2>
+              </div>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
+                {active.content?.trim() ? active.content : t('learn.readingEmpty')}
+              </p>
+            </Card>
+          ) : (
+            <Card className="flex aspect-video items-center justify-center bg-content/90 text-white">
+              <div className="text-center">
+                <PlayCircle size={56} className="mx-auto mb-2 opacity-80" />
+                <p className="text-sm opacity-80">{active?.title ?? t('learn.selectLesson')}</p>
+                <p className="mt-1 text-xs opacity-50">{t('learn.playerComingSoon')}</p>
+              </div>
+            </Card>
+          )}
 
           {active && (
             <Card className="p-4">
