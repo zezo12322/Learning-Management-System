@@ -12,6 +12,10 @@ abstract class AuthRepository {
   Future<Either<Failure, UserEntity>> loginWithEmailPassword({required String email, required String password});
   Future<Either<Failure, UserEntity>> loginWithGoogle();
 
+  /// Sends a password-reset email. Succeeds (Unit) even when no account exists
+  /// for the address, so callers never leak whether an email is registered.
+  Future<Either<Failure, Unit>> sendPasswordReset({required String email});
+
   Future<void> setRememberMeState(bool isChecked);
   Future<bool> getRememberMeState();
 }

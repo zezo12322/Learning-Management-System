@@ -6,6 +6,7 @@ import 'package:optimatech_lms/features/auth/data/repositories/auth_repository_i
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/signup_cubit/signup_cubit.dart';
+import 'package:optimatech_lms/features/auth/presentation/manager/forgot_password_cubit/forgot_password_cubit.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/datasources/course_learning_remote_datasource.dart';
 import 'package:optimatech_lms/features/course_learning/data/repositories/course_learning_repository_impl.dart';
@@ -40,6 +41,11 @@ import 'package:optimatech_lms/features/course_details/data/data_source/course_d
 import 'package:optimatech_lms/features/course_details/data/repositories/course_details_repository_impl.dart';
 import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_cubit.dart';
+import 'package:optimatech_lms/features/quiz/data/datasources/quiz_remote_datasource.dart';
+import 'package:optimatech_lms/features/quiz/data/repositories/quiz_repository_impl.dart';
+import 'package:optimatech_lms/features/quiz/domain/repositories/quiz_repository.dart';
+import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_cubit.dart';
+import 'package:optimatech_lms/features/notifications/presentation/manager/notifications_cubit.dart';
 
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
@@ -64,6 +70,9 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<SignupCubit>(
     () => SignupCubit(authRepository: getIt<AuthRepository>()),
+  );
+  getIt.registerFactory<ForgotPasswordCubit>(
+    () => ForgotPasswordCubit(authRepository: getIt<AuthRepository>()),
   );
 
   // ========================= Home Feature =========================
@@ -151,4 +160,18 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<CourseDetailsCubit>(
     () => CourseDetailsCubit(getIt<CourseDetailsRepository>()),
   );
+
+  // ========================= Quiz Feature =========================
+  getIt.registerLazySingleton<QuizRemoteDataSource>(
+    () => QuizRemoteDataSourceImpl(apiService: getIt<ApiService>()),
+  );
+  getIt.registerLazySingleton<QuizRepository>(
+    () => QuizRepositoryImpl(remoteDataSource: getIt<QuizRemoteDataSource>()),
+  );
+  getIt.registerFactory<QuizCubit>(
+    () => QuizCubit(getIt<QuizRepository>()),
+  );
+
+  // ========================= Notifications Feature =========================
+  getIt.registerFactory<NotificationsCubit>(() => NotificationsCubit());
 }
