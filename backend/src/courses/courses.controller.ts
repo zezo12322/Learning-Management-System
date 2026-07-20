@@ -33,6 +33,47 @@ export class CoursesController {
   // PUBLIC / STUDENT ROUTES
   // ==========================================
 
+  // Discovery routes (search/categories/popular/recommended/continue-learning)
+  // MUST stay above the ':courseId' routes below, otherwise their static paths
+  // are shadowed by the param route — "categories" etc. would be treated as a
+  // course id and CourseAccessGuard rejects it as an invalid UUID (HTTP 400).
+  // Any signed-in user may call them (no @Roles); most underlying data is public
+  // catalog content.
+
+  @Get('search')
+  search(@Query('q') searchQuery: string, @AuthToken() token: string) {
+    if (!searchQuery) {
+      throw new BadRequestException('Search query (q) is required');
+    }
+    return this.coursesService.searchCatalog(searchQuery, token);
+  }
+
+  @Get('categories')
+  getCategories(@AuthToken() token: string) {
+    return this.coursesService.getCategories(token);
+  }
+
+  // Most popular published courses (rating-aggregate ranked). Any signed-in user.
+  @Get('popular')
+  getPopular(@Query('limit') limit?: string) {
+    return this.coursesService.getPopular(limit ? Number(limit) : undefined);
+  }
+
+  // Personalized recommendations for the caller (falls back to popular).
+  @Get('recommended')
+  getRecommended(@AuthToken() token: string, @Query('limit') limit?: string) {
+    return this.coursesService.getRecommended(
+      token,
+      limit ? Number(limit) : undefined,
+    );
+  }
+
+  // The caller's enrolled courses, ranked by completed-lesson count (desc).
+  @Get('continue-learning')
+  getContinueLearning(@AuthToken() token: string) {
+    return this.coursesService.getContinueLearning(token);
+  }
+
   // Descriptions of every uploaded video in a course. Access-gated in the service
   // (owner/admin or active enrollee see all; others get free-preview only).
   @Get(':courseId/videos')
