@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/app_header/notification_button.dart';
+import 'package:optimatech_lms/features/notifications/presentation/views/notifications_view.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 
 class WishlistView extends StatefulWidget {
@@ -28,13 +29,13 @@ class _WishlistViewState extends State<WishlistView> {
         actions: [
           NotificationButton(
             count: 0,
-            onTap: () {},
+            onTap: () => Navigator.pushNamed(context, NotificationsView.routeName),
           ),
           Gap(16.w),
         ],
       ),
-      body: const Center(
-        child: Text('Please add your favorite courses to the wishlist'),
+      body: Center(
+        child: Text('wishlist.empty'.tr()),
       ),
     );
   }

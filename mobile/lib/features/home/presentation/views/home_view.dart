@@ -64,6 +64,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Depend on the locale so a live language switch rebuilds this widget
+    // (and re-translates the bottom-nav labels below, which use context-less
+    // `.tr()` and wouldn't otherwise refresh until navigation).
+    context.locale;
+
     // Build the body widget depending on the currently selected tab
     Widget bodyWidget;
     if (currentScreen == 0) {
@@ -78,7 +83,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     } else if (currentScreen == 2) {
       bodyWidget = const WishlistView();
     } else if (currentScreen == 3) {
-      bodyWidget = const ProfileView();
+      // Non-const so the Profile tab re-translates on a live language switch.
+      bodyWidget = ProfileView();
     } else {
       bodyWidget = const SizedBox.shrink();
     }
