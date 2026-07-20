@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:optimatech_lms/core/utils/constants.dart';
+import 'package:optimatech_lms/core/helper_function/lecture_type.dart';
+import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
@@ -70,6 +72,7 @@ class CourseLearningContent extends StatelessWidget {
                                   .withValues(alpha: 0.6),
                             ),
                             Gap(4.h),
+                            const _LectureReadingSection(),
                             LessonTabsRow(
                               selected: selectedTab,
                               onSelected: onTabSelected,
@@ -100,6 +103,7 @@ class _LectureVideoSection extends StatelessWidget {
     return BlocBuilder<CourseLearningCubit, CourseLearningState>(
       buildWhen: (prev, curr) =>
       prev.currentLecture?.videoUrl != curr.currentLecture?.videoUrl ||
+          prev.currentLecture?.type != curr.currentLecture?.type ||
           prev.lectureState != curr.lectureState,
       builder: (context, state) {
         if (state.lectureState == Status.loading) {
@@ -121,11 +125,85 @@ class _LectureVideoSection extends StatelessWidget {
           );
         }
 
-        final url = state.currentLecture?.videoUrl ?? '';
+        // Only VIDEO lectures render the media player. Reading / interactive /
+        // quiz lectures render their content in the body below, so no media
+        // area (and no misleading "failed to load" banner) is shown here.
+        final lecture = state.currentLecture;
+        if (lecture == null || lecture.type != LectureContentType.video) {
+          return const SizedBox.shrink();
+        }
+
+        final url = lecture.videoUrl ?? '';
 
         return LessonVideoPlayerSection(
           key: ValueKey(url.isEmpty ? 'empty-video' : url),
           url: url,
+        );
+      },
+    );
+  }
+}
+
+/// Renders the textual body of a READING lecture. For any other lecture type
+/// (video/interactive/quiz) it collapses to nothing, so video lectures keep
+/// their original layout untouched.
+class _LectureReadingSection extends StatelessWidget {
+  const _LectureReadingSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CourseLearningCubit, CourseLearningState>(
+      buildWhen: (prev, curr) =>
+      prev.currentLecture?.id != curr.currentLecture?.id ||
+          prev.currentLecture?.type != curr.currentLecture?.type ||
+          prev.lectureState != curr.lectureState,
+      builder: (context, state) {
+        final lecture = state.currentLecture;
+        if (lecture == null || lecture.type != LectureContentType.reading) {
+          return const SizedBox.shrink();
+        }
+
+        final content = lecture.content?.trim() ?? '';
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 16.h),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16.r),
+            decoration: BoxDecoration(
+              color: AppColors.disableBackground.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.menu_book_rounded,
+                      color: context.theme.colorScheme.primary,
+                      size: 20.sp,
+                    ),
+                    Gap(8.w),
+                    Text(
+                      'lesson_learning.reading.title'.tr(),
+                      style: context.textTheme.titleSmall,
+                    ),
+                  ],
+                ),
+                Gap(12.h),
+                Text(
+                  content.isEmpty
+                      ? 'lesson_learning.reading.empty'.tr()
+                      : content,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.theme.colorScheme.onSurfaceVariant,
+                    height: 1.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
