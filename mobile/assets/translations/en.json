@@ -74,6 +74,15 @@
       "no_account": "Don't have an account?",
       "register": "Register"
     },
+    "forgot_password_screen": {
+      "title": "Forgot Password",
+      "heading": "Reset your password",
+      "subtitle": "Enter the email linked to your account and we'll send you a reset link.",
+      "send_btn": "Send reset link",
+      "success_title": "Check your email",
+      "success_message": "If an account exists for {}, a password reset link is on its way.",
+      "back_to_login": "Back to login"
+    },
     "signup_screen": {
       "create_account": "Create\nAccount",
       "subtitle": "Join Optima and start your\nlearning journey today",
@@ -191,8 +200,8 @@
     }
   },
   "wishlist": {
-    "title": "Wishlist"
-
+    "title": "Wishlist",
+    "empty": "Please add your favorite courses to the wishlist"
   },
   "profile": {
     "title": "My Profile",
@@ -240,7 +249,9 @@
     },
     "certificates": {
       "issued_on": "Issued on {date}",
-      "verified": "Verified"
+      "verified": "Verified",
+      "empty": "No certificates earned yet.",
+      "load_error": "Failed to load certificates"
     },
     "completed_courses": {
       "completed_on": "Completed on {date}",
@@ -257,7 +268,10 @@
       "language": "Language",
       "select_language": "Select Language",
       "change_Theme": "Change Theme",
-      "select_theme": "Select Theme"
+      "select_theme": "Select Theme",
+      "theme_system": "System",
+      "theme_light": "Light Theme",
+      "theme_dark": "Dark Theme"
     }
   },
   "lesson_learning": {
@@ -285,5 +299,32 @@
       "title": "About this lesson",
       "description": "Learn different user research methods and how to choose the right one for your project."
     }
+  },
+  "quiz": {
+    "title": "Quiz",
+    "empty": "This quiz has no questions yet.",
+    "error_title": "Couldn't load the quiz",
+    "question_of": "Question {} of {}",
+    "answered": "{}/{} answered",
+    "points": "{} pts",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "result_title": "Quiz Result",
+    "score_of": "{}/{}",
+    "passed": "Passed",
+    "failed": "Keep practicing",
+    "back": "Back"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "empty_hint": "You're all caught up. New updates will show up here."
+  },
+  "ai_tutor": {
+    "title": "AI Tutor",
+    "coming_soon": "AI Tutor is coming soon",
+    "coming_soon_body": "Ask questions about your lessons and get answers grounded in the course content — we're putting the finishing touches on it.",
+    "disclaimer": "Powered by AI"
   }
 }

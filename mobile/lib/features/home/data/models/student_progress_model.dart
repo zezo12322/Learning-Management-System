@@ -6,6 +6,9 @@ class StudentProgressModel extends StudentProgressEntity {
     required super.totalLessons,
     required super.timeLeft,
     required super.progressPercent,
+    required super.courseId,
+    required super.title,
+    required super.thumbnail,
   });
 
   factory StudentProgressModel.fromDataConnect(Map<String, dynamic> json) {
@@ -14,6 +17,9 @@ class StudentProgressModel extends StudentProgressEntity {
       totalLessons: json['totalLessons'] as int? ?? 0,
       timeLeft: json['timeLeft'] as String? ?? '',
       progressPercent: (json['progressPercent'] as num?)?.toDouble() ?? 0.0,
+      courseId: json['courseId'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      thumbnail: json['thumbnail'] as String? ?? '',
     );
   }
 }
