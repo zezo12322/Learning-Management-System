@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chewie/chewie.dart';
 import 'package:easy_localization/easy_localization.dart' as esay;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/language_service.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
@@ -30,6 +30,9 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
 
   bool _hasError = false;
   bool _isLoading = false;
+  // Latch so "mark complete" fires once per video, not on every value tick
+  // after the playhead reaches the end (which spammed PUT /lectures/:id/progress).
+  bool _completedSent = false;
 
   @override
   void initState() {
@@ -65,32 +68,17 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
       return;
     }
 
-    String finalUrl = '';
-
     try {
       if (mounted) {
         setState(() {
           _isLoading = true;
           _hasError = false;
+          _completedSent = false;
         });
       }
 
-      final user = FirebaseAuth.instance.currentUser;
-      final token = await user?.getIdToken();
-
-      // Temporary bypass: Use corsproxy to bypass Firebase Storage CORS restrictions during local testing.
-      // Additionally, the database seeder inserted 'placeholder' instead of real videos.
-      // If we detect a placeholder, we inject a real sample video so the UI can be tested!
-      if (url.contains('placeholder')) {
-        finalUrl = 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4';
-      } else {
-        finalUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
-      }
-      
-      print('DEBUG VIDEO URL: $finalUrl');
-
       final controller = VideoPlayerController.networkUrl(
-        Uri.parse(finalUrl),
+        Uri.parse(url),
       );
       await controller.initialize();
 
@@ -99,13 +87,16 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         return;
       }
 
-      // Add a listener for video completion
+      // Fire "mark complete" exactly once when the playhead first reaches the
+      // end. The listener ticks continuously, so without the _completedSent
+      // latch this would call the endpoint on every subsequent tick.
       controller.addListener(() {
-        if (!mounted) return;
+        if (!mounted || _completedSent) return;
         final value = controller.value;
-        if (value.isInitialized && 
-            value.position >= value.duration && 
+        if (value.isInitialized &&
+            value.position >= value.duration &&
             value.duration > Duration.zero) {
+          _completedSent = true;
           context.read<CourseLearningCubit>().markCurrentLectureAsCompleted();
         }
       });
@@ -144,7 +135,7 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         errorBuilder: (context, errorMessage) {
           return Center(
             child: Text(
-              'lesson_learning.video.error_lesson'.tr(),
+              'lesson_learning.video.unavailable'.tr(),
               style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
           );
@@ -161,8 +152,8 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         });
       }
     } catch (e) {
-      print('Video player initialization error: $e');
-      print('Attempted URL: $finalUrl');
+      debugPrint('Video player initialization error: $e');
+      debugPrint('Attempted URL: $url');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -202,9 +193,22 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         child: Container(
           color: Colors.black,
           alignment: Alignment.center,
-          child: Text(
-            'lesson_learning.video.error_lesson'.tr(),
-            style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.videocam_off_rounded,
+                color: Colors.white70,
+                size: 40,
+              ),
+              Gap(8.h),
+              Text(
+                'lesson_learning.video.unavailable'.tr(),
+                textAlign: TextAlign.center,
+                style:
+                    context.textTheme.bodyMedium?.copyWith(color: Colors.white),
+              ),
+            ],
           ),
         ),
       );
@@ -231,12 +235,19 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const Icon(
+                      Icons.videocam_off_rounded,
+                      color: Colors.white70,
+                      size: 40,
+                    ),
+                    Gap(8.h),
                     Text(
-                      'lesson_learning.video.error_playing'.tr(),
+                      'lesson_learning.video.unavailable'.tr(),
+                      textAlign: TextAlign.center,
                       style: context.textTheme.bodyMedium?.copyWith(color: Colors.white),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh, color: Colors.white70),
                       onPressed: _reinitializePlayer,
                     ),
                   ],
