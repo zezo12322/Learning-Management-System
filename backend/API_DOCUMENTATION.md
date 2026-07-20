@@ -2,7 +2,7 @@
 
 Complete request/response reference for every endpoint in the NestJS backend (`backend/src/**/*.controller.ts`). This is the detailed companion to [`API_REFERENCE.md`](./API_REFERENCE.md) (which is the quick-lookup table). If a route isn't here, it doesn't exist in the API.
 
-> **Mapping the API to the code.** [Appendix A](#appendix-a--complete-endpoint-index-all-89-routes) lists all 89 routes with a **Source** column linking each to its exact handler (`file:line`). [Appendix B](#appendix-b--controller--service-source-map) maps every controller to its base path and the service that holds its logic. DTOs (request shapes + validation) live in each module's `dto/` folder next to its controller.
+> **Mapping the API to the code.** [Appendix A](#appendix-a--complete-endpoint-index-all-90-routes) lists all 90 routes with a **Source** column linking each to its exact handler (`file:line`). [Appendix B](#appendix-b--controller--service-source-map) maps every controller to its base path and the service that holds its logic. DTOs (request shapes + validation) live in each module's `dto/` folder next to its controller.
 
 ---
 
@@ -708,6 +708,20 @@ Soft delete + re-normalizes remaining order. → **`200`** `{ "success": true }`
 
 ### 11.2 Taking — **User (enrolled); attempt-owner enforced**
 
+#### `GET /courses/:courseId/lectures/:lectureId/quiz`
+Resolves the quiz attached to a QUIZ-type lecture — the entry point when the client holds only a `lectureId` (e.g. rendering a lecture) and needs to discover the quiz and its `id`. Student-safe view (**no `isCorrect`**), identical shape to the `…/quizzes/:quizId/questions` response below. Access is gated against the lecture's real owning course (owner/admin previewing, or active enrollee); the route's `:courseId` is not trusted.
+**Response `200`:**
+```json
+{
+  "id": "…", "passingScore": 70, "maxAttempts": 3, "timeLimitMinutes": 30,
+  "questions": [
+    { "id": "…", "questionText": "…", "points": 2,
+      "options": [ { "id": "…", "text": "Deployment" } ] }
+  ]
+}
+```
+**Errors:** `404` lecture not found / lecture has no quiz · `403` not owner/admin and no active enrollment.
+
 #### `GET /courses/:courseId/quizzes/:quizId/questions`
 Student-safe view (**no `isCorrect`**). Render the quiz from this.
 **Response `200`:**
@@ -1119,13 +1133,15 @@ Poll transcode status.
 1. `POST /courses` → 2. `POST /courses/:id/sections` → 3. add lectures → 4. (video) upload via §18 → transcode → 5. `POST …/stream/register` → 6. `PATCH /courses/:id/status {status:"PUBLISHED"}`
 
 **Student takes a quiz**
-1. `GET …/quizzes/:quizId/questions` → 2. `POST …/attempts` → 3. `POST …/attempts/:id/answers` (per answer) → 4. `POST …/attempts/:id/heartbeat` (if timed) → 5. `POST …/attempts/:id/finish`
+1. `GET …/lectures/:lectureId/quiz` (resolve quiz from the lecture) → 2. `POST …/attempts` → 3. `POST …/attempts/:id/answers` (per answer) → 4. `POST …/attempts/:id/heartbeat` (if timed) → 5. `POST …/attempts/:id/finish`
+
+> Clients that already hold the `quizId` may skip step 1 and use `GET …/quizzes/:quizId/questions` instead.
 
 ---
 
 ## 22. Client-called Cloud Functions (Firebase SDK — NOT REST)
 
-> **Read this if you build sign-up or the admin role UI.** These live in a **separate** Firebase Cloud Functions deployment (`/functions`), **not** the NestJS backend. You do **not** call them with `fetch`/a base URL — you invoke them through the Firebase SDK's `httpsCallable`. They are **not** included in the 89 REST routes above.
+> **Read this if you build sign-up or the admin role UI.** These live in a **separate** Firebase Cloud Functions deployment (`/functions`), **not** the NestJS backend. You do **not** call them with `fetch`/a base URL — you invoke them through the Firebase SDK's `httpsCallable`. They are **not** included in the 90 REST routes above.
 
 **Region:** all functions are deployed to **`europe-west3`** — you must pass this region when getting the callable, or the call fails.
 
@@ -1209,7 +1225,7 @@ For completeness — these run automatically inside Firebase and the frontend ne
 
 ---
 
-## Appendix A — Complete endpoint index (all 89 routes)
+## Appendix A — Complete endpoint index (all 90 routes)
 
 Every route in the backend, prefixed with `/api/v1`. Use it as a build checklist. Auth: **P** = Public · **U** = User · **I/A** = Instructor/Admin · **Own** = must own the resource · **Adm** = Admin only.
 
@@ -1262,50 +1278,51 @@ Every route in the backend, prefixed with `/api/v1`. Use it as a build checklist
 | 45 | DELETE | `/courses/:courseId/ratings/me` | U | 10 | [ratings.controller.ts:65](./src/ratings/ratings.controller.ts#L65) |
 | 46 | POST | `/courses/:courseId/lectures/:lectureId/quiz` | I/A Own | 11.1 | [quizzes.controller.ts:42](./src/quizzes/quizzes.controller.ts#L42) |
 | 47 | GET | `/courses/:courseId/quizzes/:quizId` | I/A Own | 11.1 | [quizzes.controller.ts:56](./src/quizzes/quizzes.controller.ts#L56) |
-| 48 | PATCH | `/courses/:courseId/quizzes/:quizId` | I/A Own | 11.1 | [quizzes.controller.ts:77](./src/quizzes/quizzes.controller.ts#L77) |
-| 49 | DELETE | `/courses/:courseId/quizzes/:quizId` | I/A Own | 11.1 | [quizzes.controller.ts:89](./src/quizzes/quizzes.controller.ts#L89) |
-| 50 | POST | `/courses/:courseId/quizzes/:quizId/questions` | I/A Own | 11.1 | [quizzes.controller.ts:101](./src/quizzes/quizzes.controller.ts#L101) |
-| 51 | PATCH | `/courses/:courseId/quizzes/:quizId/questions/:questionId` | I/A Own | 11.1 | [quizzes.controller.ts:113](./src/quizzes/quizzes.controller.ts#L113) |
-| 52 | DELETE | `/courses/:courseId/quizzes/:quizId/questions/:questionId` | I/A Own | 11.1 | [quizzes.controller.ts:125](./src/quizzes/quizzes.controller.ts#L125) |
-| 53 | PUT | `/courses/:courseId/quizzes/:quizId/questions/reorder` | I/A Own | 11.1 | [quizzes.controller.ts:137](./src/quizzes/quizzes.controller.ts#L137) |
-| 54 | PATCH | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId` | I/A Own | 11.1 | [quizzes.controller.ts:153](./src/quizzes/quizzes.controller.ts#L153) |
-| 55 | DELETE | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId` | I/A Own | 11.1 | [quizzes.controller.ts:167](./src/quizzes/quizzes.controller.ts#L167) |
-| 56 | PUT | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/reorder` | I/A Own | 11.1 | [quizzes.controller.ts:180](./src/quizzes/quizzes.controller.ts#L180) |
-| 57 | GET | `/courses/:courseId/quizzes/:quizId/questions` | U enrolled | 11.2 | [quizzes.controller.ts:66](./src/quizzes/quizzes.controller.ts#L66) |
-| 58 | POST | `/courses/:courseId/quizzes/:quizId/attempts` | U enrolled | 11.2 | [quizzes.controller.ts:203](./src/quizzes/quizzes.controller.ts#L203) |
-| 59 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/answers` | U (owner) | 11.2 | [quizzes.controller.ts:212](./src/quizzes/quizzes.controller.ts#L212) |
-| 60 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/finish` | U (owner) | 11.2 | [quizzes.controller.ts:222](./src/quizzes/quizzes.controller.ts#L222) |
-| 61 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/heartbeat` | U (owner) | 11.2 | [quizzes.controller.ts:235](./src/quizzes/quizzes.controller.ts#L235) |
-| 62 | POST | `/missions` | I/A | 12 | [missions.controller.ts:27](./src/missions/missions.controller.ts#L27) |
-| 63 | GET | `/missions` | I/A | 12 | [missions.controller.ts:40](./src/missions/missions.controller.ts#L40) |
-| 64 | GET | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:45](./src/missions/missions.controller.ts#L45) |
-| 65 | PATCH | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:51](./src/missions/missions.controller.ts#L51) |
-| 66 | DELETE | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:64](./src/missions/missions.controller.ts#L64) |
-| 67 | POST | `/missions/:missionId/micro-lessons` | I/A Own | 13 | [micro-lessons.controller.ts:31](./src/micro-lessons/micro-lessons.controller.ts#L31) |
-| 68 | PATCH | `/missions/:missionId/micro-lessons/:microLessonId` | I/A Own | 13 | [micro-lessons.controller.ts:41](./src/micro-lessons/micro-lessons.controller.ts#L41) |
-| 69 | DELETE | `/missions/:missionId/micro-lessons/:microLessonId` | I/A Own | 13 | [micro-lessons.controller.ts:52](./src/micro-lessons/micro-lessons.controller.ts#L52) |
-| 70 | PUT | `/missions/:missionId/micro-lessons/reorder` | I/A Own | 13 | [micro-lessons.controller.ts:63](./src/micro-lessons/micro-lessons.controller.ts#L63) |
-| 71 | POST | `/missions/:missionId/templates` | I/A Own | 14 | [templates.controller.ts:31](./src/templates/templates.controller.ts#L31) |
-| 72 | GET | `/missions/:missionId/templates` | U enrolled | 14 | [templates.controller.ts:44](./src/templates/templates.controller.ts#L44) |
-| 73 | DELETE | `/missions/:missionId/templates/:templateId` | I/A Own | 14 | [templates.controller.ts:55](./src/templates/templates.controller.ts#L55) |
-| 74 | POST | `/missions/:missionId/rubric` | I/A Own | 15 | [rubric.controller.ts:28](./src/rubric/rubric.controller.ts#L28) |
-| 75 | PATCH | `/missions/:missionId/rubric/:criterionId` | I/A Own | 15 | [rubric.controller.ts:38](./src/rubric/rubric.controller.ts#L38) |
-| 76 | DELETE | `/missions/:missionId/rubric/:criterionId` | I/A Own | 15 | [rubric.controller.ts:49](./src/rubric/rubric.controller.ts#L49) |
-| 77 | PUT | `/missions/:missionId/rubric/reorder` | I/A Own | 15 | [rubric.controller.ts:60](./src/rubric/rubric.controller.ts#L60) |
-| 78 | POST | `/missions/:missionId/submissions` | U enrolled | 16 | [submissions.controller.ts:25](./src/submissions/submissions.controller.ts#L25) |
-| 79 | GET | `/me/submissions` | U | 16 | [submissions.controller.ts:35](./src/submissions/submissions.controller.ts#L35) |
-| 80 | GET | `/submissions/pending` | I/A | 16 | [submissions.controller.ts:42](./src/submissions/submissions.controller.ts#L42) |
-| 81 | POST | `/submissions/:submissionId/grade` | I/A | 16 | [submissions.controller.ts:49](./src/submissions/submissions.controller.ts#L49) |
-| 82 | POST | `/uploads/signed-url` | I/A Own | 17 | [uploads.controller.ts:18](./src/uploads/uploads.controller.ts#L18) |
-| 83 | POST | `/uploads/confirm` | I/A Own | 17 | [uploads.controller.ts:23](./src/uploads/uploads.controller.ts#L23) |
-| 84 | GET | `/lectures/:lectureId/stream/manifest` | U enrolled | 19.2 | [streaming.controller.ts:32](./src/streaming/streaming.controller.ts#L32) |
-| 85 | GET | `/lectures/:lectureId/stream/watermark` | U enrolled | 19.3 | [streaming.controller.ts:57](./src/streaming/streaming.controller.ts#L57) |
-| 86 | GET | `/lectures/:lectureId/stream/key` | U enrolled | 19.4 | [streaming.controller.ts:81](./src/streaming/streaming.controller.ts#L81) |
-| 87 | POST | `/courses/:courseId/lectures/:lectureId/stream/register` | I/A Own | 19.6 | [streaming.controller.ts:113](./src/streaming/streaming.controller.ts#L113) |
-| 88 | POST | `/courses/:courseId/lectures/:lectureId/video/transcode` | I/A Own | 20 | [transcoding.controller.ts:29](./src/transcoding/transcoding.controller.ts#L29) |
-| 89 | GET | `/courses/:courseId/lectures/:lectureId/video/transcode/status` | I/A Own | 20 | [transcoding.controller.ts:43](./src/transcoding/transcoding.controller.ts#L43) |
+| 48 | PATCH | `/courses/:courseId/quizzes/:quizId` | I/A Own | 11.1 | [quizzes.controller.ts:92](./src/quizzes/quizzes.controller.ts#L92) |
+| 49 | DELETE | `/courses/:courseId/quizzes/:quizId` | I/A Own | 11.1 | [quizzes.controller.ts:104](./src/quizzes/quizzes.controller.ts#L104) |
+| 50 | POST | `/courses/:courseId/quizzes/:quizId/questions` | I/A Own | 11.1 | [quizzes.controller.ts:116](./src/quizzes/quizzes.controller.ts#L116) |
+| 51 | PATCH | `/courses/:courseId/quizzes/:quizId/questions/:questionId` | I/A Own | 11.1 | [quizzes.controller.ts:128](./src/quizzes/quizzes.controller.ts#L128) |
+| 52 | DELETE | `/courses/:courseId/quizzes/:quizId/questions/:questionId` | I/A Own | 11.1 | [quizzes.controller.ts:140](./src/quizzes/quizzes.controller.ts#L140) |
+| 53 | PUT | `/courses/:courseId/quizzes/:quizId/questions/reorder` | I/A Own | 11.1 | [quizzes.controller.ts:152](./src/quizzes/quizzes.controller.ts#L152) |
+| 54 | PATCH | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId` | I/A Own | 11.1 | [quizzes.controller.ts:168](./src/quizzes/quizzes.controller.ts#L168) |
+| 55 | DELETE | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/:optionId` | I/A Own | 11.1 | [quizzes.controller.ts:182](./src/quizzes/quizzes.controller.ts#L182) |
+| 56 | PUT | `/courses/:courseId/quizzes/:quizId/questions/:questionId/options/reorder` | I/A Own | 11.1 | [quizzes.controller.ts:195](./src/quizzes/quizzes.controller.ts#L195) |
+| 57 | GET | `/courses/:courseId/lectures/:lectureId/quiz` | U enrolled | 11.2 | [quizzes.controller.ts:68](./src/quizzes/quizzes.controller.ts#L68) |
+| 58 | GET | `/courses/:courseId/quizzes/:quizId/questions` | U enrolled | 11.2 | [quizzes.controller.ts:81](./src/quizzes/quizzes.controller.ts#L81) |
+| 59 | POST | `/courses/:courseId/quizzes/:quizId/attempts` | U enrolled | 11.2 | [quizzes.controller.ts:218](./src/quizzes/quizzes.controller.ts#L218) |
+| 60 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/answers` | U (owner) | 11.2 | [quizzes.controller.ts:227](./src/quizzes/quizzes.controller.ts#L227) |
+| 61 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/finish` | U (owner) | 11.2 | [quizzes.controller.ts:237](./src/quizzes/quizzes.controller.ts#L237) |
+| 62 | POST | `/courses/:courseId/quizzes/:quizId/attempts/:attemptId/heartbeat` | U (owner) | 11.2 | [quizzes.controller.ts:250](./src/quizzes/quizzes.controller.ts#L250) |
+| 63 | POST | `/missions` | I/A | 12 | [missions.controller.ts:27](./src/missions/missions.controller.ts#L27) |
+| 64 | GET | `/missions` | I/A | 12 | [missions.controller.ts:40](./src/missions/missions.controller.ts#L40) |
+| 65 | GET | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:45](./src/missions/missions.controller.ts#L45) |
+| 66 | PATCH | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:51](./src/missions/missions.controller.ts#L51) |
+| 67 | DELETE | `/missions/:missionId` | I/A Own | 12 | [missions.controller.ts:64](./src/missions/missions.controller.ts#L64) |
+| 68 | POST | `/missions/:missionId/micro-lessons` | I/A Own | 13 | [micro-lessons.controller.ts:31](./src/micro-lessons/micro-lessons.controller.ts#L31) |
+| 69 | PATCH | `/missions/:missionId/micro-lessons/:microLessonId` | I/A Own | 13 | [micro-lessons.controller.ts:41](./src/micro-lessons/micro-lessons.controller.ts#L41) |
+| 70 | DELETE | `/missions/:missionId/micro-lessons/:microLessonId` | I/A Own | 13 | [micro-lessons.controller.ts:52](./src/micro-lessons/micro-lessons.controller.ts#L52) |
+| 71 | PUT | `/missions/:missionId/micro-lessons/reorder` | I/A Own | 13 | [micro-lessons.controller.ts:63](./src/micro-lessons/micro-lessons.controller.ts#L63) |
+| 72 | POST | `/missions/:missionId/templates` | I/A Own | 14 | [templates.controller.ts:31](./src/templates/templates.controller.ts#L31) |
+| 73 | GET | `/missions/:missionId/templates` | U enrolled | 14 | [templates.controller.ts:44](./src/templates/templates.controller.ts#L44) |
+| 74 | DELETE | `/missions/:missionId/templates/:templateId` | I/A Own | 14 | [templates.controller.ts:55](./src/templates/templates.controller.ts#L55) |
+| 75 | POST | `/missions/:missionId/rubric` | I/A Own | 15 | [rubric.controller.ts:28](./src/rubric/rubric.controller.ts#L28) |
+| 76 | PATCH | `/missions/:missionId/rubric/:criterionId` | I/A Own | 15 | [rubric.controller.ts:38](./src/rubric/rubric.controller.ts#L38) |
+| 77 | DELETE | `/missions/:missionId/rubric/:criterionId` | I/A Own | 15 | [rubric.controller.ts:49](./src/rubric/rubric.controller.ts#L49) |
+| 78 | PUT | `/missions/:missionId/rubric/reorder` | I/A Own | 15 | [rubric.controller.ts:60](./src/rubric/rubric.controller.ts#L60) |
+| 79 | POST | `/missions/:missionId/submissions` | U enrolled | 16 | [submissions.controller.ts:25](./src/submissions/submissions.controller.ts#L25) |
+| 80 | GET | `/me/submissions` | U | 16 | [submissions.controller.ts:35](./src/submissions/submissions.controller.ts#L35) |
+| 81 | GET | `/submissions/pending` | I/A | 16 | [submissions.controller.ts:42](./src/submissions/submissions.controller.ts#L42) |
+| 82 | POST | `/submissions/:submissionId/grade` | I/A | 16 | [submissions.controller.ts:49](./src/submissions/submissions.controller.ts#L49) |
+| 83 | POST | `/uploads/signed-url` | I/A Own | 17 | [uploads.controller.ts:18](./src/uploads/uploads.controller.ts#L18) |
+| 84 | POST | `/uploads/confirm` | I/A Own | 17 | [uploads.controller.ts:23](./src/uploads/uploads.controller.ts#L23) |
+| 85 | GET | `/lectures/:lectureId/stream/manifest` | U enrolled | 19.2 | [streaming.controller.ts:32](./src/streaming/streaming.controller.ts#L32) |
+| 86 | GET | `/lectures/:lectureId/stream/watermark` | U enrolled | 19.3 | [streaming.controller.ts:57](./src/streaming/streaming.controller.ts#L57) |
+| 87 | GET | `/lectures/:lectureId/stream/key` | U enrolled | 19.4 | [streaming.controller.ts:81](./src/streaming/streaming.controller.ts#L81) |
+| 88 | POST | `/courses/:courseId/lectures/:lectureId/stream/register` | I/A Own | 19.6 | [streaming.controller.ts:113](./src/streaming/streaming.controller.ts#L113) |
+| 89 | POST | `/courses/:courseId/lectures/:lectureId/video/transcode` | I/A Own | 20 | [transcoding.controller.ts:29](./src/transcoding/transcoding.controller.ts#L29) |
+| 90 | GET | `/courses/:courseId/lectures/:lectureId/video/transcode/status` | I/A Own | 20 | [transcoding.controller.ts:43](./src/transcoding/transcoding.controller.ts#L43) |
 
-> **Route total: 89** distinct handlers across 19 controller files. This index was generated by scanning every `@Get/@Post/@Put/@Patch/@Delete` decorator in `src/**/*.controller.ts` — it is the full set. The **Source** column links each route to its handler in the codebase (`file:line`; line numbers are as of the 2026-07-05 scan and may drift). Breakdown: health 1, me 3, admin 1, catalog 2, courses 15, sections 4, lectures 6, enrollment 4, progress 4, ratings 5, quizzes 16, missions 5, micro-lessons 4, templates 3, rubric 4, submissions 4, uploads 2, streaming 4, transcoding 2.
+> **Route total: 90** distinct handlers across 19 controller files. This index was generated by scanning every `@Get/@Post/@Put/@Patch/@Delete` decorator in `src/**/*.controller.ts` — it is the full set. The **Source** column links each route to its handler in the codebase (`file:line`; line numbers are as of the 2026-07-05 scan and may drift). Breakdown: health 1, me 3, admin 1, catalog 2, courses 15, sections 4, lectures 6, enrollment 4, progress 4, ratings 5, quizzes 17, missions 5, micro-lessons 4, templates 3, rubric 4, submissions 4, uploads 2, streaming 4, transcoding 2.
 
 ## Appendix B — Controller & service source map
 
