@@ -57,6 +57,13 @@ export class FirebaseService implements OnModuleInit {
     delete claims.admin;
     claims.roles = [role];
     await this.getAuth().setCustomUserClaims(uid, claims);
+
+    // Revoke all existing refresh tokens so the user must re-authenticate.
+    // Without this, a demoted admin's stale ID token (minted before the role
+    // change) would keep granting admin access until it expires naturally
+    // (up to 1 hour). Forcing a re-auth ensures the new claims take effect
+    // immediately on the next session.
+    await this.getAuth().revokeRefreshTokens(uid);
   }
 
   /**
