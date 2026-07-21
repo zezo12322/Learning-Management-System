@@ -61,6 +61,21 @@ export class QuizzesController {
     return this.quizzesService.getQuiz(quizId, token);
   }
 
+  // Student-safe view keyed on the LECTURE id — the front-end knows the lecture
+  // it's rendering, not the quiz id. Returns the answer-free quiz (incl. its id)
+  // so it can then start attempts; 404 if the lecture has no quiz.
+  // Access is gated in the service (M4): course owner/admin or active enrollee.
+  @Get('courses/:courseId/lectures/:lectureId/quiz')
+  getQuizForLecture(
+    @Param('lectureId') lectureId: string,
+    @AuthToken() token: string,
+    @CurrentUser('uid') uid: string,
+    @Req() req: any,
+  ) {
+    const isAdmin = (req.userRoles ?? []).includes('admin');
+    return this.quizzesService.getQuizForLecture(lectureId, token, uid, isAdmin);
+  }
+
   // Student-safe view (no isCorrect) — used to render the quiz for taking.
   // Access is gated in the service (M4): course owner/admin or active enrollee.
   @Get('courses/:courseId/quizzes/:quizId/questions')
