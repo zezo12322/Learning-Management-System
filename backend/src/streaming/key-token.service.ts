@@ -39,6 +39,12 @@ export class KeyTokenService {
       this.logger.error(
         'STREAM_KEY_SECRET is not set — secure video key tokens cannot be issued.',
       );
+    } else if (this.secret.length < 32) {
+      // Security hardening: warn if secret is too short.
+      // HMAC-SHA256 should use at least 256-bit (32-byte) keys for security.
+      this.logger.warn(
+        `STREAM_KEY_SECRET is only ${this.secret.length} bytes. For HMAC-SHA256 security, use at least 32 bytes (256 bits).`,
+      );
     }
   }
 

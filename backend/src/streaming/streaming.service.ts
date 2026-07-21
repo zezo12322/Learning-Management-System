@@ -22,6 +22,8 @@ interface ManifestRequest {
   variant?: string;
   /** Caller IP, recorded in the access log for leak forensics. */
   ip?: string;
+  /** User-Agent header, recorded for forensic analysis and bot detection. */
+  userAgent?: string;
 }
 
 /**
@@ -54,8 +56,11 @@ export class StreamingService {
     private readonly watermark: WatermarkService,
     config: ConfigService,
   ) {
+    // Security hardening: reduced default TTL from 360 to 60 minutes.
+    // Shorter-lived signed URLs limit the window for URL sharing/leakage.
+    // Can still be overridden via STREAM_URL_TTL_MINUTES env var if needed.
     this.urlTtlMinutes = Number(
-      config.get<string>('STREAM_URL_TTL_MINUTES', '360'),
+      config.get<string>('STREAM_URL_TTL_MINUTES', '60'),
     );
     // Absolute base for self-referential URLs embedded in the manifest (key +
     // sub-playlist endpoints). Must be reachable by the player.
@@ -167,6 +172,7 @@ export class StreamingService {
 
     this.logAccess('manifest', req.uid, req.lectureId, req.ip, {
       variant: relPlaylist,
+      userAgent: req.userAgent,
     });
 
     return this.rewritePlaylist(raw, {
@@ -188,11 +194,13 @@ export class StreamingService {
     token: string,
     isAdmin: boolean,
     ip?: string,
+    userAgent?: string,
   ): Promise<WatermarkPayload> {
     await this.resolveAndAuthorize(lectureId, uid, token, isAdmin);
     const payload = this.watermark.issue(uid, email, lectureId);
     this.logAccess('watermark', uid, lectureId, ip, {
       sessionId: payload.sessionId,
+      userAgent,
     });
     return payload;
   }
@@ -245,6 +253,7 @@ export class StreamingService {
     isAdmin: boolean,
     keyToken: string,
     ip?: string,
+    userAgent?: string,
   ): Promise<Buffer> {
     const claims = this.keyTokens.verify(keyToken);
     if (claims.uid !== uid || claims.lectureId !== lectureId) {
@@ -269,7 +278,7 @@ export class StreamingService {
     }
 
     // Forensic trail: who fetched the decryption key, when, from where.
-    this.logAccess('key', uid, lectureId, ip, { keyPath });
+    this.logAccess('key', uid, lectureId, ip, { keyPath, userAgent });
     return key;
   }
 
