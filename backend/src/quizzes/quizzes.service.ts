@@ -81,6 +81,51 @@ export class QuizzesService {
   }
 
   /**
+   * Student-safe quiz fetch keyed on the LECTURE id. Lets the front-end — which
+   * only knows the lecture it's rendering — discover the quiz (and its id) so it
+   * can then start attempts. Resolves the lecture's real owning course and gates
+   * access before returning the answer-free question set.
+   */
+  async getQuizForLecture(
+    lectureId: string,
+    authToken: string,
+    uid: string | undefined,
+    isAdmin: boolean,
+  ) {
+    // Resolve the lecture and its real owning course (the route's :courseId is
+    // not trusted — access is gated against the resolved course).
+    const lectureData = await this.dc.executeQuery(
+      'GetLectureContent',
+      { lectureId },
+      authToken,
+    );
+    const lecture = lectureData?.courseLecture;
+    if (!lecture) {
+      throw new NotFoundException(`Lecture ${lectureId} not found`);
+    }
+
+    // Gate access (M4): only the course owner/admin (previewing) or an
+    // actively-enrolled student may load the quiz questions.
+    await this.assertCanTakeOrPreview(
+      lecture.section?.course?.id,
+      authToken,
+      uid,
+      isAdmin,
+    );
+
+    const data = await this.dc.executeQuery(
+      'GetQuizQuestions',
+      { lectureId },
+      authToken,
+    );
+    const quiz = data?.courseQuizs?.[0];
+    if (!quiz) {
+      throw new NotFoundException('No quiz found for this lecture');
+    }
+    return quiz;
+  }
+
+  /**
    * Allows the request through if the caller owns the course (or is admin) or
    * has an ACTIVE enrollment in it; otherwise throws 403. Shared by the
    * student-facing quiz read/taking paths.

@@ -312,6 +312,88 @@ describe('QuizzesService', () => {
     });
   });
 
+  describe('getQuizForLecture', () => {
+    const base = {
+      GetLectureContent: {
+        courseLecture: { id: 'L1', section: { course: { id: 'c1' } } },
+      },
+      GetQuizQuestions: { courseQuizs: [{ id: 'quiz1', takeQuestions: [] }] },
+    };
+
+    it('allows a course owner to preview', async () => {
+      const dc = makeDc(base);
+      access.assertCourseAccess.mockResolvedValue(undefined); // owner
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      const res = await svc.getQuizForLecture('L1', 'tok', 'u1', false);
+      expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
+    });
+
+    it('allows an enrolled student (non-owner)', async () => {
+      const dc = makeDc({
+        ...base,
+        GetUserEnrollmentForCourse: { enrollments: [{ status: 'ACTIVE' }] },
+      });
+      access.assertCourseAccess.mockRejectedValue(new ForbiddenException());
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      const res = await svc.getQuizForLecture('L1', 'tok', 'u1', false);
+      expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
+    });
+
+    it('blocks a non-owner, non-enrolled user', async () => {
+      const dc = makeDc({
+        ...base,
+        GetUserEnrollmentForCourse: { enrollments: [] },
+      });
+      access.assertCourseAccess.mockRejectedValue(new ForbiddenException());
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      await expect(
+        svc.getQuizForLecture('L1', 'tok', 'u1', false),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('404s for an unknown lecture', async () => {
+      const dc = makeDc({ GetLectureContent: { courseLecture: null } });
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      await expect(
+        svc.getQuizForLecture('nope', 'tok', 'u1', false),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('404s when the lecture has no quiz', async () => {
+      const dc = makeDc({ ...base, GetQuizQuestions: { courseQuizs: [] } });
+      access.assertCourseAccess.mockResolvedValue(undefined); // owner
+      const svc = new QuizzesService(
+        dc as any,
+        completion as any,
+        ordering,
+        access as any,
+      );
+      await expect(
+        svc.getQuizForLecture('L1', 'tok', 'u1', false),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
   describe('createQuestion', () => {
     it('rejects a question with no correct option', async () => {
       const dc = makeDc({
