@@ -6,14 +6,8 @@ import { CompletionService } from '../completion/completion.service';
 import {
   LECTURE_PROGRESS_QUEUE,
   RecordProgressJob,
+  COMPLETION_THRESHOLD,
 } from './lecture-progress.queue';
-
-/**
- * Fraction of a lecture's duration that, once reached, marks it complete.
- * Mirrors Udemy/Coursera behaviour where the final few % (credits/outro) don't
- * need to be watched for the lecture to count as done.
- */
-const COMPLETION_THRESHOLD = 0.9;
 
 /**
  * Background consumer for the lecture-progress queue.
