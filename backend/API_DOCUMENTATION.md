@@ -564,9 +564,10 @@ High-frequency; queued, not written synchronously. Post every few seconds during
 
 **Response `202`:** `{ "accepted": true }`
 
-### `PUT /lectures/:lectureId/progress` — sync write / mark complete
-For explicit "mark complete" where the client needs the result immediately.
-**Body:** `{ "lastWatchedSecond": 600, "completed": true }` → **`200`** `{ "success": true }`
+### `PUT /lectures/:lectureId/progress` — sync write
+Synchronous progress write for when the client needs the result immediately. As with the queued POST above, **completion is derived server-side** (≥90% of the lecture's duration) — the legacy `completed` field is still accepted for backward compatibility but is **ignored**, so a client cannot assert completion. Lectures with no stored duration never auto-complete.
+**Body:** `{ "lastWatchedSecond": 600 }` → **`200`** `{ "success": true, "completed": false }`
+(`completed` in the response is the server-derived result for this write.)
 
 ### `GET /lectures/:lectureId/progress`
 **Response `200`:** `{ "lastWatchedSecond": 145, "completedAt": "2026-07-01T…" | null }` (defaults to `{ lastWatchedSecond: 0, completedAt: null }`).
@@ -845,10 +846,11 @@ Same fields, optional. → **`200`** `{ "missionMicroLesson_update": { "id": "�
 **Form fields:**
 | Field | Type | Rules |
 |---|---|---|
-| `file` | file | required; validated by `FileValidationPipe` (type/size) |
+| `file` | file | required; `.pdf`/`.docx`/`.xlsx`, ≤50 MB. Validated by `FileValidationPipe` (MIME + magic-bytes + size) and hard-capped at the Multer layer |
 | `title` | string | 1–200 chars, required |
 
 **Response `201`:** `{ "missionTemplate_insert": { "id": "…", "fileUrl": "…" } }`
+**Errors:** `413 Payload Too Large` if the file exceeds 50 MB; `400 Bad Request` for a disallowed type/extension or contents that don't match the declared type.
 
 ### `GET /missions/:missionId/templates`
 **User**, access-gated: the mission's owner/admin **or** a caller with an `ACTIVE` or `COMPLETED` enrollment in the mission. `fileUrl` is a short-lived signed read URL.
