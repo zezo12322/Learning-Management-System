@@ -27,6 +27,7 @@ import { EnrollmentModule } from './enrollment/enrollment.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { RatingsModule } from './ratings/ratings.module';
     SubmissionsModule,
     CatalogModule,
     RatingsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [
