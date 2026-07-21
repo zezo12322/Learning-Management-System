@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CompletionService } from '../completion/completion.service';
+import { EnrollmentService } from '../enrollment/enrollment.service';
 import {
   LECTURE_PROGRESS_QUEUE,
   RecordProgressJob,
@@ -29,6 +30,7 @@ export class ProgressProcessor extends WorkerHost {
   constructor(
     private readonly dc: DataConnectService,
     private readonly completionService: CompletionService,
+    private readonly enrollmentService: EnrollmentService,
   ) {
     super();
   }
@@ -40,6 +42,7 @@ export class ProgressProcessor extends WorkerHost {
     const lectureData = await this.dc.executeQueryAsAdmin<{
       courseLecture: {
         duration: number | null;
+        isFreePreview?: boolean;
         section?: { course?: { id?: string } };
       } | null;
     }>('GetLectureDuration', { lectureId });
@@ -53,14 +56,32 @@ export class ProgressProcessor extends WorkerHost {
       return;
     }
 
-    // 2. Derive completion server-side. Only a positive duration can complete;
+    const courseId = lecture.section?.course?.id;
+    const isFreePreview = lecture.isFreePreview ?? false;
+
+    // 2. ENROLLMENT VERIFICATION: Only enrolled students can record progress.
+    // Free-preview lectures are exempt — anyone can preview them.
+    if (courseId && !isFreePreview) {
+      const isEnrolled = await this.enrollmentService.checkEnrollmentAsAdmin(
+        courseId,
+        userId,
+      );
+      if (!isEnrolled) {
+        this.logger.warn(
+          `Dropping progress job ${job.id}: user ${userId} not enrolled in course ${courseId}`,
+        );
+        return;
+      }
+    }
+
+    // 3. Derive completion server-side. Only a positive duration can complete;
     //    lectures with unknown/zero duration never auto-complete here.
     const duration = lecture.duration ?? 0;
     const reachedThreshold =
       duration > 0 && lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
     const completedAt = reachedThreshold ? new Date().toISOString() : null;
 
-    // 3. Upsert on the composite key (user, lecture). Clamp the stored position
+    // 4. Upsert on the composite key (user, lecture). Clamp the stored position
     //    to the lecture length so a bad client can't persist nonsense > duration.
     const storedSecond =
       duration > 0 ? Math.min(lastWatchedSecond, duration) : lastWatchedSecond;
@@ -72,10 +93,9 @@ export class ProgressProcessor extends WorkerHost {
       completedAt,
     });
 
-    // 4. On a completion transition, cascade the course-completion check
+    // 5. On a completion transition, cascade the course-completion check
     //    (certificates/enrollment status — KAN-116) as admin.
     if (reachedThreshold) {
-      const courseId = lecture.section?.course?.id;
       if (courseId) {
         await this.completionService.checkCourseCompletionAsAdmin(
           courseId,
