@@ -43,6 +43,44 @@ export class TutorError extends Error {
   }
 }
 
+// --- AI Course Studio (generation) -----------------------------------------
+// The AI service has NO dedicated generation endpoint — only the RAG /chat.
+// So Studio actions are implemented as targeted prompts sent to the SAME chat
+// endpoint, grounded in a chosen (ingested) video's transcript. No AI-service
+// change. Output is free text (e.g. a quiz is text, not structured JSON).
+
+export type StudioKind = 'SUMMARY' | 'OUTCOMES' | 'QUIZ' | 'LESSON_PLAN'
+
+export const STUDIO_ACTIONS: { kind: StudioKind; label: string }[] = [
+  { kind: 'SUMMARY', label: 'Lesson summary' },
+  { kind: 'OUTCOMES', label: 'Learning outcomes' },
+  { kind: 'QUIZ', label: 'Quiz questions' },
+  { kind: 'LESSON_PLAN', label: 'Lesson plan' },
+]
+
+const KIND_PROMPTS: Record<StudioKind, string> = {
+  SUMMARY:
+    "Using only this video's transcript, write a concise summary (5-8 sentences) of what this lesson covers.",
+  OUTCOMES:
+    "Using only this video's transcript, list 5 clear learning outcomes as bullet points, each starting with an action verb.",
+  QUIZ:
+    "Using only this video's transcript, create 3 multiple-choice questions. For each, give the question, four options labelled A-D, and state the correct answer.",
+  LESSON_PLAN:
+    "Using only this video's transcript, produce a short lesson plan: objectives, key topics in order, and one suggested activity.",
+}
+
+export async function generateAsset(input: {
+  courseId: string
+  videoId: string
+  kind: StudioKind
+}): Promise<TutorAnswer> {
+  return askTutor({
+    courseId: input.courseId,
+    videoId: input.videoId,
+    message: KIND_PROMPTS[input.kind],
+  })
+}
+
 export async function askTutor(input: AskTutorInput): Promise<TutorAnswer> {
   const token = await getFirebaseAuth().currentUser?.getIdToken()
 
