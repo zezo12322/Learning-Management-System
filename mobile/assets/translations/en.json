@@ -277,7 +277,8 @@
   "lesson_learning": {
     "video": {
       "error_lesson": "Failed to load the lesson, please try again later.",
-      "error_playing": "Error playing video"
+      "error_playing": "Error playing video",
+      "unavailable": "This video isn't available right now."
     },
     "actions": {
       "previous": "Previous",
@@ -298,6 +299,10 @@
     "about": {
       "title": "About this lesson",
       "description": "Learn different user research methods and how to choose the right one for your project."
+    },
+    "reading": {
+      "title": "Reading",
+      "empty": "This lesson has no content yet."
     }
   },
   "quiz": {
