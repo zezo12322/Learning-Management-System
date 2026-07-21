@@ -22,6 +22,16 @@ mutation LogPayment(
   )
 }
 
+mutation UpdatePaymentStatusByReference(
+  $referenceId: String!,
+  $status: PaymentStatus!
+) @auth(level: NO_ACCESS) {
+  payment_updateMany(
+    where: { referenceId: { eq: $referenceId } },
+    data: { status: $status }
+  )
+}
+
 # NO_ACCESS: $paymentId was not owner-scoped, so a USER-level version was an IDOR
 # (add line items to another user's payment). Backend/gateway-only, like LogPayment.
 mutation AddPaymentItem(
@@ -47,5 +57,18 @@ mutation AddPaymentItem(
 query MyPaymentHistory @auth(level: USER) {
   payments(where: { userId: { eq_expr: "auth.uid" } }, orderBy: [{ createdAt: DESC }]) {
     id customerEmailSnapshot gateway status amount currency referenceId createdAt paymentItems_on_payment { targetType priceAtPurchase course { title } mission { title } subscriptionTier { name } }
+  }
+}
+
+query GetPaymentDetailsByReference($referenceId: String!) @auth(level: NO_ACCESS) {
+  payments(where: { referenceId: { eq: $referenceId } }) {
+    id
+    userId
+    paymentItems_on_payment {
+      targetType
+      courseId
+      missionId
+      subscriptionTierId
+    }
   }
 }
