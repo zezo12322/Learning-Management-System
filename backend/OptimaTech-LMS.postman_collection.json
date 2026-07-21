@@ -969,7 +969,7 @@
           "response": []
         },
         {
-          "name": "Sync write / mark complete",
+          "name": "Sync write",
           "request": {
             "method": "PUT",
             "header": [
@@ -989,10 +989,10 @@
                 "progress"
               ]
             },
-            "description": "**User.** For explicit mark-complete where the client needs the result immediately.",
+            "description": "**User.** Synchronous progress write when the client needs the result immediately. Completion is derived server-side (≥90% of the lecture duration); the legacy `completed` field is accepted but ignored. Returns `{ \"success\": true, \"completed\": <bool> }`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"lastWatchedSecond\": 600,\n  \"completed\": true\n}",
+              "raw": "{\n  \"lastWatchedSecond\": 600\n}",
               "options": {
                 "raw": {
                   "language": "json"
