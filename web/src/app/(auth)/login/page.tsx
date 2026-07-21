@@ -108,7 +108,11 @@ export default function LoginPage() {
           <span className="h-px flex-1 bg-border" /> {t('auth.or')} <span className="h-px flex-1 bg-border" />
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* method="post" so that if a submit fires before hydration (native
+            submit), credentials go in the request body — never the URL query
+            string / browser history / proxy logs. preventDefault still applies
+            once hydrated. */}
+        <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label htmlFor="email">{t('auth.email')}</Label>
             <Input id="email" type="email" placeholder="you@example.com" icon={<Mail size={17} />} invalid={!!errors.email} {...register('email')} />

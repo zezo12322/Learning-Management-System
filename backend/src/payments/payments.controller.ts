@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Res, HttpStatus, Get, Query, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { DataConnectService } from '../firebase/dataconnect.service';
