@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  UseFilters,
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,6 +22,8 @@ import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FileValidationPipe } from '../common/pipes/file-validation.pipe';
+import { MulterExceptionFilter } from '../common/filters/multer-exception.filter';
+import { FILE_SIZE_LIMITS } from '../common/constants/storage-paths';
 import { CreateTemplateDto } from './dto/template.dto';
 
 @Controller('missions/:missionId/templates')
@@ -31,7 +34,17 @@ export class TemplatesController {
   @Post()
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  @UseInterceptors(FileInterceptor('file', { storage: undefined }))
+  @UseFilters(MulterExceptionFilter)
+  // Cap the upload at the Multer layer so an oversized body is rejected while
+  // streaming, before the whole file is buffered into memory. FileValidationPipe
+  // re-checks size, but that runs only AFTER Multer has read the full body — on
+  // its own it can't prevent a memory-exhaustion DoS.
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: undefined,
+      limits: { fileSize: FILE_SIZE_LIMITS.TEMPLATE, files: 1 },
+    }),
+  )
   upload(
     @Param('missionId') missionId: string,
     @Body() dto: CreateTemplateDto,
