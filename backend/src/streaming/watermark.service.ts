@@ -32,11 +32,17 @@ export class WatermarkService {
   constructor(config: ConfigService) {
     this.secret = config.get<string>('STREAM_KEY_SECRET', '');
     this.ttlMinutes = Number(
-      config.get<string>('STREAM_URL_TTL_MINUTES', '360'),
+      config.get<string>('STREAM_URL_TTL_MINUTES', '60'),
     );
     if (!this.secret) {
       this.logger.error(
         'STREAM_KEY_SECRET is not set — watermark payloads cannot be signed.',
+      );
+    } else if (this.secret.length < 32) {
+      // Security hardening: warn if secret is too short.
+      // HMAC-SHA256 should use at least 256-bit (32-byte) keys for security.
+      this.logger.warn(
+        `STREAM_KEY_SECRET is only ${this.secret.length} bytes. For HMAC-SHA256 security, use at least 32 bytes (256 bits).`,
       );
     }
   }

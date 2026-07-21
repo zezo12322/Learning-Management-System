@@ -93,8 +93,44 @@ export class UploadsService {
     private readonly transcoding: TranscodingService,
   ) {}
 
+  /**
+   * Audit log for upload operations. Emits structured JSON for forensic analysis
+   * and security monitoring. Track all upload attempts (successful and failed)
+   * for anomaly detection and compliance.
+   */
+  private logUpload(
+    event: 'signed_url_request' | 'upload_confirm' | 'upload_failed',
+    callerUid: string,
+    entityType: string,
+    courseId: string,
+    extra?: Record<string, unknown>,
+  ): void {
+    this.logger.log(
+      `upload-audit ${JSON.stringify({
+        event,
+        uid: callerUid,
+        entityType,
+        courseId,
+        at: new Date().toISOString(),
+        ...extra,
+      })}`,
+    );
+  }
+
   async generateSignedUrl(dto: SignedUrlRequestDto, caller: UploadCaller) {
     const rule = ENTITY_RULES[dto.entityType];
+
+    // Audit log: signed URL request
+    this.logUpload(
+      'signed_url_request',
+      caller.uid,
+      dto.entityType,
+      dto.courseId,
+      {
+        filename: dto.filename,
+        contentType: dto.contentType,
+      },
+    );
 
     // 1) Authorize: caller must own (or admin) the course this upload targets.
     await this.access.assertCourseAccess(
@@ -125,6 +161,12 @@ export class UploadsService {
 
   async confirmUpload(dto: ConfirmUploadDto, caller: UploadCaller) {
     const rule = ENTITY_RULES[dto.entityType];
+
+    // Audit log: upload confirmation
+    this.logUpload('upload_confirm', caller.uid, dto.entityType, dto.courseId, {
+      storagePath: dto.storagePath,
+      lectureId: dto.lectureId,
+    });
 
     // 1) Authorize against the owning course.
     await this.access.assertCourseAccess(
