@@ -5,6 +5,12 @@ export class UpdateProgressDto {
   @Min(0)
   lastWatchedSecond: number;
 
+  /**
+   * @deprecated Accepted but IGNORED. Completion is derived server-side from
+   * `lastWatchedSecond` vs the lecture duration (see ProgressService), so a
+   * client can no longer assert completion. Retained only so existing clients
+   * that still send it aren't rejected by `forbidNonWhitelisted`.
+   */
   @IsOptional()
   @IsBoolean()
   completed?: boolean;

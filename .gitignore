@@ -98,3 +98,6 @@ dataconnect_generated/
 # CI/CD
 .github/
 functions/lib/
+
+# Local ad-hoc debug scripts (never commit — may contain DB credentials)
+backend/test.js

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { UpdateProgressDto } from './dto/progress.dto';
 import { CompletionService } from '../completion/completion.service';
+import { COMPLETION_THRESHOLD } from './lecture-progress.queue';
 
 @Injectable()
 export class ProgressService {
@@ -16,7 +17,32 @@ export class ProgressService {
     authToken: string,
     uid: string,
   ) {
-    const completedAt = dto.completed ? new Date().toISOString() : null;
+    // Load the authoritative lecture duration (+ owning course) so completion is
+    // derived server-side, exactly like the async worker (ProgressProcessor).
+    // The client's `dto.completed` is deliberately NOT trusted — otherwise a user
+    // could PUT `{ completed: true }` to mark any lecture done without watching
+    // it, spoofing completion (and cascading to certificates via KAN-116).
+    const lectureData = await this.dc.executeQuery(
+      'GetLectureContent',
+      { lectureId },
+      authToken,
+    );
+    const lecture = lectureData?.courseLecture;
+    const duration = lecture?.duration ?? 0;
+
+    // Only a positive duration can complete; lectures with unknown/zero duration
+    // never auto-complete here.
+    const completed =
+      duration > 0 &&
+      dto.lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
+    const completedAt = completed ? new Date().toISOString() : null;
+
+    // Clamp the stored position to the lecture length so a bad client can't
+    // persist a position past the end.
+    const storedSecond =
+      duration > 0
+        ? Math.min(dto.lastWatchedSecond, duration)
+        : dto.lastWatchedSecond;
 
     // UpdateLectureProgress is NO_ACCESS (backend-only) and runs via the service
     // account, so the progress owner is passed explicitly rather than derived
@@ -25,28 +51,22 @@ export class ProgressService {
       'UpdateLectureProgress',
       {
         lectureId,
-        lastWatchedSecond: dto.lastWatchedSecond,
+        lastWatchedSecond: storedSecond,
         completedAt,
         userId: uid,
       },
       authToken,
     );
 
-    // Trigger completion check if marked as completed (KAN-116)
-    if (dto.completed) {
-      // Get lecture's course ID for the completion check
-      const lectureData = await this.dc.executeQuery(
-        'GetLectureContent',
-        { lectureId },
-        authToken,
-      );
-      const courseId = lectureData?.courseLecture?.section?.course?.id;
+    // Trigger completion check only on a real, server-derived completion (KAN-116)
+    if (completed) {
+      const courseId = lecture?.section?.course?.id;
       if (courseId) {
         await this.completionService.checkCourseCompletion(courseId, authToken);
       }
     }
 
-    return { success: true };
+    return { success: true, completed };
   }
 
   async getLectureProgress(lectureId: string, authToken: string) {
