@@ -99,6 +99,33 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  UpdatePaymentStatusByReference: /* GraphQL */ `
+    mutation UpdatePaymentStatusByReference(
+      $referenceId: String!
+      $status: PaymentStatus!
+    ) {
+      payment_updateMany(
+        where: { referenceId: { eq: $referenceId } }
+        data: { status: $status }
+      )
+    }
+  `,
+
+  GetPaymentDetailsByReference: /* GraphQL */ `
+    query GetPaymentDetailsByReference($referenceId: String!) {
+      payments(where: { referenceId: { eq: $referenceId } }) {
+        id
+        userId
+        paymentItems_on_payment {
+          targetType
+          courseId
+          missionId
+          subscriptionTierId
+        }
+      }
+    }
+  `,
+
   // --- Transcoding worker (TranscodingProcessor) ---
   AdminUpdateLecture: /* GraphQL */ `
     mutation AdminUpdateLecture(
@@ -1438,4 +1465,8 @@ export const FORCE_ADMIN_OPERATIONS: ReadonlySet<string> = new Set([
   'GetCourseCurriculum',
   // Video descriptions gated in CoursesService (owner/admin/enrollee entitlement)
   'GetCourseVideos',
+  // Payments
+  'LogPayment',
+  'UpdatePaymentStatusByReference',
+  'GetPaymentDetailsByReference',
 ]);
