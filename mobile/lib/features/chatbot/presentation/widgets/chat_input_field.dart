@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:optimatech_lms/features/chatbot/domain/entities/chat_context_entity.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 
 class ChatInputField extends StatefulWidget {
-  final ChatContextEntity contextEntity;
+  final String courseId;
+  final String videoId;
+  final int Function()? getPlaybackMs;
 
-  const ChatInputField({super.key, required this.contextEntity});
+  const ChatInputField({
+    super.key, 
+    required this.courseId, 
+    required this.videoId,
+    this.getPlaybackMs,
+  });
 
   @override
   State<ChatInputField> createState() => _ChatInputFieldState();
@@ -20,7 +26,16 @@ class _ChatInputFieldState extends State<ChatInputField> {
     if (text.isEmpty) return;
 
     _textController.clear();
-    context.read<ChatCubit>().sendMessage(text, widget.contextEntity);
+    
+    // Read the dynamic video timestamp right before sending!
+    final ms = widget.getPlaybackMs?.call() ?? 0;
+    
+    context.read<ChatCubit>().sendMessage(
+      text, 
+      widget.courseId, 
+      widget.videoId, 
+      ms,
+    );
   }
 
   @override

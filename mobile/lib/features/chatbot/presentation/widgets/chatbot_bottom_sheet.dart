@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:optimatech_lms/features/chatbot/domain/entities/chat_context_entity.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_messages_list.dart';
 
 class ChatbotBottomSheet extends StatelessWidget {
-  final ChatContextEntity contextEntity;
+  final String courseId;
+  final String videoId;
+  final int Function()? getPlaybackMs;
+  final void Function(int startMs)? onCitationTap;
 
-  const ChatbotBottomSheet({super.key, required this.contextEntity});
+  const ChatbotBottomSheet({
+    super.key, 
+    required this.courseId, 
+    required this.videoId,
+    this.getPlaybackMs,
+    this.onCitationTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +30,17 @@ class ChatbotBottomSheet extends StatelessWidget {
         children: [
           // Header
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Text(
                       'Optimatech chatbot',
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -49,12 +56,16 @@ class ChatbotBottomSheet extends StatelessWidget {
           const Divider(height: 1),
 
           // Messages List
-          const Expanded(
-            child: ChatMessagesList(),
+          Expanded(
+            child: ChatMessagesList(onCitationTap: onCitationTap),
           ),
 
           // Input Area
-          ChatInputField(contextEntity: contextEntity),
+          ChatInputField(
+            courseId: courseId,
+            videoId: videoId,
+            getPlaybackMs: getPlaybackMs,
+          ),
         ],
       ),
     );
