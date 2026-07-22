@@ -12,14 +12,16 @@ abstract class ChatRepository {
     required ChatContextEntity context,
   });
 
-  /// Retrieves the chat history for a specific video session.
+  /// Retrieves the chat history for a specific course or video session.
   Future<Either<Failure, List<ChatMessageEntity>>> getChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
   });
 
-  /// Saves the chat history for a specific video session.
+  /// Saves the chat history for a specific course or video session.
   Future<Either<Failure, void>> saveChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
     required List<ChatMessageEntity> messages,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_message_entity.dart';
 
 class ChatBubbleWidget extends StatelessWidget {
@@ -44,20 +45,40 @@ class ChatBubbleWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Use Markdown for bot messages to render bullet points properly
-              isUser
-                ? Text(
-                    message.text.isEmpty ? '...' : message.text,
-                    style: TextStyle(
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                  )
-                : MarkdownBody(
-                    data: message.text.isEmpty ? '...' : message.text,
-                    styleSheet: MarkdownStyleSheet(
-                      p: TextStyle(color: theme.colorScheme.onSurface),
-                      listBullet: TextStyle(color: theme.colorScheme.onSurface),
-                    ),
+              if (message.isLoading)
+                Shimmer.fromColors(
+                  baseColor: theme.colorScheme.onSurface.withOpacity(0.5),
+                  highlightColor: theme.colorScheme.onSurface,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.auto_awesome, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Thinking...',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
+                )
+              else if (isUser)
+                Text(
+                  message.text.isEmpty ? '...' : message.text,
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                )
+              else
+                MarkdownBody(
+                  data: message.text.isEmpty ? '...' : message.text,
+                  styleSheet: MarkdownStyleSheet(
+                    p: TextStyle(color: theme.colorScheme.onSurface),
+                    listBullet: TextStyle(color: theme.colorScheme.onSurface),
+                  ),
+                ),
 
               // Citations row
               if (!isUser && message.citations.isNotEmpty) ...[
