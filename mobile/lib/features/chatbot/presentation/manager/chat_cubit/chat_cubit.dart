@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
@@ -40,6 +41,26 @@ class ChatCubit extends Cubit<ChatState> {
       },
       (history) {
         _messages.addAll(history);
+
+        if (_messages.isEmpty) {
+          final user = getIt<FirebaseAuthService>().currentUser;
+          String userName = user?.displayName?.split(' ').first ?? '';
+          if (userName.isEmpty && user?.email != null) {
+            userName = user!.email!.split('@').first;
+          }
+          if (userName.isEmpty) {
+            userName = 'Student';
+          }
+          final welcomeText = 'chatbot.welcome_message'.tr(namedArgs: {'name': userName});
+
+          _messages.add(ChatMessageEntity(
+            id: 'welcome_msg',
+            text: welcomeText,
+            sender: ChatSender.bot,
+            timestamp: DateTime.now(),
+          ));
+        }
+
         emit(ChatSuccess(List.from(_messages)));
       },
     );
