@@ -6,7 +6,9 @@ import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_bubble_widget.dart';
 
 class ChatMessagesList extends StatefulWidget {
-  const ChatMessagesList({super.key});
+  final void Function(int startMs)? onCitationTap;
+
+  const ChatMessagesList({super.key, this.onCitationTap});
 
   @override
   State<ChatMessagesList> createState() => _ChatMessagesListState();
@@ -46,13 +48,6 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
 
         if (state is ChatSuccess) {
           messages = state.messages;
-        } else if (state is ChatError) {
-          return Center(
-            child: Text(
-              'Error: ${state.message}',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          );
         }
 
         if (state is ChatInitial && messages.isEmpty) {
@@ -60,21 +55,34 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
             child: Text('How can I help you today?'),
           );
         }
-        
-        if (state is ChatLoading && messages.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
 
         return ListView.builder(
           controller: _scrollController,
           reverse: true,
           padding: const EdgeInsets.all(16.0),
-          itemCount: messages.length,
+          // +1 if loading to show a spinner at the bottom (index 0 in reversed list)
+          itemCount: messages.length + (state is ChatLoading ? 1 : 0),
           itemBuilder: (context, index) {
-            final msg = messages[messages.length - 1 - index];
-            return ChatBubbleWidget(message: msg);
+            if (state is ChatLoading && index == 0) {
+              return const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              );
+            }
+
+            final actualIndex = state is ChatLoading ? index - 1 : index;
+            final msg = messages[messages.length - 1 - actualIndex];
+            return ChatBubbleWidget(
+              message: msg,
+              onCitationTap: widget.onCitationTap,
+            );
           },
         );
       },
