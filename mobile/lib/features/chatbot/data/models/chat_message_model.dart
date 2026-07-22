@@ -29,10 +29,14 @@ class ChatMessageModel extends ChatMessageEntity {
     }
 
     final parsedTimeStr = json['timestamp'];
-    final parsedTime = parsedTimeStr != null ? DateTime.parse(parsedTimeStr) : DateTime.now();
+    final parsedTime =
+        parsedTimeStr != null ? DateTime.parse(parsedTimeStr) : DateTime.now();
 
     return ChatMessageModel(
-      id: json['id'] ?? json['session_id'] ?? json['request_id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: json['id'] ??
+          json['session_id'] ??
+          json['request_id'] ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       text: json['text'] ?? json['answer'] ?? '',
       sender: parsedSender,
       timestamp: parsedTime,
