@@ -79,9 +79,6 @@ class ChatCubit extends Cubit<ChatState> {
     ));
     emit(ChatSuccess(List.from(_messages)));
 
-    // Emit loading state (keeps UI showing loader if used elsewhere)
-    emit(ChatLoading());
-
     // 3. Build the RAG Context
     final contextEntity = ChatContextEntity(
       tenantId: tenantId,
