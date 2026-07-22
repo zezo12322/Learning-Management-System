@@ -1,22 +1,25 @@
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_context_entity.dart';
 
-/// Data Model for [ChatContextEntity].
-/// Responsible for formatting the user's context into a JSON structure
-/// that the backend API expects when a new message is sent.
 class ChatContextModel extends ChatContextEntity {
   const ChatContextModel({
-    super.currentScreen,
-    super.courseId,
-    super.lessonId,
+    required super.tenantId,
+    required super.userId,
+    required super.courseId,
+    required super.videoId,
+    required super.sessionId,
+    required super.playbackMs,
   });
 
-  /// Converts the context into a JSON map. 
-  /// Null fields are omitted to keep the payload clean.
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson(String message, String requestId) {
     return {
-      if (currentScreen != null) 'currentScreen': currentScreen,
-      if (courseId != null) 'courseId': courseId,
-      if (lessonId != null) 'lessonId': lessonId,
+      'request_id': requestId,
+      'tenant_id': tenantId,
+      'user_id': userId,
+      'course_id': courseId,
+      'video_id': videoId,
+      'session_id': sessionId,
+      'playback_ms': playbackMs,
+      'message': message,
     };
   }
 }
