@@ -139,7 +139,7 @@ describe('LecturesService', () => {
         firebase as any,
       );
       await expect(
-        svc.update('L1', { type: LectureType.VIDEO } as any, 'tok'),
+        svc.update('L1', { type: LectureType.VIDEO }, 'tok'),
       ).resolves.toBeDefined();
       expect(dc.executeMutation).toHaveBeenCalledWith(
         'AdminUpdateLecture',
@@ -159,7 +159,7 @@ describe('LecturesService', () => {
         firebase as any,
       );
       await expect(
-        svc.update('L1', { type: LectureType.VIDEO } as any, 'tok'),
+        svc.update('L1', { type: LectureType.VIDEO }, 'tok'),
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 

@@ -10,18 +10,31 @@ export class PaymentsService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly dataConnectService: DataConnectService
+    private readonly dataConnectService: DataConnectService,
   ) {}
 
-  async generateCheckoutUrl(amountCents: number, items: any[], billingData: any, userAuthToken: string): Promise<string> {
+  async generateCheckoutUrl(
+    amountCents: number,
+    items: any[],
+    billingData: any,
+    userAuthToken: string,
+  ): Promise<string> {
     const secretKey = this.configService.get<string>('PAYMOB_SECRET_KEY');
     const publicKey = this.configService.get<string>('PAYMOB_PUBLIC_KEY');
     // If the boss sends multiple IDs, they can be separated by commas in .env
-    const rawIntegrationIds = this.configService.get<string>('PAYMOB_INTEGRATION_IDS', '');
-    const paymentMethods = rawIntegrationIds ? rawIntegrationIds.split(',').map(id => Number(id.trim())) : [];
+    const rawIntegrationIds = this.configService.get<string>(
+      'PAYMOB_INTEGRATION_IDS',
+      '',
+    );
+    const paymentMethods = rawIntegrationIds
+      ? rawIntegrationIds.split(',').map((id) => Number(id.trim()))
+      : [];
 
     if (!secretKey || !publicKey) {
-      throw new HttpException('Paymob Secret/Public keys are missing in configuration', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Paymob Secret/Public keys are missing in configuration',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // 1. Create the Intention via Paymob NextGen API
@@ -34,7 +47,7 @@ export class PaymentsService {
         first_name: billingData.first_name || 'Customer',
         last_name: billingData.last_name || 'Name',
         email: billingData.email || 'customer@example.com',
-      }
+      },
     };
 
     if (paymentMethods.length > 0) {
@@ -43,9 +56,9 @@ export class PaymentsService {
 
     const response = await fetch(`${this.baseUrl}/intention/`, {
       method: 'POST',
-      headers: { 
-        'Authorization': `Token ${secretKey}`,
-        'Content-Type': 'application/json' 
+      headers: {
+        Authorization: `Token ${secretKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(intentionBody),
     });
@@ -54,7 +67,10 @@ export class PaymentsService {
 
     if (!response.ok) {
       this.logger.error('Paymob Intention creation failed', data);
-      throw new HttpException('Failed to create payment intention', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to create payment intention',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     const clientSecret = data.client_secret;
@@ -62,27 +78,34 @@ export class PaymentsService {
 
     // 2. Log payment in Data Connect database (PENDING status)
     try {
-      const paymentRes = await this.dataConnectService.executeMutation('LogPayment', {
-        gateway: 'PAYMOB',
-        referenceId: intentionId.toString(),
-        amount: amountCents,
-        customerEmailSnapshot: billingData.email || 'unknown@example.com'
-      }, userAuthToken);
+      const paymentRes = await this.dataConnectService.executeMutation(
+        'LogPayment',
+        {
+          gateway: 'PAYMOB',
+          referenceId: intentionId.toString(),
+          amount: amountCents,
+          customerEmailSnapshot: billingData.email || 'unknown@example.com',
+        },
+        userAuthToken,
+      );
 
       const paymentId = paymentRes?.payment_insert;
-      
+
       // If we received items with targetType and ID, log them as well
       if (paymentId && Array.isArray(items)) {
         for (const item of items) {
           if (item.targetType && (item.courseId || item.missionId)) {
-            await this.dataConnectService.executeMutationAsAdmin('AddPaymentItem', {
-              paymentId: paymentId,
-              targetType: item.targetType,
-              courseId: item.courseId || null,
-              missionId: item.missionId || null,
-              subscriptionTierId: item.subscriptionTierId || null,
-              price: item.price || 0
-            });
+            await this.dataConnectService.executeMutationAsAdmin(
+              'AddPaymentItem',
+              {
+                paymentId: paymentId,
+                targetType: item.targetType,
+                courseId: item.courseId || null,
+                missionId: item.missionId || null,
+                subscriptionTierId: item.subscriptionTierId || null,
+                price: item.price || 0,
+              },
+            );
           }
         }
       }
@@ -97,7 +120,9 @@ export class PaymentsService {
   verifyHmac(queryHmac: string, bodyObj: any): boolean {
     const hmacSecret = this.configService.get<string>('PAYMOB_HMAC_SECRET');
     if (!hmacSecret) {
-      this.logger.warn('PAYMOB_HMAC_SECRET is missing, skipping HMAC validation');
+      this.logger.warn(
+        'PAYMOB_HMAC_SECRET is missing, skipping HMAC validation',
+      );
       return true; // We accept if secret is not configured, but warn
     }
 
@@ -146,9 +171,14 @@ export class PaymentsService {
       source_data?.sub_type,
       source_data?.type,
       success,
-    ].map(v => (v === undefined || v === null ? '' : String(v))).join('');
+    ]
+      .map((v) => (v === undefined || v === null ? '' : String(v)))
+      .join('');
 
-    const hashed = crypto.createHmac('sha512', hmacSecret).update(dataString).digest('hex');
+    const hashed = crypto
+      .createHmac('sha512', hmacSecret)
+      .update(dataString)
+      .digest('hex');
     return hashed === queryHmac;
   }
 }
