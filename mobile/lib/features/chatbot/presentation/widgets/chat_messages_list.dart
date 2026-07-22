@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_message_entity.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_state.dart';
@@ -37,6 +38,16 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
   Widget build(BuildContext context) {
     return BlocConsumer<ChatCubit, ChatState>(
       listener: (context, state) {
+        if (state is ChatError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        
         if (state is ChatSuccess || state is ChatError || state is ChatLoading) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _scrollToBottom();
@@ -57,8 +68,8 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
         }
 
         if (state is ChatInitial && messages.isEmpty) {
-          return const Center(
-            child: Text('How can I help you today?'),
+          return Center(
+            child: Text('chatbot.empty_state'.tr()),
           );
         }
 

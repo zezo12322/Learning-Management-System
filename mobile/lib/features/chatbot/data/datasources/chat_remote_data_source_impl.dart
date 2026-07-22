@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_message_entity.dart';
 import 'package:uuid/uuid.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:optimatech_lms/features/chatbot/data/models/chat_context_model.dart';
 import 'package:optimatech_lms/features/chatbot/data/models/chat_message_model.dart';
 import 'chat_remote_data_source.dart';
@@ -16,6 +18,12 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     required String text,
     required ChatContextModel context,
   }) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.none) ||
+        connectivityResult == [ConnectivityResult.none]) {
+      throw Exception('chatbot.offline_error'.tr());
+    }
+
     const String apiKey = 'YOUR_INTERNAL_API_KEY'; // To be moved to env config
 
     final requestId = uuid.v4();

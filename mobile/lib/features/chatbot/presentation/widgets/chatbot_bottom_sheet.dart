@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_messages_list.dart';
 
@@ -39,7 +40,7 @@ class ChatbotBottomSheet extends StatelessWidget {
                     Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
                     const SizedBox(width: 8),
                     Text(
-                      'Optimatech chatbot',
+                      'chatbot.title'.tr(),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
