@@ -25,7 +25,7 @@ class GlobalChatbotFab extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return BlocProvider<ChatCubit>(
-          create: (_) => getIt<ChatCubit>()..loadChatHistory(videoId ?? courseId),
+          create: (_) => getIt<ChatCubit>()..loadChatHistory(courseId: courseId, videoId: videoId),
           child: ChatbotBottomSheet(
             courseId: courseId,
             videoId: videoId,

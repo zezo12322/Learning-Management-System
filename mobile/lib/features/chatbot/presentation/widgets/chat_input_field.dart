@@ -33,7 +33,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
     context.read<ChatCubit>().sendMessage(
       text, 
       widget.courseId, 
-      widget.videoId ?? widget.courseId, 
+      widget.videoId, 
       ms,
     );
   }
