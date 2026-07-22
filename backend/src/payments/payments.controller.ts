@@ -83,7 +83,9 @@ export class PaymentsController {
         }
       }
 
-      const status = body.obj.success ? 'SUCCESS' : 'FAILED';
+      // PaymentStatus enum only has PENDING/COMPLETED/FAILED/REFUNDED — a
+      // 'SUCCESS' literal is rejected by Data Connect enum validation.
+      const status = body.obj.success ? 'COMPLETED' : 'FAILED';
       // In NextGen API, the webhook might provide intention_id or order.id
       const referenceId =
         body.obj.intention_id?.toString() ||
@@ -106,7 +108,7 @@ export class PaymentsController {
           );
 
           // 3. If successful, enroll the user
-          if (status === 'SUCCESS') {
+          if (status === 'COMPLETED') {
             const paymentDetails: any =
               await this.dataConnectService.executeQueryAsAdmin(
                 'GetPaymentDetailsByReference',
