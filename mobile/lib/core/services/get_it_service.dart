@@ -1,4 +1,15 @@
 import 'package:get_it/get_it.dart';
+import 'package:dio/dio.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/local_datasource/chat_local_data_source.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/local_datasource/chat_local_data_source_impl.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/remote_datasource/chat_remote_data_source.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/remote_datasource/chat_remote_data_source_impl.dart';
+import 'package:optimatech_lms/features/chatbot/data/repositories/chat_repository_impl.dart';
+import 'package:optimatech_lms/features/chatbot/domain/repositories/chat_repository.dart';
+import 'package:optimatech_lms/features/chatbot/domain/usecases/send_message_usecase.dart';
+import 'package:optimatech_lms/features/chatbot/domain/usecases/get_chat_history_usecase.dart';
+import 'package:optimatech_lms/features/chatbot/domain/usecases/save_chat_history_usecase.dart';
+import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 import 'package:optimatech_lms/core/services/fire_store_service.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
 import 'package:optimatech_lms/features/auth/data/datasources/auth_local_data_sources.dart';
@@ -174,4 +185,34 @@ Future<void> setupDependencies() async {
 
   // ========================= Notifications Feature =========================
   getIt.registerFactory<NotificationsCubit>(() => NotificationsCubit());
+  
+  // ========================= Chatbot Feature =========================
+  getIt.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(dio: Dio()), // Assuming Dio is used
+  );
+  getIt.registerLazySingleton<ChatLocalDataSource>(
+    () => ChatLocalDataSourceImpl(sharedPreferences: getIt<SharedPreferences>()),
+  );
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(
+      remoteDataSource: getIt<ChatRemoteDataSource>(),
+      localDataSource: getIt<ChatLocalDataSource>(),
+    ),
+  );
+  getIt.registerLazySingleton<SendMessageUseCase>(
+    () => SendMessageUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerLazySingleton<GetChatHistoryUseCase>(
+    () => GetChatHistoryUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerLazySingleton<SaveChatHistoryUseCase>(
+    () => SaveChatHistoryUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerFactory<ChatCubit>(
+    () => ChatCubit(
+      sendMessageUseCase: getIt<SendMessageUseCase>(),
+      getChatHistoryUseCase: getIt<GetChatHistoryUseCase>(),
+      saveChatHistoryUseCase: getIt<SaveChatHistoryUseCase>(),
+    ),
+  );
 }
