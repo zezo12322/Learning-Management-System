@@ -15,7 +15,7 @@ class ChatCubit extends Cubit<ChatState> {
   final SaveChatHistoryUseCase saveChatHistoryUseCase;
   
   final List<ChatMessageEntity> _messages = [];
-  late final String _sessionId;
+  late String _sessionId;
 
   ChatCubit({
     required this.sendMessageUseCase,
@@ -26,23 +26,26 @@ class ChatCubit extends Cubit<ChatState> {
     _sessionId = const Uuid().v4();
   }
 
-  Future<void> loadChatHistory(String videoId) async {
+  Future<void> loadChatHistory({required String courseId, String? videoId}) async {
+    // Reset session scope to ensure strictly isolated chat history
+    _sessionId = const Uuid().v4();
+    _messages.clear();
+
     emit(ChatLoading());
-    final result = await getChatHistoryUseCase(videoId);
+    final result = await getChatHistoryUseCase(courseId: courseId, videoId: videoId);
     result.fold(
       (failure) {
         emit(ChatError(failure.message));
         emit(ChatSuccess(List.from(_messages))); // Fallback to existing
       },
       (history) {
-        _messages.clear();
         _messages.addAll(history);
         emit(ChatSuccess(List.from(_messages)));
       },
     );
   }
 
-  Future<void> sendMessage(String text, String courseId, String videoId, int playbackMs) async {
+  Future<void> sendMessage(String text, String courseId, String? videoId, int playbackMs) async {
     // 1. Get current User ID (Fallback to 'anonymous' if not logged in)
     final userId = getIt<FirebaseAuthService>().currentUser?.uid ?? 'anonymous';
     final tenantId = 'DEFAULT_TENANT'; // Could be dynamic in a multi-tenant setup
@@ -59,9 +62,24 @@ class ChatCubit extends Cubit<ChatState> {
     emit(ChatSuccess(List.from(_messages))); 
 
     // Save to local storage after adding user message
-    await saveChatHistoryUseCase(SaveChatHistoryParams(videoId: videoId, messages: _messages));
+    final messagesToSave = _messages.where((m) => !m.isLoading).toList();
+    await saveChatHistoryUseCase(SaveChatHistoryParams(
+      courseId: courseId,
+      videoId: videoId,
+      messages: messagesToSave,
+    ));
 
-    // Emit loading state to show spinner while waiting for the LLM
+    // Emit optimistic bot loading message
+    _messages.add(ChatMessageEntity(
+      id: 'loading_placeholder',
+      text: '',
+      sender: ChatSender.bot,
+      timestamp: DateTime.now(),
+      isLoading: true,
+    ));
+    emit(ChatSuccess(List.from(_messages)));
+
+    // Emit loading state (keeps UI showing loader if used elsewhere)
     emit(ChatLoading());
 
     // 3. Build the RAG Context
@@ -81,17 +99,24 @@ class ChatCubit extends Cubit<ChatState> {
     
     result.fold(
       (failure) {
+        _messages.removeWhere((m) => m.isLoading);
         emit(ChatError(failure.message));
         // Fallback to previous successful state to preserve messages
         emit(ChatSuccess(List.from(_messages)));
       },
       (botMessage) async {
+        _messages.removeWhere((m) => m.isLoading);
         // 5. Append Bot Message
         _messages.add(botMessage);
         emit(ChatSuccess(List.from(_messages)));
 
         // Save to local storage after adding bot message
-        await saveChatHistoryUseCase(SaveChatHistoryParams(videoId: videoId, messages: _messages));
+        final finalMessagesToSave = _messages.where((m) => !m.isLoading).toList();
+        await saveChatHistoryUseCase(SaveChatHistoryParams(
+          courseId: courseId,
+          videoId: videoId,
+          messages: finalMessagesToSave,
+        ));
       },
     );
   }
