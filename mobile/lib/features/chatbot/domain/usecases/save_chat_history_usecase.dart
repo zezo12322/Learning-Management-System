@@ -11,6 +11,7 @@ class SaveChatHistoryUseCase {
 
   Future<Either<Failure, void>> call(SaveChatHistoryParams params) async {
     return await repository.saveChatHistory(
+      courseId: params.courseId,
       videoId: params.videoId,
       messages: params.messages,
     );
@@ -18,14 +19,16 @@ class SaveChatHistoryUseCase {
 }
 
 class SaveChatHistoryParams extends Equatable {
-  final String videoId;
+  final String courseId;
+  final String? videoId;
   final List<ChatMessageEntity> messages;
 
   const SaveChatHistoryParams({
-    required this.videoId,
+    required this.courseId,
+    this.videoId,
     required this.messages,
   });
 
   @override
-  List<Object?> get props => [videoId, messages];
+  List<Object?> get props => [courseId, videoId, messages];
 }
