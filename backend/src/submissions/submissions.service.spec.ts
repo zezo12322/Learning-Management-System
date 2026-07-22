@@ -37,7 +37,7 @@ describe('SubmissionsService', () => {
         completion as any,
       );
       await expect(
-        svc.submit('m1', { fileUrl: 'http://f' } as any, 'tok', 'u1'),
+        svc.submit('m1', { fileUrl: 'http://f' }, 'tok', 'u1'),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
@@ -90,7 +90,7 @@ describe('SubmissionsService', () => {
         completion as any,
       );
       await expect(
-        svc.grade('s1', {} as any, 'tok', 'u1', false),
+        svc.grade('s1', {}, 'tok', 'u1', false),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
 
@@ -103,7 +103,7 @@ describe('SubmissionsService', () => {
         completion as any,
       );
       await expect(
-        svc.grade('s1', {} as any, 'tok', 'u1', false),
+        svc.grade('s1', {}, 'tok', 'u1', false),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
@@ -117,7 +117,7 @@ describe('SubmissionsService', () => {
       await expect(
         svc.grade(
           's1',
-          { scores: [{ criterionId: 'cr1', score: 999 }] } as any,
+          { scores: [{ criterionId: 'cr1', score: 999 }] },
           'tok',
           'u1',
           false,
@@ -135,7 +135,7 @@ describe('SubmissionsService', () => {
       await expect(
         svc.grade(
           's1',
-          { scores: [{ criterionId: 'OTHER', score: 5 }] } as any,
+          { scores: [{ criterionId: 'OTHER', score: 5 }] },
           'tok',
           'u1',
           false,
