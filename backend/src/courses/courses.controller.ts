@@ -120,10 +120,7 @@ export class CoursesController {
   @Get(':courseId/overview')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  getOverview(
-    @Param('courseId') courseId: string,
-    @AuthToken() token: string,
-  ) {
+  getOverview(@Param('courseId') courseId: string, @AuthToken() token: string) {
     return this.coursesService.getOverview(courseId, token);
   }
 

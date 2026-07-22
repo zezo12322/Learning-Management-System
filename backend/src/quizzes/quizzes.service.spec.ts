@@ -414,7 +414,7 @@ describe('QuizzesService', () => {
               { text: 'a', isCorrect: false },
               { text: 'b', isCorrect: false },
             ],
-          } as any,
+          },
           'tok',
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -446,7 +446,7 @@ describe('QuizzesService', () => {
               { id: 'opt-A', text: 'A', isCorrect: false },
               { id: 'opt-FOREIGN', text: 'hacked', isCorrect: true },
             ],
-          } as any,
+          },
           'tok',
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -477,7 +477,7 @@ describe('QuizzesService', () => {
               { id: 'opt-A', text: 'A', isCorrect: false },
               { text: 'B', isCorrect: false },
             ],
-          } as any,
+          },
           'tok',
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -507,7 +507,7 @@ describe('QuizzesService', () => {
             { id: 'opt-A', text: 'A2', isCorrect: true }, // update
             { text: 'C', isCorrect: false }, // insert
           ],
-        } as any,
+        },
         'tok',
       );
       expect(res).toEqual({ success: true });
