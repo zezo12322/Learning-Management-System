@@ -8,7 +8,13 @@ class GetChatHistoryUseCase {
 
   const GetChatHistoryUseCase(this.repository);
 
-  Future<Either<Failure, List<ChatMessageEntity>>> call(String videoId) async {
-    return await repository.getChatHistory(videoId: videoId);
+  Future<Either<Failure, List<ChatMessageEntity>>> call({
+    required String courseId,
+    String? videoId,
+  }) async {
+    return await repository.getChatHistory(
+      courseId: courseId,
+      videoId: videoId,
+    );
   }
 }
