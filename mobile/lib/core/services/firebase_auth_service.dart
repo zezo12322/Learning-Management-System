@@ -4,6 +4,8 @@ import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthService {
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+
   Future<User> signInWithEmailPassword({required String email, required String password}) async{
     try{
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(

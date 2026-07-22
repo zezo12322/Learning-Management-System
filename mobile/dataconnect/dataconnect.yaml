@@ -1,0 +1,11 @@
+specVersion: "v1alpha"
+serviceId: "learning-management-syst-3cc3a"
+location: "us-central1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdc"
+      cloudSql:
+        instanceId: "fdc-instance"
+connectorDirs: ["./connector"]
