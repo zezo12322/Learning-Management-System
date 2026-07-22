@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 
 class ChatInputField extends StatefulWidget {
@@ -59,7 +60,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -73,13 +74,13 @@ class _ChatInputFieldState extends State<ChatInputField> {
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _sendMessage(),
               decoration: InputDecoration(
-                hintText: 'Ask me anything...',
+                hintText: 'chatbot.hint_text'.tr(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerHighest,
+                fillColor: theme.colorScheme.surfaceDim,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 14,
