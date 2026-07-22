@@ -45,7 +45,7 @@ class CourseModel {
       ),
       avgRating: result.avgRating.toDouble(),
       ratingCount: result.ratingCount,
-      enrollmentCount: result.activeEnrollments.length,
+      enrollmentCount: 0,
     );
   }
 

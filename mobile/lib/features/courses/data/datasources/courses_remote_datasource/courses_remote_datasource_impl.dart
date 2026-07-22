@@ -81,7 +81,7 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
             author: Author(name: c.author.name, avatar: c.author.avatar),
             avgRating: c.avgRating.toDouble(),
             ratingCount: c.ratingCount,
-            enrollmentCount: c.activeEnrollments.length,
+            enrollmentCount: 0,
           )
         ).toList();
       }
@@ -103,7 +103,7 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
           author: Author(name: c.author.name, avatar: c.author.avatar),
           avgRating: c.avgRating.toDouble(),
           ratingCount: c.ratingCount,
-          enrollmentCount: c.activeEnrollments.length,
+          enrollmentCount: 0,
         )
       ).toList();
 
@@ -122,7 +122,7 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
             author: Author(name: c.author.name, avatar: c.author.avatar),
             avgRating: c.avgRating.toDouble(),
             ratingCount: c.ratingCount,
-            enrollmentCount: c.activeEnrollments.length,
+            enrollmentCount: 0,
           )
         ).toList();
       }
