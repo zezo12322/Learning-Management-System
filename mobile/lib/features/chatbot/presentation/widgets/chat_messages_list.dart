@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_message_entity.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_state.dart';
@@ -68,8 +69,19 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
         }
 
         if (state is ChatInitial && messages.isEmpty) {
+          final user = FirebaseAuth.instance.currentUser;
+          final userName = user?.displayName?.split(' ').first ?? '';
+
           return Center(
-            child: Text('chatbot.empty_state'.tr()),
+            child: Text(
+              userName.isNotEmpty 
+                  ? 'chatbot.welcome_user'.tr(args: [userName])
+                  : 'chatbot.empty_state'.tr(),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           );
         }
 
