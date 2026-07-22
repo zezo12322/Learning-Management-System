@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/course_content_tabs.dart';
@@ -50,9 +51,50 @@ class _CourseDetailsContent extends StatefulWidget {
   State<_CourseDetailsContent> createState() => _CourseDetailsContentState();
 }
 
-class _CourseDetailsContentState extends State<_CourseDetailsContent> {
+class _CourseDetailsContentState extends State<_CourseDetailsContent>
+    with WidgetsBindingObserver {
   // selected tab index 0: overview, 1: curriculum, 2: reviews, 3: resources
   int _selectedTabIndex = 1;
+
+  // True between opening the Paymob checkout in the browser and the user
+  // coming back to the app, so we know to re-check enrollment on resume.
+  bool _awaitingPaymentReturn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // The Paymob webhook enrolls the user server-side while they pay in the
+    // browser; when they come back, confirm the enrollment and unlock the course.
+    if (state == AppLifecycleState.resumed && _awaitingPaymentReturn) {
+      _awaitingPaymentReturn = false;
+      context.read<CourseDetailsCubit>().confirmPaymentReturn(widget.course.id);
+    }
+  }
+
+  Future<void> _openCheckout(String checkoutUrl) async {
+    final launched = await launchUrl(
+      Uri.parse(checkoutUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched) {
+      _awaitingPaymentReturn = false;
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('payment.could_not_open'.tr())),
+      );
+    }
+  }
 
   // ------------------------------------------------------------
   // open videoPlayer Stage screen from current screen
@@ -89,13 +131,20 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
 
           if (state is CourseDetailsLoaded) {
             allLessons = state.curriculum.sections.expand((s) => s.lessons).toList();
-            isEnrolling = state.isEnrolling;
+            isEnrolling = state.isEnrolling ||
+                state.isPurchasing ||
+                state.isConfirmingPayment;
           }
 
           return BlocListener<CourseDetailsCubit, CourseDetailsState>(
             listener: (context, state) {
               if (state is CourseDetailsLoaded) {
-                if (state.enrollmentSuccess) {
+                if (state.checkoutUrl != null) {
+                  final checkoutUrl = state.checkoutUrl!;
+                  context.read<CourseDetailsCubit>().consumeCheckoutUrl();
+                  _awaitingPaymentReturn = true;
+                  _openCheckout(checkoutUrl);
+                } else if (state.enrollmentSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Successfully enrolled!')),
                   );
@@ -107,6 +156,14 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
                 } else if (state.enrollmentError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Enrollment failed: ${state.enrollmentError}')),
+                  );
+                } else if (state.purchaseError != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('payment.start_failed'.tr())),
+                  );
+                } else if (state.paymentPending) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('payment.pending_hint'.tr())),
                   );
                 }
               }
@@ -186,8 +243,16 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
                 CourseEnrollBottomBar(
                   price: widget.course.price,
                   isEnrolling: isEnrolling,
+                  isPaidCourse: widget.course.price > 0,
                   onEnroll: () {
-                    context.read<CourseDetailsCubit>().enrollInCourse(widget.course.id);
+                    final cubit = context.read<CourseDetailsCubit>();
+                    if (widget.course.price > 0) {
+                      // Paid course → Paymob checkout; the webhook enrolls the
+                      // user after a successful payment.
+                      cubit.buyCourse(widget.course.id, widget.course.price);
+                    } else {
+                      cubit.enrollInCourse(widget.course.id);
+                    }
                   },
                 ),
               ],
