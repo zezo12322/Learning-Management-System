@@ -2,11 +2,13 @@ import 'package:optimatech_lms/features/chatbot/data/models/chat_message_model.d
 
 abstract class ChatLocalDataSource {
   Future<void> saveChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
     required List<ChatMessageModel> messages,
   });
 
   Future<List<ChatMessageModel>> getChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
   });
 }
