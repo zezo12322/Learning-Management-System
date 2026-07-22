@@ -331,5 +331,12 @@
     "coming_soon": "AI Tutor is coming soon",
     "coming_soon_body": "Ask questions about your lessons and get answers grounded in the course content — we're putting the finishing touches on it.",
     "disclaimer": "Powered by AI"
+  },
+  "chatbot": {
+    "title": "Optimatech chatbot",
+    "hint_text": "Ask me anything...",
+    "empty_state": "How can I help you today?",
+    "thinking": "Thinking...",
+    "offline_error": "No internet connection. AI requires an active connection."
   }
 }
