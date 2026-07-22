@@ -511,6 +511,17 @@ const en: Dict = {
   'quizTake.notPassed': 'Not passed',
   'quizTake.correct': 'correct',
   'quizTake.retake': 'Retake',
+
+  // Payment result (Paymob redirect landing pages)
+  'payment.success.title': 'Payment successful',
+  'payment.success.body': 'Thank you! We received your payment and your enrollment is being activated now.',
+  'payment.success.hint': 'This can take a few moments — refresh My courses if it does not appear right away.',
+  'payment.success.cta': 'Go to my courses',
+  'payment.failed.title': 'Payment failed',
+  'payment.failed.body': 'The payment could not be completed, so no enrollment was activated. You can try again from the course page.',
+  'payment.failed.hint': 'If the problem keeps happening, try another payment method or contact support.',
+  'payment.failed.cta': 'Browse the catalog',
+  'payment.backToDashboard': 'Back to dashboard',
 }
 
 const ar: Dict = {
@@ -1010,6 +1021,17 @@ const ar: Dict = {
   'quizTake.notPassed': 'غير ناجح',
   'quizTake.correct': 'صحيحة',
   'quizTake.retake': 'إعادة المحاولة',
+
+  // Payment result (Paymob redirect landing pages)
+  'payment.success.title': 'تم الدفع بنجاح',
+  'payment.success.body': 'شكرًا لك! استلمنا دفعتك ويجري تفعيل اشتراكك الآن.',
+  'payment.success.hint': 'قد يستغرق ذلك بضع لحظات — حدِّث صفحة دوراتي إذا لم يظهر الاشتراك فورًا.',
+  'payment.success.cta': 'الانتقال إلى دوراتي',
+  'payment.failed.title': 'فشلت عملية الدفع',
+  'payment.failed.body': 'تعذّر إتمام عملية الدفع، ولم يتم تفعيل أي اشتراك. يمكنك المحاولة مرة أخرى من صفحة الدورة.',
+  'payment.failed.hint': 'إذا تكررت المشكلة، جرِّب وسيلة دفع أخرى أو تواصل مع الدعم.',
+  'payment.failed.cta': 'تصفّح الكتالوج',
+  'payment.backToDashboard': 'العودة إلى لوحة التحكم',
 }
 
 export const dictionaries: Record<Locale, Dict> = { en, ar }
