@@ -1,4 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:dio/dio.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/chat_remote_data_source.dart';
+import 'package:optimatech_lms/features/chatbot/data/datasources/chat_remote_data_source_impl.dart';
+import 'package:optimatech_lms/features/chatbot/data/repositories/chat_repository_impl.dart';
+import 'package:optimatech_lms/features/chatbot/domain/repositories/chat_repository.dart';
+import 'package:optimatech_lms/features/chatbot/domain/usecases/send_message_usecase.dart';
+import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/chat_cubit.dart';
 import 'package:optimatech_lms/core/services/fire_store_service.dart';
 import 'package:optimatech_lms/core/services/firebase_auth_service.dart';
 import 'package:optimatech_lms/features/auth/data/datasources/auth_local_data_sources.dart';
@@ -174,4 +181,17 @@ Future<void> setupDependencies() async {
 
   // ========================= Notifications Feature =========================
   getIt.registerFactory<NotificationsCubit>(() => NotificationsCubit());
+  // ========================= Chatbot Feature =========================
+  getIt.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(dio: Dio()), // Assuming Dio is used
+  );
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: getIt<ChatRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<SendMessageUseCase>(
+    () => SendMessageUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerFactory<ChatCubit>(
+    () => ChatCubit(getIt<SendMessageUseCase>()),
+  );
 }
