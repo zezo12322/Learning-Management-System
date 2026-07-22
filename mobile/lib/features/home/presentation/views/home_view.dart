@@ -9,6 +9,7 @@ import 'package:optimatech_lms/features/home/presentation/views/home_body.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/glass_bottom_navbar.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
 import 'package:optimatech_lms/features/wishlist/presentation/views/wishlist_view.dart';
+import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 
 // ============================================================================
 // HomeView — Root widget for the Home screen.
@@ -92,6 +93,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return Scaffold(
       extendBody: true,
       body: bodyWidget,
+      floatingActionButton: const GlobalChatbotFab(courseId: 'UNKNOWN', videoId: 'UNKNOWN'),
       bottomNavigationBar: GlassBottomNavBar(
         currentIndex: currentScreen,
         onTap: onTabTapped,
