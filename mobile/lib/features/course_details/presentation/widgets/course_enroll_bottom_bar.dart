@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -9,11 +10,16 @@ class CourseEnrollBottomBar extends StatelessWidget {
     required this.price,
     this.onEnroll,
     this.isEnrolling = false,
+    this.isPaidCourse = false,
   });
 
   final double price;
   final VoidCallback? onEnroll;
   final bool isEnrolling;
+
+  /// Paid courses show a "Buy now" CTA that goes through Paymob checkout
+  /// instead of the free "Enroll now" flow.
+  final bool isPaidCourse;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +138,9 @@ class CourseEnrollBottomBar extends StatelessWidget {
                       )
                     else ...[
                       Text(
-                        'Enroll Now',
+                        isPaidCourse
+                            ? 'course_details.buy_now'.tr()
+                            : 'course_details.enroll_now'.tr(),
                         style: TextStyles.labelLarge.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeights.semiBold,
