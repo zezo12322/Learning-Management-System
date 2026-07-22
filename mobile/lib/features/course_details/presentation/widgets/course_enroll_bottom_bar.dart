@@ -53,7 +53,7 @@ class CourseEnrollBottomBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Price',
+                  'course_details.price'.tr(),
                   style: TextStyles.labelSmall.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -65,7 +65,8 @@ class CourseEnrollBottomBar extends StatelessWidget {
                   runSpacing: 4.h,
                   children: [
                     Text(
-                      '\$${price.toStringAsFixed(2)}',
+                      // Courses are charged in EGP (see backend Paymob intention).
+                      'common.egp'.tr(args: [price.toStringAsFixed(2)]),
                       style: TextStyles.titleSmall.copyWith(
                         fontSize: 20.sp,
                         fontWeight: FontWeights.bold,
@@ -73,7 +74,8 @@ class CourseEnrollBottomBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '\$${(price * 1.25).toStringAsFixed(2)}',
+                      'common.egp'
+                          .tr(args: [(price * 1.25).toStringAsFixed(2)]),
                       style: TextStyles.labelMedium.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         decoration: TextDecoration.lineThrough,
