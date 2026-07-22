@@ -5,7 +5,7 @@ class ChatContextModel extends ChatContextEntity {
     required super.tenantId,
     required super.userId,
     required super.courseId,
-    required super.videoId,
+    super.videoId,
     required super.sessionId,
     required super.playbackMs,
   });
