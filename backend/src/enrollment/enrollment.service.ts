@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
@@ -13,9 +14,9 @@ import { DataConnectService } from '../firebase/dataconnect.service';
  * than inserting a duplicate, since the schema has no uniqueness on
  * (user, course/mission) yet — see the DB constraint follow-up.
  *
- * NOTE: paid-course gating (price > 0 ⇒ requires a completed payment) is not
- * enforced here because the payment flow is not yet implemented; revisit when
- * payments land.
+ * Paid-course gating: a course with price > 0 can only be self-enrolled by a
+ * user who has a COMPLETED payment containing it — the Paymob webhook is the
+ * normal enrollment path for purchases. Free courses enroll directly.
  */
 @Injectable()
 export class EnrollmentService {
@@ -51,6 +52,30 @@ export class EnrollmentService {
         authToken,
       );
       return { id: existing.id, status: 'ACTIVE', reactivated: true };
+    }
+
+    // Paid-course gate: creating a NEW enrollment on a paid course requires a
+    // COMPLETED payment that includes it (the Paymob webhook performs the
+    // enrollment for purchases). Without this, any authenticated user could
+    // take a paid course for free by calling this endpoint directly.
+    // Reactivation above is exempt — an existing row means access was granted.
+    if ((course.price ?? 0) > 0) {
+      const paymentsData: any = await this.dc.executeQueryAsAdmin(
+        'GetUserCompletedPayments',
+        { userId: uid },
+      );
+      const hasPaidForCourse = (paymentsData?.payments ?? []).some((p: any) =>
+        (p?.paymentItems_on_payment ?? []).some(
+          (item: any) =>
+            typeof item?.courseId === 'string' &&
+            item.courseId.toLowerCase() === courseId.toLowerCase(),
+        ),
+      );
+      if (!hasPaidForCourse) {
+        throw new ForbiddenException(
+          'This course requires purchase before enrollment',
+        );
+      }
     }
 
     // EnrollInCourse is NO_ACCESS (backend-only), so the checks above are the sole
