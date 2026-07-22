@@ -8,7 +8,7 @@ import 'package:optimatech_lms/features/course_learning/presentation/manager/cou
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/course_leaning_content.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/custom_course_learning_appbar.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/lesson_tap_row.dart';
-
+import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 class CourseLearningView extends StatefulWidget {
   const CourseLearningView({super.key, required this.courseId});
 
@@ -65,6 +65,15 @@ class _CourseLearningViewState extends State<CourseLearningView> {
                       setState(() => _isBookmarked = !_isBookmarked),
                 );
             }
+          },
+        ),
+        floatingActionButton: BlocBuilder<CourseLearningCubit, CourseLearningState>(
+          builder: (context, state) {
+            return GlobalChatbotFab(
+              courseId: widget.courseId,
+              videoId: state.currentLecture?.id,
+              // Optional: pass getPlaybackMs and onCitationTap if implemented here
+            );
           },
         ),
       ),

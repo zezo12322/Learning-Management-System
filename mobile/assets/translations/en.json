@@ -327,9 +327,212 @@
     "empty_hint": "You're all caught up. New updates will show up here."
   },
   "ai_tutor": {
+    "assignments": {
+      "available": "Available",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "empty": "No Assignments",
+      "available_desc": "Open for submission",
+      "submitted_desc": "Awaiting review",
+      "graded_desc": "View feedback",
+      "empty_desc": "You are all caught up"
+    }
+  },
+  "nav_bar": {
+    "home": "Home",
+    "courses": "Courses",
+    "wishlist": "Wishlist",
+    "profile": "Profile"
+  },
+  "navigation": {
+    "not_found": "Page Not Found",
+    "not_found_msg": "The route you requested does not exist.",
+    "go_home": "Go to Home"
+  },
+  "course_details": {
+    "you_might_also_like": "You might also like"
+  },
+  "courses": {
+    "title": "Courses",
+    "searchHint": "Search for courses, lessons, quizzes...",
+    "categories": {
+      "title": "Categories",
+      "viewAll": "View all",
+      "empty": "No categories found"
+    },
+    "list": {
+      "empty": "No courses found",
+      "lessonsCount": "{count} Lessons"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "errors": {
+      "unexpected": "Unexpected error occurred"
+    },
+    "filterSheet": {
+      "title": "Filter",
+      "courseStatus": "Course status",
+      "sortBy": "Sort by",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low"
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Please add your favorite courses to the wishlist"
+  },
+  "profile": {
+    "title": "My Profile",
+    "common": {
+      "edit": "Edit",
+      "view_all": "View All"
+    },
+    "header": {
+      "role": "Student",
+      "joined": "Joined {}",
+      "stats": {
+        "courses": "Courses Enrolled",
+        "courses_subtitle": "Active learning",
+        "hours": "Hours Learned",
+        "hours_subtitle": "+12 this week",
+        "assessments": "Assessments Completed",
+        "assessments_subtitle": "85% average score",
+        "certificates": "Certificates Earned",
+        "certificates_subtitle": "Keep it up!"
+      }
+    },
+    "sections": {
+      "user_information": "User Information",
+      "learning_statistics": "Learning Statistics",
+      "certificates": "Certificates",
+      "completed_courses": "Completed Courses",
+      "settings": "Settings"
+    },
+    "info": {
+      "full_name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "location": "Location",
+      "birth_date": "Date of Birth"
+    },
+    "statistics": {
+      "hours": "Hours Learned",
+      "hours_subtitle": "+12 this week",
+      "courses": "Courses Enrolled",
+      "courses_subtitle": "Active learning",
+      "certificates": "Certificates",
+      "certificates_subtitle": "Completed",
+      "assessments": "Assessments",
+      "assessments_subtitle": "85% Average"
+    },
+    "certificates": {
+      "issued_on": "Issued on {date}",
+      "verified": "Verified",
+      "empty": "No certificates earned yet.",
+      "load_error": "Failed to load certificates"
+    },
+    "completed_courses": {
+      "completed_on": "Completed on {date}",
+      "completed": "Completed"
+    },
+    "settings": {
+      "account": "Account Settings",
+      "notifications": "Notification Preferences",
+      "privacy": "Privacy & Security",
+      "help": "Help & Support",
+      "logout": "Logout",
+      "logout_dialog": "Logout?",
+      "log_out_confirmation": "Are you sure you want to log out?",
+      "language": "Language",
+      "select_language": "Select Language",
+      "change_Theme": "Change Theme",
+      "select_theme": "Select Theme",
+      "theme_system": "System",
+      "theme_light": "Light Theme",
+      "theme_dark": "Dark Theme"
+    }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "Failed to load the lesson, please try again later.",
+      "error_playing": "Error playing video",
+      "unavailable": "This video isn't available right now."
+    },
+    "actions": {
+      "previous": "Previous",
+      "mark_complete": "Mark Complete",
+      "next": "Next"
+    },
+    "tabs": {
+      "curriculum": "Curriculum",
+      "notes": "Notes",
+      "resources": "Resources",
+      "discussion": "Discussion"
+    },
+    "curriculum": {
+      "title": "Course Curriculum",
+      "lessons_count": "{count} Lessons",
+      "now_playing": "Now Playing"
+    },
+    "about": {
+      "title": "About this lesson",
+      "description": "Learn different user research methods and how to choose the right one for your project."
+    },
+    "reading": {
+      "title": "Reading",
+      "empty": "This lesson has no content yet."
+    }
+  },
+  "quiz": {
+    "title": "Quiz",
+    "empty": "This quiz has no questions yet.",
+    "error_title": "Couldn't load the quiz",
+    "question_of": "Question {} of {}",
+    "answered": "{}/{} answered",
+    "points": "{} pts",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "result_title": "Quiz Result",
+    "score_of": "{}/{}",
+    "passed": "Passed",
+    "failed": "Keep practicing",
+    "back": "Back"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "empty_hint": "You're all caught up. New updates will show up here."
+  },
+  "ai_tutor": {
     "title": "AI Tutor",
     "coming_soon": "AI Tutor is coming soon",
     "coming_soon_body": "Ask questions about your lessons and get answers grounded in the course content — we're putting the finishing touches on it.",
     "disclaimer": "Powered by AI"
+  },
+  "chatbot": {
+    "title": "Optimatech chatbot",
+    "hint_text": "Ask me anything...",
+    "empty_state": "How can I help you today?",
+    "welcome_message": "Welcome {name}! 👋 How can I help you today?",
+    "thinking": "Thinking...",
+    "offline_error": "No internet connection. AI requires an active connection."
   }
 }
