@@ -155,7 +155,14 @@
     "go_home": "Go to Home"
   },
   "course_details": {
-    "you_might_also_like": "You might also like"
+    "you_might_also_like": "You might also like",
+    "enroll_now": "Enroll Now",
+    "buy_now": "Buy Now"
+  },
+  "payment": {
+    "start_failed": "Could not start the payment. Please try again.",
+    "could_not_open": "Could not open the payment page. Please try again.",
+    "pending_hint": "Payment is still being confirmed. Pull to refresh in a moment — your course will unlock automatically once the payment is confirmed."
   },
   "courses": {
     "title": "Courses",
