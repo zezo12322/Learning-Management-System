@@ -1,43 +1,44 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:optimatech_lms/core/error/exceptions.dart';
-import 'package:optimatech_lms/features/chatbot/data/datasources/chat_remote_data_source.dart';
+import 'package:uuid/uuid.dart';
 import 'package:optimatech_lms/features/chatbot/data/models/chat_context_model.dart';
+import 'package:optimatech_lms/features/chatbot/data/models/chat_message_model.dart';
+import 'chat_remote_data_source.dart';
 
-/// The actual implementation of [ChatRemoteDataSource] using Dio.
-/// Handles the raw HTTP request to the AI/Chatbot backend endpoint.
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final Dio dio;
+  final Uuid uuid = const Uuid();
 
   ChatRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<Stream<String>> sendMessage({
+  Future<ChatMessageModel> sendMessage({
     required String text,
     required ChatContextModel context,
   }) async {
+    const String apiKey = 'YOUR_INTERNAL_API_KEY'; // To be moved to env config
+
+    final requestId = uuid.v4();
+    final payload = context.toJson(text, requestId);
+
     try {
-      // POST request to the backend with streaming response type enabled.
       final response = await dio.post(
-        '/api/chat/send', // Dummy endpoint, update as needed
-        data: {
-          'text': text,
-          'context': context.toJson(),
-        },
+        'http://localhost:8000/v1/rag/chat', // Use backend URL from env
+        data: payload,
         options: Options(
-          responseType: ResponseType.stream, // Crucial for typing effect
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Api-Key': apiKey,
+          },
         ),
       );
 
-      // Cast the raw response data to a byte stream and decode it to strings.
-      final stream = response.data.stream as Stream<List<int>>;
-      return stream.map((data) => utf8.decode(data));
-    } on DioException catch (e) {
-      // Catch network/HTTP errors and wrap them in custom app exceptions.
-      throw CustomExceptions(message: e.message ?? 'Failed to connect to Chatbot API');
+      if (response.statusCode == 200) {
+        return ChatMessageModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to send message: ${response.statusCode}');
+      }
     } catch (e) {
-      // Catch any generic Dart errors.
-      throw CustomExceptions(message: e.toString());
+      throw Exception('Network or API Error: $e');
     }
   }
 }
