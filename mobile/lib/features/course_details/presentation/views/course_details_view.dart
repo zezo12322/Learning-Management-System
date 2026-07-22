@@ -24,6 +24,7 @@ import 'package:optimatech_lms/features/course_details/presentation/manager/cour
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/resources_content.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
+import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 
 class CourseDetailsView extends StatelessWidget {
   const CourseDetailsView({super.key, required this.course});
@@ -82,6 +83,10 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent> {
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceDim,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 90.h),
+        child: GlobalChatbotFab(courseId: widget.course.id),
+      ),
       body: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
         builder: (context, state) {
           List<CourseLessonEntity> allLessons = [];

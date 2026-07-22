@@ -4,14 +4,14 @@ import 'package:optimatech_lms/features/chatbot/presentation/widgets/chat_messag
 
 class ChatbotBottomSheet extends StatelessWidget {
   final String courseId;
-  final String videoId;
+  final String? videoId;
   final int Function()? getPlaybackMs;
   final void Function(int startMs)? onCitationTap;
 
   const ChatbotBottomSheet({
     super.key, 
     required this.courseId, 
-    required this.videoId,
+    this.videoId,
     this.getPlaybackMs,
     this.onCitationTap,
   });
