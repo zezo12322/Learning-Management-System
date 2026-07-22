@@ -6,14 +6,14 @@ import 'package:optimatech_lms/features/chatbot/presentation/widgets/chatbot_bot
 
 class GlobalChatbotFab extends StatelessWidget {
   final String courseId;
-  final String videoId;
+  final String? videoId;
   final int Function()? getPlaybackMs;
   final void Function(int startMs)? onCitationTap;
 
   const GlobalChatbotFab({
     super.key,
     required this.courseId,
-    required this.videoId,
+    this.videoId,
     this.getPlaybackMs,
     this.onCitationTap,
   });
@@ -25,7 +25,7 @@ class GlobalChatbotFab extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return BlocProvider<ChatCubit>(
-          create: (_) => getIt<ChatCubit>(),
+          create: (_) => getIt<ChatCubit>()..loadChatHistory(videoId ?? courseId),
           child: ChatbotBottomSheet(
             courseId: courseId,
             videoId: videoId,
