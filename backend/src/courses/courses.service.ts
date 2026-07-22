@@ -480,7 +480,8 @@ export class CoursesService {
       for (const sub of m.submissions ?? []) {
         totalSubmissions += 1;
         if (sub.status in submissionByStatus) {
-          submissionByStatus[sub.status as keyof typeof submissionByStatus] += 1;
+          submissionByStatus[sub.status as keyof typeof submissionByStatus] +=
+            1;
         }
       }
     }
