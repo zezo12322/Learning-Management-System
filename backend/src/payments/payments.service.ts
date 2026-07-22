@@ -18,6 +18,7 @@ export class PaymentsService {
     items: any[],
     billingData: any,
     userAuthToken: string,
+    userId: string,
   ): Promise<string> {
     const secretKey = this.configService.get<string>('PAYMOB_SECRET_KEY');
     const publicKey = this.configService.get<string>('PAYMOB_PUBLIC_KEY');
@@ -81,6 +82,7 @@ export class PaymentsService {
       const paymentRes = await this.dataConnectService.executeMutation(
         'LogPayment',
         {
+          userId,
           gateway: 'PAYMOB',
           referenceId: intentionId.toString(),
           amount: amountCents,
@@ -89,7 +91,10 @@ export class PaymentsService {
         userAuthToken,
       );
 
-      const paymentId = paymentRes?.payment_insert;
+      // payment_insert returns the row key ({ id }); older connector responses
+      // returned the bare id — accept both shapes.
+      const insertKey = paymentRes?.payment_insert;
+      const paymentId = insertKey?.id ?? insertKey;
 
       // If we received items with targetType and ID, log them as well
       if (paymentId && Array.isArray(items)) {
