@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:optimatech_lms/features/chatbot/domain/entities/chat_message_entity.dart';
 
 class ChatBubbleWidget extends StatelessWidget {
@@ -23,7 +24,7 @@ class ChatBubbleWidget extends StatelessWidget {
     final double opacity = !isUser && !message.grounded ? 0.6 : 1.0;
 
     return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
       child: Opacity(
         opacity: opacity,
         child: Container(
@@ -36,9 +37,11 @@ class ChatBubbleWidget extends StatelessWidget {
             color: isUser 
                 ? theme.colorScheme.primary 
                 : theme.colorScheme.surfaceDim,
-            borderRadius: BorderRadius.circular(16).copyWith(
-              bottomRight: isUser ? const Radius.circular(0) : null,
-              bottomLeft: !isUser ? const Radius.circular(0) : null,
+            borderRadius: BorderRadiusDirectional.only(
+              topStart: const Radius.circular(16),
+              topEnd: const Radius.circular(16),
+              bottomStart: !isUser ? Radius.zero : const Radius.circular(16),
+              bottomEnd: isUser ? Radius.zero : const Radius.circular(16),
             ),
           ),
           child: Column(
@@ -55,7 +58,7 @@ class ChatBubbleWidget extends StatelessWidget {
                       const Icon(Icons.auto_awesome, size: 16),
                       const SizedBox(width: 8),
                       Text(
-                        'Thinking...',
+                        'chatbot.thinking'.tr(),
                         style: TextStyle(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
