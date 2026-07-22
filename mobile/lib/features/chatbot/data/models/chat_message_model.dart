@@ -22,11 +22,20 @@ class ChatMessageModel extends ChatMessageEntity {
       );
     }
 
+    final senderStr = json['sender'];
+    ChatSender parsedSender = ChatSender.bot;
+    if (senderStr == 'ChatSender.user') {
+      parsedSender = ChatSender.user;
+    }
+
+    final parsedTimeStr = json['timestamp'];
+    final parsedTime = parsedTimeStr != null ? DateTime.parse(parsedTimeStr) : DateTime.now();
+
     return ChatMessageModel(
-      id: json['session_id'] ?? json['request_id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      text: json['answer'] ?? '',
-      sender: ChatSender.bot, // API response is always from the bot
-      timestamp: DateTime.now(), // Use current time since API doesn't return timestamp
+      id: json['id'] ?? json['session_id'] ?? json['request_id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      text: json['text'] ?? json['answer'] ?? '',
+      sender: parsedSender,
+      timestamp: parsedTime,
       grounded: json['grounded'] ?? true,
       scopeUsed: json['scope_used'],
       citations: citationsList,
@@ -36,6 +45,7 @@ class ChatMessageModel extends ChatMessageEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'text': text,
       'answer': text,
       'sender': sender.toString(),
       'timestamp': timestamp.toIso8601String(),
