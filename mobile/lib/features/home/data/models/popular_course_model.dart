@@ -31,7 +31,7 @@ class PopularCourseModel extends HomeCourseEntity {
       categoryName: course.category.name,
       tags: course.tags,
       ratingCount: course.ratingCount,
-      enrollmentCount: course.activeEnrollments.length,
+      enrollmentCount: 0,
       courseStatus: 'PUBLISHED',
       language: 'en',
       id: course.id,
