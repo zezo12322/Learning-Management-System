@@ -175,6 +175,19 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // Paid-course enrollment gate (EnrollmentService): does this user have a
+  // COMPLETED payment that includes the course they are trying to enroll in?
+  GetUserCompletedPayments: /* GraphQL */ `
+    query GetUserCompletedPayments($userId: String!) {
+      payments(where: { userId: { eq: $userId }, status: { eq: COMPLETED } }) {
+        id
+        paymentItems_on_payment {
+          courseId
+        }
+      }
+    }
+  `,
+
   // --- Transcoding worker (TranscodingProcessor) ---
   AdminUpdateLecture: /* GraphQL */ `
     mutation AdminUpdateLecture(
