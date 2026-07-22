@@ -16,6 +16,9 @@ class ChatMessageEntity extends Equatable {
   final bool grounded;
   final String? scopeUsed;
   final List<CitationEntity> citations;
+  
+  // UI specific fields
+  final bool isLoading;
 
   const ChatMessageEntity({
     required this.id,
@@ -25,6 +28,7 @@ class ChatMessageEntity extends Equatable {
     this.grounded = true,
     this.scopeUsed,
     this.citations = const [],
+    this.isLoading = false,
   });
 
   @override
@@ -36,5 +40,6 @@ class ChatMessageEntity extends Equatable {
         grounded,
         scopeUsed,
         citations,
+        isLoading,
       ];
 }
