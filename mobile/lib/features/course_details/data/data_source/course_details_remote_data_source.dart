@@ -1,6 +1,5 @@
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_details/data/models/course_curriculum_model.dart';
-import 'package:optimatech_lms/features/course_details/domain/entities/course_curriculum_entity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class CourseDetailsRemoteDataSource {
