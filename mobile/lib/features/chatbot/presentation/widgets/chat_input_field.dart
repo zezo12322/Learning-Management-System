@@ -4,13 +4,13 @@ import 'package:optimatech_lms/features/chatbot/presentation/manager/chat_cubit/
 
 class ChatInputField extends StatefulWidget {
   final String courseId;
-  final String videoId;
+  final String? videoId;
   final int Function()? getPlaybackMs;
 
   const ChatInputField({
     super.key, 
     required this.courseId, 
-    required this.videoId,
+    this.videoId,
     this.getPlaybackMs,
   });
 
@@ -33,7 +33,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
     context.read<ChatCubit>().sendMessage(
       text, 
       widget.courseId, 
-      widget.videoId, 
+      widget.videoId ?? widget.courseId, 
       ms,
     );
   }
