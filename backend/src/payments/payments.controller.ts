@@ -12,6 +12,7 @@ import {
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { DataConnectService } from '../firebase/dataconnect.service';
 
@@ -28,6 +29,7 @@ export class PaymentsController {
     @Body() body: any,
     @Res() res: Response,
     @AuthToken() userAuthToken: string,
+    @CurrentUser('uid') userId: string,
   ) {
     // Expected to receive amount and user details for checkout
     const amountCents = body.amountCents || 10000; // default 100 EGP for testing
@@ -56,6 +58,7 @@ export class PaymentsController {
         items,
         billingData,
         userAuthToken,
+        userId,
       );
 
       // Redirect user directly to the Paymob hosted checkout page

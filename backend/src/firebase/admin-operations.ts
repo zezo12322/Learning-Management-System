@@ -99,6 +99,55 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // Payment rows are NO_ACCESS in the connector (a client could otherwise
+  // fabricate them). The connector variant derives userId from auth.uid, which
+  // does not exist on the admin endpoint — so this variant takes the verified
+  // uid explicitly from PaymentsService.
+  LogPayment: /* GraphQL */ `
+    mutation LogPayment(
+      $userId: String!
+      $gateway: PaymentGateway!
+      $referenceId: String!
+      $amount: Int!
+      $currency: String = "EGP"
+      $customerEmailSnapshot: String!
+    ) {
+      payment_insert(
+        data: {
+          userId: $userId
+          customerEmailSnapshot: $customerEmailSnapshot
+          gateway: $gateway
+          status: PENDING
+          referenceId: $referenceId
+          amount: $amount
+          currency: $currency
+        }
+      )
+    }
+  `,
+
+  AddPaymentItem: /* GraphQL */ `
+    mutation AddPaymentItem(
+      $paymentId: UUID!
+      $targetType: PaymentItemTarget!
+      $courseId: UUID
+      $missionId: UUID
+      $subscriptionTierId: UUID
+      $price: Int!
+    ) {
+      paymentItem_insert(
+        data: {
+          paymentId: $paymentId
+          targetType: $targetType
+          courseId: $courseId
+          missionId: $missionId
+          subscriptionTierId: $subscriptionTierId
+          priceAtPurchase: $price
+        }
+      )
+    }
+  `,
+
   UpdatePaymentStatusByReference: /* GraphQL */ `
     mutation UpdatePaymentStatusByReference(
       $referenceId: String!
