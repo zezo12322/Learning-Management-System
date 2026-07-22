@@ -1,21 +1,30 @@
 import 'package:equatable/equatable.dart';
 
-/// Holds the user's current context (like the screen they are on or the course they are viewing).
-/// This context is sent to the AI so the bot can provide highly contextual, relevant answers.
+/// Holds the user's current context to be sent as the RAG request payload.
 class ChatContextEntity extends Equatable {
-  /// e.g., 'CourseDetailsView' or 'VideoPlayerScreen'
-  final String? currentScreen;
-  /// ID of the course the user is currently interacting with, if any
-  final String? courseId;
-  /// ID of the specific lesson being watched, if any
-  final String? lessonId;
+  final String tenantId;
+  final String userId;
+  final String courseId;
+  final String videoId;
+  final String sessionId;
+  final int playbackMs;
 
   const ChatContextEntity({
-    this.currentScreen,
-    this.courseId,
-    this.lessonId,
+    required this.tenantId,
+    required this.userId,
+    required this.courseId,
+    required this.videoId,
+    required this.sessionId,
+    required this.playbackMs,
   });
 
   @override
-  List<Object?> get props => [currentScreen, courseId, lessonId];
+  List<Object?> get props => [
+        tenantId,
+        userId,
+        courseId,
+        videoId,
+        sessionId,
+        playbackMs,
+      ];
 }
