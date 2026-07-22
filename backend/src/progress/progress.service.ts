@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { UpdateProgressDto } from './dto/progress.dto';
 import { CompletionService } from '../completion/completion.service';
+import { EnrollmentService } from '../enrollment/enrollment.service';
 import { COMPLETION_THRESHOLD } from './lecture-progress.queue';
 
 @Injectable()
@@ -9,6 +14,7 @@ export class ProgressService {
   constructor(
     private readonly dc: DataConnectService,
     private readonly completionService: CompletionService,
+    private readonly enrollmentService: EnrollmentService,
   ) {}
 
   async updateProgress(
@@ -28,13 +34,36 @@ export class ProgressService {
       authToken,
     );
     const lecture = lectureData?.courseLecture;
+    if (!lecture) {
+      throw new NotFoundException(`Lecture ${lectureId} not found`);
+    }
+
+    const courseId = lecture?.section?.course?.id;
+    const isFreePreview = lecture?.isFreePreview ?? false;
+
+    // ENROLLMENT VERIFICATION: Only enrolled students can record progress.
+    // Free-preview lectures are exempt — anyone can preview them.
+    if (courseId && !isFreePreview) {
+      const enrollment = await this.enrollmentService.getCourseEnrollment(
+        courseId,
+        authToken,
+      );
+      if (
+        !enrollment ||
+        (enrollment.status !== 'ACTIVE' && enrollment.status !== 'COMPLETED')
+      ) {
+        throw new ForbiddenException(
+          'You must be enrolled in the course to update lecture progress',
+        );
+      }
+    }
+
     const duration = lecture?.duration ?? 0;
 
     // Only a positive duration can complete; lectures with unknown/zero duration
     // never auto-complete here.
     const completed =
-      duration > 0 &&
-      dto.lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
+      duration > 0 && dto.lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
     const completedAt = completed ? new Date().toISOString() : null;
 
     // Clamp the stored position to the lecture length so a bad client can't

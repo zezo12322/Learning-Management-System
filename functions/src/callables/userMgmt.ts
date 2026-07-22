@@ -179,7 +179,14 @@ export const changeUserRole = onCall(
       newClaims.roles = [newRole];
       await admin.auth().setCustomUserClaims(targetUid, newClaims);
 
-      logger.info(`🎉 [SUCCESS] Role fully synchronized across Database and Token.`);
+      // Revoke all existing refresh tokens so the user must re-authenticate.
+      // Without this, a demoted admin's stale ID token (minted before the role
+      // change) would keep granting admin access until it expires naturally
+      // (up to 1 hour). Forcing a re-auth ensures the new claims take effect
+      // immediately on the next session.
+      await admin.auth().revokeRefreshTokens(targetUid);
+
+      logger.info(`🎉 [SUCCESS] Role fully synchronized across Database and Token. Refresh tokens revoked.`);
       return {success: true, message: `User successfully updated to ${newRole}.`};
     } catch (error: any) {
       logger.error("❌ [API ERROR inside changeUserRole]", { error: error.message, stack: error.stack, targetUid, callerUid });

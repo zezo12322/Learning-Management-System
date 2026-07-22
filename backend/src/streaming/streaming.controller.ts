@@ -6,6 +6,7 @@ import {
   Query,
   Header,
   Ip,
+  Req,
   UseGuards,
   BadRequestException,
   StreamableFile,
@@ -39,6 +40,7 @@ export class StreamingController {
     @CurrentUser('admin') isAdmin: boolean,
     @Ip() ip: string,
     @Query('v') variant?: string,
+    @Req() req?: any,
   ) {
     return this.streaming.getManifest({
       lectureId,
@@ -47,6 +49,7 @@ export class StreamingController {
       isAdmin: isAdmin === true,
       variant,
       ip,
+      userAgent: req?.headers?.['user-agent'],
     });
   }
 
@@ -63,6 +66,7 @@ export class StreamingController {
     @CurrentUser('email') email: string,
     @CurrentUser('admin') isAdmin: boolean,
     @Ip() ip: string,
+    @Req() req: any,
   ) {
     return this.streaming.getWatermark(
       lectureId,
@@ -71,6 +75,7 @@ export class StreamingController {
       token,
       isAdmin === true,
       ip,
+      req.headers?.['user-agent'],
     );
   }
 
@@ -88,6 +93,7 @@ export class StreamingController {
     @CurrentUser('admin') isAdmin: boolean,
     @Ip() ip: string,
     @Query('kt') kt?: string,
+    @Req() req?: any,
   ): Promise<StreamableFile> {
     if (!kt) {
       throw new BadRequestException('Missing key token');
@@ -99,6 +105,7 @@ export class StreamingController {
       isAdmin === true,
       kt,
       ip,
+      req?.headers?.['user-agent'],
     );
     // Wrap in StreamableFile so Nest sends the raw 16 bytes; returning a bare
     // Buffer makes Nest JSON-serialize it ({"type":"Buffer",...}), which breaks

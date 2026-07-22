@@ -115,4 +115,23 @@ export class EnrollmentService {
     );
     return data?.enrollments?.[0] ?? null;
   }
+
+  /**
+   * Admin/worker variant: check if user is enrolled in course.
+   * Runs with service-account credentials (no auth.uid).
+   */
+  async checkEnrollmentAsAdmin(
+    courseId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const data = await this.dc.executeQueryAsAdmin(
+      'GetUserEnrollmentForCourseByUser',
+      { courseId, userId },
+    );
+    const enrollment = data?.enrollments?.[0];
+    return (
+      !!enrollment &&
+      (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED')
+    );
+  }
 }
