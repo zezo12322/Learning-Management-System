@@ -93,7 +93,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return Scaffold(
       extendBody: true,
       body: bodyWidget,
-      floatingActionButton: const GlobalChatbotFab(currentScreen: 'HomeView'),
+      floatingActionButton: const GlobalChatbotFab(courseId: 'UNKNOWN', videoId: 'UNKNOWN'),
       bottomNavigationBar: GlassBottomNavBar(
         currentIndex: currentScreen,
         onTap: onTabTapped,
