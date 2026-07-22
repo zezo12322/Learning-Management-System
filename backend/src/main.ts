@@ -29,7 +29,11 @@ async function bootstrap() {
   const localhostOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || localhostOrigin.test(origin) || corsOrigins.includes(origin)) {
+      if (
+        !origin ||
+        localhostOrigin.test(origin) ||
+        corsOrigins.includes(origin)
+      ) {
         return callback(null, true);
       }
       return callback(new Error(`Origin ${origin} not allowed by CORS`), false);

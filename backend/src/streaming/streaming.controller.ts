@@ -113,8 +113,6 @@ export class StreamingController {
     return new StreamableFile(key, { type: 'application/octet-stream' });
   }
 
-
-
   /**
    * Admin/instructor: register uploaded HLS assets for a lecture (sets videoUrl
    * to the master playlist after verifying the playlist + key exist).

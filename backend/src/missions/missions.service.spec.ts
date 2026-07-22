@@ -54,7 +54,7 @@ describe('MissionsService', () => {
       const dc = makeDc();
       const svc = new MissionsService(dc as any, access as any);
       await expect(
-        svc.update('m1', { courseId: 'foreign' } as any, 'tok', 'u1', false),
+        svc.update('m1', { courseId: 'foreign' }, 'tok', 'u1', false),
       ).rejects.toBeInstanceOf(ForbiddenException);
       expect(dc.executeMutation).not.toHaveBeenCalled();
     });
