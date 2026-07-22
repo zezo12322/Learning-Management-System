@@ -50,10 +50,14 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, List<ChatMessageEntity>>> getChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
   }) async {
     try {
-      final localData = await localDataSource.getChatHistory(videoId: videoId);
+      final localData = await localDataSource.getChatHistory(
+        courseId: courseId,
+        videoId: videoId,
+      );
       return Right(localData);
     } on CustomExceptions catch (e) {
       return Left(CacheFailure(e.message));
@@ -64,7 +68,8 @@ class ChatRepositoryImpl implements ChatRepository {
 
   @override
   Future<Either<Failure, void>> saveChatHistory({
-    required String videoId,
+    required String courseId,
+    String? videoId,
     required List<ChatMessageEntity> messages,
   }) async {
     try {
@@ -80,7 +85,11 @@ class ChatRepositoryImpl implements ChatRepository {
         );
       }).toList();
 
-      await localDataSource.saveChatHistory(videoId: videoId, messages: messageModels);
+      await localDataSource.saveChatHistory(
+        courseId: courseId,
+        videoId: videoId,
+        messages: messageModels,
+      );
       return const Right(null);
     } on CustomExceptions catch (e) {
       return Left(CacheFailure(e.message));

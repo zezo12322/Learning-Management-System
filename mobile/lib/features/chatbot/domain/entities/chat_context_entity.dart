@@ -5,7 +5,7 @@ class ChatContextEntity extends Equatable {
   final String tenantId;
   final String userId;
   final String courseId;
-  final String videoId;
+  final String? videoId;
   final String sessionId;
   final int playbackMs;
 
