@@ -18,6 +18,7 @@ import 'package:optimatech_lms/features/home/presentation/widgets/build_popular_
 import 'package:optimatech_lms/features/home/presentation/widgets/build_recommended_courses_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_shimmer_skeleton.dart';
 import '../../../courses/presentation/views/widgets/show_courses_filter_bottom_sheet.dart';
+import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
 
 // ============================================================================
 // HomeBody — Main content area for the Home tab.
@@ -124,6 +125,20 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
                 buildContinueLearningSection(
                   context,
                   widget.continueLearning.first,
+                ),
+                Gap(28.h),
+              ] else if (continueCourse != null) ...[
+                buildContinueLearningSection(
+                  context,
+                  StudentProgressEntity(
+                    watchedLessons: 2,
+                    totalLessons: 10,
+                    timeLeft: '45 mins',
+                    progressPercent: 0.2,
+                    courseId: continueCourse.id,
+                    title: continueCourse.title,
+                    thumbnail: continueCourse.image,
+                  ),
                 ),
                 Gap(28.h),
               ],
