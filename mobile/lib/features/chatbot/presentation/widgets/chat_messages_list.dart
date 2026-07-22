@@ -37,7 +37,7 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
   Widget build(BuildContext context) {
     return BlocConsumer<ChatCubit, ChatState>(
       listener: (context, state) {
-        if (state is ChatSuccess || state is ChatError) {
+        if (state is ChatSuccess || state is ChatError || state is ChatLoading) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _scrollToBottom();
           });
@@ -50,6 +50,12 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           messages = state.messages;
         }
 
+        if (state is ChatLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
         if (state is ChatInitial && messages.isEmpty) {
           return const Center(
             child: Text('How can I help you today?'),
@@ -60,25 +66,9 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
           controller: _scrollController,
           reverse: true,
           padding: const EdgeInsets.all(16.0),
-          // +1 if loading to show a spinner at the bottom (index 0 in reversed list)
-          itemCount: messages.length + (state is ChatLoading ? 1 : 0),
+          itemCount: messages.length,
           itemBuilder: (context, index) {
-            if (state is ChatLoading && index == 0) {
-              return const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              );
-            }
-
-            final actualIndex = state is ChatLoading ? index - 1 : index;
-            final msg = messages[messages.length - 1 - actualIndex];
+            final msg = messages[messages.length - 1 - index];
             return ChatBubbleWidget(
               message: msg,
               onCitationTap: widget.onCitationTap,
