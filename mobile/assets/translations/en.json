@@ -531,7 +531,7 @@
     "title": "Optimatech chatbot",
     "hint_text": "Ask me anything...",
     "empty_state": "How can I help you today?",
-    "welcome_user": "Welcome {},\nHow can I help you today?",
+    "welcome_message": "Welcome {name}! 👋 How can I help you today?",
     "thinking": "Thinking...",
     "offline_error": "No internet connection. AI requires an active connection."
   }
