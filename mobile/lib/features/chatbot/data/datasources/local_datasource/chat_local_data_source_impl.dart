@@ -25,7 +25,7 @@ class ChatLocalDataSourceImpl implements ChatLocalDataSource {
       );
       await sharedPreferences.setString(key, jsonString);
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to save chat history.');
+      throw const CustomExceptions(message: 'Failed to save chat history.');
     }
   }
 
@@ -46,7 +46,7 @@ class ChatLocalDataSourceImpl implements ChatLocalDataSource {
       }
       return [];
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to load chat history.');
+      throw const CustomExceptions(message: 'Failed to load chat history.');
     }
   }
 }
