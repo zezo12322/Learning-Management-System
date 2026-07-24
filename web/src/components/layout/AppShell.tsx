@@ -10,6 +10,7 @@ import {
   Bookmark,
   UploadCloud,
   UserRound,
+  UserPlus,
   LayoutDashboard,
   LibraryBig,
   LogOut,
@@ -48,15 +49,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     enabled: isAuthenticated,
   })
   const firstCourseId = authoringQuery.data?.[0]?.id
-  const nav = useMemo(
-    () => firstCourseId
-      ? [
-          ...BASE_NAV,
-          { href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot },
-        ]
-      : BASE_NAV,
-    [firstCourseId]
-  )
+  const canManageStudents = roles.includes('admin') || roles.includes('instructor')
+  const nav = useMemo(() => {
+    const items = [...BASE_NAV]
+    // Admin/instructor can register students (KAN-12) — insert after Courses.
+    if (canManageStudents) {
+      items.splice(2, 0, { href: '/students', label: 'nav.students', icon: UserPlus })
+    }
+    if (firstCourseId) {
+      items.push({ href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot })
+    }
+    return items
+  }, [firstCourseId, canManageStudents])
   const currentLabel = t(nav.find((item) => isActive(pathname, item.href))?.label ?? 'workspace.default')
   const accountName = me?.name || 'Account'
   const accountRole = roles.length
