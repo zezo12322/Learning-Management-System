@@ -11,11 +11,12 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 import { admin, adminDC } from "../config/firebase";
 // Import the strongly-typed generated Admin SDK instead of executing raw queries
-import { 
-  getUserClaimsFn, 
-  createDefaultUserAndProfileFn, 
-  deleteUserRecordFn 
+import {
+  getUserClaimsFn,
+  createDefaultUserAndProfileFn,
+  deleteUserRecordFn
 } from "@dataconnect/admin-generated";
+import { sendWelcomeEmail } from "../utils/mailer";
 
 /**
  * TRIGGER: onCreate
@@ -54,6 +55,9 @@ export const syncClaims = functions.region("europe-west3").auth.user().onCreate(
       const defaultClaims = {roles: ["student"], companyId: null};
       await getAuth().setCustomUserClaims(user.uid, defaultClaims);
 
+      // Welcome the freshly-provisioned student (KAN-40). Never throws.
+      await sendWelcomeEmail(userEmail, userName);
+
       logger.info(`🎉 [SUCCESS] Relational record created, profile setup, and roles attached.`);
       return;
     }
@@ -68,6 +72,11 @@ export const syncClaims = functions.region("europe-west3").auth.user().onCreate(
     const claims = {roles, companyId};
     await getAuth().setCustomUserClaims(user.uid, claims);
     logger.info(`🎉 [SUCCESS] Custom verification claims synced to token.`);
+
+    // Welcome the newly registered student (KAN-40). Covers the email/password
+    // signup path — registerStudent has already provisioned the DB row above,
+    // so this branch runs for a brand-new self-service registration.
+    await sendWelcomeEmail(user.email, user.displayName);
   } catch (error: any) {
     // Structured error logging
     logger.error("❌ [CRITICAL ERROR inside syncClaims]", { error: error.message, stack: error.stack, uid: user.uid });
