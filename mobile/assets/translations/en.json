@@ -280,7 +280,16 @@
       "select_theme": "Select Theme",
       "theme_system": "System",
       "theme_light": "Light Theme",
-      "theme_dark": "Dark Theme"
+      "theme_dark": "Dark Theme",
+      "delete_account": "Delete account"
+    },
+    "delete": {
+      "title": "Delete your account?",
+      "warning": "This permanently deletes your account and all your data — enrollments, progress, and certificates. This action cannot be undone.",
+      "password_label": "Confirm your password",
+      "password_required": "Enter your password to confirm.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "confirm": "Delete account"
     }
   },
   "lesson_learning": {
@@ -475,7 +484,16 @@
       "select_theme": "Select Theme",
       "theme_system": "System",
       "theme_light": "Light Theme",
-      "theme_dark": "Dark Theme"
+      "theme_dark": "Dark Theme",
+      "delete_account": "Delete account"
+    },
+    "delete": {
+      "title": "Delete your account?",
+      "warning": "This permanently deletes your account and all your data — enrollments, progress, and certificates. This action cannot be undone.",
+      "password_label": "Confirm your password",
+      "password_required": "Enter your password to confirm.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "confirm": "Delete account"
     }
   },
   "lesson_learning": {
