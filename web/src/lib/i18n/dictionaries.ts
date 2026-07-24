@@ -97,6 +97,23 @@ const en: Dict = {
   'reg.val.pwUpper': 'Include one uppercase letter.',
   'reg.val.pwNum': 'Include one number.',
 
+  // Students — admin registration (KAN-12)
+  'nav.students': 'Students',
+  'students.title': 'Add a student',
+  'students.subtitle': 'Register a student directly. They get a welcome email and a temporary password to sign in.',
+  'students.accessDenied': 'Your account needs administrator or instructor access to register students.',
+  'students.formTitle': 'Student details',
+  'students.formSubtitle': 'The student is created immediately and can sign in with the temporary password below.',
+  'students.submit': 'Register student',
+  'students.successTitle': 'Student registered',
+  'students.successBody': 'Share these sign-in details with the student and ask them to change the password after first sign-in. A welcome email is sent automatically when email delivery is configured.',
+  'students.credEmail': 'Email',
+  'students.tempPassword': 'Temporary password',
+  'students.copy': 'Copy',
+  'students.copied': 'Copied',
+  'students.addAnother': 'Register another student',
+  'students.err.generic': 'We could not register the student. Please try again.',
+
   // Shared / common
   'common.createCourse': 'Create course',
   'common.published': 'Published',
@@ -606,6 +623,23 @@ const ar: Dict = {
   'reg.val.pwLen': 'استخدم 8 أحرف على الأقل.',
   'reg.val.pwUpper': 'أضِف حرفًا كبيرًا واحدًا على الأقل.',
   'reg.val.pwNum': 'أضِف رقمًا واحدًا على الأقل.',
+
+  // Students — admin registration (KAN-12)
+  'nav.students': 'الطلاب',
+  'students.title': 'إضافة طالب',
+  'students.subtitle': 'سجّل طالبًا مباشرةً. هيوصله إيميل ترحيب وكلمة مرور مؤقتة للدخول.',
+  'students.accessDenied': 'يحتاج حسابك صلاحية مسؤول أو مدرّب لتسجيل الطلاب.',
+  'students.formTitle': 'بيانات الطالب',
+  'students.formSubtitle': 'يتم إنشاء الطالب فورًا ويقدر يسجّل الدخول بكلمة المرور المؤقتة الظاهرة تحت.',
+  'students.submit': 'تسجيل الطالب',
+  'students.successTitle': 'تم تسجيل الطالب',
+  'students.successBody': 'شارك بيانات الدخول دي مع الطالب واطلب منه تغيير كلمة المرور بعد أول تسجيل دخول. بيتبعت إيميل ترحيب تلقائيًا لما يكون إرسال البريد متظبّطًا.',
+  'students.credEmail': 'البريد الإلكتروني',
+  'students.tempPassword': 'كلمة المرور المؤقتة',
+  'students.copy': 'نسخ',
+  'students.copied': 'تم النسخ',
+  'students.addAnother': 'تسجيل طالب آخر',
+  'students.err.generic': 'تعذّر تسجيل الطالب. حاول مرة أخرى.',
 
   // Shared / common
   'common.createCourse': 'إنشاء دورة',
