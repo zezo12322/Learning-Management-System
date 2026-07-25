@@ -175,12 +175,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-1 flex-col items-center gap-1 rounded-lg py-1.5 text-[10px]',
+                // min-w-0 + truncate: admins/instructors get up to 9 items here,
+                // and flex items default to min-width:auto, so without these the
+                // labels refuse to shrink and the last tab is clipped off-screen.
+                'flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1.5 text-[10px]',
                 active ? 'text-primary' : 'text-content-muted'
               )}
             >
-              <item.icon size={19} />
-              {t(item.label)}
+              <item.icon size={19} className="shrink-0" />
+              <span className="max-w-full truncate">{t(item.label)}</span>
             </Link>
           )
         })}

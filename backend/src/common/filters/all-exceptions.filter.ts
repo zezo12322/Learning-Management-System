@@ -110,11 +110,25 @@ function middlewareErrorStatus(exception: unknown): number | null {
     : null;
 }
 
-/** One-line, human-readable reason drawn from the outgoing error body. */
+/**
+ * One-line, human-readable reason drawn from the outgoing error body.
+ *
+ * Truncated: with `forbidNonWhitelisted`, ValidationPipe emits one message per
+ * unknown property, so an unbounded join would let any authenticated caller
+ * inflate a single log line (and the drain's bill) with a fat request body.
+ */
+const MAX_REASON_LENGTH = 300;
+
 function describe(body: string | object): string {
-  if (typeof body === 'string') return body;
+  if (typeof body === 'string') return truncate(body);
   const message = (body as { message?: unknown }).message;
-  if (typeof message === 'string') return message;
-  if (Array.isArray(message)) return message.join('; ');
+  if (typeof message === 'string') return truncate(message);
+  if (Array.isArray(message)) return truncate(message.join('; '));
   return 'Client error';
+}
+
+function truncate(reason: string): string {
+  return reason.length > MAX_REASON_LENGTH
+    ? `${reason.slice(0, MAX_REASON_LENGTH)}… (truncated)`
+    : reason;
 }

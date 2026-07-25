@@ -100,6 +100,26 @@ describe('AllExceptionsFilter', () => {
     expect(line).not.toContain('Bad Request Exception');
   });
 
+  it('truncates a huge validation message so a caller cannot inflate the log line', () => {
+    // forbidNonWhitelisted emits one message per unknown property, so the body
+    // length is attacker-controlled.
+    const many = Array.from(
+      { length: 500 },
+      (_, i) => `property ${i} should not exist`,
+    );
+    const res = mockResponse();
+    filter.catch(
+      new BadRequestException(many),
+      mockHost(res, '/api/v1/courses', 'POST'),
+    );
+
+    const line = warnSpy.mock.calls[0][0] as string;
+    expect(line).toContain('(truncated)');
+    expect(line.length).toBeLessThan(500);
+    // The full detail still reaches the client.
+    expect((res.body as { message: string[] }).message).toHaveLength(500);
+  });
+
   it('never writes the query string to the log line', () => {
     const res = mockResponse();
     filter.catch(
