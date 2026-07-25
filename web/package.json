@@ -8,6 +8,8 @@
     "start": "next start -p 5173",
     "lint": "eslint . --max-warnings=0",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
@@ -46,6 +48,7 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
+    "vitest": "^4.1.10",
     "wrangler": "4.112.0"
   }
 }

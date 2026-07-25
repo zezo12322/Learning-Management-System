@@ -122,6 +122,55 @@ export interface Me {
   roles: Role[]
 }
 
+/** Instructor course-overview analytics (GET /courses/:courseId/overview). */
+export interface CourseOverview {
+  course: {
+    id: string
+    title: string
+    description: string | null
+    price: number
+    status: string
+    language: string
+    level: string
+    thumbnail: string | null
+    tags: string[]
+    category: { id: string; name: string } | null
+    author: { id: string; name: string; email: string; avatar: string | null } | null
+    createdAt: string
+    updatedAt: string
+  }
+  instructors: Array<{ id: string; name: string; email: string; avatar: string | null }>
+  content: {
+    totalSections: number
+    totalLectures: number
+    lecturesByType: { VIDEO: number; READING: number; INTERACTIVE: number; QUIZ: number }
+    totalQuizzes: number
+    totalDurationSeconds: number
+  }
+  assignments: {
+    total: number
+    submissions: {
+      total: number
+      byStatus: { PENDING: number; GRADED: number; RETURNED: number; REJECTED: number }
+    }
+  }
+  enrollments: {
+    total: number
+    byStatus: { ACTIVE: number; COMPLETED: number; DROPPED: number; SUSPENDED: number }
+  }
+  progress: {
+    activeLearners: number
+    averageCompletionPercent: number
+    fullyCompletedLearners: number
+    completionRatePercent: number
+  }
+  ratings: {
+    average: number
+    count: number
+    distribution: { 1: number; 2: number; 3: number; 4: number; 5: number }
+  }
+}
+
 export type CourseLifecycleStatus = 'DRAFT' | 'IN_REVIEW' | 'PUBLISHED' | 'ARCHIVED'
 export type UploadAssetState = 'QUEUED' | 'UPLOADING' | 'PROCESSING' | 'READY' | 'ERROR'
 

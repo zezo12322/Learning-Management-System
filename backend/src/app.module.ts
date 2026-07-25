@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
@@ -28,6 +28,8 @@ import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -91,6 +93,18 @@ import { PaymentsModule } from './payments/payments.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    // Monitoring (KAN-60): central error logging/response shaping and the
+    // per-request access log. Registered here rather than in main.ts so both
+    // resolve through DI (an error tracker can be injected later) and so tests
+    // that build from AppModule run the same pipeline as production.
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
