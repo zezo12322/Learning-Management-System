@@ -15,6 +15,32 @@ healthcheck `/api/v1/health`, `restartPolicyType: ON_FAILURE`, max 5 retries).
 Cloudflare config lives in `web/wrangler.jsonc` (worker `optima-lms-web`,
 observability logs + traces enabled).
 
+### CI / CD pipelines
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `.github/workflows/ci.yml` | every PR + push to `main` | Per-package lint / type-check / build / test. On a PR only the packages the diff touches run; `main` always runs everything. Backend publishes a coverage summary + artifact. The aggregate **`CI`** job is the one to require in branch protection — the package jobs are skipped (not passed) on unrelated PRs, which would otherwise stall a required check. |
+| `.github/workflows/security.yml` | every PR + push to `main` + weekly (Mon 06:00 UTC) | Secret scan over full history (gitleaks), dependency review of what a PR adds, and `npm audit` per package. |
+| `.github/workflows/deploy-web.yml` | **manual only** (`workflow_dispatch`) | Reproducible Cloudflare deploy of `web/`, replacing `npm run deploy` from a laptop. Runs in the `production` GitHub Environment, then health-checks the result. |
+| `.github/dependabot.yml` | weekly (Mon) | Grouped dependency PRs for the three npm packages, Flutter `pub`, and the GitHub Actions themselves. |
+
+`backend/` deploys are intentionally **not** in a workflow — Railway already deploys
+from `main`, and a second path would double-deploy.
+
+**Audit gate:** `npm audit` blocks only on **critical**. The measured baseline was
+0 critical but 25-28 **high** per package (mostly transitive dev tooling), so
+gating on `high` would fail every PR on pre-existing debt. Raise the threshold in
+`security.yml` once Dependabot has worked the backlog down.
+
+**One-time setup to finish the CD half:**
+1. Create the **`production`** environment (Settings → Environments) and add
+   required reviewers — that is the manual approval gate.
+2. Add secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
+   `NEXT_PUBLIC_FIREBASE_API_KEY`; add variables `NEXT_PUBLIC_API_URL`, the other
+   `NEXT_PUBLIC_FIREBASE_*` values, and optionally `WEB_HEALTH_URL` to enable the
+   post-deploy check. The workflow fails fast with the exact missing names.
+3. Require the **`CI`** and **`Security`** checks on `main` in branch protection.
+
 ## 2. Monitoring
 
 ### Health endpoint
