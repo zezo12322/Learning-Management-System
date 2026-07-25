@@ -1,9 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Centralized error logging + consistent error responses (KAN-60).
+  app.useGlobalFilters(new AllExceptionsFilter());
+  // Per-request access log (method, path, status, latency) (KAN-60).
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Enable global validation pipe with transform
   app.useGlobalPipes(
@@ -46,4 +53,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
