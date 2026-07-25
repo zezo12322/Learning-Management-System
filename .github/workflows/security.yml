@@ -21,20 +21,31 @@ jobs:
     name: Secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Non-blocking on the first pass: the scanner has never run against this
-    # history, so an unknown backlog of findings must not block merges before
-    # anyone has triaged it. Flip to blocking once a clean run is confirmed.
-    continue-on-error: true
+    # Blocking on pull requests, informational everywhere else. The PR scan looks
+    # only at the commits the PR adds, so it reliably fails on a NEW secret and
+    # cannot be poisoned by the past. The full-history scan still reports a
+    # pre-existing committed credential that only key rotation plus a history
+    # rewrite can clear (docs/OPERATIONS.md §5), so it must not block merges.
+    continue-on-error: ${{ github.event_name != 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # Full history so the scan covers past commits, not just the tip.
+          # Full history so both the diff range and the sweep can resolve.
           fetch-depth: 0
 
-      # Run the gitleaks image directly rather than the marketplace action: the
-      # action requires a paid licence key for organization accounts, the image
-      # does not.
-      - name: gitleaks
+      # The gitleaks image is used directly rather than the marketplace action,
+      # which requires a paid licence key for organization accounts.
+      # Reviewed non-findings are allowlisted by fingerprint in .gitleaksignore.
+      - name: Scan commits added by this PR (blocking)
+        if: github.event_name == 'pull_request'
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --source=/repo --redact --verbose \
+            --log-opts="--no-merges ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
+            --report-format=sarif --report-path=/repo/gitleaks.sarif
+
+      - name: Sweep full history (informational)
+        if: github.event_name != 'pull_request'
         run: |
           docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
             detect --source=/repo --redact --verbose \
