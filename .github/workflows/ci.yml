@@ -103,10 +103,6 @@ jobs:
   mobile:
     name: Mobile (Flutter)
     runs-on: ubuntu-latest
-    # Non-blocking for now: this job could not be validated locally (no Flutter
-    # SDK in the authoring environment), so a first-run analyzer failure must not
-    # block merges. Flip this off once a green run confirms the baseline.
-    continue-on-error: true
     defaults:
       run:
         working-directory: mobile
@@ -120,8 +116,15 @@ jobs:
 
       - run: flutter pub get
 
-      - run: flutter analyze
+      # Gate on real errors only. The first CI run measured the baseline: 0
+      # errors, but 26 warnings and 354 infos of pre-existing lint debt — and
+      # `flutter analyze` exits non-zero on any of them, which would block every
+      # PR on debt it did not introduce. Anything that fails to compile is an
+      # error and still fails this job. Tighten these flags as the debt is paid
+      # down (tracked in KAN-146).
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      # mobile/test currently holds a placeholder smoke test; real widget and
-      # integration tests are tracked in KAN-146.
+      # mobile/test currently holds a placeholder smoke test, so it must not gate
+      # merges yet; real widget/integration tests are tracked in KAN-146.
       - run: flutter test
+        continue-on-error: true
