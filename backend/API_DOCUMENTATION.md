@@ -66,8 +66,18 @@ Liveness probe. **Public.**
 
 **Response `200`:**
 ```json
-{ "status": "ok", "timestamp": "2026-07-04T10:15:00.000Z" }
+{
+  "status": "ok",
+  "timestamp": "2026-07-04T10:15:00.000Z",
+  "uptime": 3812,
+  "env": "production"
+}
 ```
+
+`uptime` is process uptime in seconds (it resets on restart); `env` is
+`NODE_ENV`, or `"unknown"` when unset. Deliberately dependency-free — it reports
+process liveness only, so a transient DB/Redis blip cannot flap Railway's
+healthcheck. It is therefore **not** a readiness probe.
 
 ---
 
