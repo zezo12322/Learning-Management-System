@@ -23,9 +23,15 @@ import { safeRequestPath } from '../utils/request-log';
  *
  * Liveness probes are skipped: Railway's healthcheck plus an external uptime
  * monitor would otherwise bury real traffic in the drain the runbook tells
- * operators to grep.
+ * operators to grep. Matched by suffix so the skip survives a global-prefix
+ * change and a monitor configured with a trailing slash.
  */
-const SILENT_PATHS = new Set(['/api/v1/health']);
+const SILENT_ROUTES = ['/health'];
+
+function isSilent(path: string): boolean {
+  const normalized = path.endsWith('/') ? path.slice(0, -1) : path;
+  return SILENT_ROUTES.some((route) => normalized.endsWith(route));
+}
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -36,7 +42,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = http.getRequest<Request>();
     const path = safeRequestPath(request);
 
-    if (SILENT_PATHS.has(path)) return next.handle();
+    if (isSilent(path)) return next.handle();
 
     const { method } = request;
     const startedAt = Date.now();

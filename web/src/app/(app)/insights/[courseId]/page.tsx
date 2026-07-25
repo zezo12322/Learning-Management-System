@@ -80,7 +80,9 @@ export default function CourseInsightsPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-16 w-full rounded-card" />
-        <div className="grid gap-4 md:grid-cols-4">
+        {/* Same breakpoints as the real KPI grid below, so data arriving does not
+            reflow the layout. */}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-[210px] rounded-card" />
           ))}
@@ -98,10 +100,17 @@ export default function CourseInsightsPage() {
     label: t(`insights.sub.${status.toLowerCase()}`),
     value: data.assignments.submissions.byStatus[status],
   }))
-  // Gate on the distribution rows, not `ratings.count`: the count comes from a
-  // best-effort denormalised cache that can lag, and reporting "no ratings" over
-  // a non-empty distribution would contradict the bars right beside it.
+  // Derive from the distribution rows, not `ratings.average`/`count`: those come
+  // from a best-effort denormalised cache that can lag behind the rows, so a
+  // headline of "0.0 from 3 ratings" could sit above three filled bars. Prefer
+  // the cache when it is populated, fall back to the rows when it is not.
   const ratingTotal = RATING_LEVELS.reduce((sum, n) => sum + data.ratings.distribution[n], 0)
+  const ratingAverage =
+    data.ratings.average > 0
+      ? data.ratings.average
+      : ratingTotal > 0
+        ? RATING_LEVELS.reduce((sum, n) => sum + n * data.ratings.distribution[n], 0) / ratingTotal
+        : 0
   const maxRatingCount = Math.max(1, ...RATING_LEVELS.map((n) => data.ratings.distribution[n]))
 
   return (
@@ -205,7 +214,7 @@ export default function CourseInsightsPage() {
           {ratingTotal > 0 ? (
             <>
               <div className="mb-4 flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-content">{data.ratings.average.toFixed(1)}</span>
+                <span className="text-3xl font-bold text-content">{ratingAverage.toFixed(1)}</span>
                 <span className="text-xs text-content-secondary">
                   {t('insights.ratings.count').replace(
                     '{n}',
