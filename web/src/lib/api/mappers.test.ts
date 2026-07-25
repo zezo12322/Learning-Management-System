@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest'
+// A runtime (non-type) import through the `@/` alias — guards the vitest
+// resolve.alias config, without which this line fails to resolve.
+import { formatCompact } from '@/lib/utils'
 import {
   arrayValue,
   mapAuthoringCourse,
@@ -12,6 +15,12 @@ import {
   objectValue,
   stringValue,
 } from './mappers'
+
+describe('test harness', () => {
+  it('resolves runtime imports through the @/ path alias', () => {
+    expect(formatCompact(1500)).toBeTruthy()
+  })
+})
 
 describe('primitive coercion helpers', () => {
   it('objectValue returns plain objects and rejects arrays/null', () => {

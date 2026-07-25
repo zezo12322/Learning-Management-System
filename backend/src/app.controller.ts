@@ -12,7 +12,8 @@ export class AppController {
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: Math.floor(process.uptime()),
-      env: process.env.NODE_ENV ?? 'development',
+      // `||` not `??`: a defined-but-empty NODE_ENV should read as unset.
+      env: process.env.NODE_ENV || 'unknown',
     };
   }
 }
