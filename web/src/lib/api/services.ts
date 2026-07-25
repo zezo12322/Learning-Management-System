@@ -1,20 +1,14 @@
 import { apiClient } from './client'
 import type {
-  AuthoringCourse,
-  AuthoringSection,
   Category,
   ContinueLearningItem,
-  CourseCard,
   CourseLevel,
   CourseProgress,
   Curriculum,
   Enrollment,
-  Lecture,
   LectureType,
-  Me,
   RatingSummary,
   Review,
-  Role,
   SignedUpload,
   UploadEntityType,
   Quiz,
@@ -25,132 +19,19 @@ import type {
   TakeQuestion,
   TakeQuiz,
 } from '@/lib/types'
-
-type JsonObject = Record<string, unknown>
-
-const objectValue = (value: unknown): JsonObject =>
-  value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonObject) : {}
-
-const stringValue = (value: unknown, fallback = '') =>
-  typeof value === 'string' ? value : fallback
-
-const numberValue = (value: unknown, fallback = 0) =>
-  typeof value === 'number' && Number.isFinite(value) ? value : fallback
-
-const arrayValue = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
-
-function mutationEntity(payload: unknown, keys: string[]): JsonObject {
-  const root = objectValue(payload)
-  for (const key of keys) {
-    const candidate = objectValue(root[key])
-    if (Object.keys(candidate).length) return candidate
-  }
-  return root
-}
-
-function mapLecture(value: unknown, index: number): Lecture {
-  const raw = objectValue(value)
-  return {
-    id: stringValue(raw.id),
-    title: stringValue(raw.title, 'Untitled lesson'),
-    type: stringValue(raw.type, 'READING') as LectureType,
-    duration: numberValue(raw.duration),
-    order: numberValue(raw.order, index + 1),
-    isFreePreview: Boolean(raw.isFreePreview),
-    content: typeof raw.content === 'string' ? raw.content : null,
-    videoUrl: typeof raw.videoUrl === 'string' ? raw.videoUrl : null,
-    transcriptUrl: typeof raw.transcriptUrl === 'string' ? raw.transcriptUrl : null,
-  }
-}
-
-function mapSection(value: unknown, index: number): AuthoringSection {
-  const raw = objectValue(value)
-  const lectures = raw.adminLectures ?? raw.publishedLectures ?? raw.lectures
-  return {
-    id: stringValue(raw.id),
-    title: stringValue(raw.title, 'Untitled section'),
-    order: numberValue(raw.order, index + 1),
-    lectures: arrayValue(lectures).map(mapLecture),
-  }
-}
-
-function mapCourseCard(value: unknown): CourseCard {
-  const raw = objectValue(value)
-  const category = objectValue(raw.category)
-  const author = objectValue(raw.author)
-  return {
-    id: stringValue(raw.id),
-    title: stringValue(raw.title, 'Untitled course'),
-    description: stringValue(raw.description) || undefined,
-    price: numberValue(raw.price),
-    language: stringValue(raw.language) || undefined,
-    level: stringValue(raw.level, 'BEGINNER') as CourseLevel,
-    thumbnail: typeof raw.thumbnail === 'string' ? raw.thumbnail : null,
-    avgRating: numberValue(raw.avgRating),
-    ratingCount: numberValue(raw.ratingCount),
-    tags: arrayValue(raw.tags).filter((tag): tag is string => typeof tag === 'string'),
-    category: stringValue(category.name) ? { name: stringValue(category.name) } : undefined,
-    author: stringValue(author.name)
-      ? { name: stringValue(author.name), avatar: typeof author.avatar === 'string' ? author.avatar : null }
-      : undefined,
-  }
-}
-
-function mapAuthoringCourse(value: unknown): AuthoringCourse {
-  const raw = objectValue(value)
-  const category = objectValue(raw.category)
-  const sections = arrayValue(raw.adminSections ?? raw.sections).map(mapSection)
-  const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
-  const durationMinutes = Math.ceil(
-    sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0) / 60
-  )
-  const readiness = [raw.title, raw.description, raw.category, raw.level, raw.language]
-  return {
-    id: stringValue(raw.id),
-    title: stringValue(raw.title, 'Untitled course'),
-    description: stringValue(raw.description),
-    category: stringValue(category.name, 'Uncategorized'),
-    categoryId: stringValue(category.id) || undefined,
-    level: stringValue(raw.level, 'BEGINNER') as CourseLevel,
-    language: stringValue(raw.language, 'English'),
-    status: stringValue(raw.status, 'DRAFT') as AuthoringCourse['status'],
-    progress: Math.round((readiness.filter(Boolean).length / readiness.length) * 100),
-    lessonCount,
-    durationMinutes,
-    students: numberValue(raw.students),
-    updatedAt: stringValue(raw.updatedAt, 'Not available'),
-    price: numberValue(raw.price),
-    tags: arrayValue(raw.tags).filter((tag): tag is string => typeof tag === 'string'),
-    thumbnail: typeof raw.thumbnail === 'string' ? raw.thumbnail : null,
-    sections,
-  }
-}
-
-function mapMe(value: unknown): Me | null {
-  if (!value) return null
-  const raw = objectValue(value)
-  const profile = objectValue(raw.profile_on_user ?? raw.profile)
-  const roleRows = arrayValue(raw.userRoles_on_user ?? raw.roles)
-  const roles = roleRows
-    .map((item) => {
-      if (typeof item === 'string') return item.toLowerCase()
-      return stringValue(objectValue(objectValue(item).role).name).toLowerCase()
-    })
-    .filter((role): role is Role => ['student', 'instructor', 'admin'].includes(role))
-  return {
-    uid: stringValue(raw.id ?? raw.uid),
-    email: stringValue(raw.email),
-    name: stringValue(raw.name),
-    avatar: typeof raw.avatar === 'string' ? raw.avatar : null,
-    profile: {
-      bio: stringValue(profile.bio) || undefined,
-      company: stringValue(profile.company) || undefined,
-      phone: stringValue(profile.phone) || undefined,
-      preferences: objectValue(profile.syncedPreferences ?? profile.preferences),
-    },
-    roles,
-  }
-}
+import {
+  arrayValue,
+  mapAuthoringCourse,
+  mapCourseCard,
+  mapCourseOverview,
+  mapLecture,
+  mapMe,
+  mapSection,
+  mutationEntity,
+  numberValue,
+  objectValue,
+  stringValue,
+} from './mappers'
 
 export const meApi = {
   get: () => apiClient.get('/me').then((response) => mapMe(response.data)),
@@ -162,6 +43,13 @@ export const meApi = {
     phone?: string
     preferences?: Record<string, unknown>
   }) => apiClient.patch('/me/profile', payload).then((response) => response.data),
+}
+
+// Instructor course-overview analytics (KAN-51). Consumes the backend
+// aggregation at GET /courses/:courseId/overview (owner/admin-scoped).
+export const analyticsApi = {
+  courseOverview: (courseId: string) =>
+    apiClient.get(`/courses/${courseId}/overview`).then((response) => mapCourseOverview(response.data)),
 }
 
 export const catalogApi = {

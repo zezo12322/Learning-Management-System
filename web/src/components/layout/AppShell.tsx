@@ -8,6 +8,7 @@ import {
   BookOpen,
   Bot,
   Bookmark,
+  BarChart3,
   UploadCloud,
   UserRound,
   UserPlus,
@@ -52,9 +53,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const canManageStudents = roles.includes('admin') || roles.includes('instructor')
   const nav = useMemo(() => {
     const items = [...BASE_NAV]
-    // Admin/instructor can register students (KAN-12) — insert after Courses.
+    // Admin/instructor management links after Courses: student registration
+    // (KAN-12) and course analytics (KAN-51).
     if (canManageStudents) {
-      items.splice(2, 0, { href: '/students', label: 'nav.students', icon: UserPlus })
+      items.splice(
+        2,
+        0,
+        { href: '/students', label: 'nav.students', icon: UserPlus },
+        { href: '/insights', label: 'nav.insights', icon: BarChart3 },
+      )
     }
     if (firstCourseId) {
       items.push({ href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot })
