@@ -132,9 +132,11 @@ describe('StreamingService', () => {
       expect(firebase.downloadFile).toHaveBeenCalledWith(
         `${HLS_DIR}/720p/index.m3u8`,
       );
+      // 60 = the hardened default TTL in minutes (STREAM_URL_TTL_MINUTES); the
+      // security hardening lowered it from 360, and this expectation was stale.
       expect(firebase.generateSignedReadUrl).toHaveBeenCalledWith(
         `${HLS_DIR}/720p/seg_000.ts`,
-        360,
+        60,
       );
     });
 
