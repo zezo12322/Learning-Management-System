@@ -1,16 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { ForbiddenException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Centralized error logging + consistent error responses (KAN-60).
-  app.useGlobalFilters(new AllExceptionsFilter());
-  // Per-request access log (method, path, status, latency) (KAN-60).
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  // The global error filter + access log (KAN-60) are registered as APP_FILTER /
+  // APP_INTERCEPTOR providers in AppModule, so they resolve through the DI
+  // container (and are exercised by e2e tests that build from AppModule).
 
   // Enable global validation pipe with transform
   app.useGlobalPipes(
@@ -43,7 +40,13 @@ async function bootstrap() {
       ) {
         return callback(null, true);
       }
-      return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+      // A ForbiddenException (not a bare Error) so a disallowed origin is logged
+      // as a 403 client error rather than an error-level 5xx, which would be a
+      // false positive in the incident signal (see AllExceptionsFilter).
+      return callback(
+        new ForbiddenException(`Origin ${origin} not allowed by CORS`),
+        false,
+      );
     },
     credentials: true,
   });

@@ -14,7 +14,7 @@ import type {
   Role,
 } from '@/lib/types'
 
-export type JsonObject = Record<string, unknown>
+type JsonObject = Record<string, unknown>
 
 export const objectValue = (value: unknown): JsonObject =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonObject) : {}
