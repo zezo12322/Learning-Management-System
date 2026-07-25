@@ -101,7 +101,9 @@ dataconnect_generated/
 *.iml
 
 # CI/CD
-.github/
+# NOTE: `.github/` must stay tracked — it is where GitHub reads workflows,
+# CODEOWNERS and templates from. Ignoring it silently prevented this repo from
+# having any CI at all (KAN-59). Only build output belongs here.
 functions/lib/
 
 # Local ad-hoc debug scripts (never commit — may contain DB credentials)
