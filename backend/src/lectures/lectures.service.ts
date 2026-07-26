@@ -129,6 +129,22 @@ export class LecturesService {
     lectureId: string,
     authToken: string,
   ) {
+    // Notify AI service to delete the video index (fire-and-forget, don't block on failure)
+    try {
+      const aiUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+      const internalApiKey = process.env.INTERNAL_API_KEY || 'default-secret';
+      fetch(`${aiUrl}/v1/videos/${lectureId}`, {
+        method: 'DELETE',
+        headers: { 'X-Internal-Api-Key': internalApiKey },
+      }).catch((err) =>
+        console.warn(
+          `Failed to delete AI index for ${lectureId}: ${err.message}`,
+        ),
+      );
+    } catch (err) {
+      // ignore
+    }
+
     await this.dc.executeMutation(
       'AdminSoftDeleteLecture',
       { lectureId },

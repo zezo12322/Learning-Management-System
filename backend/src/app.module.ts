@@ -28,6 +28,7 @@ import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AiModule } from './ai/ai.module';
 import { RedisThrottlerStorage } from './common/guards/redis-throttler.storage';
 import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.guard';
 
@@ -95,6 +96,7 @@ import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.
     CatalogModule,
     RatingsModule,
     PaymentsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [

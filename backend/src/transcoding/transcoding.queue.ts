@@ -21,3 +21,12 @@ export interface PackageHlsJob {
   /** Firebase uid that requested it (audit only; the worker writes as admin). */
   requestedBy: string;
 }
+
+export const AI_CLEANUP_QUEUE = 'ai-cleanup';
+export const AI_CLEANUP_JOB = 'ai-cleanup-job';
+
+export interface AiCleanupJob {
+  aiJobId: string;
+  sourcePath: string;
+  lectureId: string;
+}

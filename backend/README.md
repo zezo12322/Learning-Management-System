@@ -4,20 +4,21 @@ This is the central backend API for the OptimaTech LMS platform, built with **Ne
 
 ## 🏗️ Architecture
 
-The backend is built as a **modular monolith** with 21 feature modules and 2 global modules. It connects to **Firebase Data Connect (PostgreSQL)** for data storage and **Firebase Storage** for media, using **Firebase Auth** for authentication.
+The backend is built as a **modular monolith** with 22 feature modules and 2 global modules. It connects to **Firebase Data Connect (PostgreSQL)** for data storage and **Firebase Storage** for media, using **Firebase Auth** for authentication.
 
 ### ⚖️ SDK vs. REST API (Important)
 This backend is **not** intended for standard student data reads (like fetching course catalogs or curriculum). Client apps (Flutter/Web) should use the native **Firebase Data Connect SDK** for high-performance reads. 
-This NestJS API should be used exclusively for **Authoring, Heavy Compute, and Complex RBAC** operations that cannot be safely managed natively by the client.
+This NestJS API should be used exclusively for **Authoring, Heavy Compute, Complex RBAC**, and **AI Proxying** operations that cannot be safely managed natively by the client.
 
 ### Key Components
 
 - **Firebase Gateway (`FirebaseModule`)**: Wraps the Firebase Admin SDK. Generates signed URLs for storage and acts as the gateway to the Data Connect REST API, executing GraphQL operations securely.
 - **Security (`CommonModule`)**: Contains 4 core guards (`FirebaseAuthGuard`, `RolesGuard`, `CourseAccessGuard`, `ResourceOwnershipGuard`) to handle Role-Based Access Control (RBAC) and IDOR prevention.
 - **Media Pipeline**: Uses a two-phase upload protocol with signed URLs (`UploadsModule`). Videos are sent to a `BullMQ` queue (`TranscodingModule`) where FFmpeg converts them to AES-128 encrypted HLS. The `StreamingModule` serves these securely with HMAC key tokens and forensic watermarking.
-- **Background Processing**: Uses **BullMQ** (backed by Redis) for high-frequency video playback progress heartbeats (`ProgressModule`) and video transcoding. A cron job (`QuizzesModule`) automatically grades expired quiz attempts.
+- **AI Integration (`AiModule`)**: Integrates with an external Python AI Service. Automatically triggers video indexing (RAG pipeline) upon transcoding completion. Provides secure, access-gated endpoints for students to chat with lecture videos, and polling endpoints for instructors to monitor AI ingestion status. Background queues handle retries and cleanup of orphaned media.
+- **Background Processing**: Uses **BullMQ** (backed by Redis) for high-frequency video playback progress heartbeats (`ProgressModule`), video transcoding, and AI garbage collection (`TranscodingModule/AiCleanupProcessor`). A cron job (`QuizzesModule`) automatically grades expired quiz attempts.
 - **Core Features**: 
-  - Courses, Sections, Lectures (with secure preview rules)
+  - Courses, Sections, Lectures (with secure preview rules and cascade deletions)
   - Quizzes and Missions (project-based assessments with rubrics)
   - Ratings, Catalog, and progressive completion tracking.
 
@@ -55,4 +56,7 @@ npm run start:prod
 ```
 
 ### Environment Variables
-Check the root `.env` file for required variables like `DB_HOST`, `REDIS_HOST`, `FIREBASE_PROJECT_ID`, etc.
+Check the root `.env` file for required variables like:
+- `DB_HOST`, `REDIS_HOST`, `FIREBASE_PROJECT_ID`
+- `AI_SERVICE_URL` (URL of the external AI python microservice)
+- `INTERNAL_API_KEY` (Secret key to communicate with the AI microservice)

@@ -267,6 +267,8 @@ query GetLectureContent($lectureId: UUID!) @auth(level: NO_ACCESS) {
     title
     type
     videoUrl
+    originalVideoUrl
+    aiJobId
     content
     duration
     transcriptUrl
@@ -365,7 +367,7 @@ query AdminGetCourse($courseId: UUID!)
         where: { deletedAt: { eq: null } },
         orderBy: [{ order: ASC }]
       ) {
-        id title type videoUrl content duration transcriptUrl isFreePreview order
+        id title type videoUrl originalVideoUrl aiJobId content duration transcriptUrl isFreePreview order
       }
     }
   }
@@ -489,24 +491,24 @@ mutation AdminUpdateSectionOrder(
 # ==========================================
 
 mutation AdminCreateLectureFull(
-  $sectionId: UUID!, $title: String!, $type: LectureType!, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean!, $order: Int!
+  $sectionId: UUID!, $title: String!, $type: LectureType!, $videoUrl: String, $originalVideoUrl: String, $aiJobId: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean!, $order: Int!
 )
 @auth(level: NO_ACCESS) {
   courseLecture_insert(
     data: {
-      sectionId: $sectionId, title: $title, type: $type, videoUrl: $videoUrl, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, order: $order
+      sectionId: $sectionId, title: $title, type: $type, videoUrl: $videoUrl, originalVideoUrl: $originalVideoUrl, aiJobId: $aiJobId, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, order: $order
     }
   )
 }
 
 mutation AdminUpdateLecture(
-  $lectureId: UUID!, $title: String, $type: LectureType, $videoUrl: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean
+  $lectureId: UUID!, $title: String, $type: LectureType, $videoUrl: String, $originalVideoUrl: String, $aiJobId: String, $content: String, $duration: Int, $transcriptUrl: String, $isFreePreview: Boolean
 )
 @auth(level: NO_ACCESS) {
   courseLecture_update(
     id: $lectureId,
     data: {
-      title: $title, type: $type, videoUrl: $videoUrl, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, updatedAt_expr: "request.time"
+      title: $title, type: $type, videoUrl: $videoUrl, originalVideoUrl: $originalVideoUrl, aiJobId: $aiJobId, content: $content, duration: $duration, transcriptUrl: $transcriptUrl, isFreePreview: $isFreePreview, updatedAt_expr: "request.time"
     }
   )
 }
