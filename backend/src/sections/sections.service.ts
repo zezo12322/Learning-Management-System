@@ -36,6 +36,32 @@ export class SectionsService {
   }
 
   async delete(courseId: string, sectionId: string, authToken: string) {
+    // 0. Fetch the section's lectures to clean up their AI indices before soft-deleting
+    const course = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
+    const section = (course?.course?.adminSections ?? []).find(
+      (s: any) => s.id === sectionId,
+    );
+    if (section) {
+      const aiUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+      const internalApiKey = process.env.INTERNAL_API_KEY || 'default-secret';
+      for (const lecture of section.adminLectures ?? []) {
+        if (lecture.type === 'VIDEO') {
+          fetch(`${aiUrl}/v1/videos/${lecture.id}`, {
+            method: 'DELETE',
+            headers: { 'X-Internal-Api-Key': internalApiKey },
+          }).catch((err) =>
+            console.warn(
+              `Failed to delete AI index for ${lecture.id}: ${err.message}`,
+            ),
+          );
+        }
+      }
+    }
+
     // 1. Soft-delete all child lectures in the section first (cascade)
     await this.dc.executeMutation(
       'AdminSoftDeleteLecturesBySection',
@@ -52,12 +78,12 @@ export class SectionsService {
     );
 
     // 3. Re-normalize the order of the remaining sections in the course
-    const course = await this.dc.executeQuery(
+    const postDeleteCourse = await this.dc.executeQuery(
       'AdminGetCourse',
       { courseId },
       authToken,
     );
-    const remaining = (course?.course?.adminSections ?? [])
+    const remaining = (postDeleteCourse?.course?.adminSections ?? [])
       .filter((s: any) => s.id !== sectionId)
       .map((s: any) => s.id);
     await this.ordering.applyOrder(

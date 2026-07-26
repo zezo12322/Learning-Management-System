@@ -133,6 +133,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $title: String
       $type: LectureType
       $videoUrl: String
+      $originalVideoUrl: String
+      $aiJobId: String
       $content: String
       $duration: Int
       $transcriptUrl: String
@@ -144,6 +146,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           title: $title
           type: $type
           videoUrl: $videoUrl
+          originalVideoUrl: $originalVideoUrl
+          aiJobId: $aiJobId
           content: $content
           duration: $duration
           transcriptUrl: $transcriptUrl
@@ -305,6 +309,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $title: String!
       $type: LectureType!
       $videoUrl: String
+      $originalVideoUrl: String
+      $aiJobId: String
       $content: String
       $duration: Int
       $transcriptUrl: String
@@ -317,6 +323,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           title: $title
           type: $type
           videoUrl: $videoUrl
+          originalVideoUrl: $originalVideoUrl
+          aiJobId: $aiJobId
           content: $content
           duration: $duration
           transcriptUrl: $transcriptUrl
