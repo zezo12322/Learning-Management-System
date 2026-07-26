@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -28,6 +28,8 @@ import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { PaymentsModule } from './payments/payments.module';
+import { RedisThrottlerStorage } from './common/guards/redis-throttler.storage';
+import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.guard';
 
 @Module({
   imports: [
@@ -55,13 +57,22 @@ import { PaymentsModule } from './payments/payments.module';
         },
       }),
     }),
-    // Global rate limiting (M8): 100 requests / 60s per client by default.
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
+    // Global rate limiting: 100 requests / 60s per client.
+    // Uses Redis-backed storage for shared state across instances.
+    // FailClosedThrottlerGuard returns 503 if Redis is unreachable.
+    ThrottlerModule.forRootAsync({
+      imports: [],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: 60000,
+            limit: 100,
+          },
+        ],
+        storage: new RedisThrottlerStorage(config),
+      }),
+    }),
     CommonModule,
     AdminModule,
     FirebaseModule,
@@ -87,10 +98,10 @@ import { PaymentsModule } from './payments/payments.module';
   ],
   controllers: [AppController],
   providers: [
-    // Apply the throttler globally.
+    // Apply the throttler globally with fail-closed behavior.
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: FailClosedThrottlerGuard,
     },
   ],
 })
