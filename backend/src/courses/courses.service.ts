@@ -339,6 +339,30 @@ export class CoursesService {
   }
 
   async softDelete(courseId: string, authToken: string) {
+    // 0. Fetch the course's lectures to clean up their AI indices before soft-deleting
+    const courseData = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
+    const sections = courseData?.course?.adminSections ?? [];
+    const aiUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const internalApiKey = process.env.INTERNAL_API_KEY || 'default-secret';
+    for (const section of sections) {
+      for (const lecture of section.adminLectures ?? []) {
+        if (lecture.type === 'VIDEO') {
+          fetch(`${aiUrl}/v1/videos/${lecture.id}`, {
+            method: 'DELETE',
+            headers: { 'X-Internal-Api-Key': internalApiKey },
+          }).catch((err) =>
+            console.warn(
+              `Failed to delete AI index for ${lecture.id}: ${err.message}`,
+            ),
+          );
+        }
+      }
+    }
+
     return this.dc.executeMutation(
       'AdminSoftDeleteCourse',
       { courseId },

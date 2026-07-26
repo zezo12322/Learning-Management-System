@@ -1,4 +1,5 @@
 import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { UploadsService } from './uploads.service';
 import { SignedUrlRequestDto, ConfirmUploadDto } from './dto/upload.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -15,12 +16,16 @@ export class UploadsController {
     private readonly dc: DataConnectService,
   ) {}
 
+  // Strict rate limit: 10 signed URL requests per 60 seconds (resource protection).
   @Post('signed-url')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   generateSignedUrl(@Body() dto: SignedUrlRequestDto, @Req() req: any) {
     return this.uploadsService.generateSignedUrl(dto, this.caller(req));
   }
 
+  // Strict rate limit: 10 confirm requests per 60 seconds (resource protection).
   @Post('confirm')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   confirmUpload(@Body() dto: ConfirmUploadDto, @Req() req: any) {
     return this.uploadsService.confirmUpload(dto, this.caller(req));
   }

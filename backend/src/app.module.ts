@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -28,6 +28,9 @@ import { SubmissionsModule } from './submissions/submissions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AiModule } from './ai/ai.module';
+import { RedisThrottlerStorage } from 'nestjs-redis-throttler';
+import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.guard';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
@@ -57,13 +60,22 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
         },
       }),
     }),
-    // Global rate limiting (M8): 100 requests / 60s per client by default.
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
+    // Global rate limiting: 100 requests / 60s per client.
+    // Uses Redis-backed storage for shared state across instances.
+    // FailClosedThrottlerGuard returns 503 if Redis is unreachable.
+    ThrottlerModule.forRootAsync({
+      imports: [],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: 60000,
+            limit: 100,
+          },
+        ],
+        storage: new RedisThrottlerStorage(config),
+      }),
+    }),
     CommonModule,
     AdminModule,
     FirebaseModule,
@@ -86,13 +98,14 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     CatalogModule,
     RatingsModule,
     PaymentsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [
-    // Apply the throttler globally.
+    // Apply the throttler globally with fail-closed behavior.
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: FailClosedThrottlerGuard,
     },
     // Monitoring (KAN-60): central error logging/response shaping and the
     // per-request access log. Registered here rather than in main.ts so both
@@ -108,4 +121,4 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
