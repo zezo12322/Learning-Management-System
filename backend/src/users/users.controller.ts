@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -14,7 +15,9 @@ import { AuthToken } from '../common/decorators/auth-token.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Strict rate limit: 5 sync requests per 60 seconds (brute-force protection).
   @Post('sync')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
     return this.usersService.sync(dto, token);
   }
