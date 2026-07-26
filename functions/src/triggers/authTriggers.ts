@@ -7,6 +7,8 @@
 
 import * as functions from "firebase-functions/v1";
 import { logger } from "firebase-functions";
+import { getAuth } from "firebase-admin/auth";
+import { getStorage } from "firebase-admin/storage";
 import { admin, adminDC } from "../config/firebase";
 // Import the strongly-typed generated Admin SDK instead of executing raw queries
 import { 
@@ -44,13 +46,13 @@ export const syncClaims = functions.region("europe-west3").auth.user().onCreate(
       } catch (dbError) {
         logger.error(`❌ [ROLLBACK] Failed to insert relational data for OAuth user ${user.uid}. Cleaning up Firebase Auth...`, dbError);
         // Implement Saga/Rollback: Delete the newly created Auth user if DB creation fails
-        await admin.auth().deleteUser(user.uid);
+        await getAuth().deleteUser(user.uid);
         throw dbError; // Rethrow to mark the function execution as failed
       }
 
       // Assign the default claims manually since the DB trigger is catching up
       const defaultClaims = {roles: ["student"], companyId: null};
-      await admin.auth().setCustomUserClaims(user.uid, defaultClaims);
+      await getAuth().setCustomUserClaims(user.uid, defaultClaims);
 
       logger.info(`🎉 [SUCCESS] Relational record created, profile setup, and roles attached.`);
       return;
@@ -64,7 +66,7 @@ export const syncClaims = functions.region("europe-west3").auth.user().onCreate(
     const companyId = userData.profile_on_user ? userData.profile_on_user.company : null;
 
     const claims = {roles, companyId};
-    await admin.auth().setCustomUserClaims(user.uid, claims);
+    await getAuth().setCustomUserClaims(user.uid, claims);
     logger.info(`🎉 [SUCCESS] Custom verification claims synced to token.`);
   } catch (error: any) {
     // Structured error logging
@@ -88,7 +90,7 @@ export const cleanupUserData = functions.region("europe-west3").auth.user().onDe
     logger.info(`✅ [SUCCESS] Relational row data wiped.`);
 
     // 2. Wipe Storage files associated with the user
-    const bucket = admin.storage().bucket();
+    const bucket = getStorage().bucket();
     await bucket.deleteFiles({
       prefix: `users/${user.uid}/`,
     });

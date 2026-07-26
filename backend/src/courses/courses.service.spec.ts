@@ -73,7 +73,6 @@ describe('CoursesService.updateStatus (publish gating)', () => {
   });
 });
 
-
 describe('CoursesService.getCourseVideos', () => {
   const courseData = {
     course: {

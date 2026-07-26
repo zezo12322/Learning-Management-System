@@ -9,6 +9,7 @@ import 'package:optimatech_lms/features/home/presentation/views/home_body.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/glass_bottom_navbar.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/profile_view.dart';
 import 'package:optimatech_lms/features/wishlist/presentation/views/wishlist_view.dart';
+import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 
 // ============================================================================
 // HomeView — Root widget for the Home screen.
@@ -64,6 +65,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Depend on the locale so a live language switch rebuilds this widget
+    // (and re-translates the bottom-nav labels below, which use context-less
+    // `.tr()` and wouldn't otherwise refresh until navigation).
+    context.locale;
+
     // Build the body widget depending on the currently selected tab
     Widget bodyWidget;
     if (currentScreen == 0) {
@@ -78,7 +84,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     } else if (currentScreen == 2) {
       bodyWidget = const WishlistView();
     } else if (currentScreen == 3) {
-      bodyWidget = const ProfileView();
+      // Non-const so the Profile tab re-translates on a live language switch.
+      bodyWidget = ProfileView();
     } else {
       bodyWidget = const SizedBox.shrink();
     }
@@ -86,6 +93,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return Scaffold(
       extendBody: true,
       body: bodyWidget,
+      floatingActionButton: const GlobalChatbotFab(courseId: 'UNKNOWN', videoId: 'UNKNOWN'),
       bottomNavigationBar: GlassBottomNavBar(
         currentIndex: currentScreen,
         onTap: onTabTapped,
