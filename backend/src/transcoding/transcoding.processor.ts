@@ -1,6 +1,6 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost, InjectQueue } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { Job } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { spawn } from 'child_process';
 import { randomBytes } from 'crypto';
 import { promises as fs } from 'fs';
@@ -11,7 +11,14 @@ import ffprobeStatic from 'ffprobe-static';
 import { FirebaseService } from '../firebase/firebase.service';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CourseStoragePaths } from '../common/constants/storage-paths';
-import { VIDEO_TRANSCODE_QUEUE, PackageHlsJob } from './transcoding.queue';
+import {
+  VIDEO_TRANSCODE_QUEUE,
+  PackageHlsJob,
+  AI_CLEANUP_QUEUE,
+  AiCleanupJob,
+  AI_CLEANUP_JOB,
+} from './transcoding.queue';
+import { v4 as uuidv4 } from 'uuid';
 
 const HLS_SEGMENT_SECONDS = 6;
 
@@ -42,6 +49,8 @@ export class TranscodingProcessor extends WorkerHost {
   constructor(
     private readonly firebase: FirebaseService,
     private readonly dc: DataConnectService,
+    @InjectQueue(AI_CLEANUP_QUEUE)
+    private readonly cleanupQueue: Queue<AiCleanupJob>,
   ) {
     super();
   }
@@ -103,17 +112,86 @@ export class TranscodingProcessor extends WorkerHost {
         }),
       );
 
-      // 6. Point the lecture at the packaged master playlist + store duration.
+      const aiJobId = uuidv4();
+
+      // 6. Point the lecture at the packaged master playlist + store duration, and save the original MP4 path
       await this.dc.executeMutationAsAdmin('AdminUpdateLecture', {
         lectureId,
         videoUrl: CourseStoragePaths.lectureHlsMaster(courseId, lectureId),
+        originalVideoUrl: sourcePath,
         duration,
+        aiJobId, // Save aiJobId so frontend can query it
       });
 
       await job.updateProgress(100);
       this.logger.log(
         `Lecture ${lectureId} packaged: ${files.length} files, ${duration}s`,
       );
+
+      // 7. Integrate with AI Service to ingest the video
+      this.logger.log(`Starting AI ingestion for lecture ${lectureId}`);
+      try {
+        const aiUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+        const internalApiKey = process.env.INTERNAL_API_KEY || 'default-secret';
+
+        // Use DataConnectService to fetch the lecture title
+        const lectureData = await this.dc.executeQueryAsAdmin(
+          'GetLectureContent',
+          { lectureId },
+        );
+        const videoTitle = lectureData?.courseLecture?.title || 'Lecture Video';
+
+        // AI service needs a directly downloadable URL
+        const signedVideoUrl = await this.firebase.generateSignedReadUrl(
+          sourcePath,
+          120,
+        ); // valid for 2 hours
+
+        const ingestRes = await fetch(`${aiUrl}/v1/ingest/video`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Api-Key': internalApiKey,
+          },
+          body: JSON.stringify({
+            job_id: aiJobId,
+            tenant_id: 'default',
+            course_id: courseId,
+            video_id: lectureId,
+            video_title: videoTitle,
+            video_url: signedVideoUrl,
+            duration_ms: duration * 1000,
+            idempotency_key: `${lectureId}:transcribe_index`,
+          }),
+        });
+
+        if (!ingestRes.ok && ingestRes.status !== 409) {
+          throw new Error(
+            `AI Ingest failed: ${ingestRes.status} ${ingestRes.statusText}`,
+          );
+        }
+
+        this.logger.log(
+          `AI ingestion queued for ${lectureId}. Enqueueing cleanup job to prevent orphans.`,
+        );
+
+        // 8. Enqueue cleanup job to delete the original MP4 when AI is done
+        await this.cleanupQueue.add(
+          AI_CLEANUP_JOB,
+          { aiJobId, sourcePath, lectureId },
+          {
+            jobId: `cleanup-${aiJobId}`,
+            attempts: 500, // Up to ~2 hours of retries
+            backoff: { type: 'fixed', delay: 15000 }, // Retry every 15 seconds
+            removeOnComplete: true,
+            removeOnFail: { age: 86400 * 7 }, // keep failures for a week
+          },
+        );
+      } catch (err: any) {
+        this.logger.error(
+          `AI ingestion integration failed for ${lectureId}: ${err?.message}`,
+        );
+      }
     } finally {
       // Always clean up the scratch dir, even on failure.
       await fs

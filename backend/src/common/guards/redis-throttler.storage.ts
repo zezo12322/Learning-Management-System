@@ -33,7 +33,9 @@ export interface ThrottlerStorage {
 }
 
 @Injectable()
-export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy {
+export class RedisThrottlerStorage
+  implements ThrottlerStorage, OnModuleDestroy
+{
   private readonly logger = new Logger(RedisThrottlerStorage.name);
   private readonly redis: Redis;
 
@@ -89,11 +91,10 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
       return {current, ttl}
     `;
 
-    const result = (await this.redis.eval(
-      script,
-      1,
-      redisKey,
-    )) as [number, number];
+    const result = (await this.redis.eval(script, 1, redisKey)) as [
+      number,
+      number,
+    ];
 
     const totalHits = result[0];
     const ttlRemainingSeconds = result[1] > 0 ? result[1] : ttlSeconds;
@@ -101,7 +102,8 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
 
     const isBlocked = totalHits > limit;
     const timeToBlockExpire = isBlocked
-      ? Date.now() + (blockDuration > 0 ? blockDuration : ttlRemainingSeconds * 1000)
+      ? Date.now() +
+        (blockDuration > 0 ? blockDuration : ttlRemainingSeconds * 1000)
       : 0;
 
     return {
