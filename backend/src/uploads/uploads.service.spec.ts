@@ -42,7 +42,7 @@ describe('UploadsService', () => {
             courseId: 'c1',
             filename: 'a.mp4',
             contentType: 'video/mp4',
-          } as any,
+          },
           caller,
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
@@ -56,7 +56,7 @@ describe('UploadsService', () => {
             courseId: 'c1',
             filename: 'a.exe',
             contentType: 'application/x-msdownload',
-          } as any,
+          },
           caller,
         ),
       ).rejects.toBeInstanceOf(BadRequestException);

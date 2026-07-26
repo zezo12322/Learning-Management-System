@@ -73,7 +73,12 @@ export class QuizzesController {
     @Req() req: any,
   ) {
     const isAdmin = (req.userRoles ?? []).includes('admin');
-    return this.quizzesService.getQuizForLecture(lectureId, token, uid, isAdmin);
+    return this.quizzesService.getQuizForLecture(
+      lectureId,
+      token,
+      uid,
+      isAdmin,
+    );
   }
 
   // Student-safe view (no isCorrect) — used to render the quiz for taking.

@@ -1,0 +1,2654 @@
+{
+  "info": {
+    "name": "OptimaTech LMS - Backend API",
+    "_postman_id": "optimatech-lms-backend-api",
+    "description": "Complete Postman collection for the OptimaTech LMS NestJS backend (86 REST endpoints).\n\n## Setup\n1. Select this collection > **Variables** tab.\n2. Set `authToken` to a valid **Firebase ID token** (the collection sends it as `Authorization: Bearer <token>` on every request except the Public ones).\n3. `baseUrl` defaults to the Railway production deploy. For local dev, change it to `http://localhost:3000/api/v1`.\n4. Fill the id variables (`courseId`, `sectionId`, `lectureId`, `quizId`, ...) as you go - the request URLs reference them.\n\n## Notes\n- Auth levels are noted in each request's description: **Public** / **User** / **Instructor/Admin** / **Owner** / **enrolled**.\n- Public routes (health, catalog list, ratings list/summary) override auth to `noauth`.\n- `POST /me/sync` must be the first authenticated call after sign-in.\n- Discovery/read data (popular, recommended, search, categories, curriculum browsing) is served via the Firebase Data Connect client SDK, not REST - only the REST routes that actually exist in the backend are included here.\n- Global prefix is `/api/v1` (already baked into `baseUrl`). Rate limit: 100 req / 60s.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Liveness probe. **Public** — no token.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Identity (me)",
+      "item": [
+        {
+          "name": "Sync user (call once after sign-in)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me/sync",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me",
+                "sync"
+              ]
+            },
+            "description": "Provision/refresh the caller's user row. **User.** Call once after first sign-in, before any other authed call.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane@example.com\",\n  \"name\": \"Jane Doe\",\n  \"avatar\": \"https://cdn.optimatech.io/avatars/jane.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": "Current user + profile + roles. **User.** Returns null if never synced."
+          },
+          "response": []
+        },
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me",
+                "profile"
+              ]
+            },
+            "description": "Update own profile. **User.** All fields optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Backend engineer\",\n  \"company\": \"OptimaTech\",\n  \"phone\": \"+201234567890\",\n  \"preferences\": {\n    \"theme\": \"dark\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Admin",
+      "item": [
+        {
+          "name": "Set user role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{uid}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{uid}}",
+                "role"
+              ]
+            },
+            "description": "Assign global role via custom claim. **Admin only.** role in admin|instructor|student.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"instructor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Catalog (discovery)",
+      "item": [
+        {
+          "name": "List published courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/catalog/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "catalog",
+                "courses"
+              ]
+            },
+            "description": "Published course cards. **Public.**",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Course curriculum",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/catalog/courses/{{courseId}}/curriculum",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "catalog",
+                "courses",
+                "{{courseId}}",
+                "curriculum"
+              ]
+            },
+            "description": "Course outline (sections -> lectures) + rating summary. **User.**"
+          },
+          "response": []
+        }
+      ],
+      "description": "Most discovery/read data should be fetched via the FDC client SDK (see API doc s0.5). These two remain on REST."
+    },
+    {
+      "name": "5. Courses",
+      "item": [
+        {
+          "name": "Course videos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/videos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "videos"
+              ]
+            },
+            "description": "Descriptions of every uploaded VIDEO lecture. **User**, access-gated."
+          },
+          "response": []
+        },
+        {
+          "name": "Create course (DRAFT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            },
+            "description": "Create a course. **Instructor/Admin.** level in BEGINNER|INTERMEDIATE|ADVANCED. price in minor units.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Advanced Kubernetes\",\n  \"description\": \"Deep dive\",\n  \"price\": 9900,\n  \"language\": \"en\",\n  \"level\": \"ADVANCED\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"tags\": [\n    \"k8s\",\n    \"devops\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List my authored courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            },
+            "description": "Courses the caller authored. **Instructor/Admin.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Get course (admin view)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            },
+            "description": "Full admin view incl. sections/lectures. **Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Course overview (analytics)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/overview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "overview"
+              ]
+            },
+            "description": "Instructor analytics: content counts, enrollment breakdown, completion/progress, ratings. **Owner** (admin unconditional)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            },
+            "description": "Update course. **Owner.** All fields optional (same shape as create + thumbnail).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Advanced Kubernetes 2026\",\n  \"price\": 12900,\n  \"thumbnail\": \"courses/.../thumb.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change course status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "status"
+              ]
+            },
+            "description": "Publish/unpublish/archive. **Owner.** status in DRAFT|PUBLISHED|ARCHIVED. Publishing needs >=1 section each with >=1 lecture.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PUBLISHED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete course (soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            },
+            "description": "Soft delete. **Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Add co-instructor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/instructors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "instructors"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove co-instructor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/instructors/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "instructors",
+                "{{userId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "List co-instructors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/instructors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "instructors"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Sections",
+      "item": [
+        {
+          "name": "Create section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections"
+              ]
+            },
+            "description": "**Instructor/Admin, owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update section",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 1 - revised\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete section",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder sections",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "reorder"
+              ]
+            },
+            "description": "**Owner.** orderedIds must be the complete set of the course's section IDs (dashed v4 UUIDs).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Lectures",
+      "item": [
+        {
+          "name": "Create lecture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures"
+              ]
+            },
+            "description": "**Owner.** type in VIDEO|READING|INTERACTIVE|QUIZ. VIDEO needs videoUrl; READING needs content.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pods & Deployments\",\n  \"type\": \"VIDEO\",\n  \"videoUrl\": \"courses/.../video.mp4\",\n  \"content\": \"Markdown for READING lectures\",\n  \"duration\": 600,\n  \"transcriptUrl\": \"courses/.../transcript.pdf\",\n  \"isFreePreview\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update lecture",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures/{{lectureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures",
+                "{{lectureId}}"
+              ]
+            },
+            "description": "**Owner.** Same fields, all optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pods & Deployments (v2)\",\n  \"duration\": 640\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete lecture (soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures/{{lectureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures",
+                "{{lectureId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder lectures",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures",
+                "reorder"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Move lecture to section",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/move",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "move"
+              ]
+            },
+            "description": "**Owner.** Target section must be in the same course.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetSectionId\": \"{{sectionId}}\",\n  \"targetOrder\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get lecture content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}"
+              ]
+            },
+            "description": "Student-facing content (signed URLs). **User**, access-gated (owner/admin or active/completed enrollee, or free preview)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Enrollment",
+      "item": [
+        {
+          "name": "Enroll in course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/enroll",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "enroll"
+              ]
+            },
+            "description": "**User.** Idempotent (reactivates a dropped enrollment). No body required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My course enrollment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/enrollment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "enrollment"
+              ]
+            },
+            "description": "**User.** Source of truth for 'is the course completed'. May return null."
+          },
+          "response": []
+        },
+        {
+          "name": "Enroll in mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/enroll",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "enroll"
+              ]
+            },
+            "description": "**User.** No body required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My mission enrollment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/enrollment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "enrollment"
+              ]
+            },
+            "description": "**User.** May return null."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Progress",
+      "item": [
+        {
+          "name": "Playback heartbeat (queued)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "progress"
+              ]
+            },
+            "description": "**User.** High-frequency; queued. Completion is derived server-side at 90% - never send completed here.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lastWatchedSecond\": 145,\n  \"watchedSeconds\": 130\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sync write / mark complete",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "progress"
+              ]
+            },
+            "description": "**User.** For explicit mark-complete where the client needs the result immediately.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lastWatchedSecond\": 600,\n  \"completed\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get lecture progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "progress"
+              ]
+            },
+            "description": "**User.** Defaults to {lastWatchedSecond:0, completedAt:null}."
+          },
+          "response": []
+        },
+        {
+          "name": "Get course progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "progress"
+              ]
+            },
+            "description": "**User.** Computed percentages per section + overall."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. Ratings & reviews",
+      "item": [
+        {
+          "name": "List reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/ratings?limit=20&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "ratings"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Paginated reviews. **Public.** limit 1-50 (default 20); offset >=0.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rating summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/ratings/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "ratings",
+                "summary"
+              ]
+            },
+            "description": "**Public.** average, count, distribution.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My rating",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/ratings/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "ratings",
+                "me"
+              ]
+            },
+            "description": "**User.** My rating or null."
+          },
+          "response": []
+        },
+        {
+          "name": "Create/update my rating",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/ratings/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "ratings",
+                "me"
+              ]
+            },
+            "description": "**User, enrolled.** rating int 1-5; review optional <=2000.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"review\": \"Solid course\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete my rating",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/ratings/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "ratings",
+                "me"
+              ]
+            },
+            "description": "**User.**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11. Quizzes - Builder (Instructor/Admin, owner)",
+      "item": [
+        {
+          "name": "Create quiz (on QUIZ lecture)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/quiz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "quiz"
+              ]
+            },
+            "description": "Attach a quiz to a QUIZ-type lecture. One quiz per lecture. timeLimitMinutes optional (untimed if omitted).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passingScore\": 70,\n  \"maxAttempts\": 3,\n  \"timeLimitMinutes\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get quiz (answer key)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}"
+              ]
+            },
+            "description": "Answer-key view (includes isCorrect). Builders only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update quiz",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}"
+              ]
+            },
+            "description": "All fields optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passingScore\": 60,\n  \"maxAttempts\": 5,\n  \"timeLimitMinutes\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete quiz",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions"
+              ]
+            },
+            "description": "options requires >=2 and >=1 correct. points optional (>=0).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Which is a controller?\",\n  \"points\": 2,\n  \"explanation\": \"Deployments manage ReplicaSets\",\n  \"options\": [\n    {\n      \"text\": \"Deployment\",\n      \"isCorrect\": true\n    },\n    {\n      \"text\": \"Pod\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update question (+options diff)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "{{questionId}}"
+              ]
+            },
+            "description": "Full desired option set: insert without id, update with id, delete anything omitted. Incoming ids must belong to this question.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Updated?\",\n  \"options\": [\n    {\n      \"id\": \"{{optionId}}\",\n      \"text\": \"Deployment\",\n      \"isCorrect\": true\n    },\n    {\n      \"text\": \"New option\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete question (soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "{{questionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder questions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "reorder"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update option",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/{{questionId}}/options/{{optionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "{{questionId}}",
+                "options",
+                "{{optionId}}"
+              ]
+            },
+            "description": "Both optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Deployment\",\n  \"isCorrect\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete option",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/{{questionId}}/options/{{optionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "{{questionId}}",
+                "options",
+                "{{optionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder options",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions/{{questionId}}/options/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions",
+                "{{questionId}}",
+                "options",
+                "reorder"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12. Quizzes - Taking (User, enrolled)",
+      "item": [
+        {
+          "name": "Get quiz by LECTURE id (NEW)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/quiz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "quiz"
+              ]
+            },
+            "description": "Resolve the quiz attached to a QUIZ lecture when the client only holds a lectureId. Student-safe (no isCorrect). 404 if the lecture has no quiz."
+          },
+          "response": []
+        },
+        {
+          "name": "Get quiz questions (student-safe)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "questions"
+              ]
+            },
+            "description": "Student-safe view (no isCorrect). Render the quiz from this."
+          },
+          "response": []
+        },
+        {
+          "name": "Start attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts"
+              ]
+            },
+            "description": "No body. 403 if no active enrollment / max attempts exceeded; 400 if an attempt is already in progress.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit one answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/attempts/{{attemptId}}/answers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts",
+                "{{attemptId}}",
+                "answers"
+              ]
+            },
+            "description": "Attempt-owner enforced. 410 Gone if the session timed out (response includes the auto-grade payload).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"{{questionId}}\",\n  \"selectedOptionId\": \"{{optionId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finish attempt (grade)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/attempts/{{attemptId}}/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts",
+                "{{attemptId}}",
+                "finish"
+              ]
+            },
+            "description": "No body. Finalizes + grades. Returns score/passed/totalPoints/...",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Heartbeat (timed sessions)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/quizzes/{{quizId}}/attempts/{{attemptId}}/heartbeat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts",
+                "{{attemptId}}",
+                "heartbeat"
+              ]
+            },
+            "description": "No body. Keep a timed attempt alive / check remaining time.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "13. Missions (authoring)",
+      "item": [
+        {
+          "name": "Create mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions"
+              ]
+            },
+            "description": "**Instructor/Admin.** difficulty in BEGINNER|INTERMEDIATE|ADVANCED|EXPERT. courseId optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incident Response Drill\",\n  \"scenarioDescription\": \"A production outage...\",\n  \"durationMinutes\": 90,\n  \"categoryId\": \"{{categoryId}}\",\n  \"difficulty\": \"ADVANCED\",\n  \"skillsTested\": [\n    \"debugging\",\n    \"communication\"\n  ],\n  \"courseId\": \"{{courseId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List my missions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions"
+              ]
+            },
+            "description": "**Instructor/Admin.** Missions I authored."
+          },
+          "response": []
+        },
+        {
+          "name": "Get mission",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Update mission",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}"
+              ]
+            },
+            "description": "**Owner.** All fields optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incident Response Drill v2\",\n  \"durationMinutes\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete mission (soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14. Micro-lessons",
+      "item": [
+        {
+          "name": "Create micro-lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/micro-lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "micro-lessons"
+              ]
+            },
+            "description": "**Owner.** type in VIDEO|READING|INTERACTIVE|QUIZ; assetUrl/content/durationSeconds optional.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Brief\",\n  \"type\": \"READING\",\n  \"assetUrl\": \"https://...\",\n  \"content\": \"...\",\n  \"durationSeconds\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update micro-lesson",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/micro-lessons/{{microLessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "micro-lessons",
+                "{{microLessonId}}"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Brief (v2)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete micro-lesson",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/micro-lessons/{{microLessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "micro-lessons",
+                "{{microLessonId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder micro-lessons",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/micro-lessons/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "micro-lessons",
+                "reorder"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "15. Mission templates",
+      "item": [
+        {
+          "name": "Upload template (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "templates"
+              ]
+            },
+            "description": "**Owner.** multipart/form-data (NOT JSON). Fields: file (required), title (1-200 chars).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "type": "text",
+                  "value": "Deliverable template"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "templates"
+              ]
+            },
+            "description": "**User**, access-gated (owner/admin or active/completed enrollee). fileUrl is a short-lived signed read URL."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete template",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/templates/{{templateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "templates",
+                "{{templateId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "16. Mission rubric",
+      "item": [
+        {
+          "name": "Add criterion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/rubric",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "rubric"
+              ]
+            },
+            "description": "**Owner.** description optional; maxPoints >=0.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"criterionName\": \"Clarity\",\n  \"description\": \"How clear is the writeup\",\n  \"maxPoints\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update criterion",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/rubric/{{criterionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "rubric",
+                "{{criterionId}}"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"criterionName\": \"Clarity\",\n  \"maxPoints\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete criterion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/rubric/{{criterionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "rubric",
+                "{{criterionId}}"
+              ]
+            },
+            "description": "**Owner.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder criteria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/rubric/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "rubric",
+                "reorder"
+              ]
+            },
+            "description": "**Owner.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedIds\": [\n    \"<dashed-uuid-1>\",\n    \"<dashed-uuid-2>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "17. Mission submissions & grading",
+      "item": [
+        {
+          "name": "Submit deliverable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/missions/{{missionId}}/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "missions",
+                "{{missionId}}",
+                "submissions"
+              ]
+            },
+            "description": "**User (student), enrolled.** Upload the file first (Uploads), then submit its URL. fileUrl <=2000 chars.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileUrl\": \"https://.../deliverable.pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "me",
+                "submissions"
+              ]
+            },
+            "description": "**User.** My submissions + scores + feedback."
+          },
+          "response": []
+        },
+        {
+          "name": "Pending submissions (to grade)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/submissions/pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "submissions",
+                "pending"
+              ]
+            },
+            "description": "**Instructor/Admin.** Submissions awaiting grading."
+          },
+          "response": []
+        },
+        {
+          "name": "Grade submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/submissions/{{submissionId}}/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "submissions",
+                "{{submissionId}}",
+                "grade"
+              ]
+            },
+            "description": "**Instructor/Admin.** Both fields optional; each score >=0. Grading marks the mission enrollment COMPLETED.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback\": \"Good structure, tighten the summary.\",\n  \"scores\": [\n    {\n      \"criterionId\": \"{{criterionId}}\",\n      \"score\": 8\n    },\n    {\n      \"criterionId\": \"{{criterionId}}\",\n      \"score\": 6\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "18. File uploads",
+      "item": [
+        {
+          "name": "Get signed upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/uploads/signed-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "signed-url"
+              ]
+            },
+            "description": "**Owner.** entityType in COURSE_THUMBNAIL|LECTURE_VIDEO|LECTURE_TRANSCRIPT. Then PUT bytes directly to the returned uploadUrl (no token), then confirm.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"LECTURE_VIDEO\",\n  \"courseId\": \"{{courseId}}\",\n  \"lectureId\": \"{{lectureId}}\",\n  \"filename\": \"lesson1.mp4\",\n  \"contentType\": \"video/mp4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm upload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/uploads/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "confirm"
+              ]
+            },
+            "description": "**Owner.** Persists the reference. For LECTURE_VIDEO this auto-enqueues transcoding.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"LECTURE_VIDEO\",\n  \"courseId\": \"{{courseId}}\",\n  \"lectureId\": \"{{lectureId}}\",\n  \"storagePath\": \"courses/.../video/uuid-lesson1.mp4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "19. Video streaming (playback)",
+      "item": [
+        {
+          "name": "Stream manifest (.m3u8)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/stream/manifest?v=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "stream",
+                "manifest"
+              ],
+              "query": [
+                {
+                  "key": "v",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "**User**, access-gated. Returns rewritten HLS manifest text. Give the URL to an HLS player; don't parse it. `v` is optional and normally set by the player."
+          },
+          "response": []
+        },
+        {
+          "name": "Forensic watermark",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/stream/watermark",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "stream",
+                "watermark"
+              ]
+            },
+            "description": "**User**, same gate as manifest. Use the `text` field as an overlay."
+          },
+          "response": []
+        },
+        {
+          "name": "AES key",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lectures/{{lectureId}}/stream/key?kt=<keyToken-from-manifest>",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lectures",
+                "{{lectureId}}",
+                "stream",
+                "key"
+              ],
+              "query": [
+                {
+                  "key": "kt",
+                  "value": "<keyToken-from-manifest>"
+                }
+              ]
+            },
+            "description": "**User, enrolled.** Raw 16-byte AES-128 key. The player calls this automatically; needs both the Firebase token (header) and kt (query)."
+          },
+          "response": []
+        },
+        {
+          "name": "Register HLS assets (manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/stream/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "stream",
+                "register"
+              ]
+            },
+            "description": "**Owner.** No body. Points the lecture videoUrl at already-uploaded HLS master. Usually the transcoder does this automatically.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "20. Video transcoding",
+      "item": [
+        {
+          "name": "Queue transcode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/video/transcode",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "video",
+                "transcode"
+              ]
+            },
+            "description": "**Owner.** Queue secure-HLS packaging. sourcePath <=1024 chars, must belong to this lecture.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourcePath\": \"courses/<c>/lectures/<l>/video/<file>.mp4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transcode status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}/video/transcode/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lectures",
+                "{{lectureId}}",
+                "video",
+                "transcode",
+                "status"
+              ]
+            },
+            "description": "**Owner.** Poll BullMQ job state (queued|active|completed|failed)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://learning-management-system-production-a97c.up.railway.app/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "uid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "courseId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sectionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lectureId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "quizId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "questionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "optionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attemptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "missionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "microLessonId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "templateId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "criterionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "submissionId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
