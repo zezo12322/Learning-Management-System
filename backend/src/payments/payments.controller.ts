@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Res, HttpStatus, Get, Query, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
@@ -12,8 +13,10 @@ export class PaymentsController {
     private readonly dataConnectService: DataConnectService
   ) {}
 
+  // Strict rate limit: 5 checkout requests per 60 seconds (payment abuse protection).
   @Post('checkout')
   @UseGuards(FirebaseAuthGuard)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   async checkout(@Body() body: any, @Res() res: Response, @AuthToken() userAuthToken: string) {
     // Expected to receive amount and user details for checkout
     const amountCents = body.amountCents || 10000; // default 100 EGP for testing

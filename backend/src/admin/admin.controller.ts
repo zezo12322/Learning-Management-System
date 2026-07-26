@@ -1,4 +1,5 @@
 import { Controller, Put, Param, Body, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -20,7 +21,9 @@ import { SetRoleDto } from './dto/set-role.dto';
 export class AdminController {
   constructor(private readonly firebase: FirebaseService) {}
 
+  // Strict rate limit: 5 role changes per 60 seconds (privilege escalation protection).
   @Put(':uid/role')
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   async setRole(@Param('uid') uid: string, @Body() dto: SetRoleDto) {
     await this.firebase.setUserRole(uid, dto.role);
     return { uid, role: dto.role };
