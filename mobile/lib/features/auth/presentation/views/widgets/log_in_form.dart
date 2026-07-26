@@ -12,6 +12,7 @@ import 'package:optimatech_lms/core/widgets/primary_button.dart';
 import 'package:optimatech_lms/features/auth/presentation/manager/login_cubit/log_in_cubit.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/sign_up_view.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/bottom_decor_strip.dart';
+import 'package:optimatech_lms/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/forget_password_bt.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/google_bt.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/widgets/or_divider.dart';
@@ -154,7 +155,10 @@ class _LogInFormState extends State<LogInForm> {
                     const Spacer(),
                     ForgetPasswordBt(
                       onPressed: () {
-                        // TODO: navigate to ForgotPasswordView
+                        Navigator.pushNamed(
+                          context,
+                          ForgotPasswordView.routeName,
+                        );
                       },
                     ),
                   ],

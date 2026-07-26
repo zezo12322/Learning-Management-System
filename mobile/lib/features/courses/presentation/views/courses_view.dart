@@ -8,6 +8,7 @@ import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 import 'package:optimatech_lms/core/widgets/notification_button.dart';
+import 'package:optimatech_lms/features/notifications/presentation/views/notifications_view.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
@@ -53,7 +54,7 @@ class CourseBody extends StatelessWidget {
         actions: [
           NotificationButton(
             count: 0,
-            onTap: () {},
+            onTap: () => Navigator.pushNamed(context, NotificationsView.routeName),
           ),
           Gap(16.w),
         ],

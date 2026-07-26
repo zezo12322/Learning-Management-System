@@ -4,6 +4,8 @@ import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthService {
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+
   Future<User> signInWithEmailPassword({required String email, required String password}) async{
     try{
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -42,6 +44,25 @@ class FirebaseAuthService {
       // Once signed in, return the UserCredential
       return (await FirebaseAuth.instance.signInWithCredential(credential)).user!;
     }catch (e){
+      throw CustomExceptions(message: 'auth.error.genericError'.tr());
+    }
+  }
+
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      // Don't reveal whether an account exists — treat "user-not-found" as
+      // success so the UI shows a neutral "check your email" message.
+      if (e.code == 'user-not-found') return;
+      if (e.code == 'invalid-email') {
+        throw CustomExceptions(message: 'auth.validation.email_not_match'.tr());
+      } else if (e.code == 'network-request-failed') {
+        throw CustomExceptions(message: 'auth.error.networkError'.tr());
+      } else {
+        throw CustomExceptions(message: 'auth.error.genericError'.tr());
+      }
+    } catch (e) {
       throw CustomExceptions(message: 'auth.error.genericError'.tr());
     }
   }
