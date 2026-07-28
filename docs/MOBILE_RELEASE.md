@@ -35,12 +35,63 @@ not the APK.
 
 The release build currently falls back to **debug keys** when no keystore is
 configured, and a debug-signed APK **cannot be published**. Create the keystore
-once, on a machine you control:
+once, on a machine you control.
 
+Run it **outside the repository folder** (e.g. `~/keys`, `C:\Users\<you>\keys`) so
+it cannot be committed by accident.
+
+`keytool` ships with the JDK, not with Flutter. If it is not on your `PATH`, use
+the one Android Studio bundles:
+
+- Windows — `& "$env:LOCALAPPDATA\Programs\Android Studio\jbr\bin\keytool.exe"`
+  (or under `C:\Program Files\Android\Android Studio\jbr\bin\`)
+- macOS — `/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/keytool`
+
+**macOS / Linux (bash):**
 ```bash
 keytool -genkey -v -keystore upload-keystore.jks \
   -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 ```
+
+**Windows (PowerShell)** — one line. PowerShell does **not** understand bash's
+`\` line-continuation; pasting the multi-line block above fails with
+`Illegal option: \`. Its own continuation character is a trailing backtick.
+```powershell
+keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+It then prompts for a **store password**, the certificate fields (name, org,
+city, two-letter country code — `EG`), and finally a **key password** (Enter
+reuses the store password). Nothing is echoed as you type the passwords.
+
+> **Type passwords in ASCII.** With an Arabic keyboard layout active you will
+> silently produce Arabic characters. The JVM encodes a non-ASCII password using
+> the platform's default charset, so a keystore created on Windows can then fail
+> to open on the Linux CI runner. Switch layout to English first.
+
+### Verify the keystore before you rely on it
+A mistyped password is invisible at creation and only surfaces later as a failed
+CI build. Check it immediately (single line, same on every OS):
+
+```bash
+keytool -list -v -keystore upload-keystore.jks -alias upload
+```
+If it prints the certificate, the **store password** is correct — and the output
+confirms the alias, which must match `ANDROID_KEY_ALIAS` exactly.
+
+`-list` never touches the **key** password. To check that one, ask for something
+that needs the private key:
+
+```bash
+keytool -certreq -alias upload -keystore upload-keystore.jks
+```
+It prompts for the store password, then the key password, and prints a CSR on
+success. Nothing is written and nothing is sent anywhere — discard the output.
+
+In practice the two are usually identical: on JDK 9+ `keytool` creates a **PKCS12**
+keystore even for a `.jks` filename, and PKCS12 does not support a separate key
+password — so pressing Enter at the key-password prompt is the normal path, and
+`ANDROID_KEY_PASSWORD` gets the same value as `ANDROID_KEYSTORE_PASSWORD`.
 
 > **Guard this file like a production credential.** If it is lost, you can never
 > ship an update to the same Play Store listing again. Back it up somewhere
@@ -58,20 +109,45 @@ keyAlias=upload
 keyPassword=<key password>
 ```
 
-`storeFile` is resolved relative to `mobile/android/`.
+`storeFile` is resolved relative to `mobile/android/`. If you point it at an
+absolute Windows path, write it with **forward slashes** (`C:/Users/you/keys/…`)
+or doubled backslashes — `\` is an escape character in a `.properties` file, so
+`C:\Users\…` silently resolves to the wrong path.
 
 ### For CI builds
-Add these repository secrets (Settings → Secrets and variables → Actions):
+Add these repository secrets (Settings → Secrets and variables → Actions →
+**New repository secret**, one per row):
 
 | Secret | Value |
 |---|---|
-| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 upload-keystore.jks` |
+| `ANDROID_KEYSTORE_BASE64` | the keystore, base64-encoded (below) |
 | `ANDROID_KEYSTORE_PASSWORD` | store password |
 | `ANDROID_KEY_ALIAS` | e.g. `upload` |
 | `ANDROID_KEY_PASSWORD` | key password |
 
+Encoding the keystore — the result must be **one line with no wrapping**, because
+the workflow pipes it straight into `base64 -d`:
+
+```bash
+base64 -w0 upload-keystore.jks              # Linux
+base64 -i upload-keystore.jks | tr -d '\n'  # macOS
+```
+```powershell
+# Windows: straight to the clipboard, so the value never lands in a file or in
+# your shell history. Then paste into the secret field.
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("upload-keystore.jks")) | Set-Clipboard
+```
+Do **not** use `certutil -encode` on Windows — it wraps the output and adds
+`-----BEGIN CERTIFICATE-----` headers, which `base64 -d` will not accept.
+
+Paste these values into GitHub directly. Don't route a keystore or a password
+through chat, email or a ticket — anything you paste there is stored by whatever
+you pasted it into.
+
 Until `ANDROID_KEYSTORE_BASE64` exists the workflow still builds, but warns and
-marks the artifact as not publishable.
+marks the artifact as not publishable. Once all four secrets are set, the run
+summary shows `Signing: ✅ release keystore` — that line is the proof they were
+picked up correctly.
 
 ## 3. Building
 
@@ -83,13 +159,25 @@ Artifacts produced:
 - `app-release-apk` / `app-release-aab`
 - `deobfuscation-symbols` — Dart symbols **and** R8 `mapping.txt`
 
-**Locally:**
+**Locally** (these are single-line, so they run as-is in bash *and* PowerShell):
 ```bash
 cd mobile
 flutter build apk --release --obfuscate --split-debug-info=build/symbols
 # Play Store prefers an App Bundle:
 flutter build appbundle --release --obfuscate --split-debug-info=build/symbols
 ```
+
+A local release build signs with whatever `android/key.properties` points at — and
+with **debug keys** if that file is missing, printing a warning from Gradle. Check
+what you actually got before shipping it anywhere, using `apksigner` from the
+Android SDK (`$ANDROID_HOME/build-tools/<version>/`, `apksigner.bat` on Windows):
+
+```bash
+apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk
+```
+A signer `CN=Android Debug` means it is debug-signed and not publishable. Prefer
+`apksigner` over `keytool -printcert -jarfile` here: modern builds may carry only
+v2/v3 signatures, which `keytool` cannot read.
 
 ## 4. Keep the symbols — this is not optional
 
