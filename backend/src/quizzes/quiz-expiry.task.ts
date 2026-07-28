@@ -2,6 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { QuizzesService } from './quizzes.service';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { RedisLockService } from '../common/redis/redis-lock.service';
+
+/** Redis key guarding the sweep across replicas. */
+const SWEEP_LOCK_KEY = 'lock:quiz-expiry-sweep';
+
+/**
+ * Lock lifetime. Two ticks of headroom so a slow sweep is never preempted by
+ * the next one, while a replica that dies mid-sweep still frees the lock within
+ * two minutes instead of stalling expiry until it comes back.
+ */
+const SWEEP_LOCK_TTL_MS = 120_000;
 
 /**
  * Server-side timer enforcement (KAN-115).
@@ -12,9 +23,12 @@ import { DataConnectService } from '../firebase/dataconnect.service';
  * auto-grades any whose window has elapsed — independent of any client — using
  * the backend's service credentials.
  *
- * NOTE: for horizontally-scaled deployments, every replica would run this. Move
- * to a single Cloud Scheduler → endpoint (or add a distributed lock) so the
- * sweep runs once per tick.
+ * The sweep is wrapped in a Redis lock (KAN-147) because `@nestjs/schedule`
+ * timers are per-process: with more than one replica this would otherwise fire
+ * on every instance at the same second, and each would auto-grade the same
+ * attempts concurrently. Skipping a tick is harmless — the next one is a minute
+ * away, and attempts still finalize lazily on any client call — so the lock
+ * fails closed (see RedisLockService).
  */
 @Injectable()
 export class QuizExpiryTask {
@@ -23,10 +37,18 @@ export class QuizExpiryTask {
   constructor(
     private readonly quizzes: QuizzesService,
     private readonly dc: DataConnectService,
+    private readonly locks: RedisLockService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async finalizeExpiredAttempts(): Promise<void> {
+    await this.locks.runExclusively(SWEEP_LOCK_KEY, SWEEP_LOCK_TTL_MS, () =>
+      this.sweep(),
+    );
+  }
+
+  /** The sweep itself — assumes the caller holds the lock. */
+  private async sweep(): Promise<void> {
     let inProgress: any[];
     try {
       const data = await this.dc.executeQueryAsAdmin('GetExpiredAttempts');
