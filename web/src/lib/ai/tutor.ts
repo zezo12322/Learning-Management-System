@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import { apiClient } from '@/lib/api/client'
+import { QUIZ_JSON_PROMPT } from '@/lib/ai/quizParse'
 
 // Client for the AI tutor. Talks to the NestJS backend's /ai endpoints — never
 // to the AI RAG service directly.
@@ -225,8 +226,9 @@ const KIND_PROMPTS: Record<StudioKind, string> = {
     "Using only this video's transcript, write a concise summary (5-8 sentences) of what this lesson covers.",
   OUTCOMES:
     "Using only this video's transcript, list 5 clear learning outcomes as bullet points, each starting with an action verb.",
-  QUIZ:
-    "Using only this video's transcript, create 3 multiple-choice questions. For each, give the question, four options labelled A-D, and state the correct answer.",
+  // The quiz answer is parsed into real questions and saved through the quiz
+  // authoring API, so it asks for JSON rather than prose. See quizParse.ts.
+  QUIZ: QUIZ_JSON_PROMPT,
   LESSON_PLAN:
     "Using only this video's transcript, produce a short lesson plan: objectives, key topics in order, and one suggested activity.",
 }

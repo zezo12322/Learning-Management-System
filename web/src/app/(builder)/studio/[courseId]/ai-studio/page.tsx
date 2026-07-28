@@ -38,6 +38,17 @@ export default function AIStudioPage() {
     [curriculum.data],
   )
 
+  // A quiz attaches to a QUIZ-type lecture, so generated questions need one as a
+  // destination — it is never the VIDEO lecture they were generated from.
+  const quizLectures = useMemo(
+    () =>
+      (curriculum.data?.sections ?? [])
+        .flatMap((s) => s.lectures)
+        .filter((l) => l.type === 'QUIZ')
+        .map((l) => ({ id: l.id, title: l.title })),
+    [curriculum.data],
+  )
+
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const active = videoLectures.find((l) => l.id === selectedId) ?? videoLectures[0] ?? null
 
@@ -74,7 +85,13 @@ export default function AIStudioPage() {
           {active && (
             <>
               <AiIngestStatus key={`status-${active.id}`} lectureId={active.id} canRetry={canRetryIngest} />
-              <AiCourseStudio key={active.id} lectureId={active.id} lectureTitle={active.title} />
+              <AiCourseStudio
+                key={active.id}
+                courseId={courseId}
+                lectureId={active.id}
+                lectureTitle={active.title}
+                quizLectures={quizLectures}
+              />
             </>
           )}
         </div>
