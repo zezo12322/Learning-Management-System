@@ -17,6 +17,21 @@
  * existing connector path unchanged.
  */
 export const ADMIN_OPERATIONS: Record<string, string> = {
+  // --- Readiness probe (HealthService, KAN-147) ---
+  // The cheapest real read available: one row from a small reference table.
+  // Proves in a single round trip that Data Connect is reachable, that the
+  // Postgres behind it is answering, and that the service-account credential is
+  // still valid. Runs on a monitor's cadence, so it must stay this small — and
+  // it must never be added to FORCE_ADMIN_OPERATIONS, since no user-token path
+  // should ever reach it.
+  HealthProbe: /* GraphQL */ `
+    query HealthProbe {
+      categories(limit: 1) {
+        id
+      }
+    }
+  `,
+
   // --- Granular progress worker (ProgressProcessor) ---
   GetLectureDuration: /* GraphQL */ `
     query GetLectureDuration($lectureId: UUID!) {

@@ -6,6 +6,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { AllExceptionsFilter } from './all-exceptions.filter';
+import { Alert, AlertService } from '../alerting/alert.service';
+import { ErrorRateMonitor } from '../alerting/error-rate.monitor';
 
 /** Minimal Express response double capturing what the filter writes. */
 function mockResponse(overrides: { headersSent?: boolean } = {}) {
@@ -45,9 +47,20 @@ describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
   let errorSpy: jest.SpyInstance;
   let warnSpy: jest.SpyInstance;
+  let sent: Alert[];
+  let recorded: number[];
 
   beforeEach(() => {
-    filter = new AllExceptionsFilter();
+    sent = [];
+    recorded = [];
+    const alerts = {
+      send: (alert: Alert) => sent.push(alert),
+    } as unknown as AlertService;
+    const errorRate = {
+      record: (status: number) => recorded.push(status),
+    } as unknown as ErrorRateMonitor;
+
+    filter = new AllExceptionsFilter(alerts, errorRate);
     errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
     warnSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation();
   });
@@ -173,5 +186,56 @@ describe('AllExceptionsFilter', () => {
       message: 'Internal server error',
     });
     expect(errorSpy).toHaveBeenCalled();
+  });
+
+  describe('alerting (KAN-147)', () => {
+    it('raises a critical alert for a server error', () => {
+      filter.catch(
+        new TypeError('boom'),
+        mockHost(mockResponse(), '/api/v1/x'),
+      );
+      expect(sent).toHaveLength(1);
+      expect(sent[0].severity).toBe('critical');
+      expect(sent[0].title).toContain('500');
+    });
+
+    it('does not alert on client errors', () => {
+      filter.catch(
+        new BadRequestException('bad input'),
+        mockHost(mockResponse(), '/api/v1/x'),
+      );
+      expect(sent).toHaveLength(0);
+    });
+
+    it('keys the alert on error class, not message, so the cooldown holds', () => {
+      // Messages embed ids and values; keying on them would send one alert per
+      // request for what is really a single recurring fault.
+      filter.catch(
+        new TypeError('failed for user 111'),
+        mockHost(mockResponse(), '/api/v1/x'),
+      );
+      filter.catch(
+        new TypeError('failed for user 222'),
+        mockHost(mockResponse(), '/api/v1/x'),
+      );
+      expect(sent[0].key).toBe(sent[1].key);
+      expect(sent[0].key).toContain('TypeError');
+    });
+
+    it('never puts a stack trace in the outbound alert', () => {
+      const err = new Error('secret path /srv/app/config');
+      filter.catch(err, mockHost(mockResponse(), '/api/v1/x'));
+      expect(sent[0].detail).not.toContain('at ');
+      expect(JSON.stringify(sent[0])).not.toContain(err.stack ?? 'NO_STACK');
+    });
+
+    it('counts every completed request for the error-rate window', () => {
+      filter.catch(
+        new BadRequestException('nope'),
+        mockHost(mockResponse(), '/api/v1/x'),
+      );
+      filter.catch(new Error('boom'), mockHost(mockResponse(), '/api/v1/y'));
+      expect(recorded).toEqual([400, 500]);
+    });
   });
 });

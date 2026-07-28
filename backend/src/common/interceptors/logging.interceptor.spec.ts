@@ -1,6 +1,7 @@
 import { CallHandler, ExecutionContext, Logger } from '@nestjs/common';
 import { of } from 'rxjs';
 import { LoggingInterceptor } from './logging.interceptor';
+import { ErrorRateMonitor } from '../alerting/error-rate.monitor';
 
 function mockContext(url: string, statusCode = 200, method = 'GET') {
   return {
@@ -15,11 +16,15 @@ const nextHandler: CallHandler = { handle: () => of('ok') };
 
 /** Runs the interceptor to completion and returns the emitted log calls. */
 function run(context: ExecutionContext) {
-  const interceptor = new LoggingInterceptor();
+  const recorded: number[] = [];
+  const errorRate = {
+    record: (status: number) => recorded.push(status),
+  } as unknown as ErrorRateMonitor;
+  const interceptor = new LoggingInterceptor(errorRate);
   const logSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation();
   const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
   interceptor.intercept(context, nextHandler).subscribe();
-  return { logSpy, errorSpy };
+  return { logSpy, errorSpy, recorded };
 }
 
 describe('LoggingInterceptor', () => {
@@ -54,5 +59,22 @@ describe('LoggingInterceptor', () => {
   it('skips liveness probes, with or without a trailing slash', () => {
     expect(run(mockContext('/api/v1/health')).logSpy).not.toHaveBeenCalled();
     expect(run(mockContext('/api/v1/health/')).logSpy).not.toHaveBeenCalled();
+  });
+
+  it('skips readiness probes too', () => {
+    expect(
+      run(mockContext('/api/v1/health/ready')).logSpy,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('counts real requests toward the error-rate window', () => {
+    expect(run(mockContext('/api/v1/courses')).recorded).toEqual([200]);
+  });
+
+  it('keeps health probes out of the error-rate window', () => {
+    // A monitor polling every few seconds would otherwise dominate the window
+    // and dilute a genuine spike in user traffic into nothing.
+    expect(run(mockContext('/api/v1/health')).recorded).toEqual([]);
+    expect(run(mockContext('/api/v1/health/ready')).recorded).toEqual([]);
   });
 });

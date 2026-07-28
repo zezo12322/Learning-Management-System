@@ -9,6 +9,8 @@ import {
 import { Request, Response } from 'express';
 import { inspect } from 'node:util';
 import { safeRequestPath } from '../utils/request-log';
+import { AlertService } from '../alerting/alert.service';
+import { ErrorRateMonitor } from '../alerting/error-rate.monitor';
 
 /**
  * App-wide exception filter — the central monitoring signal for backend errors
@@ -33,6 +35,11 @@ import { safeRequestPath } from '../utils/request-log';
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger('ExceptionFilter');
+
+  constructor(
+    private readonly alerts: AlertService,
+    private readonly errorRate: ErrorRateMonitor,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -66,6 +73,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const where = `${request.method} ${safeRequestPath(request)}`;
 
+    // Feeds the rolling error-rate alarm (KAN-147). Requests that succeed are
+    // counted by LoggingInterceptor; a thrown failure never reaches its `tap`,
+    // so between the two every completed request is counted exactly once.
+    this.errorRate.record(status);
+
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
         `${where} -> ${status}`,
@@ -73,6 +85,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           ? exception.stack
           : inspect(exception, { depth: 3 }),
       );
+      this.raiseAlert(where, status, exception);
     } else {
       // Read the reason off the response body: for ValidationPipe failures
       // `exception.message` is only the generic "Bad Request Exception" (Nest
@@ -98,6 +111,33 @@ export class AllExceptionsFilter implements ExceptionFilter {
       .json(
         typeof body === 'string' ? { statusCode: status, message: body } : body,
       );
+  }
+
+  /**
+   * Pushes a server error to the on-call channel (KAN-147).
+   *
+   * The dedupe key is `method + path + error class`, NOT the message: messages
+   * embed ids and values, so keying on them would defeat the cooldown and send
+   * one alert per request during an incident. The path keeps its ids (it is the
+   * concrete path, per safeRequestPath) — AlertService caps how many distinct
+   * keys it tracks precisely because of that.
+   *
+   * Only the error's class name and first line are sent. The stack stays in the
+   * log: a webhook message is not a private channel, and stacks carry file
+   * paths and, via error messages, sometimes user data.
+   */
+  private raiseAlert(where: string, status: number, exception: unknown): void {
+    const name =
+      exception instanceof Error ? exception.constructor.name : 'UnknownError';
+    const message =
+      exception instanceof Error ? exception.message : 'Non-Error thrown';
+
+    this.alerts.send({
+      key: `5xx:${where}:${name}`,
+      severity: 'critical',
+      title: `${status} on ${where}`,
+      detail: `${name}: ${truncate(message)}`,
+    });
   }
 }
 
