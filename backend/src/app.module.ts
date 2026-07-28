@@ -4,9 +4,11 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CommonModule } from './common/common.module';
+import { RedisModule } from './common/redis/redis.module';
+import { AlertingModule } from './common/alerting/alerting.module';
+import { HealthModule } from './health/health.module';
 import { AdminModule } from './admin/admin.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { CoursesModule } from './courses/courses.module';
@@ -63,19 +65,25 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     // Global rate limiting: 100 requests / 60s per client.
     // Uses Redis-backed storage for shared state across instances.
     // FailClosedThrottlerGuard returns 503 if Redis is unreachable.
+    //
+    // The storage is injected rather than constructed here (KAN-147) so it and
+    // the readiness probe share RedisModule's single connection.
     ThrottlerModule.forRootAsync({
-      imports: [],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
+      imports: [RedisModule],
+      inject: [RedisThrottlerStorage],
+      useFactory: (storage: RedisThrottlerStorage) => ({
         throttlers: [
           {
             ttl: 60000,
             limit: 100,
           },
         ],
-        storage: new RedisThrottlerStorage(config),
+        storage,
       }),
     }),
+    RedisModule,
+    AlertingModule,
+    HealthModule,
     CommonModule,
     AdminModule,
     FirebaseModule,
@@ -100,7 +108,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     PaymentsModule,
     AiModule,
   ],
-  controllers: [AppController],
+  // Health endpoints moved to HealthModule (KAN-147); AppController is gone.
+  controllers: [],
   providers: [
     // Apply the throttler globally with fail-closed behavior.
     {
@@ -121,4 +130,4 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
