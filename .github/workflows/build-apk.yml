@@ -1,0 +1,156 @@
+name: Build Android Release
+
+# Manual, and on a version tag. Deliberately not on every push: a release build
+# takes minutes and produces artifacts nobody needs per-commit.
+on:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: What to build
+        type: choice
+        default: apk
+        options: [apk, appbundle, both]
+      ref:
+        description: Branch or tag to build
+        required: false
+        default: main
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Obfuscated release build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - run: flutter pub get
+
+      # Signing is optional so the workflow still produces a testable artifact
+      # before the keystore secrets exist — but an unsigned/debug-signed build is
+      # clearly marked as not publishable in the summary below.
+      - name: Configure release signing
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set — building with debug keys. This artifact CANNOT be published."
+            exit 0
+          fi
+          for name in KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::ANDROID_KEYSTORE_BASE64 is set but ANDROID_$name is missing."
+              exit 1
+            fi
+          done
+          echo "$KEYSTORE_BASE64" | base64 -d > android/release.jks
+          # storeFile is resolved relative to mobile/android/ by build.gradle.kts.
+          {
+            echo "storeFile=release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+          echo "Release signing configured."
+
+      # --obfuscate renames Dart symbols in libapp.so; --split-debug-info is
+      # mandatory alongside it and writes the symbol files needed to make a
+      # crash trace readable again. Those symbols are NOT in the APK — losing
+      # them means permanently unreadable stack traces for this build, which is
+      # why they are uploaded as an artifact below.
+      - name: Build APK
+        if: inputs.format == 'apk' || inputs.format == 'both' || startsWith(github.ref, 'refs/tags/')
+        run: |
+          flutter build apk --release \
+            --obfuscate --split-debug-info=build/symbols
+
+      - name: Build App Bundle
+        if: inputs.format == 'appbundle' || inputs.format == 'both'
+        run: |
+          flutter build appbundle --release \
+            --obfuscate --split-debug-info=build/symbols
+
+      - name: Upload APK
+        if: always() && hashFiles('mobile/build/app/outputs/flutter-apk/app-release.apk') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Upload App Bundle
+        if: always() && hashFiles('mobile/build/app/outputs/bundle/release/app-release.aab') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: mobile/build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      # Keep these forever-ish: without them, and without R8's mapping.txt, a
+      # crash report from this build is undecipherable.
+      - name: Upload de-obfuscation symbols
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deobfuscation-symbols
+          path: |
+            mobile/build/symbols
+            mobile/build/app/outputs/mapping/release/mapping.txt
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Android release build"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Ref | \`${{ inputs.ref || github.ref }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Dart obfuscation | enabled (\`--obfuscate\`) |"
+            echo "| R8 shrink + obfuscate | enabled (\`isMinifyEnabled\`) |"
+            if [ "${{ steps.signing.outputs.signed }}" = "true" ]; then
+              echo "| Signing | ✅ release keystore |"
+            else
+              echo "| Signing | ⚠️ **debug keys — NOT publishable** |"
+            fi
+            echo "| Result | ${{ job.status }} |"
+            echo
+            echo "Download the \`deobfuscation-symbols\` artifact and keep it with the release —"
+            echo "crash traces from an obfuscated build are unreadable without it."
+            echo
+            echo "**Smoke-test the artifact on a real device before publishing** (login, video"
+            echo "playback, payment). R8 can only be validated at runtime."
+          } >> "$GITHUB_STEP_SUMMARY"
