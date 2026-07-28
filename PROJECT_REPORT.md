@@ -190,7 +190,7 @@ Learning-Management-System/
 - **النشر:** مستهدف **Cloudflare Workers عبر OpenNext**، والـ backend على **Railway**، مع Security Headers مضبوطة.
 
 **ما هو placeholder / غير مبنيّ:**
-- **مبنى الذكاء الاصطناعي (AI Studio / AI Tutor):** مجرد "قريبًا" — العقد (`lib/ai/contract.ts`) معرّف بعناية لكنه **غير موصول بأي backend للـ AI**، ولا يوجد موديول AI في الـ NestJS.
+- **مبنى الذكاء الاصطناعي (AI Studio / AI Tutor):** **موصول الآن** بموديول `backend/src/ai/` عبر `POST /ai/lectures/:lectureId/chat` و `GET …/status` و `POST …/retry`، ومقفول خلف `NEXT_PUBLIC_AI_ENABLED`. الناقص: مفيش endpoint مخصّص للتوليد (أزرار الـ Studio عبارة عن prompts على نفس مسار المحادثة، فالمخرَج نص حر مش JSON منظّم)، ومفيش حفظ لتاريخ المحادثة ولا streaming ولا حدود استخدام.
 - **مشغّل الفيديو:** placeholder ("المشغّل الآمن قيد الإعداد").
 - **الكويزات، المدفوعات، الإشعارات، الشهادات، صفحة المحفوظات:** غير مبنية في الويب.
 - **تعدّد اللغات غير متّسق:** خليط عربي/إنجليزي مكتوب يدويًا بلا إطار i18n، مع `dir="ltr"` رغم المحتوى العربي.

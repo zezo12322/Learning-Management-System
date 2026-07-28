@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { Send, Sparkles, AlertCircle } from 'lucide-react'
-import { askTutor, TutorError, type TutorCitation } from '@/lib/ai/tutor'
+import { askTutor, toTutorError, type TutorCitation } from '@/lib/ai/tutor'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -21,13 +21,11 @@ function msLabel(ms: number): string {
 }
 
 export function AiTutorChat({
-  courseId,
-  videoId,
-  videoTitle,
+  lectureId,
+  lectureTitle,
 }: {
-  courseId: string
-  videoId: string
-  videoTitle?: string
+  lectureId: string
+  lectureTitle?: string
 }) {
   const [turns, setTurns] = useState<ChatTurn[]>([])
   const [input, setInput] = useState('')
@@ -44,8 +42,7 @@ export function AiTutorChat({
     setLoading(true)
     try {
       const res = await askTutor({
-        courseId,
-        videoId,
+        lectureId,
         message,
         sessionId: sessionId.current,
       })
@@ -60,14 +57,8 @@ export function AiTutorChat({
         },
       ])
     } catch (e) {
-      const te = e as TutorError
-      const msg =
-        te.code === 'VIDEO_NOT_READY'
-          ? 'This video is still being indexed. Try again once processing completes.'
-          : te.code === 'AI_NOT_CONFIGURED'
-            ? 'The AI service is not configured for this environment yet.'
-            : te.message || 'Something went wrong.'
-      setError(msg)
+      // toTutorError already produces a user-facing message per status code.
+      setError(toTutorError(e).message)
     } finally {
       setLoading(false)
     }
@@ -80,8 +71,8 @@ export function AiTutorChat({
         <Sparkles size={16} className="text-primary" />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-content">AI Tutor</p>
-          {videoTitle && (
-            <p className="truncate text-xs text-content-secondary">Grounded in: {videoTitle}</p>
+          {lectureTitle && (
+            <p className="truncate text-xs text-content-secondary">Grounded in: {lectureTitle}</p>
           )}
         </div>
       </div>

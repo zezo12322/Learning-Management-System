@@ -5,7 +5,7 @@ import { Sparkles, AlertCircle } from 'lucide-react'
 import {
   generateAsset,
   STUDIO_ACTIONS,
-  TutorError,
+  toTutorError,
   type StudioKind,
   type TutorCitation,
 } from '@/lib/ai/tutor'
@@ -13,13 +13,11 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 export function AiCourseStudio({
-  courseId,
-  videoId,
-  videoTitle,
+  lectureId,
+  lectureTitle,
 }: {
-  courseId: string
-  videoId: string
-  videoTitle?: string
+  lectureId: string
+  lectureTitle?: string
 }) {
   const [busy, setBusy] = useState<StudioKind | null>(null)
   const [result, setResult] = useState<{ kind: StudioKind; text: string; citations: TutorCitation[] } | null>(null)
@@ -31,17 +29,11 @@ export function AiCourseStudio({
     setResult(null)
     setBusy(kind)
     try {
-      const res = await generateAsset({ courseId, videoId, kind })
+      const res = await generateAsset({ lectureId, kind })
       setResult({ kind, text: res.answer, citations: res.citations })
     } catch (e) {
-      const te = e as TutorError
-      setError(
-        te.code === 'VIDEO_NOT_READY'
-          ? 'This video is still being indexed. Generation needs a processed video.'
-          : te.code === 'AI_NOT_CONFIGURED'
-            ? 'The AI service is not configured for this environment yet.'
-            : te.message || 'Generation failed.',
-      )
+      // toTutorError already produces a user-facing message per status code.
+      setError(toTutorError(e).message)
     } finally {
       setBusy(null)
     }
@@ -55,7 +47,7 @@ export function AiCourseStudio({
         <div className="mb-3 flex items-center gap-2">
           <Sparkles size={16} className="text-primary" />
           <p className="text-sm font-semibold text-content">
-            Generate from{videoTitle ? `: ${videoTitle}` : ' this lesson'}
+            Generate from{lectureTitle ? `: ${lectureTitle}` : ' this lesson'}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

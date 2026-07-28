@@ -5,17 +5,23 @@ import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useT } from '@/lib/i18n'
 import { catalogApi } from '@/lib/api/services'
+import { useAuth } from '@/lib/auth/AuthProvider'
 import { isAiTutorEnabled } from '@/lib/ai/tutor'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { AIUnavailable } from '@/components/workspace/AIUnavailable'
 import { AiCourseStudio } from '@/components/ai/AiCourseStudio'
+import { AiIngestStatus } from '@/components/ai/AiIngestStatus'
 import { Card } from '@/components/ui/card'
 import { PageSpinner } from '@/components/ui/spinner'
 
 export default function AIStudioPage() {
   const t = useT()
   const { courseId } = useParams<{ courseId: string }>()
+  const { roles } = useAuth()
   const enabled = isAiTutorEnabled()
+  // Re-running ingestion is admin / owning-instructor only on the backend, so
+  // don't offer a button that would just 403.
+  const canRetryIngest = roles.includes('admin') || roles.includes('instructor')
 
   const curriculum = useQuery({
     queryKey: ['curriculum', courseId],
@@ -66,12 +72,10 @@ export default function AIStudioPage() {
           </div>
 
           {active && (
-            <AiCourseStudio
-              key={active.id}
-              courseId={courseId}
-              videoId={active.id}
-              videoTitle={active.title}
-            />
+            <>
+              <AiIngestStatus key={`status-${active.id}`} lectureId={active.id} canRetry={canRetryIngest} />
+              <AiCourseStudio key={active.id} lectureId={active.id} lectureTitle={active.title} />
+            </>
           )}
         </div>
       )}
