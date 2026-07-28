@@ -149,7 +149,33 @@ marks the artifact as not publishable. Once all four secrets are set, the run
 summary shows `Signing: ✅ release keystore` — that line is the proof they were
 picked up correctly.
 
-## 3. Building
+## 3. `google-services.json` must be in the tree
+
+`mobile/android/app/google-services.json` is committed, and needs to stay that
+way. The Google Services Gradle plugin reads that exact path; without it the
+release build dies at `:app:processReleaseGoogleServices` — but only about ten
+minutes in, after Dart has already compiled. The workflow now checks for it in
+the first few seconds instead, and also verifies the file's `package_name`
+matches `applicationId`, because a file from the wrong app builds fine and then
+fails at runtime with an unhelpful Firebase init error.
+
+**It is not a secret.** It carries Firebase *client* config: the same project id,
+app id and API key already committed in `mobile/lib/core/config/firebase_options.dart`,
+and shipped inside every published APK. Access is governed by Security Rules and
+App Check, not by hiding these values — see §1. It was gitignored once under
+"Secrets & Configs"; that protected nothing while `firebase_options.dart` sat
+committed beside it, and it made a release build impossible from a clean clone.
+
+The credential that genuinely must never be committed is the **Admin SDK**
+service-account key (`firebase-service-account*.json`), which bypasses Security
+Rules entirely. That one is still ignored — and one copy is already in git
+history awaiting rotation (`OPERATIONS.md` §5).
+
+If you would rather keep the file out of the tree, the workflow accepts a
+`GOOGLE_SERVICES_JSON` repository secret instead, as raw JSON or base64. Get the
+file from Firebase console → Project settings → your Android app.
+
+## 4. Building
 
 **Via CI (recommended — reproducible):** Actions → **Build Android Release** →
 *Run workflow*, choose `apk`, `appbundle`, or `both`. Pushing a `v*` tag builds an
@@ -179,7 +205,7 @@ A signer `CN=Android Debug` means it is debug-signed and not publishable. Prefer
 `apksigner` over `keytool -printcert -jarfile` here: modern builds may carry only
 v2/v3 signatures, which `keytool` cannot read.
 
-## 4. Keep the symbols — this is not optional
+## 5. Keep the symbols — this is not optional
 
 An obfuscated build produces stack traces like `#0 aB.cD (package:…)`. They are
 unreadable without the artifacts from the exact build that produced them.
@@ -192,7 +218,7 @@ R8's `mapping.txt` does the same for Java/Kotlin traces. **Archive both with eve
 release you publish** — the CI artifact is retained for 90 days, which is not
 long enough for a release you support for a year.
 
-## 5. Before publishing: smoke-test on a real device
+## 6. Before publishing: smoke-test on a real device
 
 R8 can only be validated at runtime — a missing keep rule shows up as a crash in
 release that never happens in debug. Install the artifact and check at minimum:
