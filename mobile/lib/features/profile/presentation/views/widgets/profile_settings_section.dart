@@ -10,6 +10,9 @@ import 'package:optimatech_lms/core/widgets/modern_dialog.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/widgets/setting/profile_setting_tile.dart';
 
+import '../../../../../core/services/get_it_service.dart';
+import '../../../../../core/services/secure_storage_service.dart';
+
 class ProfileSettingsSection extends StatelessWidget {
   const ProfileSettingsSection({super.key});
 
@@ -90,6 +93,7 @@ class ProfileSettingsSection extends StatelessWidget {
                     onCancel: () => Navigator.pop(context),
                     onConfirm: () async{
                       //await StorageService.clearAll();
+                      await getIt<SecureStorageService>().deleteAuthToken();
                       await FirebaseAuth.instance.signOut();
                       if(!context.mounted) return;
                       Navigator.pushNamedAndRemoveUntil(context, LogInView.routeName, (route) => false,);

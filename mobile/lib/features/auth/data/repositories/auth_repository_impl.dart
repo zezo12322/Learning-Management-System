@@ -20,6 +20,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> loginWithEmailPassword({required String email, required String password}) async{
     try{
       User user = await firebaseAuthService.signInWithEmailPassword(email: email, password: password);
+      String? token = await user.getIdToken();
+      if (token != null) authLocalDataSources.saveToken(token: token);
       UserEntity userEntity = UserModel.fromFirebaseUser(user).toEntity();
       return right(userEntity);
     }on CustomExceptions catch (e) {
@@ -40,6 +42,8 @@ class AuthRepositoryImpl implements AuthRepository {
       //   data: userModel.toMap(),
       //   merge: true,
       // );
+      String? token = await user.getIdToken();
+      if (token != null) authLocalDataSources.saveToken(token: token);
       return right(userModel.toEntity());
     }on CustomExceptions catch (e) {
       return left(ServerFailure(e.message));
