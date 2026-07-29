@@ -1,5 +1,6 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:dio/dio.dart';
+import 'package:optimatech_lms/core/services/secure_storage_service.dart';
 import 'package:optimatech_lms/features/chatbot/data/datasources/local_datasource/chat_local_data_source.dart';
 import 'package:optimatech_lms/features/chatbot/data/datasources/local_datasource/chat_local_data_source_impl.dart';
 import 'package:optimatech_lms/features/chatbot/data/datasources/remote_datasource/chat_remote_data_source.dart';
@@ -66,9 +67,25 @@ Future<void> setupDependencies() async {
 
   getIt.registerLazySingleton<ApiService>(() => ApiService());
 
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    ),
+  );
+  getIt.registerLazySingleton<SecureStorageService>(
+    () => SecureStorageService(storage: getIt<FlutterSecureStorage>()),
+  );
+
   getIt.registerLazySingleton<FirebaseAuthService>(() => FirebaseAuthService(),);
   getIt.registerLazySingleton<FireStoreService>(() => FireStoreService(),);
-  getIt.registerLazySingleton<AuthLocalDataSources>(() => AuthLocalDataSourcesImpl(sharedPreferences: getIt<SharedPreferences>()),);
+  getIt.registerLazySingleton<AuthLocalDataSources>(
+    () => AuthLocalDataSourcesImpl(
+      sharedPreferences: getIt<SharedPreferences>(),
+      secureStorageService: getIt<SecureStorageService>()
+    ),
+  );
+
   getIt.registerLazySingleton<AuthRepository>(() =>
       AuthRepositoryImpl(
         firebaseAuthService: getIt<FirebaseAuthService>(),
@@ -188,7 +205,7 @@ Future<void> setupDependencies() async {
   
   // ========================= Chatbot Feature =========================
   getIt.registerLazySingleton<ChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(dio: Dio()), // Assuming Dio is used
+    () => ChatRemoteDataSourceImpl(apiService: getIt<ApiService>()), // Assuming Dio is used
   );
   getIt.registerLazySingleton<ChatLocalDataSource>(
     () => ChatLocalDataSourceImpl(sharedPreferences: getIt<SharedPreferences>()),
