@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseGuards, Req } from '@nestjs/common';
 import { EnrollmentService } from './enrollment.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { AuditLoggingService } from '../logging/logging.service';
 
 /**
  * Student-facing enrollment (H5). Any authenticated user may enroll themselves;
@@ -11,15 +12,30 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @Controller()
 @UseGuards(FirebaseAuthGuard)
 export class EnrollmentController {
-  constructor(private readonly enrollmentService: EnrollmentService) {}
+  constructor(
+    private readonly enrollmentService: EnrollmentService,
+    private readonly auditLoggingService: AuditLoggingService,
+  ) {}
 
   @Post('courses/:courseId/enroll')
-  enrollInCourse(
+  async enrollInCourse(
     @Param('courseId') courseId: string,
     @AuthToken() token: string,
     @CurrentUser('uid') uid: string,
+    @Req() req: any,
   ) {
-    return this.enrollmentService.enrollInCourse(courseId, token, uid);
+    const result = await this.enrollmentService.enrollInCourse(courseId, token, uid);
+
+    // Audit Log: Enrollment in Course
+    this.auditLoggingService.createLog({
+      action: 'ENROLLMENT_CREATED',
+      adminUid: uid,
+      targetUid: uid,
+      ipAddress: req.ip,
+      details: { courseId, type: 'COURSE' },
+    });
+
+    return result;
   }
 
   @Get('courses/:courseId/enrollment')
@@ -31,12 +47,24 @@ export class EnrollmentController {
   }
 
   @Post('missions/:missionId/enroll')
-  enrollInMission(
+  async enrollInMission(
     @Param('missionId') missionId: string,
     @AuthToken() token: string,
     @CurrentUser('uid') uid: string,
+    @Req() req: any,
   ) {
-    return this.enrollmentService.enrollInMission(missionId, token, uid);
+    const result = await this.enrollmentService.enrollInMission(missionId, token, uid);
+
+    // Audit Log: Enrollment in Mission
+    this.auditLoggingService.createLog({
+      action: 'ENROLLMENT_CREATED',
+      adminUid: uid,
+      targetUid: uid,
+      ipAddress: req.ip,
+      details: { missionId, type: 'MISSION' },
+    });
+
+    return result;
   }
 
   @Get('missions/:missionId/enrollment')

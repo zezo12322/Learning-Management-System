@@ -6,6 +6,7 @@ import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { AuditLoggingService } from '../logging/logging.service';
 
 @Controller('uploads')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
@@ -14,20 +15,43 @@ export class UploadsController {
   constructor(
     private readonly uploadsService: UploadsService,
     private readonly dc: DataConnectService,
+    private readonly auditLoggingService: AuditLoggingService,
   ) {}
 
   // Strict rate limit: 10 signed URL requests per 60 seconds (resource protection).
   @Post('signed-url')
   @Throttle({ default: { ttl: 60000, limit: 10 } })
-  generateSignedUrl(@Body() dto: SignedUrlRequestDto, @Req() req: any) {
-    return this.uploadsService.generateSignedUrl(dto, this.caller(req));
+  async generateSignedUrl(@Body() dto: SignedUrlRequestDto, @Req() req: any) {
+    const result = await this.uploadsService.generateSignedUrl(dto, this.caller(req));
+
+    // Audit Log: Upload Signed URL Request
+    this.auditLoggingService.createLog({
+      action: 'UPLOAD_SIGNED_URL',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: null,
+      ipAddress: req.ip,
+      details: { entityType: dto.entityType, courseId: dto.courseId, lectureId: dto.lectureId, contentType: dto.contentType },
+    });
+
+    return result;
   }
 
   // Strict rate limit: 10 confirm requests per 60 seconds (resource protection).
   @Post('confirm')
   @Throttle({ default: { ttl: 60000, limit: 10 } })
-  confirmUpload(@Body() dto: ConfirmUploadDto, @Req() req: any) {
-    return this.uploadsService.confirmUpload(dto, this.caller(req));
+  async confirmUpload(@Body() dto: ConfirmUploadDto, @Req() req: any) {
+    const result = await this.uploadsService.confirmUpload(dto, this.caller(req));
+
+    // Audit Log: Upload Confirmed
+    this.auditLoggingService.createLog({
+      action: 'UPLOAD_CONFIRMED',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: null,
+      ipAddress: req.ip,
+      details: { entityType: dto.entityType, courseId: dto.courseId, lectureId: dto.lectureId, storagePath: dto.storagePath },
+    });
+
+    return result;
   }
 
   /** Build the authorized-caller context from the request (roles set by RolesGuard). */

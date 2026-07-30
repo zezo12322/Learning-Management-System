@@ -102,4 +102,8 @@ export class CheckoutDto {
   @Type(() => CheckoutBillingData)
   @IsOptional()
   billingData?: CheckoutBillingData;
+
+  @IsString()
+  @IsOptional()
+  returnUrl?: string;
 }

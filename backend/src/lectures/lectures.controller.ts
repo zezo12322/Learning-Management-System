@@ -1,21 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
-import {
-  CreateLectureDto,
-  UpdateLectureDto,
-  MoveLectureDto,
-} from './dto/lecture.dto';
+import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -24,53 +9,86 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { AuditLoggingService } from '../logging/logging.service';
 
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class LecturesController {
-  constructor(private readonly lecturesService: LecturesService) {}
+  constructor(
+    private readonly lecturesService: LecturesService,
+    private readonly auditLoggingService: AuditLoggingService,
+  ) {}
 
   @Post('courses/:courseId/sections/:sectionId/lectures')
   @Roles('admin', 'instructor')
   @OwnsResource('section')
   @UseGuards(ResourceOwnershipGuard)
-  create(
+  async create(
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Body() dto: CreateLectureDto,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.lecturesService.create(courseId, sectionId, dto, token);
+    const result = await this.lecturesService.create(courseId, sectionId, dto, token);
+    this.auditLoggingService.createLog({
+      action: 'CREATE_LECTURE',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: result?.lecture_insert?.id ?? null,
+      ipAddress: req.ip,
+      details: { courseId, sectionId, ...dto },
+    });
+    return result;
   }
 
   @Patch('courses/:courseId/sections/:sectionId/lectures/:lectureId')
   @Roles('admin', 'instructor')
   @OwnsResource('lecture')
   @UseGuards(ResourceOwnershipGuard)
-  update(
+  async update(
     @Param('lectureId') lectureId: string,
     @Body() dto: UpdateLectureDto,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.lecturesService.update(lectureId, dto, token);
+    const result = await this.lecturesService.update(lectureId, dto, token);
+    this.auditLoggingService.createLog({
+      action: 'UPDATE_LECTURE',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: lectureId,
+      ipAddress: req.ip,
+      details: dto,
+    });
+    return result;
   }
 
   @Delete('courses/:courseId/sections/:sectionId/lectures/:lectureId')
   @Roles('admin', 'instructor')
   @OwnsResource('lecture')
   @UseGuards(ResourceOwnershipGuard)
-  softDelete(
+  async softDelete(
     @Param('courseId') courseId: string,
     @Param('sectionId') sectionId: string,
     @Param('lectureId') lectureId: string,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.lecturesService.softDelete(
+    const result = await this.lecturesService.softDelete(
       courseId,
       sectionId,
       lectureId,
       token,
     );
+
+    this.auditLoggingService.createLog({
+      action: 'DELETE_LECTURE',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: lectureId,
+      ipAddress: req.ip,
+      details: { courseId, sectionId, lectureId },
+    });
+
+    return result;
   }
 
   @Put('courses/:courseId/sections/:sectionId/lectures/reorder')

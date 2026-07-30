@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-  HttpStatus,
-  Get,
-  Query,
-  UseGuards,
-  UnauthorizedException,
-  ValidationPipe,
-  HttpException,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get, Query, UseGuards, UnauthorizedException, ValidationPipe, HttpException, Req } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
@@ -19,13 +7,15 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CheckoutDto } from './dto/checkout.dto';
+import { AuditLoggingService } from '../logging/logging.service';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
     private readonly dataConnectService: DataConnectService,
-  ) { }
+    private readonly auditLoggingService: AuditLoggingService,
+  ) {}
 
   // Strict rate limit: 5 checkout requests per 60 seconds (payment abuse protection).
   @Post('checkout')
@@ -36,6 +26,7 @@ export class PaymentsController {
     @Res() res: Response,
     @AuthToken() userAuthToken: string,
     @CurrentUser('uid') userId: string,
+    @Req() req: any,
   ) {
     // Server-side price validation: look up each item's actual price from the database.
     // Never trust client-provided prices.
@@ -127,6 +118,15 @@ export class PaymentsController {
         returnUrl,
       );
 
+      // Audit Log: Payment Initiated
+      this.auditLoggingService.createLog({
+        action: 'PAYMENT_INITIATED',
+        adminUid: req.user?.uid ?? 'unknown',
+        targetUid: null,
+        ipAddress: req.ip,
+        details: { totalAmountCents, items, billingData },
+      });
+
       // Return the checkout URL to the frontend so it can redirect the user
       // via window.location.href (avoiding CORS issues with 302 redirects in fetch)
       return res.status(HttpStatus.OK).json({ checkoutUrl });
@@ -188,6 +188,16 @@ export class PaymentsController {
             const payment = paymentDetails?.payments?.[0];
             if (payment && payment.paymentItems_on_payment) {
               const userId = payment.userId;
+
+              // Audit Log: Payment Successful
+              this.auditLoggingService.createLog({
+                action: 'PAYMENT_SUCCESS',
+                adminUid: 'SYSTEM',
+                targetUid: userId,
+                ipAddress: undefined,
+                details: { referenceId, paymentId: payment.id },
+              });
+
               for (const item of payment.paymentItems_on_payment) {
                 if (item.targetType === 'COURSE' && item.courseId) {
                   await this.dataConnectService.executeMutationAsAdmin(
@@ -200,6 +210,15 @@ export class PaymentsController {
                   console.log(
                     `Enrolled user ${userId} in course ${item.courseId}`,
                   );
+
+                  // Audit Log: Enrollment
+                  this.auditLoggingService.createLog({
+                    action: 'ENROLLMENT_CREATED',
+                    adminUid: 'SYSTEM',
+                    targetUid: userId,
+                    ipAddress: undefined,
+                    details: { courseId: item.courseId, type: 'COURSE' },
+                  });
                 } else if (item.targetType === 'MISSION' && item.missionId) {
                   await this.dataConnectService.executeMutationAsAdmin(
                     'EnrollInMission',
@@ -211,9 +230,27 @@ export class PaymentsController {
                   console.log(
                     `Enrolled user ${userId} in mission ${item.missionId}`,
                   );
+
+                  // Audit Log: Enrollment
+                  this.auditLoggingService.createLog({
+                    action: 'ENROLLMENT_CREATED',
+                    adminUid: 'SYSTEM',
+                    targetUid: userId,
+                    ipAddress: undefined,
+                    details: { missionId: item.missionId, type: 'MISSION' },
+                  });
                 }
               }
             }
+          } else {
+            // Audit Log: Payment Failed
+            this.auditLoggingService.createLog({
+              action: 'PAYMENT_FAILED',
+              adminUid: 'SYSTEM',
+              targetUid: null,
+              ipAddress: undefined,
+              details: { referenceId },
+            });
           }
         } catch (error) {
           console.error('Failed to process payment webhook:', error);
