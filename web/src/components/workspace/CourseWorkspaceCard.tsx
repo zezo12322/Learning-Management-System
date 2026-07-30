@@ -6,18 +6,11 @@ import type { AuthoringCourse } from '@/lib/types'
 import { useT } from '@/lib/i18n'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { StatusPill, type StatusTone } from '@/components/workspace/StatusPill'
-
-const statusMap: Record<AuthoringCourse['status'], { labelKey: string; tone: StatusTone }> = {
-  DRAFT: { labelKey: 'courses.status.draft', tone: 'neutral' },
-  IN_REVIEW: { labelKey: 'courses.status.inReview', tone: 'warning' },
-  PUBLISHED: { labelKey: 'courses.status.published', tone: 'success' },
-  ARCHIVED: { labelKey: 'courses.status.archived', tone: 'neutral' },
-}
+import { StatusPill, courseStatusOf } from '@/components/workspace/StatusPill'
 
 export function CourseWorkspaceCard({ course, featured = false }: { course: AuthoringCourse; featured?: boolean }) {
   const t = useT()
-  const status = statusMap[course.status]
+  const status = courseStatusOf(course.status)
   return (
     <Link href={`/studio/${course.id}/setup`} className="block h-full">
       <Card hover className={featured ? 'h-full border-primary bg-brand-soft/40 p-4 sm:p-5' : 'h-full p-4 sm:p-5'}>

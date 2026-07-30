@@ -3,6 +3,7 @@ import { ProgressProcessor } from './progress.processor';
 describe('ProgressProcessor', () => {
   let dc: { executeQueryAsAdmin: jest.Mock; executeMutationAsAdmin: jest.Mock };
   let completion: { checkCourseCompletionAsAdmin: jest.Mock };
+  let enrollment: { checkEnrollmentAsAdmin: jest.Mock };
   let proc: ProgressProcessor;
 
   const lecture = (duration: number | null, courseId = 'c1') => ({
@@ -23,7 +24,16 @@ describe('ProgressProcessor', () => {
     completion = {
       checkCourseCompletionAsAdmin: jest.fn().mockResolvedValue(undefined),
     };
-    proc = new ProgressProcessor(dc as any, completion as any);
+    // The processor verifies enrollment before recording progress (free-preview
+    // lectures are exempt). Default to enrolled; the guard itself is covered below.
+    enrollment = {
+      checkEnrollmentAsAdmin: jest.fn().mockResolvedValue(true),
+    };
+    proc = new ProgressProcessor(
+      dc as any,
+      completion as any,
+      enrollment as any,
+    );
   });
 
   it('marks complete and cascades when watched ≥ 90% of duration', async () => {
@@ -77,6 +87,38 @@ describe('ProgressProcessor', () => {
     expect(vars.completedAt).toBeNull();
     expect(vars.lastWatchedSecond).toBe(9999); // not clamped when no duration
     expect(completion.checkCourseCompletionAsAdmin).not.toHaveBeenCalled();
+  });
+
+  it('drops the job (no write) when the user is not enrolled', async () => {
+    enrollment.checkEnrollmentAsAdmin.mockResolvedValue(false);
+    dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
+    await proc.process(
+      job({ userId: 'stranger', lectureId: 'L1', lastWatchedSecond: 90 }),
+    );
+
+    expect(enrollment.checkEnrollmentAsAdmin).toHaveBeenCalledWith(
+      'c1',
+      'stranger',
+    );
+    expect(dc.executeMutationAsAdmin).not.toHaveBeenCalled();
+    expect(completion.checkCourseCompletionAsAdmin).not.toHaveBeenCalled();
+  });
+
+  it('skips the enrollment check for a free-preview lecture', async () => {
+    enrollment.checkEnrollmentAsAdmin.mockResolvedValue(false);
+    dc.executeQueryAsAdmin.mockResolvedValue({
+      courseLecture: {
+        duration: 100,
+        isFreePreview: true,
+        section: { course: { id: 'c1' } },
+      },
+    });
+    await proc.process(
+      job({ userId: 'visitor', lectureId: 'L1', lastWatchedSecond: 50 }),
+    );
+
+    expect(enrollment.checkEnrollmentAsAdmin).not.toHaveBeenCalled();
+    expect(dc.executeMutationAsAdmin).toHaveBeenCalled();
   });
 
   it('drops the job (no write) when the lecture no longer exists', async () => {

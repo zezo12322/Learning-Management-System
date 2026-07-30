@@ -1,0 +1,33 @@
+# gitleaks allowlist — see .github/workflows/security.yml
+#
+# Each entry is a fingerprint (commit:path:rule:line) for a finding reviewed and
+# judged NOT a credential leak. Only add a line here with a reason.
+#
+# NOTE: the committed Firebase Admin service-account private key in
+# backend/firebase-service-account.json is deliberately NOT listed. It is a real
+# leak; it must be rotated in Google Cloud and purged from history rather than
+# silenced here. See docs/OPERATIONS.md §5.
+
+# ── Firebase *client* configuration — public by design ──────────────────────
+# apiKey in firebase_options.dart / google-services.json identifies the project
+# to Google; it is shipped inside every published app binary and is not a secret.
+# Access is controlled by Firebase Security Rules and App Check, not by hiding it.
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/lib/core/config/firebase_options.dart:gcp-api-key:53
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/lib/core/config/firebase_options.dart:gcp-api-key:61
+041b3e17335ac1461af3ee8aab28cbc37151278b:mobile/lib/core/config/firebase_options.dart:gcp-api-key:50
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/lib/firebase_options.dart:gcp-api-key:53
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/lib/firebase_options.dart:gcp-api-key:61
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/android/app/google-services.json:gcp-api-key:23
+890dae3158de7400c0c22115336178f17f0a4d54:mobile/android/app/google-services.json:gcp-api-key:59
+f0e1fde8e6053753de6df92cdf78d614eab38e08:mobile/android/app/google-services.json:gcp-api-key:23
+f0e1fde8e6053753de6df92cdf78d614eab38e08:mobile/android/app/google-services.json:gcp-api-key:67
+
+# ── Test fixtures ───────────────────────────────────────────────────────────
+# Hard-coded throwaway keys in an encryption unit test, named mockSecretKey and
+# wrongKey; they exist to exercise the happy path and the wrong-key path.
+5c5773447af99ad9193f853a5fb0b3f808f1a51c:functions/src/functionTests/encryptionService.test.ts:generic-api-key:4
+5c5773447af99ad9193f853a5fb0b3f808f1a51c:functions/src/functionTests/encryptionService.test.ts:generic-api-key:46
+
+# ── False positive ──────────────────────────────────────────────────────────
+# The Coveralls badge URL carried over from the default NestJS README template.
+268c22829403db3862ecaf26dc92db1ed123fa4c:backend/README.md:generic-api-key:5

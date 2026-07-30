@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config/dist/config.module';
 import { CommonModule } from './common/common.module';
+import { RedisModule } from './common/redis/redis.module';
+import { AlertingModule } from './common/alerting/alerting.module';
+import { HealthModule } from './health/health.module';
 import { AdminModule } from './admin/admin.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { CoursesModule } from './courses/courses.module';
@@ -31,6 +33,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { AiModule } from './ai/ai.module';
 import { RedisThrottlerStorage } from './common/guards/redis-throttler.storage';
 import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.guard';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -61,19 +65,25 @@ import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.
     // Global rate limiting: 100 requests / 60s per client.
     // Uses Redis-backed storage for shared state across instances.
     // FailClosedThrottlerGuard returns 503 if Redis is unreachable.
+    //
+    // The storage is injected rather than constructed here (KAN-147) so it and
+    // the readiness probe share RedisModule's single connection.
     ThrottlerModule.forRootAsync({
-      imports: [],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
+      imports: [RedisModule],
+      inject: [RedisThrottlerStorage],
+      useFactory: (storage: RedisThrottlerStorage) => ({
         throttlers: [
           {
             ttl: 60000,
             limit: 100,
           },
         ],
-        storage: new RedisThrottlerStorage(config),
+        storage,
       }),
     }),
+    RedisModule,
+    AlertingModule,
+    HealthModule,
     CommonModule,
     AdminModule,
     FirebaseModule,
@@ -98,12 +108,25 @@ import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.
     PaymentsModule,
     AiModule,
   ],
-  controllers: [AppController],
+  // Health endpoints moved to HealthModule (KAN-147); AppController is gone.
+  controllers: [],
   providers: [
     // Apply the throttler globally with fail-closed behavior.
     {
       provide: APP_GUARD,
       useClass: FailClosedThrottlerGuard,
+    },
+    // Monitoring (KAN-60): central error logging/response shaping and the
+    // per-request access log. Registered here rather than in main.ts so both
+    // resolve through DI (an error tracker can be injected later) and so tests
+    // that build from AppModule run the same pipeline as production.
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })

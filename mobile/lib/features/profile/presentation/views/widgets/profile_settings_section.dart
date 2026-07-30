@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/helper_function/build_change_language_dialog.dart';
 import 'package:optimatech_lms/core/helper_function/build_change_theme_dialog.dart';
+import 'package:optimatech_lms/core/helper_function/build_delete_account_dialog.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/modern_dialog.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
@@ -100,6 +101,15 @@ class ProfileSettingsSection extends StatelessWidget {
                     },
                   );
                 },
+              ),
+              ProfileSettingTile(
+                data: const ProfileSettingTileData(
+                  icon: Icons.delete_forever_outlined,
+                  titleKey: 'profile.settings.delete_account',
+                  isDestructive: true,
+                ),
+                showDivider: false,
+                onTap: () => buildDeleteAccountDialog(context),
               ),
             ],
           ),
