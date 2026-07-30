@@ -2,7 +2,7 @@
   "info": {
     "name": "OptimaTech LMS - Backend API",
     "_postman_id": "optimatech-lms-backend-api",
-    "description": "Complete Postman collection for the OptimaTech LMS NestJS backend (86 REST endpoints).\n\n## Setup\n1. Select this collection > **Variables** tab.\n2. Set `authToken` to a valid **Firebase ID token** (the collection sends it as `Authorization: Bearer <token>` on every request except the Public ones).\n3. `baseUrl` defaults to the Railway production deploy. For local dev, change it to `http://localhost:3000/api/v1`.\n4. Fill the id variables (`courseId`, `sectionId`, `lectureId`, `quizId`, ...) as you go - the request URLs reference them.\n\n## Notes\n- Auth levels are noted in each request's description: **Public** / **User** / **Instructor/Admin** / **Owner** / **enrolled**.\n- Public routes (health, catalog list, ratings list/summary) override auth to `noauth`.\n- `POST /me/sync` must be the first authenticated call after sign-in.\n- Discovery/read data (popular, recommended, search, categories, curriculum browsing) is served via the Firebase Data Connect client SDK, not REST - only the REST routes that actually exist in the backend are included here.\n- Global prefix is `/api/v1` (already baked into `baseUrl`). Rate limit: 100 req / 60s.\n",
+    "description": "Complete Postman collection for the OptimaTech LMS NestJS backend (95 REST endpoints).\n\n## Setup\n1. Select this collection > **Variables** tab.\n2. Set `authToken` to a valid **Firebase ID token** (the collection sends it as `Authorization: Bearer <token>` on every request except the Public ones).\n3. `baseUrl` defaults to the Railway production deploy. For local dev, change it to `http://localhost:3000/api/v1`.\n4. Fill the id variables (`courseId`, `sectionId`, `lectureId`, `quizId`, ...) as you go - the request URLs reference them.\n\n## Notes\n- Auth levels are noted in each request's description: **Public** / **User** / **Instructor/Admin** / **Owner** / **enrolled**.\n- Public routes (health, catalog list, ratings list/summary) override auth to `noauth`.\n- `POST /me/sync` must be the first authenticated call after sign-in.\n- Discovery/read data (popular, recommended, search, categories, curriculum browsing) is served via the Firebase Data Connect client SDK, not REST - only the REST routes that actually exist in the backend are included here.\n- Global prefix is `/api/v1` (already baked into `baseUrl`). Rate limit: 100 req / 60s.\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -34,6 +34,28 @@
               ]
             },
             "description": "Liveness probe. **Public** — no token.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Readiness check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "ready"
+              ]
+            },
+            "description": "Readiness probe. **Public** — no token.\n\nReturns `200` when this instance can serve traffic, `503` when it cannot. Checks Redis (the rate limiter fails closed without it) and Data Connect (every read/write goes through it).\n\n```json\n{\n  \"status\": \"ok\",\n  \"timestamp\": \"2026-07-28T01:00:00.000Z\",\n  \"checks\": {\n    \"redis\":       { \"status\": \"up\", \"latencyMs\": 2 },\n    \"dataconnect\": { \"status\": \"up\", \"latencyMs\": 88 }\n  }\n}\n```\n\nOn failure a check reports `\"status\": \"down\"` with `\"error\": \"timeout\"` or `\"unreachable\"` (coarse on purpose — this endpoint is unauthenticated, so driver messages carrying internal hosts/ports stay in the server log). While the process is shutting down it returns `503 {\"status\":\"shutting_down\"}` before running any check.\n\n**Operational endpoint** — for load balancers, deploy verification and uptime monitoring. Mobile/web clients should not call it. Results are cached for 10s, so polling faster just returns the cached answer.\n\nDeliberately NOT wired to Railway's healthcheckPath — a transient Redis blip would otherwise fail the platform healthcheck and roll back a healthy deploy. See docs/OPERATIONS.md §2.1.",
             "auth": {
               "type": "noauth"
             }
@@ -223,6 +245,119 @@
     {
       "name": "5. Courses",
       "item": [
+        {
+          "name": "Search courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/search?q=machine learning",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "machine learning"
+                }
+              ]
+            },
+            "description": "Full-text search over the published catalog. **User.**\n\n`q` is **required** — omitting it returns `400 Search query (q) is required`."
+          },
+          "response": []
+        },
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "categories"
+              ]
+            },
+            "description": "All course categories, for building filter UI. **User.**"
+          },
+          "response": []
+        },
+        {
+          "name": "Popular courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/popular?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "popular"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Most popular published courses, ranked by rating aggregate. **User.**\n\n`limit` is optional; omit it for the service default."
+          },
+          "response": []
+        },
+        {
+          "name": "Recommended courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/recommended?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "recommended"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Personalised recommendations for the caller, derived from the bearer token's identity. Falls back to popular courses when there is not enough signal. **User.**\n\n`limit` is optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Continue learning",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/continue-learning",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "continue-learning"
+              ]
+            },
+            "description": "The caller's enrolled courses ranked by completed-lesson count (descending) — the \"pick up where you left off\" rail. **User.**"
+          },
+          "response": []
+        },
         {
           "name": "Course videos",
           "request": {
@@ -2562,6 +2697,88 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "21. AI service (RAG chat & indexing)",
+      "item": [
+        {
+          "name": "Get AI indexing status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ai/lectures/{{lectureId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "lectures",
+                "{{lectureId}}",
+                "status"
+              ]
+            },
+            "description": "Poll the AI indexing state for a video lecture. **User.**\n\nResponse `200`: `{ \"status\": \"PENDING\" | \"PROCESSING\" | \"READY\" | \"READY_WITH_WARNINGS\" | \"FAILED\" | \"UNKNOWN\" }`"
+          },
+          "response": []
+        },
+        {
+          "name": "Ask the lecture (RAG chat)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What is a residual?\",\n  \"playbackMs\": 75000,\n  \"sessionId\": \"{{aiSessionId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/lectures/{{lectureId}}/chat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "lectures",
+                "{{lectureId}}",
+                "chat"
+              ]
+            },
+            "description": "Proxy a student question to the AI service for retrieval-augmented chat. **User** (must be enrolled; admins bypass).\n\n`playbackMs` is the current player position, used to scope retrieval to what the student has actually watched. `sessionId` groups turns into one conversation — generate a UUID per session and reuse it.\n\nResponse `200`: `{ \"answer\": \"...\", \"grounded\": true, \"citations\": [...] }`"
+          },
+          "response": []
+        },
+        {
+          "name": "Retry AI ingestion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ai/lectures/{{lectureId}}/retry",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "lectures",
+                "{{lectureId}}",
+                "retry"
+              ]
+            },
+            "description": "Re-run AI ingestion for a lecture whose processing failed. **Instructor/Admin, owner** of the lecture.\n\nResponse `201`: `{ \"success\": true, \"aiJobId\": \"...\" }`"
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -2649,6 +2866,10 @@
       "key": "submissionId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "aiSessionId",
+      "value": ""
     }
   ]
 }

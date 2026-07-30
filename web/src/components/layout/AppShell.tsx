@@ -8,8 +8,10 @@ import {
   BookOpen,
   Bot,
   Bookmark,
+  BarChart3,
   UploadCloud,
   UserRound,
+  UserPlus,
   LayoutDashboard,
   LibraryBig,
   LogOut,
@@ -48,15 +50,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     enabled: isAuthenticated,
   })
   const firstCourseId = authoringQuery.data?.[0]?.id
-  const nav = useMemo(
-    () => firstCourseId
-      ? [
-          ...BASE_NAV,
-          { href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot },
-        ]
-      : BASE_NAV,
-    [firstCourseId]
-  )
+  const canManageStudents = roles.includes('admin') || roles.includes('instructor')
+  const nav = useMemo(() => {
+    const items = [...BASE_NAV]
+    // Admin/instructor management links after Courses: student registration
+    // (KAN-12) and course analytics (KAN-51).
+    if (canManageStudents) {
+      items.splice(
+        2,
+        0,
+        { href: '/students', label: 'nav.students', icon: UserPlus },
+        { href: '/insights', label: 'nav.insights', icon: BarChart3 },
+      )
+    }
+    if (firstCourseId) {
+      items.push({ href: `/studio/${firstCourseId}/ai-studio`, label: 'nav.aiStudio', icon: Bot })
+    }
+    return items
+  }, [firstCourseId, canManageStudents])
   const currentLabel = t(nav.find((item) => isActive(pathname, item.href))?.label ?? 'workspace.default')
   const accountName = me?.name || 'Account'
   const accountRole = roles.length
@@ -164,12 +175,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-1 flex-col items-center gap-1 rounded-lg py-1.5 text-[10px]',
+                // min-w-0 + truncate: admins/instructors get up to 9 items here,
+                // and flex items default to min-width:auto, so without these the
+                // labels refuse to shrink and the last tab is clipped off-screen.
+                'flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1.5 text-[10px]',
                 active ? 'text-primary' : 'text-content-muted'
               )}
             >
-              <item.icon size={19} />
-              {t(item.label)}
+              <item.icon size={19} className="shrink-0" />
+              <span className="max-w-full truncate">{t(item.label)}</span>
             </Link>
           )
         })}

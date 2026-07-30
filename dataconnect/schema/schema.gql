@@ -120,6 +120,8 @@ type CourseLecture @table(name: "course_lectures") {
   title: String!
   type: LectureType! @index
   videoUrl: String
+  originalVideoUrl: String
+  aiJobId: String
   content: String     
   duration: Int
   transcriptUrl: String

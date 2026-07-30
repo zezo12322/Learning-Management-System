@@ -15,6 +15,7 @@ import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { CheckoutDto } from './dto/checkout.dto';
@@ -24,7 +25,7 @@ export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
     private readonly dataConnectService: DataConnectService,
-  ) {}
+  ) { }
 
   // Strict rate limit: 5 checkout requests per 60 seconds (payment abuse protection).
   @Post('checkout')
@@ -34,6 +35,7 @@ export class PaymentsController {
     @Body(new ValidationPipe({ transform: true })) body: CheckoutDto,
     @Res() res: Response,
     @AuthToken() userAuthToken: string,
+    @CurrentUser('uid') userId: string,
   ) {
     // Server-side price validation: look up each item's actual price from the database.
     // Never trust client-provided prices.
@@ -114,15 +116,20 @@ export class PaymentsController {
     };
 
     try {
+      const returnUrl = body.returnUrl;
+
       const checkoutUrl = await this.paymentsService.generateCheckoutUrl(
         totalAmountCents,
         items,
         billingData,
         userAuthToken,
+        userId,
+        returnUrl,
       );
 
-      // Redirect user directly to the Paymob hosted checkout page
-      return res.redirect(HttpStatus.FOUND, checkoutUrl);
+      // Return the checkout URL to the frontend so it can redirect the user
+      // via window.location.href (avoiding CORS issues with 302 redirects in fetch)
+      return res.status(HttpStatus.OK).json({ checkoutUrl });
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Failed to initiate payment',
@@ -144,7 +151,9 @@ export class PaymentsController {
         }
       }
 
-      const status = body.obj.success ? 'SUCCESS' : 'FAILED';
+      // PaymentStatus enum only has PENDING/COMPLETED/FAILED/REFUNDED — a
+      // 'SUCCESS' literal is rejected by Data Connect enum validation.
+      const status = body.obj.success ? 'COMPLETED' : 'FAILED';
       // In NextGen API, the webhook might provide intention_id or order.id
       const referenceId =
         body.obj.intention_id?.toString() ||
@@ -167,7 +176,7 @@ export class PaymentsController {
           );
 
           // 3. If successful, enroll the user
-          if (status === 'SUCCESS') {
+          if (status === 'COMPLETED') {
             const paymentDetails: any =
               await this.dataConnectService.executeQueryAsAdmin(
                 'GetPaymentDetailsByReference',
@@ -221,7 +230,8 @@ export class PaymentsController {
   // Success/Fail redirect URL for the user browser to return to
   @Get('callback')
   async handleBrowserCallback(@Query() query: any, @Res() res: Response) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const defaultFrontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = query.returnUrl || defaultFrontendUrl;
 
     // Paymob redirects back here after payment
     if (query.success === 'true' || query.success === true) {

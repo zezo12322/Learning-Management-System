@@ -17,6 +17,21 @@
  * existing connector path unchanged.
  */
 export const ADMIN_OPERATIONS: Record<string, string> = {
+  // --- Readiness probe (HealthService, KAN-147) ---
+  // The cheapest real read available: one row from a small reference table.
+  // Proves in a single round trip that Data Connect is reachable, that the
+  // Postgres behind it is answering, and that the service-account credential is
+  // still valid. Runs on a monitor's cadence, so it must stay this small — and
+  // it must never be added to FORCE_ADMIN_OPERATIONS, since no user-token path
+  // should ever reach it.
+  HealthProbe: /* GraphQL */ `
+    query HealthProbe {
+      categories(limit: 1) {
+        id
+      }
+    }
+  `,
+
   // --- Granular progress worker (ProgressProcessor) ---
   GetLectureDuration: /* GraphQL */ `
     query GetLectureDuration($lectureId: UUID!) {
@@ -99,6 +114,55 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // Payment rows are NO_ACCESS in the connector (a client could otherwise
+  // fabricate them). The connector variant derives userId from auth.uid, which
+  // does not exist on the admin endpoint — so this variant takes the verified
+  // uid explicitly from PaymentsService.
+  LogPayment: /* GraphQL */ `
+    mutation LogPayment(
+      $userId: String!
+      $gateway: PaymentGateway!
+      $referenceId: String!
+      $amount: Int!
+      $currency: String = "EGP"
+      $customerEmailSnapshot: String!
+    ) {
+      payment_insert(
+        data: {
+          userId: $userId
+          customerEmailSnapshot: $customerEmailSnapshot
+          gateway: $gateway
+          status: PENDING
+          referenceId: $referenceId
+          amount: $amount
+          currency: $currency
+        }
+      )
+    }
+  `,
+
+  AddPaymentItem: /* GraphQL */ `
+    mutation AddPaymentItem(
+      $paymentId: UUID!
+      $targetType: PaymentItemTarget!
+      $courseId: UUID
+      $missionId: UUID
+      $subscriptionTierId: UUID
+      $price: Int!
+    ) {
+      paymentItem_insert(
+        data: {
+          paymentId: $paymentId
+          targetType: $targetType
+          courseId: $courseId
+          missionId: $missionId
+          subscriptionTierId: $subscriptionTierId
+          priceAtPurchase: $price
+        }
+      )
+    }
+  `,
+
   UpdatePaymentStatusByReference: /* GraphQL */ `
     mutation UpdatePaymentStatusByReference(
       $referenceId: String!
@@ -126,6 +190,19 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     }
   `,
 
+  // Paid-course enrollment gate (EnrollmentService): does this user have a
+  // COMPLETED payment that includes the course they are trying to enroll in?
+  GetUserCompletedPayments: /* GraphQL */ `
+    query GetUserCompletedPayments($userId: String!) {
+      payments(where: { userId: { eq: $userId }, status: { eq: COMPLETED } }) {
+        id
+        paymentItems_on_payment {
+          courseId
+        }
+      }
+    }
+  `,
+
   // --- Transcoding worker (TranscodingProcessor) ---
   AdminUpdateLecture: /* GraphQL */ `
     mutation AdminUpdateLecture(
@@ -133,6 +210,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $title: String
       $type: LectureType
       $videoUrl: String
+      $originalVideoUrl: String
+      $aiJobId: String
       $content: String
       $duration: Int
       $transcriptUrl: String
@@ -144,6 +223,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           title: $title
           type: $type
           videoUrl: $videoUrl
+          originalVideoUrl: $originalVideoUrl
+          aiJobId: $aiJobId
           content: $content
           duration: $duration
           transcriptUrl: $transcriptUrl
@@ -305,6 +386,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $title: String!
       $type: LectureType!
       $videoUrl: String
+      $originalVideoUrl: String
+      $aiJobId: String
       $content: String
       $duration: Int
       $transcriptUrl: String
@@ -317,6 +400,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           title: $title
           type: $type
           videoUrl: $videoUrl
+          originalVideoUrl: $originalVideoUrl
+          aiJobId: $aiJobId
           content: $content
           duration: $duration
           transcriptUrl: $transcriptUrl

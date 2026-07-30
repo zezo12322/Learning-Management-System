@@ -1,6 +1,30 @@
+import type { CourseLifecycleStatus } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 export type StatusTone = 'neutral' | 'brand' | 'info' | 'success' | 'warning' | 'danger'
+
+/**
+ * Course lifecycle status → pill label + tone. Single source of truth so the
+ * same course never renders a different colour on two surfaces.
+ */
+export const courseStatusMeta: Record<
+  CourseLifecycleStatus,
+  { labelKey: string; tone: StatusTone }
+> = {
+  DRAFT: { labelKey: 'courses.status.draft', tone: 'neutral' },
+  IN_REVIEW: { labelKey: 'courses.status.inReview', tone: 'warning' },
+  PUBLISHED: { labelKey: 'courses.status.published', tone: 'success' },
+  ARCHIVED: { labelKey: 'courses.status.archived', tone: 'neutral' },
+}
+
+/**
+ * Lookup that tolerates an unknown status. `status` reaches the client through an
+ * unchecked cast in the API mapper, so a value the backend adds later would
+ * otherwise be `undefined` here and crash the whole list on `.tone`.
+ */
+export function courseStatusOf(status: string) {
+  return courseStatusMeta[status as CourseLifecycleStatus] ?? courseStatusMeta.DRAFT
+}
 
 const tones: Record<StatusTone, string> = {
   neutral: 'bg-subtle text-content-secondary',
