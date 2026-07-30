@@ -1,33 +1,21 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-  Req,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Query, Req, BadRequestException } from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import {
-  CreateCourseDto,
-  UpdateCourseDto,
-  UpdateCourseStatusDto,
-} from './dto/course.dto';
+import { CreateCourseDto, UpdateCourseDto, UpdateCourseStatusDto } from './dto/course.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { AuditLoggingService } from '../logging/logging.service';
 
 @Controller('courses')
 @UseGuards(FirebaseAuthGuard, RolesGuard)
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(
+    private readonly coursesService: CoursesService,
+    private readonly auditLoggingService: AuditLoggingService,
+  ) {}
 
   // ==========================================
   // PUBLIC / STUDENT ROUTES
@@ -93,12 +81,24 @@ export class CoursesController {
 
   @Post()
   @Roles('admin', 'instructor')
-  create(
+  async create(
     @Body() dto: CreateCourseDto,
     @AuthToken() token: string,
     @CurrentUser('uid') uid: string,
+    @Req() req: any,
   ) {
-    return this.coursesService.create(dto, token, uid);
+    console.log('--- COURSES CONTROLLER CREATE ---');
+    console.log('Extracted uid:', uid);
+    const result = await this.coursesService.create(dto, token, uid);
+    // fire-and-forget — a Firestore failure must never affect the API response
+    this.auditLoggingService.createLog({
+      action: 'CREATE_COURSE',
+      adminUid: uid,
+      targetUid: result?.course_insert?.id ?? null,
+      ipAddress: req.ip,
+      details: dto,
+    });
+    return result;
   }
 
   @Get()
@@ -127,30 +127,60 @@ export class CoursesController {
   @Patch(':courseId')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  update(
+  async update(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseDto,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.coursesService.update(courseId, dto, token);
+    const result = await this.coursesService.update(courseId, dto, token);
+    this.auditLoggingService.createLog({
+      action: 'UPDATE_COURSE',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: courseId,
+      ipAddress: req.ip,
+      details: dto,
+    });
+    return result;
   }
 
   @Patch(':courseId/status')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  updateStatus(
+  async updateStatus(
     @Param('courseId') courseId: string,
     @Body() dto: UpdateCourseStatusDto,
     @AuthToken() token: string,
+    @Req() req: any,
   ) {
-    return this.coursesService.updateStatus(courseId, dto, token);
+    const result = await this.coursesService.updateStatus(courseId, dto, token);
+    this.auditLoggingService.createLog({
+      action: 'UPDATE_COURSE_STATUS',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: courseId,
+      ipAddress: req.ip,
+      details: dto,
+    });
+    return result;
   }
 
   @Delete(':courseId')
   @Roles('admin', 'instructor')
   @UseGuards(CourseAccessGuard)
-  softDelete(@Param('courseId') courseId: string, @AuthToken() token: string) {
-    return this.coursesService.softDelete(courseId, token);
+  async softDelete(
+    @Param('courseId') courseId: string,
+    @AuthToken() token: string,
+    @Req() req: any,
+  ) {
+    const result = await this.coursesService.softDelete(courseId, token);
+    this.auditLoggingService.createLog({
+      action: 'DELETE_COURSE',
+      adminUid: req.user?.uid ?? 'unknown',
+      targetUid: courseId,
+      ipAddress: req.ip,
+      details: { courseId },
+    });
+    return result;
   }
 
   // ==========================================

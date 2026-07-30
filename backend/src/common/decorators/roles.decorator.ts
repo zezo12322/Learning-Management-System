@@ -1,7 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 
 /** Global platform roles. Source of truth is the DB (UserRole/Role tables). */
-export type AppRole = 'admin' | 'instructor' | 'student';
+export type AppRole = 'admin' | 'instructor' | 'student' | 'super_admin';
 
 export const ROLES_KEY = 'roles';
 
