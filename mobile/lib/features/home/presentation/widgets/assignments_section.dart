@@ -22,8 +22,24 @@ class AssignmentsSection extends StatelessWidget {
 
         final submissions = snapshot.data?.data.missionSubmissions ?? [];
         
-        final submittedCount = submissions.where((s) => s.status == optimatech_dc.SubmissionStatus.PENDING).length;
-        final gradedCount = submissions.where((s) => s.status == optimatech_dc.SubmissionStatus.GRADED).length;
+        // `status` is an EnumValue<SubmissionStatus> wrapper (Known | Unknown),
+        // not the bare enum — comparing it directly to SubmissionStatus.X is
+        // always false, so both counters used to render 0 no matter the data.
+        // Compare through stringValue, which both wrapper variants expose.
+        final submittedCount = submissions
+            .where(
+              (s) =>
+                  s.status.stringValue ==
+                  optimatech_dc.SubmissionStatus.PENDING.name,
+            )
+            .length;
+        final gradedCount = submissions
+            .where(
+              (s) =>
+                  s.status.stringValue ==
+                  optimatech_dc.SubmissionStatus.GRADED.name,
+            )
+            .length;
         
         final assignments = [
           AssignmentModel(

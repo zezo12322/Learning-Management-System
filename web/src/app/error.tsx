@@ -4,7 +4,6 @@
 // a page under app/ white-screens with no UI. This renders a recoverable
 // fallback with a "Try again" button (Next.js calls reset() to re-render).
 export default function Error({
-  error,
   reset,
 }: {
   error: Error & { digest?: string }

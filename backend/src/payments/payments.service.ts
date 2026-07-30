@@ -18,6 +18,8 @@ export class PaymentsService {
     items: any[],
     billingData: any,
     userAuthToken: string,
+    userId: string,
+    returnUrl?: string,
   ): Promise<string> {
     const secretKey = this.configService.get<string>('PAYMOB_SECRET_KEY');
     const publicKey = this.configService.get<string>('PAYMOB_PUBLIC_KEY');
@@ -49,6 +51,19 @@ export class PaymentsService {
         email: billingData.email || 'customer@example.com',
       },
     };
+
+    const apiBaseUrl = this.configService
+      .get<string>('API_PUBLIC_URL', 'http://localhost:3001')
+      .replace(/\/+$/, '');
+    const defaultFrontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:3000',
+    );
+    const targetFrontendUrl = returnUrl || defaultFrontendUrl;
+    
+    // Dynamically set the callback URL so Paymob knows exactly where to redirect
+    // the user after checkout, passing the correct frontend URL back to our backend.
+    intentionBody.redirection_url = `${apiBaseUrl}/api/v1/payments/callback?returnUrl=${encodeURIComponent(targetFrontendUrl)}`;
 
     if (paymentMethods.length > 0) {
       intentionBody.payment_methods = paymentMethods;
@@ -84,6 +99,7 @@ export class PaymentsService {
       const paymentRes = await this.dataConnectService.executeMutation(
         'LogPayment',
         {
+          userId,
           gateway: 'PAYMOB',
           referenceId: intentionId.toString(),
           amount: amountCents,
@@ -92,7 +108,10 @@ export class PaymentsService {
         userAuthToken,
       );
 
-      const paymentId = paymentRes?.payment_insert;
+      // payment_insert returns the row key ({ id }); older connector responses
+      // returned the bare id — accept both shapes.
+      const insertKey = paymentRes?.payment_insert;
+      const paymentId = insertKey?.id ?? insertKey;
 
       // If we received items with targetType and ID, log them as well
       if (paymentId && Array.isArray(items)) {

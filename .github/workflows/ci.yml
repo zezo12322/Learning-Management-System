@@ -1,0 +1,264 @@
+name: CI
+
+# Runs on every pull request and on pushes to main (KAN-59).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to the same ref supersedes the previous run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # paths-filter reads the PR's changed files from the API, which needs this.
+  # Without it the action fails with "Resource not accessible by integration".
+  pull-requests: read
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # Decides which package jobs need to run. On a PR only the packages touched by
+  # the diff are built; on main everything runs so the trunk is always fully
+  # verified. Shared files (the workflow itself, root config) force a full run.
+  changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Fail open: the trailing 'true' means that if detection itself breaks, every
+    # package is built rather than silently skipped. Losing coverage is a worse
+    # failure than wasting a few runner minutes.
+    outputs:
+      backend: ${{ steps.filter.outputs.backend || steps.all.outputs.all || 'true' }}
+      web: ${{ steps.filter.outputs.web || steps.all.outputs.all || 'true' }}
+      functions: ${{ steps.filter.outputs.functions || steps.all.outputs.all || 'true' }}
+      mobile: ${{ steps.filter.outputs.mobile || steps.all.outputs.all || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: all
+        if: github.event_name != 'pull_request'
+        run: echo "all=true" >> "$GITHUB_OUTPUT"
+
+      - id: filter
+        if: github.event_name == 'pull_request'
+        # Never let a detection error block the run — the outputs above fall back
+        # to building everything.
+        continue-on-error: true
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            shared: &shared
+              - '.github/workflows/ci.yml'
+              - '.github/actions/**'
+            backend:
+              - *shared
+              - 'backend/**'
+              - 'dataconnect/**'
+            web:
+              - *shared
+              - 'web/**'
+            functions:
+              - *shared
+              - 'functions/**'
+              - 'dataconnect/**'
+            mobile:
+              - *shared
+              - 'mobile/**'
+
+  backend:
+    name: Backend (NestJS)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-package
+        with:
+          package: backend
+          node-version: ${{ env.NODE_VERSION }}
+
+      # `lint:ci` rather than `lint`: the latter passes --fix, which rewrites
+      # files and lets auto-fixable violations pass silently.
+      - run: npm run lint:ci
+
+      - run: npm run build
+
+      # Unit + service specs with coverage. The e2e suites (test:e2e:dc /
+      # :ratings / :stream) need live Data Connect + Firebase credentials, so they
+      # stay out of PR CI — see KAN-148 for running them against staging.
+      # json-summary is required by the summary step below — jest's default
+      # reporters do not include it. lcov is kept for the uploaded artifact.
+      - name: Test with coverage
+        run: >
+          npm run test:cov --
+          --ci
+          --coverageReporters=json-summary
+          --coverageReporters=lcov
+          --coverageReporters=text-summary
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo "### Backend coverage"
+            echo
+            if [ -f coverage/coverage-summary.json ]; then
+              node -e '
+                const t = require("./coverage/coverage-summary.json").total;
+                const row = k => `| ${k} | ${t[k].pct}% | ${t[k].covered}/${t[k].total} |`;
+                console.log("| Metric | % | Covered |");
+                console.log("|---|---|---|");
+                ["lines","statements","functions","branches"].forEach(k => console.log(row(k)));
+              '
+            else
+              echo "_No coverage summary produced._"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
+          retention-days: 7
+          if-no-files-found: ignore
+
+  web:
+    name: Web (Next.js)
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-package
+        with:
+          package: web
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm run lint
+
+      - run: npm run type-check
+
+      - run: npm test
+
+      # Reuse Next's build cache across runs; keyed on lockfile + sources so a
+      # source change still rebuilds what it must.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('web/package-lock.json') }}-${{ hashFiles('web/src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('web/package-lock.json') }}-
+            nextjs-${{ runner.os }}-
+
+      # No NEXT_PUBLIC_* secrets are set here on purpose: this proves the build
+      # does not depend on them (the API client falls back and warns loudly).
+      # The real values are injected by the deploy environment.
+      - run: npm run build
+
+  functions:
+    name: Firebase Functions
+    needs: changes
+    if: needs.changes.outputs.functions == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-node-package
+        with:
+          package: functions
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm run lint
+
+      # NOTE: `npm run build` and `npm test` are deliberately NOT run here.
+      # functions/ imports `@dataconnect/admin-generated`, a local `file:`
+      # dependency whose directory is gitignored, so it does not exist in a clean
+      # checkout and `tsc` fails with TS2307. Building it in CI requires
+      # `firebase dataconnect:sdk:generate` with project credentials. Tracked
+      # separately — do not "fix" this by unpinning the dependency.
+
+  mobile:
+    name: Mobile (Flutter)
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # Gate on real errors only. The first CI run measured the baseline: 0
+      # errors, but 26 warnings and 354 infos of pre-existing lint debt — and
+      # `flutter analyze` exits non-zero on any of them, which would block every
+      # PR on debt it did not introduce. Anything that fails to compile is an
+      # error and still fails this job. Tighten these flags as the debt is paid
+      # down (tracked in KAN-146).
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      # mobile/test currently holds a placeholder smoke test, so it must not gate
+      # merges yet; real widget/integration tests are tracked in KAN-146.
+      - run: flutter test
+        continue-on-error: true
+
+  # Single aggregate check. Because the package jobs are path-filtered, they are
+  # "skipped" (not "success") on unrelated PRs — which would stall a branch
+  # protection rule that required them directly. Require THIS job instead: it
+  # always runs, tolerates skips, and fails if any package job failed.
+  ci:
+    name: CI
+    if: always()
+    needs: [changes, backend, web, functions, mobile]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report job results
+        run: |
+          {
+            echo "### CI results"
+            echo
+            echo "| Job | Result |"
+            echo "|---|---|"
+            echo "| Detect changes | ${{ needs.changes.result }} |"
+            echo "| Backend | ${{ needs.backend.result }} |"
+            echo "| Web | ${{ needs.web.result }} |"
+            echo "| Functions | ${{ needs.functions.result }} |"
+            echo "| Mobile | ${{ needs.mobile.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if any job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::At least one CI job did not pass."
+          exit 1
+
+      - run: echo "All required jobs passed (skipped jobs are expected on path-filtered PRs)."

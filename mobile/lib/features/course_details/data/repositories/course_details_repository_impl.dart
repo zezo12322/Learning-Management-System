@@ -16,4 +16,20 @@ class CourseDetailsRepositoryImpl implements CourseDetailsRepository {
   Future<void> enrollInCourse(String courseId) async {
     return await remoteDataSource.enrollInCourse(courseId);
   }
+
+  @override
+  Future<String> createCourseCheckoutUrl({
+    required String courseId,
+    required int amountCents,
+  }) async {
+    return await remoteDataSource.createCourseCheckoutUrl(
+      courseId: courseId,
+      amountCents: amountCents,
+    );
+  }
+
+  @override
+  Future<bool> isEnrolledInCourse(String courseId) async {
+    return await remoteDataSource.isEnrolledInCourse(courseId);
+  }
 }

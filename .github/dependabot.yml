@@ -1,0 +1,78 @@
+version: 2
+
+# Grouping matters here: the audit baseline is 25-28 high-severity advisories per
+# npm package, almost all transitive dev tooling. Ungrouped, Dependabot would open
+# dozens of PRs at once. Each ecosystem is capped and updates are batched into a
+# couple of PRs per week instead.
+updates:
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      backend-production:
+        dependency-type: production
+        update-types: [minor, patch]
+      backend-development:
+        dependency-type: development
+        update-types: [minor, patch]
+    labels: [dependencies, backend]
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      web-production:
+        dependency-type: production
+        update-types: [minor, patch]
+      web-development:
+        dependency-type: development
+        update-types: [minor, patch]
+    labels: [dependencies, web]
+    ignore:
+      # Next.js and the OpenNext/Cloudflare adapter are version-coupled with the
+      # deploy target — majors need a coordinated upgrade, not an automated PR.
+      - dependency-name: next
+        update-types: [version-update:semver-major]
+      - dependency-name: '@opennextjs/cloudflare'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: npm
+    directory: /functions
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      functions-all:
+        patterns: ['*']
+        update-types: [minor, patch]
+    labels: [dependencies, functions]
+    ignore:
+      # Pinned to the Firebase Functions Node 22 runtime.
+      - dependency-name: firebase-functions
+        update-types: [version-update:semver-major]
+      - dependency-name: firebase-admin
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: pub
+    directory: /mobile
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    labels: [dependencies, mobile]
+
+  # Keeps the workflow actions themselves current — the supply chain CI runs on.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    labels: [dependencies, ci]

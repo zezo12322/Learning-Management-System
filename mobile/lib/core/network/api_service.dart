@@ -53,6 +53,24 @@ class ApiService {
     }
   }
 
+  /// POST that does NOT follow redirects: the payments checkout endpoint
+  /// answers with a 302 whose Location header is the Paymob checkout URL,
+  /// which the app opens in the browser instead of following server-side.
+  Future<Response> postNoRedirect(String endpoint, {dynamic data}) async {
+    try {
+      return await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) => status != null && status < 400,
+        ),
+      );
+    } on DioException catch (e) {
+      throw DioErrorHandler.handleDioException(e);
+    }
+  }
+
   Future<Response> put(String endpoint, {dynamic data}) async {
     try {
       return await _dio.put(endpoint, data: data);
