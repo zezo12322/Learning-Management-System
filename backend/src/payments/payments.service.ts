@@ -18,6 +18,8 @@ export class PaymentsService {
     items: any[],
     billingData: any,
     userAuthToken: string,
+    userId: string,
+    returnUrl?: string,
   ): Promise<string> {
     const secretKey = this.configService.get<string>('PAYMOB_SECRET_KEY');
     const publicKey = this.configService.get<string>('PAYMOB_PUBLIC_KEY');
@@ -50,6 +52,19 @@ export class PaymentsService {
       },
     };
 
+    const apiBaseUrl = this.configService
+      .get<string>('API_PUBLIC_URL', 'http://localhost:3001')
+      .replace(/\/+$/, '');
+    const defaultFrontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:3000',
+    );
+    const targetFrontendUrl = returnUrl || defaultFrontendUrl;
+    
+    // Dynamically set the callback URL so Paymob knows exactly where to redirect
+    // the user after checkout, passing the correct frontend URL back to our backend.
+    intentionBody.redirection_url = `${apiBaseUrl}/api/v1/payments/callback?returnUrl=${encodeURIComponent(targetFrontendUrl)}`;
+
     if (paymentMethods.length > 0) {
       intentionBody.payment_methods = paymentMethods;
     }
@@ -76,11 +91,15 @@ export class PaymentsService {
     const clientSecret = data.client_secret;
     const intentionId = data.intention_id; // For reference/logging
 
-    // 2. Log payment in Data Connect database (PENDING status)
+    // 2. Log payment in Data Connect database (PENDING status).
+    // IMPORTANT: if this fails we must abort — do NOT return the checkout URL.
+    // Without a database record the webhook has nothing to look up, so the
+    // user would pay on Paymob and never receive course access.
     try {
       const paymentRes = await this.dataConnectService.executeMutation(
         'LogPayment',
         {
+          userId,
           gateway: 'PAYMOB',
           referenceId: intentionId.toString(),
           amount: amountCents,
@@ -89,7 +108,10 @@ export class PaymentsService {
         userAuthToken,
       );
 
-      const paymentId = paymentRes?.payment_insert;
+      // payment_insert returns the row key ({ id }); older connector responses
+      // returned the bare id — accept both shapes.
+      const insertKey = paymentRes?.payment_insert;
+      const paymentId = insertKey?.id ?? insertKey;
 
       // If we received items with targetType and ID, log them as well
       if (paymentId && Array.isArray(items)) {
@@ -110,7 +132,14 @@ export class PaymentsService {
         }
       }
     } catch (error) {
-      this.logger.error('Failed to log payment in database', error);
+      this.logger.error('Failed to log payment in database — aborting checkout to prevent orphaned payment', error);
+      // Re-throw so the controller returns a 500 and the client never gets
+      // redirected to the Paymob checkout page. The Paymob intention was
+      // already created but the user has not been charged yet.
+      throw new HttpException(
+        'Payment session could not be recorded. Please try again.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // 3. Return the Unified Checkout URL
