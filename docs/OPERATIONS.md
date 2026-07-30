@@ -33,8 +33,9 @@ Railway deploy config lives in `backend/railway.json`. Cloudflare config lives i
 |---|---|---|
 | `.github/workflows/ci.yml` | every PR + push to `main` | Per-package lint / type-check / build / test. On a PR only the packages the diff touches run; `main` always runs everything. Backend publishes a coverage summary + artifact. The aggregate **`CI`** job is the one to require in branch protection — the package jobs are skipped (not passed) on unrelated PRs, which would otherwise stall a required check. |
 | `.github/workflows/security.yml` | every PR + push to `main` + weekly (Mon 06:00 UTC) | Secret scan (gitleaks — **blocking** on PRs over the commits the PR adds, informational full-history sweep otherwise; see §6), dependency review of what a PR adds, and `npm audit` per package. |
-| `.github/workflows/deploy-web.yml` | **manual only** (`workflow_dispatch`) | Reproducible Cloudflare deploy of `web/`. Runs in the `production` GitHub Environment, then health-checks the result. |
+| `.github/workflows/deploy-web.yml` | **manual only** (`workflow_dispatch`) | Reproducible Cloudflare deploy of `web/`, replacing `npm run deploy` from a laptop. Runs in the `production` GitHub Environment, then health-checks the result. |
 | `.github/workflows/deploy-backend.yml` | **manual only** (`workflow_dispatch`) | Lint + build + test, then `railway up` into the `production` Environment, then verifies **liveness and readiness** before reporting success. |
+| `.github/workflows/build-apk.yml` | **manual** + `v*` tags | Signed, obfuscated Android release build (APK / AAB) plus the de-obfuscation symbols. See `docs/MOBILE_RELEASE.md`. |
 | `.github/dependabot.yml` | weekly (Mon) | Grouped dependency PRs for the three npm packages, Flutter `pub`, and the GitHub Actions themselves. |
 
 **Audit gate:** `npm audit` blocks only on **critical**. The measured baseline was
