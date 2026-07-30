@@ -31,7 +31,10 @@ function normalizeRoles(request: any): AppRole[] {
 
   const normalized = Array.from(roles).filter(
     (role): role is AppRole =>
-      role === 'admin' || role === 'instructor' || role === 'student',
+      role === 'admin' ||
+      role === 'instructor' ||
+      role === 'student' ||
+      role === 'super_admin',
   );
 
   request.userRoles = normalized;
