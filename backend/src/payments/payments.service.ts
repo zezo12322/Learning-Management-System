@@ -76,7 +76,10 @@ export class PaymentsService {
     const clientSecret = data.client_secret;
     const intentionId = data.intention_id; // For reference/logging
 
-    // 2. Log payment in Data Connect database (PENDING status)
+    // 2. Log payment in Data Connect database (PENDING status).
+    // IMPORTANT: if this fails we must abort — do NOT return the checkout URL.
+    // Without a database record the webhook has nothing to look up, so the
+    // user would pay on Paymob and never receive course access.
     try {
       const paymentRes = await this.dataConnectService.executeMutation(
         'LogPayment',
@@ -110,7 +113,14 @@ export class PaymentsService {
         }
       }
     } catch (error) {
-      this.logger.error('Failed to log payment in database', error);
+      this.logger.error('Failed to log payment in database — aborting checkout to prevent orphaned payment', error);
+      // Re-throw so the controller returns a 500 and the client never gets
+      // redirected to the Paymob checkout page. The Paymob intention was
+      // already created but the user has not been charged yet.
+      throw new HttpException(
+        'Payment session could not be recorded. Please try again.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // 3. Return the Unified Checkout URL

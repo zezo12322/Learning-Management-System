@@ -73,6 +73,19 @@ export class EnrollmentService {
       throw new NotFoundException(`Mission ${missionId} not found`);
     }
 
+    // If mission is linked to a parent course, verify user is enrolled in that course
+    if (mission.courseId) {
+      const isEnrolled = await this.checkEnrollmentAsAdmin(
+        mission.courseId,
+        uid,
+      );
+      if (!isEnrolled) {
+        throw new BadRequestException(
+          `You must be enrolled in the parent course to enroll in this mission`,
+        );
+      }
+    }
+
     const existingData = await this.dc.executeQuery(
       'GetUserEnrollmentForMission',
       { missionId },

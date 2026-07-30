@@ -15,6 +15,11 @@ import {
   ALLOWED_IMAGE_MIME_TYPES,
 } from '../common/constants/storage-paths';
 
+// Magic-byte header size — file-type needs at most ~4100 bytes to identify
+// any format in its database. Downloading only this slice avoids pulling the
+// full (potentially 500 MB) file just for MIME verification.
+const MAGIC_BYTE_SLICE = 4100;
+
 interface UploadCaller {
   uid: string;
   token: string;
@@ -192,6 +197,11 @@ export class UploadsService {
       );
     }
 
+    // 4) Verify magic bytes — ensures the actual binary matches the declared
+    //    content type. Prevents a client from claiming `video/mp4` while
+    //    uploading a malicious executable or script.
+    await this.verifyMagicBytes(dto.storagePath, dto.contentType);
+
     const entityId =
       rule.confirm.idField === 'lectureId' ? dto.lectureId : dto.courseId;
     if (!entityId) {
@@ -277,5 +287,80 @@ export class UploadsService {
   private sanitize(filename: string): string {
     const base = filename.replace(/^.*[\\/]/, '');
     return base.replace(/[^\w.\- ]/g, '_').slice(0, 200) || 'file';
+  }
+
+  /**
+   * Downloads the first MAGIC_BYTE_SLICE bytes of the uploaded file and uses
+   * the `file-type` package to detect the actual MIME type from binary headers.
+   * Throws a 400 if the detected type does not match the client-declared type.
+   *
+   * `file-type` v16+ is ESM-only, so we use a dynamic import() to consume it
+   * from this CommonJS NestJS context.
+   */
+  private async verifyMagicBytes(
+    storagePath: string,
+    declaredContentType: string,
+  ): Promise<void> {
+    try {
+      // Download only the header slice — avoids pulling gigabytes for detection.
+      const bucket = this.firebase.getBucket();
+      const chunks: Buffer[] = [];
+      let bytesRead = 0;
+
+      await new Promise<void>((resolve, reject) => {
+        const stream = bucket
+          .file(storagePath)
+          .createReadStream({ start: 0, end: MAGIC_BYTE_SLICE - 1 });
+        stream.on('data', (chunk: Buffer) => {
+          chunks.push(chunk);
+          bytesRead += chunk.length;
+          if (bytesRead >= MAGIC_BYTE_SLICE) {
+            stream.destroy();
+            resolve();
+          }
+        });
+        stream.on('end', resolve);
+        stream.on('close', resolve);
+        stream.on('error', reject);
+      });
+
+      const header = Buffer.concat(chunks);
+
+      // Dynamic import required because file-type v16+ is ESM-only.
+      const { fileTypeFromBuffer } = await import('file-type');
+      const detected = await fileTypeFromBuffer(header);
+
+      if (!detected) {
+        // file-type cannot detect the format — the file may be a plain text
+        // type (e.g. application/pdf with a text header). Only block if the
+        // declared type is a binary format we know must have a magic number.
+        const binaryTypes = [...ALLOWED_VIDEO_MIME_TYPES, ...ALLOWED_IMAGE_MIME_TYPES];
+        if (binaryTypes.includes(declaredContentType)) {
+          throw new BadRequestException(
+            `File content does not match declared type "${declaredContentType}": no recognizable binary signature found.`,
+          );
+        }
+        // For PDF / DOCX / XLSX we allow file-type detection gaps and rely on
+        // the DTO allowlist + Storage rules as the primary gatekeepers.
+        return;
+      }
+
+      if (detected.mime !== declaredContentType) {
+        this.logger.warn(
+          `Magic-byte mismatch: declared="${declaredContentType}" detected="${detected.mime}" path="${storagePath}"`,
+        );
+        throw new BadRequestException(
+          `File content (${detected.mime}) does not match declared content type (${declaredContentType}).`,
+        );
+      }
+    } catch (err: any) {
+      // Re-throw BadRequestExceptions; wrap unexpected storage/detection errors
+      // as a generic 400 so partial uploads don't silently pass through.
+      if (err instanceof BadRequestException) throw err;
+      this.logger.error(`Magic-byte verification failed for ${storagePath}: ${err?.message}`);
+      throw new BadRequestException(
+        'Unable to verify uploaded file integrity. Please try again.',
+      );
+    }
   }
 }
