@@ -1,0 +1,210 @@
+name: Build Android Release
+
+# Manual, and on a version tag. Deliberately not on every push: a release build
+# takes minutes and produces artifacts nobody needs per-commit.
+on:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: What to build
+        type: choice
+        default: apk
+        options: [apk, appbundle, both]
+      ref:
+        description: Branch or tag to build
+        required: false
+        default: main
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Obfuscated release build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      # Runs BEFORE the Flutter/Java setup on purpose. The Google Services Gradle
+      # plugin only complains at :app:processReleaseGoogleServices, which is ~10
+      # minutes into the job — long after Dart has compiled. Checking here fails
+      # in seconds with an actionable message.
+      #
+      # The file is normally committed (it is public client config — see
+      # .gitignore and docs/MOBILE_RELEASE.md). The secret is a fallback for
+      # anyone who would rather keep it out of the tree.
+      - name: Verify google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          target=android/app/google-services.json
+          if [ -f "$target" ]; then
+            echo "Using the committed $target."
+          elif [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            # Accept raw JSON or base64, so it does not matter how it was pasted.
+            if [ "$(printf '%s' "$GOOGLE_SERVICES_JSON" | tr -d '[:space:]' | cut -c1)" = "{" ]; then
+              printf '%s' "$GOOGLE_SERVICES_JSON" > "$target"
+              echo "Wrote $target from the GOOGLE_SERVICES_JSON secret (raw JSON)."
+            elif printf '%s' "$GOOGLE_SERVICES_JSON" | base64 -d > "$target" 2>/dev/null; then
+              echo "Wrote $target from the GOOGLE_SERVICES_JSON secret (base64)."
+            else
+              echo "::error::GOOGLE_SERVICES_JSON is set but is neither valid JSON nor valid base64."
+              exit 1
+            fi
+          else
+            echo "::error::mobile/$target is missing and the GOOGLE_SERVICES_JSON secret is not set — Gradle cannot build a Firebase-enabled release without it."
+            echo "::error::Get it from Firebase console -> Project settings -> your Android app -> google-services.json, then commit it (preferred) or add it as the GOOGLE_SERVICES_JSON repository secret. See docs/MOBILE_RELEASE.md."
+            exit 1
+          fi
+
+          if ! jq -e . "$target" >/dev/null 2>&1; then
+            echo "::error::$target is not valid JSON."
+            exit 1
+          fi
+
+          # A file for the wrong package builds fine and then fails at runtime with
+          # an unhelpful Firebase init error, so check it against the real
+          # applicationId rather than hard-coding it here.
+          want=$(grep -oP 'applicationId\s*=\s*"\K[^"]+' android/app/build.gradle.kts)
+          if [ -z "$want" ]; then
+            echo "::error::Could not read applicationId from android/app/build.gradle.kts."
+            exit 1
+          fi
+          if ! jq -e --arg p "$want" \
+            'any(.client[]?; .client_info.android_client_info.package_name == $p)' \
+            "$target" >/dev/null; then
+            echo "::error::$target has no client for package '$want'. It belongs to a different app — re-download it for this Android app in the Firebase console."
+            echo "Packages present: $(jq -r '[.client[]?.client_info.android_client_info.package_name] | join(", ")' "$target")"
+            exit 1
+          fi
+          echo "google-services.json OK for package $want (project $(jq -r '.project_info.project_id' "$target"))."
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - run: flutter pub get
+
+      # Signing is optional so the workflow still produces a testable artifact
+      # before the keystore secrets exist — but an unsigned/debug-signed build is
+      # clearly marked as not publishable in the summary below.
+      - name: Configure release signing
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set — building with debug keys. This artifact CANNOT be published."
+            exit 0
+          fi
+          for name in KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::ANDROID_KEYSTORE_BASE64 is set but ANDROID_$name is missing."
+              exit 1
+            fi
+          done
+          echo "$KEYSTORE_BASE64" | base64 -d > android/release.jks
+          # storeFile is resolved relative to mobile/android/ by build.gradle.kts.
+          {
+            echo "storeFile=release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+          echo "Release signing configured."
+
+      # --obfuscate renames Dart symbols in libapp.so; --split-debug-info is
+      # mandatory alongside it and writes the symbol files needed to make a
+      # crash trace readable again. Those symbols are NOT in the APK — losing
+      # them means permanently unreadable stack traces for this build, which is
+      # why they are uploaded as an artifact below.
+      - name: Build APK
+        if: inputs.format == 'apk' || inputs.format == 'both' || startsWith(github.ref, 'refs/tags/')
+        run: |
+          flutter build apk --release \
+            --obfuscate --split-debug-info=build/symbols
+
+      - name: Build App Bundle
+        if: inputs.format == 'appbundle' || inputs.format == 'both'
+        run: |
+          flutter build appbundle --release \
+            --obfuscate --split-debug-info=build/symbols
+
+      - name: Upload APK
+        if: always() && hashFiles('mobile/build/app/outputs/flutter-apk/app-release.apk') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Upload App Bundle
+        if: always() && hashFiles('mobile/build/app/outputs/bundle/release/app-release.aab') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: mobile/build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      # Keep these forever-ish: without them, and without R8's mapping.txt, a
+      # crash report from this build is undecipherable.
+      - name: Upload de-obfuscation symbols
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deobfuscation-symbols
+          path: |
+            mobile/build/symbols
+            mobile/build/app/outputs/mapping/release/mapping.txt
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Android release build"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Ref | \`${{ inputs.ref || github.ref }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Dart obfuscation | enabled (\`--obfuscate\`) |"
+            echo "| R8 shrink + obfuscate | enabled (\`isMinifyEnabled\`) |"
+            if [ "${{ steps.signing.outputs.signed }}" = "true" ]; then
+              echo "| Signing | ✅ release keystore |"
+            else
+              echo "| Signing | ⚠️ **debug keys — NOT publishable** |"
+            fi
+            echo "| Result | ${{ job.status }} |"
+            echo
+            echo "Download the \`deobfuscation-symbols\` artifact and keep it with the release —"
+            echo "crash traces from an obfuscated build are unreadable without it."
+            echo
+            echo "**Smoke-test the artifact on a real device before publishing** (login, video"
+            echo "playback, payment). R8 can only be validated at runtime."
+          } >> "$GITHUB_STEP_SUMMARY"

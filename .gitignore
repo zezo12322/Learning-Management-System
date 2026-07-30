@@ -69,7 +69,17 @@ mobile/**/ephemeral/
 !backend/.env.example
 *.local
 .secret.local
-mobile/android/app/google-services.json
+# mobile/android/app/google-services.json is deliberately NOT ignored. It is
+# Firebase *client* config: the same project id, app id and API key already
+# committed in mobile/lib/core/config/firebase_options.dart, and shipped inside
+# every published APK. The Google Services Gradle plugin reads that exact path,
+# so ignoring it made a release build impossible from a clean clone — which is
+# how it broke the first Build Android Release run. See docs/MOBILE_RELEASE.md.
+# The real credential that must never be committed is the Admin SDK key, covered
+# by firebase-service-account*.json above.
+#
+# GoogleService-Info.plist is the same category, kept ignored only because no
+# iOS build exists yet; un-ignore it when one lands.
 mobile/ios/Runner/GoogleService-Info.plist
 
 # OS & Editor
