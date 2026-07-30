@@ -4,7 +4,9 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
+// Liveness only. Readiness (/health/ready) needs live Redis + Data Connect, so
+// it belongs with the other credentialed e2e suites, not here.
+describe('HealthController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {

@@ -1,0 +1,28 @@
+name: Setup Node package
+description: >
+  Sets up Node with an npm cache scoped to one package directory and runs a clean
+  install. Shared by the backend / web / functions jobs so the setup exists once.
+
+inputs:
+  package:
+    description: Package directory (backend | web | functions)
+    required: true
+  node-version:
+    description: Node major version
+    required: false
+    default: '22'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.package }}/package-lock.json
+
+    # `npm ci` (not `install`) so the lockfile is authoritative and a drifted
+    # lockfile fails the build instead of being silently rewritten.
+    - run: npm ci
+      shell: bash
+      working-directory: ${{ inputs.package }}
