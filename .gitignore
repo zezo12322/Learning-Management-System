@@ -65,6 +65,8 @@ mobile/**/ephemeral/
 .env
 .env.*
 !web/.env.local.example
+# Documents every backend variable with placeholder values only — no secrets.
+!backend/.env.example
 *.local
 .secret.local
 mobile/android/app/google-services.json
@@ -101,7 +103,9 @@ dataconnect_generated/
 *.iml
 
 # CI/CD
-.github/
+# NOTE: `.github/` must stay tracked — it is where GitHub reads workflows,
+# CODEOWNERS and templates from. Ignoring it silently prevented this repo from
+# having any CI at all (KAN-59). Only build output belongs here.
 functions/lib/
 
 # Local ad-hoc debug scripts (never commit — may contain DB credentials)

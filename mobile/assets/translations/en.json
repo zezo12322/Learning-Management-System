@@ -26,7 +26,8 @@
       "ok": "OK",
       "confirm": "Confirm",
       "cancel": "Cancel"
-    }
+    },
+    "egp": "EGP {}"
   },
   "errors": {
     "network": "No internet connection. Please check your network.",
@@ -105,7 +106,7 @@
       "login": "Login",
       "success": "The Account is created successfully."
     },
-    "error":{
+    "error": {
       "weakPassword": "The password provided is too weak.",
       "emailAlreadyInUse": "An account already exists for that email.",
       "networkError": "Please check your internet connection.",
@@ -155,7 +156,15 @@
     "go_home": "Go to Home"
   },
   "course_details": {
-    "you_might_also_like": "You might also like"
+    "you_might_also_like": "You might also like",
+    "enroll_now": "Enroll Now",
+    "buy_now": "Buy Now",
+    "price": "Price"
+  },
+  "payment": {
+    "start_failed": "Could not start the payment. Please try again.",
+    "could_not_open": "Could not open the payment page. Please try again.",
+    "pending_hint": "Payment is still being confirmed. Pull to refresh in a moment — your course will unlock automatically once the payment is confirmed."
   },
   "courses": {
     "title": "Courses",
@@ -271,7 +280,16 @@
       "select_theme": "Select Theme",
       "theme_system": "System",
       "theme_light": "Light Theme",
-      "theme_dark": "Dark Theme"
+      "theme_dark": "Dark Theme",
+      "delete_account": "Delete account"
+    },
+    "delete": {
+      "title": "Delete your account?",
+      "warning": "This permanently deletes your account and all your data — enrollments, progress, and certificates. This action cannot be undone.",
+      "password_label": "Confirm your password",
+      "password_required": "Enter your password to confirm.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "confirm": "Delete account"
     }
   },
   "lesson_learning": {
@@ -466,7 +484,16 @@
       "select_theme": "Select Theme",
       "theme_system": "System",
       "theme_light": "Light Theme",
-      "theme_dark": "Dark Theme"
+      "theme_dark": "Dark Theme",
+      "delete_account": "Delete account"
+    },
+    "delete": {
+      "title": "Delete your account?",
+      "warning": "This permanently deletes your account and all your data — enrollments, progress, and certificates. This action cannot be undone.",
+      "password_label": "Confirm your password",
+      "password_required": "Enter your password to confirm.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "confirm": "Delete account"
     }
   },
   "lesson_learning": {

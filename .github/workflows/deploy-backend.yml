@@ -1,0 +1,168 @@
+name: Deploy Backend
+
+# Manual only, for now (KAN-147).
+#
+# Railway currently auto-deploys `backend/` from `main`. Until that is turned off
+# in the Railway dashboard (Service → Settings → Source → disable "Deploy on
+# push"), adding a `push:` trigger here would deploy the same commit twice.
+#
+# Once auto-deploy is off, add:
+#
+#   push:
+#     branches: [main]
+#     paths: ['backend/**', 'dataconnect/**', '.github/workflows/deploy-backend.yml']
+#
+# and every merge to main will then wait on the `production` environment's
+# required reviewers — which is the manual approval gate this ticket asks for.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag to deploy
+        required: false
+        default: main
+
+concurrency:
+  # Never two backend deploys at once, and do not cancel one midway — a
+  # cancelled deploy can leave Railway mid-switch between two versions.
+  group: deploy-backend
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and deploy to Railway
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # THE APPROVAL GATE. Attach required reviewers to this GitHub Environment
+    # (Settings → Environments → production) and scope the deploy secrets to it.
+    # Until the environment exists this simply runs unprotected — creating it is
+    # the one-time setup step in docs/OPERATIONS.md §1.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      # Build and test before deploying. Railway builds the image itself, so
+      # this is not the artifact that ships — it is the gate that stops a broken
+      # commit from ever reaching the platform.
+      - uses: ./.github/actions/setup-node-package
+        with:
+          package: backend
+
+      - run: npm run lint:ci
+        working-directory: backend
+
+      - run: npm run build
+        working-directory: backend
+
+      - run: npm test
+        working-directory: backend
+
+      # Fail fast with an actionable message rather than a confusing CLI error.
+      - name: Verify deploy credentials are configured
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE: ${{ vars.RAILWAY_SERVICE }}
+        run: |
+          missing=""
+          [ -z "$RAILWAY_TOKEN" ] && missing="$missing RAILWAY_TOKEN(secret)"
+          [ -z "$RAILWAY_SERVICE" ] && missing="$missing RAILWAY_SERVICE(variable)"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing:$missing — see docs/OPERATIONS.md §1."
+            exit 1
+          fi
+          echo "Railway credentials present."
+
+      # `up --detach` uploads this checkout and returns once the build is queued;
+      # the health gate below is what decides whether it worked. Railway will not
+      # switch traffic to the new deployment until healthcheckPath returns 200
+      # (railway.json), so a failed boot leaves the previous version serving.
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_SERVICE: ${{ vars.RAILWAY_SERVICE }}
+        run: |
+          npm install -g @railway/cli@4
+          railway up --service "$RAILWAY_SERVICE" --detach
+
+      # The deploy is only "done" when the new version answers. Liveness proves
+      # the process booted; readiness proves it can actually reach Redis and Data
+      # Connect — a container that boots with a bad credential passes the first
+      # and fails the second, which is exactly the case worth catching here.
+      - name: Verify liveness
+        if: vars.API_HEALTH_URL != ''
+        env:
+          URL: ${{ vars.API_HEALTH_URL }}
+        run: |
+          echo "Polling $URL"
+          for attempt in $(seq 1 30); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$URL" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "Live (HTTP 200) after ${attempt} attempt(s)."
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code — retrying in 10s"
+            sleep 10
+          done
+          echo "::error::Backend did not become live. See docs/OPERATIONS.md §3 for rollback."
+          exit 1
+
+      - name: Verify readiness (dependencies reachable)
+        if: vars.API_READY_URL != ''
+        env:
+          URL: ${{ vars.API_READY_URL }}
+        run: |
+          echo "Polling $URL"
+          for attempt in $(seq 1 12); do
+            # One request, not two: the body and the status must describe the
+            # same probe, and readiness is a moving target during a deploy.
+            response=$(curl -sS -w '\n%{http_code}' "$URL" || printf '\n000')
+            code=$(printf '%s' "$response" | tail -n1)
+            body=$(printf '%s' "$response" | sed '$d')
+            if [ "$code" = "200" ]; then
+              echo "Ready: $body"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code — $body"
+            sleep 10
+          done
+          echo "::error::Backend is live but not ready — a dependency (Redis / Data Connect) is unreachable. See docs/OPERATIONS.md §2."
+          exit 1
+
+      # Same webhook the app posts to, so deploy failures land in the channel the
+      # on-call is already watching. The `secrets` context is not available in
+      # step `if:` conditions, so the presence check happens in the script.
+      - name: Notify on failure
+        if: failure()
+        env:
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+          REF: ${{ inputs.ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$ALERT_WEBHOOK_URL" ]; then
+            echo "No ALERT_WEBHOOK_URL configured — skipping notification."
+            exit 0
+          fi
+          text="🔴 *Backend deploy failed* — \`$REF\` @ \`${GITHUB_SHA:0:7}\`\n$RUN_URL"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            -d "$(printf '{"text":"%s"}' "$text")" \
+            "$ALERT_WEBHOOK_URL" || echo "Alert webhook post failed (non-fatal)."
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Backend deploy"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Ref | \`${{ inputs.ref }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Result | ${{ job.status }} |"
+            echo
+            echo "Rollback: Railway dashboard → Deployments → ⋯ → Rollback. See \`docs/OPERATIONS.md\` §3."
+          } >> "$GITHUB_STEP_SUMMARY"

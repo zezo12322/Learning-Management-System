@@ -1,0 +1,113 @@
+name: Deploy Web
+
+# Manual only — never on push. The web app currently ships by someone running
+# `npm run deploy` from their laptop, which means the build environment (and the
+# NEXT_PUBLIC_* values baked into the bundle) differs per person. This makes the
+# deploy reproducible without handing the trigger to every merge.
+#
+# Backend deploys are NOT here on purpose: Railway already deploys from `main`,
+# and adding a second path would double-deploy.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag to deploy
+        required: false
+        default: main
+
+concurrency:
+  # Never two web deploys at once, and do not cancel one midway.
+  group: deploy-web
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and deploy to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Attach required reviewers to this GitHub Environment to get a manual
+    # approval gate, and scope the deploy secrets to it (KAN-147). Until the
+    # environment exists this simply runs unprotected.
+    environment: production
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: ./.github/actions/setup-node-package
+        with:
+          package: web
+
+      # Fail fast with an actionable message instead of a confusing wrangler
+      # error 20 minutes into a build.
+      - name: Verify deploy credentials are configured
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=""
+          [ -z "$CLOUDFLARE_API_TOKEN" ] && missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -z "$CLOUDFLARE_ACCOUNT_ID" ] && missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing — add them under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Cloudflare credentials present."
+
+      # NEXT_PUBLIC_* values are inlined at build time, so they must be present
+      # here rather than at runtime. Anything unset falls back to the app's own
+      # guard (which logs loudly in production) instead of silently shipping a
+      # localhost URL.
+      - name: Build and deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_AI_ENABLED: ${{ vars.NEXT_PUBLIC_AI_ENABLED }}
+          NEXT_PUBLIC_AI_API_URL: ${{ vars.NEXT_PUBLIC_AI_API_URL }}
+          NEXT_PUBLIC_AI_PROVIDER: ${{ vars.NEXT_PUBLIC_AI_PROVIDER }}
+          NEXT_PUBLIC_DEFAULT_CATEGORY_ID: ${{ vars.NEXT_PUBLIC_DEFAULT_CATEGORY_ID }}
+        run: npm run deploy
+
+      - name: Post-deploy health check
+        if: vars.WEB_HEALTH_URL != ''
+        run: |
+          echo "Checking ${{ vars.WEB_HEALTH_URL }}"
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "${{ vars.WEB_HEALTH_URL }}" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "Healthy (HTTP 200)."
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code — retrying in 10s"
+            sleep 10
+          done
+          echo "::error::Web deploy did not become healthy. See docs/OPERATIONS.md §3 for rollback."
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Web deploy"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Ref | \`${{ inputs.ref }}\` |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Result | ${{ job.status }} |"
+            echo
+            echo "Rollback: \`npx wrangler rollback\` — see \`docs/OPERATIONS.md\` §3."
+          } >> "$GITHUB_STEP_SUMMARY"
