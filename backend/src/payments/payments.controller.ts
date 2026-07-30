@@ -56,16 +56,20 @@ export class PaymentsController {
     };
 
     try {
+      const returnUrl = body.returnUrl;
+
       const checkoutUrl = await this.paymentsService.generateCheckoutUrl(
         amountCents,
         items,
         billingData,
         userAuthToken,
         userId,
+        returnUrl,
       );
 
-      // Redirect user directly to the Paymob hosted checkout page
-      return res.redirect(HttpStatus.FOUND, checkoutUrl);
+      // Return the checkout URL to the frontend so it can redirect the user
+      // via window.location.href (avoiding CORS issues with 302 redirects in fetch)
+      return res.status(HttpStatus.OK).json({ checkoutUrl });
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Failed to initiate payment',
@@ -165,7 +169,8 @@ export class PaymentsController {
   // Success/Fail redirect URL for the user browser to return to
   @Get('callback')
   async handleBrowserCallback(@Query() query: any, @Res() res: Response) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const defaultFrontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const frontendUrl = query.returnUrl || defaultFrontendUrl;
 
     // Paymob redirects back here after payment
     if (query.success === 'true' || query.success === true) {
