@@ -1,10 +1,23 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Query, UseGuards, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  HttpStatus,
+  Get,
+  Query,
+  UseGuards,
+  UnauthorizedException,
+  ValidationPipe,
+  HttpException,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { DataConnectService } from '../firebase/dataconnect.service';
+import { CheckoutDto } from './dto/checkout.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -18,15 +31,72 @@ export class PaymentsController {
   @UseGuards(FirebaseAuthGuard)
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   async checkout(
-    @Body() body: any,
+    @Body(new ValidationPipe({ transform: true })) body: CheckoutDto,
     @Res() res: Response,
     @AuthToken() userAuthToken: string,
   ) {
-    // Expected to receive amount and user details for checkout
-    const amountCents = body.amountCents || 10000; // default 100 EGP for testing
-    const items = body.items || [];
+    // Server-side price validation: look up each item's actual price from the database.
+    // Never trust client-provided prices.
+    let totalAmountCents = 0;
+    const items: Array<{
+      targetType: string;
+      courseId?: string;
+      missionId?: string;
+      subscriptionTierId?: string;
+      price: number;
+    }> = [];
 
-    // Paymob requires all these fields
+    for (const item of body.items) {
+      let priceCents = 0;
+
+      if (item.targetType === 'COURSE' && item.courseId) {
+        // Fetch the actual course price from the database
+        const courseResult: any =
+          await this.dataConnectService.executeQueryAsAdmin('AdminGetCourse', {
+            courseId: item.courseId,
+          });
+        const course = courseResult?.course;
+        if (!course) {
+          throw new HttpException(
+            `Course ${item.courseId} not found`,
+            HttpStatus.NOT_FOUND,
+          );
+        }
+        priceCents = course.price || 0;
+      } else if (item.targetType === 'MISSION' && item.missionId) {
+        // Missions don't have a direct price - they're tied to courses.
+        // For simplicity, charge $0 for missions or look up the parent course.
+        // Returning 0 price for missions since they're bundled with courses.
+        priceCents = 0;
+      } else if (
+        item.targetType === 'SUBSCRIPTION' &&
+        item.subscriptionTierId
+      ) {
+        // Fetch subscription tier price
+        const subscriptionResult: any =
+          await this.dataConnectService.executeQueryAsAdmin(
+            'AdminGetSubscriptionTier',
+            { subscriptionTierId: item.subscriptionTierId },
+          );
+        const subscription = subscriptionResult?.subscriptionTier;
+        if (!subscription) {
+          throw new HttpException(
+            `Subscription tier ${item.subscriptionTierId} not found`,
+            HttpStatus.NOT_FOUND,
+          );
+        }
+        priceCents = subscription.price || 0;
+      }
+
+      // Add to total
+      totalAmountCents += priceCents;
+      items.push({
+        ...item,
+        price: priceCents,
+      });
+    }
+
+    // Default billing data if not provided
     const billingData = body.billingData || {
       apartment: 'NA',
       email: 'test@example.com',
@@ -45,7 +115,7 @@ export class PaymentsController {
 
     try {
       const checkoutUrl = await this.paymentsService.generateCheckoutUrl(
-        amountCents,
+        totalAmountCents,
         items,
         billingData,
         userAuthToken,
@@ -63,6 +133,7 @@ export class PaymentsController {
 
   // Paymob Server-to-Server webhook callback
   @Post('webhook')
+  @Throttle({ default: { ttl: 60000, limit: 60 } })
   async handleWebhook(@Body() body: any, @Query('hmac') hmac: string) {
     if (body.type === 'TRANSACTION' || body.type === 'INTENTION') {
       // 1. Verify HMAC for security
