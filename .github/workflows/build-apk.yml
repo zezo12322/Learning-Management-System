@@ -104,6 +104,12 @@ jobs:
 
       - run: flutter pub get
 
+      - name: Generate Data Connect SDKs
+        run: npx firebase-tools dataconnect:sdk:generate
+        working-directory: ${{ github.workspace }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
       # Signing is optional so the workflow still produces a testable artifact
       # before the keystore secrets exist — but an unsigned/debug-signed build is
       # clearly marked as not publishable in the summary below.

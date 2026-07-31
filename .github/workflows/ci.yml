@@ -150,6 +150,12 @@ jobs:
           package: web
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Generate Data Connect SDKs
+        run: npx firebase-tools dataconnect:sdk:generate
+        working-directory: ${{ github.workspace }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
       - run: npm run lint
 
       - run: npm run type-check
@@ -216,6 +222,13 @@ jobs:
           cache: true
 
       - run: flutter pub get
+
+      - name: Generate Data Connect SDKs
+        run: npx firebase-tools dataconnect:sdk:generate
+        working-directory: ${{ github.workspace }}
+        env:
+          # In case firebase-tools requires authentication for the project
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       # Gate on real errors only. The first CI run measured the baseline: 0
       # errors, but 26 warnings and 354 infos of pre-existing lint debt — and
