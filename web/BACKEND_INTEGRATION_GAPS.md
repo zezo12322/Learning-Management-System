@@ -16,9 +16,24 @@ No backend source files were changed by this integration.
 
 ## Backend work still required
 
-1. **AI chat and generation API**
-   - There is no NestJS AI module or REST route for chat, course generation, tutor messages, streaming responses, conversation history, or usage limits.
-   - The web keeps AI behind the optional `NEXT_PUBLIC_AI_API_URL` contract until these endpoints exist.
+1. ~~**AI chat API**~~ — **done.** `backend/src/ai/` now proxies the AI RAG service:
+   `POST /ai/lectures/:lectureId/chat` (Firebase auth + course-access/enrollment
+   check), `GET /ai/lectures/:lectureId/status`, and
+   `POST /ai/lectures/:lectureId/retry` (admin / owning instructor). The web calls
+   these through the shared `apiClient`; `NEXT_PUBLIC_AI_ENABLED` is now only a UI
+   on/off switch, and the web holds no AI URL or key.
+
+   Still missing on the backend:
+   - **No dedicated generation endpoint.** AI Studio actions are prompt presets
+     sent to the same chat route, so output is free text — a generated quiz is
+     prose, not structured JSON that could be saved as a real quiz.
+   - **No conversation history.** `sessionId` is passed through to the AI service
+     but nothing is persisted, so a reload loses the thread.
+   - **No streaming.** Answers arrive as one response; long answers just wait.
+   - **No per-user usage limits** on a paid AI service.
+   - The chat route collapses every AI-service failure into a single 500, so the
+     client cannot tell "not indexed yet" from "service down" — which is why the
+     status endpoint is polled separately.
 
 2. **Dashboard analytics**
    - No instructor dashboard summary exists for students, enrollments, completion, revenue, or activity.

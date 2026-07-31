@@ -219,12 +219,6 @@ export interface SignedUpload {
 
 export type UploadEntityType = 'COURSE_THUMBNAIL' | 'LECTURE_VIDEO' | 'LECTURE_TRANSCRIPT'
 
-export interface AIAvailability {
-  available: boolean
-  reason?: 'NOT_CONFIGURED' | 'UNREACHABLE'
-  provider?: string
-}
-
 // ── Quizzes (authoring) ──────────────────────────────────────────────
 export interface QuizOption {
   id?: string
