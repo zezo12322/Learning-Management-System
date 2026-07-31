@@ -44,6 +44,12 @@ jobs:
         with:
           package: web
 
+      - name: Generate Data Connect SDKs
+        run: npx firebase-tools dataconnect:sdk:generate
+        working-directory: ${{ github.workspace }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
       # Fail fast with an actionable message instead of a confusing wrangler
       # error 20 minutes into a build.
       - name: Verify deploy credentials are configured
