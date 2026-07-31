@@ -22,7 +22,10 @@ export class UploadsController {
   @Post('signed-url')
   @Throttle({ default: { ttl: 60000, limit: 10 } })
   async generateSignedUrl(@Body() dto: SignedUrlRequestDto, @Req() req: any) {
-    const result = await this.uploadsService.generateSignedUrl(dto, this.caller(req));
+    const result = await this.uploadsService.generateSignedUrl(
+      dto,
+      this.caller(req),
+    );
 
     // Audit Log: Upload Signed URL Request
     this.auditLoggingService.createLog({
@@ -30,7 +33,12 @@ export class UploadsController {
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: null,
       ipAddress: req.ip,
-      details: { entityType: dto.entityType, courseId: dto.courseId, lectureId: dto.lectureId, contentType: dto.contentType },
+      details: {
+        entityType: dto.entityType,
+        courseId: dto.courseId,
+        lectureId: dto.lectureId,
+        contentType: dto.contentType,
+      },
     });
 
     return result;
@@ -40,7 +48,10 @@ export class UploadsController {
   @Post('confirm')
   @Throttle({ default: { ttl: 60000, limit: 10 } })
   async confirmUpload(@Body() dto: ConfirmUploadDto, @Req() req: any) {
-    const result = await this.uploadsService.confirmUpload(dto, this.caller(req));
+    const result = await this.uploadsService.confirmUpload(
+      dto,
+      this.caller(req),
+    );
 
     // Audit Log: Upload Confirmed
     this.auditLoggingService.createLog({
@@ -48,7 +59,12 @@ export class UploadsController {
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: null,
       ipAddress: req.ip,
-      details: { entityType: dto.entityType, courseId: dto.courseId, lectureId: dto.lectureId, storagePath: dto.storagePath },
+      details: {
+        entityType: dto.entityType,
+        courseId: dto.courseId,
+        lectureId: dto.lectureId,
+        storagePath: dto.storagePath,
+      },
     });
 
     return result;

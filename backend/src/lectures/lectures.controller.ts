@@ -1,6 +1,21 @@
-import { Controller, Get, Post, Patch, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { LecturesService } from './lectures.service';
-import { CreateLectureDto, UpdateLectureDto, MoveLectureDto } from './dto/lecture.dto';
+import {
+  CreateLectureDto,
+  UpdateLectureDto,
+  MoveLectureDto,
+} from './dto/lecture.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -30,7 +45,12 @@ export class LecturesController {
     @AuthToken() token: string,
     @Req() req: any,
   ) {
-    const result = await this.lecturesService.create(courseId, sectionId, dto, token);
+    const result = await this.lecturesService.create(
+      courseId,
+      sectionId,
+      dto,
+      token,
+    );
     this.auditLoggingService.createLog({
       action: 'CREATE_LECTURE',
       adminUid: req.user?.uid ?? 'unknown',

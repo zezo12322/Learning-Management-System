@@ -1,4 +1,14 @@
-import { Controller, Post, Patch, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Patch,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { SectionsService } from './sections.service';
 import { CreateSectionDto, UpdateSectionDto } from './dto/section.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
@@ -69,7 +79,11 @@ export class SectionsController {
     @AuthToken() token: string,
     @Req() req: any,
   ) {
-    const result = await this.sectionsService.delete(courseId, sectionId, token);
+    const result = await this.sectionsService.delete(
+      courseId,
+      sectionId,
+      token,
+    );
     this.auditLoggingService.createLog({
       action: 'DELETE_SECTION',
       adminUid: req.user?.uid ?? 'unknown',

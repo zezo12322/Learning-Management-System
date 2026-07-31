@@ -24,7 +24,11 @@ export class EnrollmentController {
     @CurrentUser('uid') uid: string,
     @Req() req: any,
   ) {
-    const result = await this.enrollmentService.enrollInCourse(courseId, token, uid);
+    const result = await this.enrollmentService.enrollInCourse(
+      courseId,
+      token,
+      uid,
+    );
 
     // Audit Log: Enrollment in Course
     this.auditLoggingService.createLog({
@@ -53,7 +57,11 @@ export class EnrollmentController {
     @CurrentUser('uid') uid: string,
     @Req() req: any,
   ) {
-    const result = await this.enrollmentService.enrollInMission(missionId, token, uid);
+    const result = await this.enrollmentService.enrollInMission(
+      missionId,
+      token,
+      uid,
+    );
 
     // Audit Log: Enrollment in Mission
     this.auditLoggingService.createLog({
