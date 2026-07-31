@@ -26,6 +26,7 @@
     "zod": "^4.4.3"
   },
   "overrides": {
+    "brace-expansion": "^5.0.9",
     "firebase-admin": "$firebase-admin",
     "firebase-functions-test": {
       "firebase-functions": "$firebase-functions"

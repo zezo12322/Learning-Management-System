@@ -102,6 +102,7 @@
     "unrs-resolver": true
   },
   "overrides": {
+    "brace-expansion": "^5.0.9",
     "ts-jest": {
       "typescript": "$typescript"
     },
