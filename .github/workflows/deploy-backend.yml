@@ -120,7 +120,7 @@ jobs:
           URL: ${{ vars.API_READY_URL }}
         run: |
           echo "Polling $URL"
-          for attempt in $(seq 1 12); do
+          for attempt in $(seq 1 30); do
             # One request, not two: the body and the status must describe the
             # same probe, and readiness is a moving target during a deploy.
             response=$(curl -sS -w '\n%{http_code}' "$URL" || printf '\n000')
