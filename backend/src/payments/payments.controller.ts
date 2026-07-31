@@ -1,4 +1,17 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Query, UseGuards, UnauthorizedException, ValidationPipe, HttpException, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  HttpStatus,
+  Get,
+  Query,
+  UseGuards,
+  UnauthorizedException,
+  ValidationPipe,
+  HttpException,
+  Req,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { PaymentsService } from './payments.service';
 import type { Response } from 'express';
@@ -267,7 +280,8 @@ export class PaymentsController {
   // Success/Fail redirect URL for the user browser to return to
   @Get('callback')
   async handleBrowserCallback(@Query() query: any, @Res() res: Response) {
-    const defaultFrontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const defaultFrontendUrl =
+      process.env.FRONTEND_URL || 'http://localhost:3000';
     const frontendUrl = query.returnUrl || defaultFrontendUrl;
 
     // Paymob redirects back here after payment

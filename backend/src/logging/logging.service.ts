@@ -107,7 +107,7 @@ export class AuditLoggingService {
           ipAddress: data.ip_address,
           details: data.details,
         };
-      }) as AuditLog[];
+      });
     } catch (error) {
       this.logger.error('Failed to fetch audit logs', error);
       throw error;
@@ -136,7 +136,7 @@ export class AuditLoggingService {
           ipAddress: data.ip_address,
           details: data.details,
         };
-      }) as AuditLog[];
+      });
     } catch (error) {
       this.logger.error('Failed to export logs for user', error);
       throw error;

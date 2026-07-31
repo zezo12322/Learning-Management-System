@@ -60,7 +60,7 @@ export class PaymentsService {
       'http://localhost:3000',
     );
     const targetFrontendUrl = returnUrl || defaultFrontendUrl;
-    
+
     // Dynamically set the callback URL so Paymob knows exactly where to redirect
     // the user after checkout, passing the correct frontend URL back to our backend.
     intentionBody.redirection_url = `${apiBaseUrl}/api/v1/payments/callback?returnUrl=${encodeURIComponent(targetFrontendUrl)}`;
@@ -132,7 +132,10 @@ export class PaymentsService {
         }
       }
     } catch (error) {
-      this.logger.error('Failed to log payment in database — aborting checkout to prevent orphaned payment', error);
+      this.logger.error(
+        'Failed to log payment in database — aborting checkout to prevent orphaned payment',
+        error,
+      );
       // Re-throw so the controller returns a 500 and the client never gets
       // redirected to the Paymob checkout page. The Paymob intention was
       // already created but the user has not been charged yet.

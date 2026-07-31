@@ -1,4 +1,11 @@
-import { Controller, Get, Query, UseGuards, HttpStatus, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  HttpStatus,
+  Res,
+} from '@nestjs/common';
 import { AuditLoggingService, AuditLog } from './logging.service';
 import type { Response } from 'express';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -71,9 +78,11 @@ export class AuditLoggingController {
         if (log.timestamp && typeof log.timestamp.toDate === 'function') {
           dateStr = log.timestamp.toDate().toISOString();
         } else if (log.timestamp && (log.timestamp as any)._seconds) {
-          dateStr = new Date((log.timestamp as any)._seconds * 1000).toISOString();
+          dateStr = new Date(
+            (log.timestamp as any)._seconds * 1000,
+          ).toISOString();
         }
-        
+
         textContent += `[${dateStr}] ACTION: ${log.action}\n`;
         textContent += `  Admin UID:  ${log.adminUid}\n`;
         if (log.targetUid) {
@@ -93,7 +102,7 @@ export class AuditLoggingController {
         'Content-Disposition',
         'attachment; filename="system_audit_logs.txt"',
       );
-      
+
       return res.status(HttpStatus.OK).send(textContent);
     } catch (error) {
       return res
