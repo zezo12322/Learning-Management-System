@@ -18,7 +18,15 @@ describe('UploadsService', () => {
       generateSignedReadUrl: jest.fn().mockResolvedValue('signed-read'),
       makeFilePublic: jest.fn().mockResolvedValue('https://public/url'),
       fileExists: jest.fn().mockResolvedValue(true),
-      getBucket: jest.fn().mockReturnValue({ name: 'bucket' }),
+      getBucket: jest.fn().mockReturnValue({
+        name: 'bucket',
+        file: jest.fn().mockReturnValue({
+          createReadStream: jest.fn().mockReturnValue({
+            on: jest.fn(),
+            pipe: jest.fn(),
+          }),
+        }),
+      }),
     };
     dc = {
       executeQuery: jest.fn(),
@@ -31,6 +39,7 @@ describe('UploadsService', () => {
         .mockResolvedValue({ jobId: 'transcode-L1', status: 'queued' }),
     };
     svc = new UploadsService(firebase, dc, access as any, transcoding as any);
+    svc.verifyMagicBytes = jest.fn().mockResolvedValue(undefined);
   });
 
   describe('generateSignedUrl', () => {

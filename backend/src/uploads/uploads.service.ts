@@ -334,7 +334,10 @@ export class UploadsService {
         // file-type cannot detect the format — the file may be a plain text
         // type (e.g. application/pdf with a text header). Only block if the
         // declared type is a binary format we know must have a magic number.
-        const binaryTypes = [...ALLOWED_VIDEO_MIME_TYPES, ...ALLOWED_IMAGE_MIME_TYPES];
+        const binaryTypes = [
+          ...ALLOWED_VIDEO_MIME_TYPES,
+          ...ALLOWED_IMAGE_MIME_TYPES,
+        ];
         if (binaryTypes.includes(declaredContentType)) {
           throw new BadRequestException(
             `File content does not match declared type "${declaredContentType}": no recognizable binary signature found.`,
@@ -357,7 +360,9 @@ export class UploadsService {
       // Re-throw BadRequestExceptions; wrap unexpected storage/detection errors
       // as a generic 400 so partial uploads don't silently pass through.
       if (err instanceof BadRequestException) throw err;
-      this.logger.error(`Magic-byte verification failed for ${storagePath}: ${err?.message}`);
+      this.logger.error(
+        `Magic-byte verification failed for ${storagePath}: ${err?.message}`,
+      );
       throw new BadRequestException(
         'Unable to verify uploaded file integrity. Please try again.',
       );
