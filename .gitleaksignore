@@ -26,6 +26,11 @@ f0e1fde8e6053753de6df92cdf78d614eab38e08:mobile/android/app/google-services.json
 # Same two current_key values as the f0e1fde entries above, same file, same lines.
 7dd1500d182dc1d46362a1f58b5913424777abb2:mobile/android/app/google-services.json:gcp-api-key:23
 7dd1500d182dc1d46362a1f58b5913424777abb2:mobile/android/app/google-services.json:gcp-api-key:67
+ee6cb99aa3e63151298ffcdc7984394df2e3b80d:mobile/android/app/google-services.json:gcp-api-key:23
+ee6cb99aa3e63151298ffcdc7984394df2e3b80d:mobile/android/app/google-services.json:gcp-api-key:67
+21e243b42c7a0fcc58dc4350f41862e8da0c8c45:mobile/android/app/google-services.json:gcp-api-key:23
+21e243b42c7a0fcc58dc4350f41862e8da0c8c45:mobile/android/app/google-services.json:gcp-api-key:67
+ebf373997d566c045a9b696d356cb618faf4e44f:backend/test/vulnerabilities and logging/LMS-Audit-Logs-Testing.postman_collection.json:gcp-api-key:11
 
 # ── Test fixtures ───────────────────────────────────────────────────────────
 # Hard-coded throwaway keys in an encryption unit test, named mockSecretKey and
