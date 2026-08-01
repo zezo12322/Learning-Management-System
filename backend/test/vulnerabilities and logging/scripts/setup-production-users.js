@@ -104,6 +104,13 @@ async function initializeAndSetup() {
       displayName: 'Test Student 1',
       claims: { roles: ['student'], companyId: null },
     },
+    {
+      uid: 'test-student-002',
+      email: 'student2@test.com',
+      password: 'password123',
+      displayName: 'Test Student 2',
+      claims: { roles: ['student'], companyId: null },
+    },
   ];
 
   console.log('🔧 Setting up test users in production Firebase...\n');
@@ -151,6 +158,7 @@ async function initializeAndSetup() {
   console.log('   Admin 2:     admin2@test.com / password123');
   console.log('   Instructor:  instructor@test.com / password123');
   console.log('   Student 1:   student1@test.com / password123');
+  console.log('   Student 2:   student2@test.com / password123');
   console.log('\n🚀 You can now use the Postman collection!\n');
 
   process.exit(0);

@@ -84,7 +84,7 @@ async function initializeAndSetup() {
     },
     {
       uid: 'test-student-002',
-      email: 'student1@test.com',
+      email: 'student2@test.com',
       password: 'password123',
       displayName: 'Test Student 2 (Not Enrolled)',
       claims: { roles: ['student'], companyId: null },
@@ -102,7 +102,7 @@ async function initializeAndSetup() {
       password: 'password123',
       displayName: 'Test Admin 1',
       claims: { roles: ['admin'], companyId: null },
-    },    
+    },
     {
       uid: 'test-admin-002',
       email: 'admin2@test.com',
@@ -110,7 +110,7 @@ async function initializeAndSetup() {
       displayName: 'Test Admin 2',
       claims: { roles: ['admin'], companyId: null },
     },
-        {
+    {
       uid: 'test-super-admin-001',
       email: 'superadmin@test.com',
       password: 'password123',
@@ -134,7 +134,12 @@ async function initializeAndSetup() {
       });
       console.log(`✅ Created user: ${user.email}`);
     } catch (error) {
-      if (error.code === 'auth/uid-exists' || error.code === 'auth/email-already-exists' || error.message.includes('already exists') || error.message.includes('already in use')) {
+      if (
+        error.code === 'auth/uid-exists' ||
+        error.code === 'auth/email-already-exists' ||
+        error.message.includes('already exists') ||
+        error.message.includes('already in use')
+      ) {
         console.log(
           `⚠️  User already exists: ${user.email} (using existing user)`,
         );
