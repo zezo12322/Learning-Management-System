@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards, BadRequestException } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';
@@ -18,7 +18,15 @@ export class UsersController {
   // Strict rate limit: 5 sync requests per 60 seconds (brute-force protection).
   @Post('sync')
   @Throttle({ default: { ttl: 60000, limit: 5 } })
-  sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
+  async sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
+    // Phase 3: Egyptian legal compliance - ToS acceptance validation
+    // If acceptedToS is provided, it must be true
+    if (dto.acceptedToS !== undefined && dto.acceptedToS !== true) {
+      throw new BadRequestException(
+        'Terms of Service acceptance is required. Please accept the ToS before registering.',
+      );
+    }
+
     return this.usersService.sync(dto, token);
   }
 

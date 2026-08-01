@@ -1,7 +1,8 @@
 mutation SyncUser(
   $email: String!, 
   $name: String!, 
-  $avatar: String
+  $avatar: String,
+  $acceptedToS: Boolean!
 ) @auth(level: USER) {
   user_upsert(
     data: {
@@ -9,6 +10,7 @@ mutation SyncUser(
       email: $email, 
       name: $name, 
       avatar: $avatar,
+      tosAcceptedAt_expr: if $acceptedToS then "request.time" else null end,
       lastLogin_expr: "request.time"
     }
   )
