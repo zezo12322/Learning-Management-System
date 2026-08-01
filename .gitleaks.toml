@@ -1,0 +1,8 @@
+[allowlist]
+paths = [
+    "mobile/android/app/google-services\\.json",
+    "mobile/lib/core/config/firebase_options\\.dart",
+    "mobile/lib/firebase_options\\.dart",
+    "functions/src/functionTests/encryptionService\\.test\\.ts",
+    "backend/README\\.md"
+]
