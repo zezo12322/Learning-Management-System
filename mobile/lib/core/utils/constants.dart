@@ -8,6 +8,12 @@ abstract class AppConstants{
   /// Set to false to use the production API.
   static const bool useLocalBackend = false;
 
+  /// Paid-course checkout is off for the closed beta: the Paymob flow still
+  /// enrolls on an unverified INTENTION webhook, so the app must not open a
+  /// checkout. Free enrollment is unaffected. Flip to true only once the
+  /// backend webhook verifies HMAC on every state-changing event.
+  static const bool paymentsEnabled = false;
+
   /// Your Production API URL goes here!
   static const String prodApiUrl = 'https://learning-management-system-production-a97c.up.railway.app/api/v1';
 

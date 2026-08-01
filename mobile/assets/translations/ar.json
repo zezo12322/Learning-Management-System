@@ -368,7 +368,11 @@
     "go_home": "الذهاب للرئيسية"
   },
   "course_details": {
-    "you_might_also_like": "قد يعجبك أيضاً"
+    "you_might_also_like": "قد يعجبك أيضاً",
+    "enroll_now": "سجّل الآن",
+    "buy_now": "اشترِ الآن",
+    "price": "السعر",
+    "paid_unavailable": "غير متاح حالياً"
   },
   "courses": {
     "title": "الكورسات",
@@ -552,7 +556,17 @@
     "title": "المعلم الذكي",
     "coming_soon": "المعلم الذكي قريباً",
     "coming_soon_body": "اسأل أسئلة حول دروسك واحصل على إجابات تستند إلى محتوى الدورة - نحن نضع اللمسات الأخيرة عليها.",
-    "disclaimer": "مدعوم بالذكاء الاصطناعي"
+    "disclaimer": "مدعوم بالذكاء الاصطناعي",
+    "assignments": {
+      "available": "متاحة",
+      "submitted": "تم التسليم",
+      "graded": "تم التقييم",
+      "empty": "لا توجد تكليفات",
+      "available_desc": "مفتوحة للتسليم",
+      "submitted_desc": "بانتظار المراجعة",
+      "graded_desc": "عرض الملاحظات",
+      "empty_desc": "أنت منجز كل شيء"
+    }
   },
   "chatbot": {
     "title": "الروبوت الذكي",

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
 
@@ -33,6 +34,9 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
   /// Paid course: fetch the Paymob checkout URL from the backend and expose it
   /// as a one-shot [CourseDetailsLoaded.checkoutUrl] for the view to open.
   Future<void> buyCourse(String courseId, double price) async {
+    // Closed beta: checkout is off (AppConstants.paymentsEnabled). The paid CTA
+    // is already disabled, so this only guards against a future caller.
+    if (!AppConstants.paymentsEnabled) return;
     if (state is! CourseDetailsLoaded) return;
     final currentState = state as CourseDetailsLoaded;
     if (currentState.isPurchasing || currentState.isEnrolling) return;
