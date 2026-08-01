@@ -1,4 +1,5 @@
 import { BuilderShell } from '@/components/layout/BuilderShell'
+import { StaffGate } from '@/components/layout/StaffGate'
 
 export default async function StudioLayout({
   children,
@@ -8,5 +9,9 @@ export default async function StudioLayout({
   params: Promise<{ courseId: string }>
 }) {
   const { courseId } = await params
-  return <BuilderShell courseId={courseId}>{children}</BuilderShell>
+  return (
+    <StaffGate>
+      <BuilderShell courseId={courseId}>{children}</BuilderShell>
+    </StaffGate>
+  )
 }

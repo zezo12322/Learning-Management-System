@@ -28,7 +28,11 @@ jobs:
   build:
     name: Obfuscated release build
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # A cold release build on a hosted runner (no Gradle cache, R8 shrink +
+    # Dart obfuscation, CMake install) measured 45m and was killed at the old
+    # 40m ceiling with the APK almost finished. 75m leaves headroom without
+    # letting a genuinely hung build sit for hours.
+    timeout-minutes: 75
     defaults:
       run:
         working-directory: mobile

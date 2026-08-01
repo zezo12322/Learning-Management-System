@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 
 class CourseEnrollBottomBar extends StatelessWidget {
   const CourseEnrollBottomBar({
@@ -20,6 +21,9 @@ class CourseEnrollBottomBar extends StatelessWidget {
   /// Paid courses show a "Buy now" CTA that goes through Paymob checkout
   /// instead of the free "Enroll now" flow.
   final bool isPaidCourse;
+
+  bool get _ctaDisabled =>
+      isEnrolling || (isPaidCourse && !AppConstants.paymentsEnabled);
 
   @override
   Widget build(BuildContext context) {
@@ -106,56 +110,63 @@ class CourseEnrollBottomBar extends StatelessWidget {
             ),
           ),
           Gap(12.w),
-          Container(
-            width: 160.w,
-            height: 48.h,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.primary,
-                  Color.lerp(
-                      colorScheme.primary, const Color(0xFF1E1B4B), 0.45)!,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14.r),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: isEnrolling ? null : onEnroll,
-                borderRadius: BorderRadius.circular(14.r),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (isEnrolling)
-                      SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.w,
-                        ),
-                      )
-                    else ...[
-                      Text(
-                        isPaidCourse
-                            ? 'course_details.buy_now'.tr()
-                            : 'course_details.enroll_now'.tr(),
-                        style: TextStyles.labelLarge.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeights.semiBold,
-                        ),
-                      ),
-                      Gap(6.w),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 18.sp,
-                        color: Colors.white,
-                      ),
-                    ],
+          Opacity(
+            opacity: _ctaDisabled ? 0.5 : 1,
+            child: Container(
+              width: 160.w,
+              height: 48.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.primary,
+                    Color.lerp(
+                        colorScheme.primary, const Color(0xFF1E1B4B), 0.45)!,
                   ],
+                ),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _ctaDisabled ? null : onEnroll,
+                  borderRadius: BorderRadius.circular(14.r),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isEnrolling)
+                        SizedBox(
+                          width: 20.w,
+                          height: 20.w,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.w,
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          isPaidCourse
+                              ? (AppConstants.paymentsEnabled
+                                  ? 'course_details.buy_now'.tr()
+                                  : 'course_details.paid_unavailable'.tr())
+                              : 'course_details.enroll_now'.tr(),
+                          style: TextStyles.labelLarge.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeights.semiBold,
+                          ),
+                        ),
+                        if (!_ctaDisabled) ...[
+                          Gap(6.w),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 18.sp,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -582,6 +582,12 @@ const en: Dict = {
   'payment.failed.hint': 'If the problem keeps happening, try another payment method or contact support.',
   'payment.failed.cta': 'Browse the catalog',
   'payment.backToDashboard': 'Back to dashboard',
+
+  // Staff-only gate (web is the authoring console; learners use the mobile app)
+  'staffOnly.title': 'Instructors only',
+  'staffOnly.body':
+    'This workspace is for instructors and admins. Learners take their courses in the Optima mobile app.',
+  'staffOnly.signOut': 'Sign out',
 }
 
 const ar: Dict = {
@@ -1152,6 +1158,12 @@ const ar: Dict = {
   'payment.failed.hint': 'إذا تكررت المشكلة، جرِّب وسيلة دفع أخرى أو تواصل مع الدعم.',
   'payment.failed.cta': 'تصفّح الكتالوج',
   'payment.backToDashboard': 'العودة إلى لوحة التحكم',
+
+  // Staff-only gate (web is the authoring console; learners use the mobile app)
+  'staffOnly.title': 'للمدرّبين فقط',
+  'staffOnly.body':
+    'مساحة العمل هذه مخصّصة للمدرّبين والمشرفين. أما الدارسون فيتابعون دوراتهم عبر تطبيق أوبتيما للهاتف.',
+  'staffOnly.signOut': 'تسجيل الخروج',
 }
 
 export const dictionaries: Record<Locale, Dict> = { en, ar }

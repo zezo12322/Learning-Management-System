@@ -6,6 +6,7 @@ import {
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ShutdownService } from './health/shutdown.service';
 
 /**
@@ -25,7 +26,7 @@ const DRAIN_DELAY_MS = Number(process.env.SHUTDOWN_DRAIN_DELAY_MS ?? 5000);
 const SHUTDOWN_TIMEOUT_MS = Number(process.env.SHUTDOWN_TIMEOUT_MS ?? 20000);
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // The global error filter + access log (KAN-60) are registered as APP_FILTER /
   // APP_INTERCEPTOR providers in AppModule, so they resolve through the DI
@@ -72,6 +73,12 @@ async function bootstrap() {
     },
     credentials: true,
   });
+
+  // Behind Railway's proxy every request arrives with the same socket address,
+  // so the throttler buckets all clients together and a handful of concurrent
+  // users (the video progress heartbeat alone) 429s everyone. Trust the single
+  // platform proxy hop so req.ip is the real client.
+  app.set('trust proxy', 1);
 
   // Global prefix for all routes
   app.setGlobalPrefix('api/v1');

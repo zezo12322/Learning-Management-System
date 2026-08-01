@@ -368,7 +368,11 @@
     "go_home": "Go to Home"
   },
   "course_details": {
-    "you_might_also_like": "You might also like"
+    "you_might_also_like": "You might also like",
+    "enroll_now": "Enroll Now",
+    "buy_now": "Buy Now",
+    "price": "Price",
+    "paid_unavailable": "Not available yet"
   },
   "courses": {
     "title": "Courses",
@@ -552,7 +556,17 @@
     "title": "AI Tutor",
     "coming_soon": "AI Tutor is coming soon",
     "coming_soon_body": "Ask questions about your lessons and get answers grounded in the course content — we're putting the finishing touches on it.",
-    "disclaimer": "Powered by AI"
+    "disclaimer": "Powered by AI",
+    "assignments": {
+      "available": "Available",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "empty": "No Assignments",
+      "available_desc": "Open for submission",
+      "submitted_desc": "Awaiting review",
+      "graded_desc": "View feedback",
+      "empty_desc": "You are all caught up"
+    }
   },
   "chatbot": {
     "title": "Optimatech chatbot",
