@@ -51,7 +51,7 @@ export class AuditLoggingService {
       if (typeof details === 'object' && details !== null) {
         serializableDetails = JSON.parse(JSON.stringify(details));
       } else {
-        serializableDetails = {} as Record<string, unknown>;
+        serializableDetails = {};
       }
 
       await docRef.set({
