@@ -1,16 +1,15 @@
 mutation SyncUser(
   $email: String!, 
-  $name: String!, 
-  $avatar: String,
-  $acceptedToS: Boolean!
-) @auth(level: USER) {
+  $name: String!,
+  $avatar: String
+)
+@auth(level: USER) {
   user_upsert(
     data: {
-      id_expr: "auth.uid", 
-      email: $email, 
-      name: $name, 
+      id_expr: "auth.uid",
+      email: $email,
+      name: $name,
       avatar: $avatar,
-      tosAcceptedAt_expr: if $acceptedToS then "request.time" else null end,
       lastLogin_expr: "request.time"
     }
   )
@@ -19,7 +18,26 @@ mutation SyncUser(
 query GetMe @auth(level: USER) {
   user(id_expr: "auth.uid") {
     id email name avatar createdAt lastLogin profile_on_user { bio company phone syncedPreferences } userRoles_on_user { role { name } }
+    acceptedTosId tosAcceptedAt
   }
+}
+
+query GetUserToSStatus($uid: String!) @auth(level: NO_ACCESS) {
+  user(id: $uid) {
+    id
+    acceptedTosId
+    tosAcceptedAt
+  }
+}
+
+mutation AcceptCurrentToS($tosId: UUID!) @auth(level: USER) {
+  user_upsert(
+    data: {
+      id_expr: "auth.uid"
+      acceptedTosId: $tosId
+      tosAcceptedAt_expr: "request.time"
+    }
+  )
 }
 
 mutation UpdateMyProfile($bio: String, $company: String, $phone: String, $preferences: Any) @auth(level: USER) {

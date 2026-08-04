@@ -23,22 +23,38 @@ enum SubmissionStatus { PENDING, GRADED, RETURNED, REJECTED }
 # IDENTITY & ACCESS
 # ==========================================
 type User @table(name: "users") {
-  id: String! @col(name: "uid") 
+  id: String! @col(name: "uid")
   email: String!
   name: String!
   avatar: String
   encryptedNationalId: String
   tosAcceptedAt: Timestamp
+  acceptedTosId: UUID
   createdAt: Timestamp! @default(expr: "request.time") @index
   lastLogin: Timestamp
 }
 
+# ==========================================
+# LEGAL DOCUMENTS
+# ==========================================
+type TermsOfService @table(name: "terms_of_service") {
+  id: UUID! @default(expr: "uuidV4()")
+  version: String! @unique
+  title: String!
+  documentUrl: String!
+  effectiveAt: Timestamp! @default(expr: "request.time") @index
+  createdAt: Timestamp! @default(expr: "request.time") @index
+  updatedAt: Timestamp! @default(expr: "request.time") @index
+  publishedAt: Timestamp
+  isCurrent: Boolean! @default(value: "false") @index
+}
+
 type Profile @table(name: "profiles", key: ["user"]) {
-  user: User! @index 
+  user: User! @index
   bio: String
   company: String
   phone: String
-  syncedPreferences: Any 
+  syncedPreferences: Any
 }
 
 type Role @table(name: "roles") {
@@ -54,7 +70,7 @@ type Permission @table(name: "permissions") {
 }
 
 type UserRole @table(name: "user_roles", key: ["user", "role"]) {
-  user: User! @index 
+  user: User! @index
   role: Role!
 }
 
@@ -79,7 +95,7 @@ type Course @table(name: "courses") {
   id: UUID! @default(expr: "uuidV4()")
   title: String!
   description: String
-  price: Int! 
+  price: Int!
   status: CourseStatus! @index
   language: String!
   level: CourseLevel!
@@ -102,7 +118,7 @@ type Course @table(name: "courses") {
 
 type CourseInstructor @table(name: "course_instructors", key: ["course", "user"]) {
   course: Course! @index
-  user: User! @index 
+  user: User! @index
 }
 
 type CourseSection @table(name: "course_sections") {
@@ -123,7 +139,7 @@ type CourseLecture @table(name: "course_lectures") {
   videoUrl: String
   originalVideoUrl: String
   aiJobId: String
-  content: String     
+  content: String
   duration: Int
   transcriptUrl: String
   isFreePreview: Boolean!
@@ -134,7 +150,7 @@ type CourseLecture @table(name: "course_lectures") {
 }
 
 # ==========================================
-# QUIZZES 
+# QUIZZES
 # ==========================================
 type CourseQuiz @table(name: "course_quizzes") {
   id: UUID! @default(expr: "uuidV4()")
@@ -150,18 +166,18 @@ type QuizQuestion @table(name: "quiz_questions") {
   id: UUID! @default(expr: "uuidV4()")
   quiz: CourseQuiz! @index
   questionText: String!
-  order: Int! @index         
-  points: Float! @default(expr: "1.0") 
-  explanation: String 
+  order: Int! @index
+  points: Float! @default(expr: "1.0")
+  explanation: String
   deletedAt: Timestamp @index
 }
 
-type QuizOption @table(name: "quiz_options") { 
+type QuizOption @table(name: "quiz_options") {
   id: UUID! @default(expr: "uuidV4()")
   question: QuizQuestion!
   text: String!
   order: Int! @index
-  isCorrect: Boolean! @default(expr: "false") 
+  isCorrect: Boolean! @default(expr: "false")
 }
 
 # ==========================================
@@ -169,15 +185,15 @@ type QuizOption @table(name: "quiz_options") {
 # ==========================================
 type Mission @table(name: "missions") {
   id: UUID! @default(expr: "uuidV4()")
-  course: Course @index 
+  course: Course @index
   title: String!
   scenarioDescription: String!
   durationMinutes: Int!
-  category: Category! 
-  difficulty: MissionDifficulty! 
+  category: Category!
+  difficulty: MissionDifficulty!
   skillsTested: [String!]!
-  author: User! @index        
-  createdBy: User!     
+  author: User! @index
+  createdBy: User!
   createdAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index
   deletedAt: Timestamp @index
@@ -188,9 +204,9 @@ type MissionMicroLesson @table(name: "mission_micro_lessons") {
   mission: Mission! @index
   title: String!
   type: LectureType! @index
-  assetUrl: String 
+  assetUrl: String
   content: String
-  durationSeconds: Int 
+  durationSeconds: Int
   order: Int! @index
 }
 
@@ -208,19 +224,19 @@ type RubricCriterion @table(name: "rubric_criteria") {
   criterionName: String!
   description: String
   maxPoints: Float!
-  order: Int! @index 
+  order: Int! @index
 }
 
 type MissionSubmission @table(name: "mission_submissions") {
   id: UUID! @default(expr: "uuidV4()")
   mission: Mission! @index
-  student: User! @index 
-  grader: User 
+  student: User! @index
+  grader: User
   fileUrl: String!
   feedback: String
-  status: SubmissionStatus! @default(expr: "'PENDING'") @index 
-  attemptNumber: Int! @default(expr: "1") 
-  submittedAt: Timestamp! @default(expr: "request.time") @index 
+  status: SubmissionStatus! @default(expr: "'PENDING'") @index
+  attemptNumber: Int! @default(expr: "1")
+  submittedAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index
 }
 
@@ -235,10 +251,10 @@ type MissionSubmissionScore @table(name: "mission_submission_scores", key: ["sub
 # ==========================================
 type Enrollment @table(name: "enrollments") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @index 
-  targetType: EnrollmentTarget! @index 
-  course: Course @index 
-  mission: Mission @index 
+  user: User! @index
+  targetType: EnrollmentTarget! @index
+  course: Course @index
+  mission: Mission @index
   status: EnrollmentStatus! @index
   enrolledAt: Timestamp! @default(expr: "request.time") @index
   completedAt: Timestamp @index
@@ -265,10 +281,10 @@ type CourseRating @table(name: "course_ratings", key: ["user", "course"]) {
 
 type QuizAttempt @table(name: "quiz_attempts") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @index 
+  user: User! @index
   quiz: CourseQuiz! @index
-  score: Float      
-  passed: Boolean   
+  score: Float
+  passed: Boolean
   startedAt: Timestamp! @default(expr: "request.time") @index
   completedAt: Timestamp @index
 }
@@ -283,8 +299,8 @@ type Session @table(name: "sessions") {
   id: UUID! @default(expr: "uuidV4()")
   course: Course! @index
   title: String!
-  hostUser: User      
-  capacity: Int       
+  hostUser: User
+  capacity: Int
   startTime: Timestamp! @index
   endTime: Timestamp!
   type: SessionType!
@@ -297,7 +313,7 @@ type Session @table(name: "sessions") {
 
 type Attendance @table(name: "attendance") {
   id: UUID! @default(expr: "uuidV4()")
-  student: User! @index 
+  student: User! @index
   session: Session!
   status: AttendanceStatus!
   method: AttendanceMethod!
@@ -309,12 +325,12 @@ type Attendance @table(name: "attendance") {
 # ==========================================
 type Certificate @table(name: "certificates") {
   id: UUID! @default(expr: "uuidV4()")
-  user: User! @index 
-  targetType: CertificateTarget! 
+  user: User! @index
+  targetType: CertificateTarget!
   course: Course @index
   mission: Mission @index
   issuedAt: Timestamp! @default(expr: "request.time") @index
-  expiresAt: Timestamp           
+  expiresAt: Timestamp
   verificationHash: String! @unique
   assetUrl: String!
 }
@@ -325,28 +341,28 @@ type Certificate @table(name: "certificates") {
 type SubscriptionTier @table(name: "subscription_tiers") {
   id: UUID! @default(expr: "uuidV4()")
   name: String! @unique
-  price: Int! 
-  billingCycle: BillingCycle! 
-  features: [String!]!        
-  isActive: Boolean! @default(expr: "true") 
+  price: Int!
+  billingCycle: BillingCycle!
+  features: [String!]!
+  isActive: Boolean! @default(expr: "true")
 }
 
 type Payment @table(name: "payments") {
   id: UUID! @default(expr: "uuidV4()")
-  
+
   # 1. Relation is now optional (User instead of User!) and implicitly uses SET_NULL
   user: User @index
-  
+
   # 2. Static Snapshot: Store this at checkout so you never lose the audit trail!
   #    Default '' makes the column migration non-destructive (existing rows get
   #    filled automatically). New rows always set the real value in LogPayment
   #    via auth.token.email, so the default only ever applies to back-migration.
   customerEmailSnapshot: String! @default(expr: "''")
-  
+
   gateway: PaymentGateway!
   status: PaymentStatus! @index
-  amount: Int!               
-  currency: String! @default(expr: "'EGP'") 
+  amount: Int!
+  currency: String! @default(expr: "'EGP'")
   referenceId: String! @unique
   createdAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index
@@ -354,26 +370,26 @@ type Payment @table(name: "payments") {
 
 type UserSubscription @table(name: "user_subscriptions") {
   id: UUID! @default(expr: "uuidV4()")
-  
+
   # Subscriptions are kept for historical metrics, but the user link is severed
   user: User @index
-  
+
   tier: SubscriptionTier!
-  payment: Payment           
+  payment: Payment
   status: SubscriptionStatus!
   startDate: Timestamp!
   endDate: Timestamp!
   autoRenew: Boolean!
-  cancelledAt: Timestamp     
-  cancelReason: String       
+  cancelledAt: Timestamp
+  cancelReason: String
 }
 
 type PaymentItem @table(name: "payment_items") {
   id: UUID! @default(expr: "uuidV4()")
   payment: Payment!
-  targetType: PaymentItemTarget! 
+  targetType: PaymentItemTarget!
   course: Course @index
   mission: Mission @index
-  subscriptionTier: SubscriptionTier 
-  priceAtPurchase: Int! 
+  subscriptionTier: SubscriptionTier
+  priceAtPurchase: Int!
 }

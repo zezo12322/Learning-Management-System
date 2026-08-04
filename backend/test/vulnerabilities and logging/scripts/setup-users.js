@@ -52,7 +52,7 @@ async function initializeAndSetup() {
   // Initialize Firebase Admin SDK for emulator
   process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099';
 
-  const serviceAccount = require('../../firebase-service-account.json');
+  const serviceAccount = require('../../../firebase-service-account.json');
 
   // Use a named app to avoid conflicts with existing default app
   const APP_NAME = 'setup-script';

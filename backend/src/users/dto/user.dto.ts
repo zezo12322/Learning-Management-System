@@ -3,15 +3,12 @@ import {
   IsEmail,
   IsOptional,
   IsNotEmpty,
-  IsBoolean,
   MaxLength,
 } from 'class-validator';
 
 /**
  * Provisions/refreshes the authenticated user's core record (M9). The uid is
  * taken server-side from the verified token (auth.uid) — never from the body.
- * Egyptian legal compliance requires ToS acceptance.
- * The frontend MUST send acceptedToS: true for registration to proceed.
  */
 export class SyncUserDto {
   @IsEmail()
@@ -26,10 +23,6 @@ export class SyncUserDto {
   @IsString()
   @MaxLength(1000)
   avatar?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  acceptedToS?: boolean;
 }
 
 export class UpdateProfileDto {

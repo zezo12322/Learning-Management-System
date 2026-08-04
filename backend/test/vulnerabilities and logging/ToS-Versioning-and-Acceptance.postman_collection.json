@@ -1,0 +1,578 @@
+{
+  "info": {
+    "name": "LMS ToS Versioning & Acceptance",
+    "_postman_id": "lms-tos-versioning-acceptance",
+    "description": "## LMS ToS Versioning & Acceptance Testing Collection\n\nTests the Terms of Service lifecycle: admin creates/publishes versions, public reads them, and users accept them.\n\n### Prerequisites\n1. Backend running: `cd backend && npm run start:dev`\n2. Redis running: `docker compose -f backend/docker-compose.yml up -d redis`\n3. Test users created via `setup-online-users.js`\n4. Update `firebaseApiKey` variable with your Firebase project's API key\n\n### Test Accounts\n| Role | Email | Password |\n|------|-------|----------|\n| Admin | admin1@test.com | password123 |\n| Student 1 | student1@test.com | password123 |\n\n### Run Order\n00 → 01 → 02 → 03\n\n### Endpoints Covered\n| Endpoint | Role | Description |\n|----------|------|-------------|\n| POST /admin/tos | admin | Create ToS version (draft) |\n| GET /admin/tos/:id | admin | Get ToS by ID |\n| PUT /admin/tos/:id | admin | Update draft ToS |\n| POST /admin/tos/:id/publish | admin | Publish ToS (becomes current) |\n| GET /admin/tos/current | admin | Get current published ToS |\n| GET /tos/current | public | Get current ToS (no auth) |\n| GET /tos/history | public | Get ToS history (no auth) |\n| GET /me/tos/status | student | Check acceptance status |\n| POST /me/tos/accept | student | Accept current ToS |\n\n### Expected Results\n- ✅ PASS = Request succeeded (200/201) and returned the expected data\n- ❌ FAIL = Request failed or returned unexpected data",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "backendUrl", "value": "http://localhost:3001/api/v1", "type": "string" },
+    {
+      "key": "firebaseApiKey",
+      "value": "PUT_YOUR_FIREBASE_API_KEY_HERE",
+      "type": "string"
+    },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "student1Token", "value": "", "type": "string" },
+    { "key": "tosId", "value": "", "type": "string" },
+    { "key": "student1Uid", "value": "test-student-001", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "00 – Auth Setup (Run First)",
+      "description": "Login test users and sync them to the database.\nRun all in order before anything else.",
+      "item": [
+        {
+          "name": "01 Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('adminToken', json.idToken);",
+                  "    console.log('✅ adminToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin1@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            },
+            "description": "📌 NO DATA NEEDED – credentials pre-filled.\nStores token in {{adminToken}}. Required for folder 01 (admin CRUD)."
+          }
+        },
+        {
+          "name": "02 Login Student 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('student1Token', json.idToken);",
+                  "    console.log('✅ student1Token stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"student1@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            },
+            "description": "📌 NO DATA NEEDED – credentials pre-filled.\nStores token in {{student1Token}}. Required for folder 03 (acceptance)."
+          }
+        },
+        {
+          "name": "03 Sync all users to DB",
+          "item": [
+            {
+              "name": "01 Sync Admin to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin1@test.com\",\n  \"name\": \"Test Admin 1\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "02 Sync Student 1 to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"name\": \"Test Student 1\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 – ToS Versioning (Admin CRUD)",
+      "description": "Admin creates, reads, updates, and publishes a ToS version.\nRun after folder 00. Saves {{tosId}} automatically.",
+      "item": [
+        {
+          "name": "01 Create ToS v1.0 → stores tosId (Expected: 200 + tosVersion_insert.id)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ ToS created (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const id = json?.tosVersion_insert?.id || json?.id;",
+                  "if (id) {",
+                  "    pm.collectionVariables.set('tosId', id);",
+                  "    console.log('✅ tosId saved:', id, '| CreateToS log written');",
+                  "} else {",
+                  "    console.error('❌ Could not extract tosId from:', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"1.0\",\n  \"title\": \"Terms of Service v1.0\",\n  \"documentUrl\": \"https://optimatech.app/legal/tos-v1.0.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/tos",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "tos"]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- version (string) ✅\n- title (string) ✅\n- documentUrl (string) ✅\n\nOptional: effectiveDate\n\n→ Saves {{tosId}}"
+          }
+        },
+        {
+          "name": "02 Get ToS by ID → verifies draft (Expected: 200 + tosVersions[0].id matches tosId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ ToS fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const tos = json?.tosVersions?.[0] || json;",
+                  "if (tos?.id) {",
+                  "    console.log('✅ ToS: version=' + tos.version + ' isCurrent=' + tos.isCurrent);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/tos/{{tosId}}",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "tos", "{{tosId}}"]
+            },
+            "description": "📌 NO DATA NEEDED – {{tosId}} auto-set from step 01.\nFetches the draft ToS by its saved ID."
+          }
+        },
+        {
+          "name": "03 Update ToS draft → title changed (Expected: 200 + tosVersion_update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ ToS updated (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ ToS draft updated');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Terms of Service v1.0 (Revised)\",\n  \"documentUrl\": \"https://optimatech.app/legal/tos-v1.0-rev.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/tos/{{tosId}}",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "tos", "{{tosId}}"]
+            },
+            "description": "📌 NO DATA NEEDED – {{tosId}} auto-set.\nUpdates the DRAFT ToS (published versions are immutable)."
+          }
+        },
+        {
+          "name": "04 Publish ToS → becomes current (Expected: 200 + isCurrent=true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ ToS published (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ ToS published as current');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/tos/{{tosId}}/publish",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "tos", "{{tosId}}", "publish"]
+            },
+            "description": "📌 NO DATA NEEDED – {{tosId}} auto-set.\nArchives all current ToS and marks this one as current with a publishedAt timestamp."
+          }
+        },
+        {
+          "name": "05 Get current ToS (admin) → published version (Expected: 200 + isCurrent=true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Current ToS fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const tos = json?.tosVersions?.[0] || json;",
+                  "if (tos?.id) {",
+                  "    console.log('✅ Current ToS: version=' + tos.version);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/tos/current",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "tos", "current"]
+            },
+            "description": "📌 NO DATA NEEDED.\nReturns the currently published ToS."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 – ToS Reading (Public, no auth)",
+      "description": "Public read-only endpoints that don't require authentication.\nRun after folder 01 (a ToS must be published).",
+      "item": [
+        {
+          "name": "01 Get public current ToS (Expected: 200 + current ToS object)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Public current ToS fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "if (json?.id) {",
+                  "    console.log('✅ Public current ToS: version=' + json.version);",
+                  "} else {",
+                  "    console.warn('⚠️ No current ToS published yet — run folder 01 first');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/tos/current",
+              "host": ["{{backendUrl}}"],
+              "path": ["tos", "current"]
+            },
+            "description": "📌 NO DATA NEEDED – public endpoint.\nReturns the currently published ToS without auth."
+          }
+        },
+        {
+          "name": "02 Get ToS history (public) → all versions (Expected: 200 + tosVersions array)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Public history fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const versions = json?.tosVersions || json;",
+                  "if (Array.isArray(versions)) {",
+                  "    console.log('✅ History has ' + versions.length + ' version(s)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/tos/history",
+              "host": ["{{backendUrl}}"],
+              "path": ["tos", "history"]
+            },
+            "description": "📌 NO DATA NEEDED – public endpoint.\nReturns all ToS versions ordered by effective date (desc)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 – ToS Acceptance (Student)",
+      "description": "Student checks status and accepts the current ToS.\nRun after folder 02 (a ToS must be published).",
+      "item": [
+        {
+          "name": "01 Get acceptance status → needsAcceptance=true (Expected: 200 + needsAcceptance:true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Status fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "console.log('✅ needsAcceptance=' + json.needsAcceptance);",
+                  "if (json.current) {",
+                  "    console.log('   Current ToS: version=' + json.current.version);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/me/tos/status",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "tos", "status"]
+            },
+            "description": "📌 NO DATA NEEDED – uses {{student1Token}}.\nReturns needsAcceptance, acceptedAt, and current ToS."
+          }
+        },
+        {
+          "name": "02 Accept current ToS (Expected: 200 + user_upsert with acceptedTosId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Accepted (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ Current ToS accepted');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/tos/accept",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "tos", "accept"]
+            },
+            "description": "📌 NO DATA NEEDED – uses {{student1Token}}.\nSets acceptedTosId to the current ToS and tosAcceptedAt to now."
+          }
+        },
+        {
+          "name": "03 Get acceptance status after → needsAcceptance=false (Expected: 200 + needsAcceptance:false)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('✅ Status fetched (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "if (json.needsAcceptance === false) {",
+                  "    console.log('✅ Student accepted current ToS (needsAcceptance=false)');",
+                  "} else {",
+                  "    console.warn('⚠️ needsAcceptance=' + json.needsAcceptance + ' — acceptance may not have persisted');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/me/tos/status",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "tos", "status"]
+            },
+            "description": "📌 NO DATA NEEDED – uses {{student1Token}}.\nVerifies acceptance persisted."
+          }
+        }
+      ]
+    }
+  ]
+}
