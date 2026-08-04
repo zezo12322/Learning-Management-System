@@ -6,6 +6,9 @@ import { FirebaseService } from '../firebase/firebase.service';
 export class AuditLoggingService {
   private readonly logger = new Logger(AuditLoggingService.name);
   private readonly collectionName = 'system_audit_logs';
+  // The (default) database doesn't exist — the project uses a named database.
+  // The Firestore database ID, e.g. "(default)" or a custom name like "optimatech-lms".
+  private readonly databaseId = 'optimatech-lms';
 
   /**
    * NOTE: A TTL (Time-to-Live) Policy must be set in Google Cloud Console for this collection.
@@ -16,7 +19,11 @@ export class AuditLoggingService {
 
   private get firestore(): FirebaseFirestore.Firestore {
     // Access the private firebaseApp via type assertion — needed for Firestore init.
-    return getFirestore((this.firebaseService as any).firebaseApp);
+    // Pass the named database ID so writes/reads hit "optimatech-lms" instead of "(default)".
+    return getFirestore(
+      (this.firebaseService as any).firebaseApp,
+      this.databaseId,
+    );
   }
 
   /**
@@ -38,13 +45,22 @@ export class AuditLoggingService {
     try {
       const docRef = this.firestore.collection(this.collectionName).doc();
 
+      // Convert details to plain JSON to avoid serialization errors
+      // (DTOs and other objects with custom prototypes can't be serialized by Firestore)
+      let serializableDetails: Record<string, unknown>;
+      if (typeof details === 'object' && details !== null) {
+        serializableDetails = JSON.parse(JSON.stringify(details));
+      } else {
+        serializableDetails = {} as Record<string, unknown>;
+      }
+
       await docRef.set({
         action,
         admin_uid: adminUid,
         target_uid: targetUid,
         timestamp: Timestamp.now(),
         ip_address: ipAddress || null,
-        details,
+        details: serializableDetails,
       });
 
       this.logger.log(

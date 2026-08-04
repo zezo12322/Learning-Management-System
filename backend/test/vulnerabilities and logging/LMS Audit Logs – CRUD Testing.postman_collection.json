@@ -1,0 +1,1708 @@
+{
+  "info": {
+    "_postman_id": "165e319a-97b3-46bc-8d04-02b5f69023ad",
+    "name": "LMS Audit Logs – CRUD Testing",
+    "description": "## LMS Audit Logs – CRUD Testing\n\nThis collection triggers every action logged to Firestore `system_audit_logs` and reads them back.\n\n### Logged Actions\n| Action | Triggered By |\n|--------|-------------|\n| `USER_SYNC` | POST /me/sync |\n| `CREATE_COURSE` | POST /courses |\n| `UPDATE_COURSE` | PATCH /courses/:id |\n| `DELETE_COURSE` | DELETE /courses/:id |\n| `CREATE_SECTION` | POST /courses/:id/sections |\n| `UPDATE_SECTION` | PATCH /courses/:id/sections/:id |\n| `DELETE_SECTION` | DELETE /courses/:id/sections/:id |\n| `CREATE_LECTURE` | POST /courses/:id/sections/:id/lectures |\n| `UPDATE_LECTURE` | PATCH /courses/:id/sections/:id/lectures/:id |\n| `DELETE_LECTURE` | DELETE /courses/:id/sections/:id/lectures/:id |\n| `UPDATE_ROLE` | PUT /admin/users/:uid/role |\n| `UPLOAD_SIGNED_URL` | POST /uploads/signed-url |\n| `UPLOAD_CONFIRMED` | POST /uploads/confirm |\n| `ENROLLMENT_CREATED` | POST /courses/:id/enroll |\n| `PAYMENT_INITIATED` | POST /payments/checkout |\n| `PAYMENT_SUCCESS` | Webhook: POST /payments/webhook |\n| `PAYMENT_FAILED` | Webhook: POST /payments/webhook |\n\n### Prerequisites (Production Firebase)\n1. Update `backend/.env` with your Firebase project credentials\n2. Run: `cd backend && node scripts/setup-production-users.js`\n3. Run: `cd backend && npm run start:dev`\n4. Run: `docker compose -f backend/docker-compose.yml up -d redis`\n\n### Run Order\n00 → 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08\n\n### View Logs\nFirebase Console → Firestore → system_audit_logs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41783792"
+  },
+  "item": [
+    {
+      "name": "00 – Auth Setup (Run First)",
+      "item": [
+        {
+          "name": "01 Login superadmin (reads logs)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('superAdminToken', json.idToken);",
+                  "    console.log('✅ superAdminToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed. Run setup-users.js first.', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"superadmin@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signInWithPassword"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{firebaseApiKey}}"
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – credentials pre-filled.\nStores token in {{superAdminToken}}. Required for folder 08 (reading logs)."
+          },
+          "response": []
+        },
+        {
+          "name": "02 Login admin1 (creates/deletes resources)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('adminToken', json.idToken);",
+                  "    console.log('✅ adminToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin1@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signInWithPassword"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{firebaseApiKey}}"
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – credentials pre-filled.\nStores token in {{adminToken}}. Used for all CRUD + role-change operations."
+          },
+          "response": []
+        },
+        {
+          "name": "03 Login instructor (alternative creator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('instructorToken', json.idToken);",
+                  "    console.log('✅ instructorToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"instructor@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signInWithPassword"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{firebaseApiKey}}"
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – credentials pre-filled.\nStores token in {{instructorToken}}."
+          },
+          "response": []
+        }
+      ],
+      "description": "Login all test users and store tokens.\nNo data to fill in – credentials match setup-users.js.\nRun all three in order before anything else."
+    },
+    {
+      "name": "01 – User Sync (USER_SYNC)",
+      "item": [
+        {
+          "name": "01 Sync admin1 to DB → USER_SYNC log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Sync OK (200 or 201)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "console.log('✅ USER_SYNC log written for admin1');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin1@test.com\",\n  \"name\": \"Test Admin 1\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "me",
+                "sync"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- email (string) ✅\n- name (string) ✅\n\nMUST run before creating courses so the user row exists.\n→ Writes: USER_SYNC audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Sync superadmin to DB → USER_SYNC log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Superadmin sync OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "console.log('✅ USER_SYNC log written for superadmin');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"superadmin@test.com\",\n  \"name\": \"Test Super Admin\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "me",
+                "sync"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n→ Writes: USER_SYNC audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "03 Sync instructor to DB → USER_SYNC log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Instructor sync OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "console.log('✅ USER_SYNC log written for instructor');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{instructorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"instructor@test.com\",\n  \"name\": \"Test Instructor\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "me",
+                "sync"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n→ Writes: USER_SYNC audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Syncs users to the database.\nRun after folder 00. Produces USER_SYNC log entries."
+    },
+    {
+      "name": "02 – Course CRUD (CREATE_COURSE, UPDATE_COURSE, DELETE_COURSE)",
+      "item": [
+        {
+          "name": "01 Create Course → CREATE_COURSE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Course created (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const id = json?.course_insert?.id;",
+                  "if (id) {",
+                  "    // Data Connect strips hyphens from UUIDs — add them back for endpoints that need standard UUID format",
+                  "    let formattedId = id;",
+                  "    if (id.length === 32) {",
+                  "        formattedId = id.replace(/(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})/, '$1-$2-$3-$4-$5');",
+                  "    }",
+                  "    pm.collectionVariables.set('courseId', formattedId);",
+                  "    console.log('✅ courseId saved:', formattedId, '| CREATE_COURSE log written');",
+                  "} else {",
+                  "    console.error('❌ Could not extract courseId from:', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Audit Log Test Course\",\n  \"description\": \"Created by the LMS audit log test collection\",\n  \"price\": 4900,\n  \"language\": \"en\",\n  \"level\": \"BEGINNER\",\n  \"categoryId\": \"00000000-0000-0000-0000-000000000001\",\n  \"tags\": [\"audit\", \"testing\"]\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- title (string) ✅\n- price (integer ≥ 0) ✅\n- language (string) ✅\n- level: BEGINNER | INTERMEDIATE | ADVANCED ✅\n- categoryId (UUID – created by seed-category.js) ✅\n- tags (array of strings) ✅\n\nOptional: description, thumbnail\n\n→ Writes: CREATE_COURSE audit log\n→ Saves {{courseId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Update Course metadata → UPDATE_COURSE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Course updated (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ UPDATE_COURSE log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Audit Log Test Course (Updated)\",\n  \"description\": \"Description updated to generate UPDATE_COURSE log\",\n  \"price\": 9900\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled, {{courseId}} auto-set.\n\nAll fields are optional for PATCH:\ntitle, description, price, language, level, categoryId, tags, thumbnail\n\n→ Writes: UPDATE_COURSE audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "03 Delete Course → DELETE_COURSE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Course deleted (200 or 204)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('✅ DELETE_COURSE log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – {{courseId}} auto-set from step 01.\n\nSoft-deletes the course.\n→ Writes: DELETE_COURSE audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Creates a course, updates it, then deletes it.\nRun after folder 01. Saves {{courseId}} automatically."
+    },
+    {
+      "name": "03 – Section CRUD (CREATE_SECTION, UPDATE_SECTION, DELETE_SECTION)",
+      "item": [
+        {
+          "name": "01 Create Section → CREATE_SECTION log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Section created (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const id = json?.courseSection_insert?.id ?? json?.section_insert?.id ?? json?.id;",
+                  "if (id) {",
+                  "    pm.collectionVariables.set('sectionId', id);",
+                  "    console.log('✅ sectionId saved:', id, '| CREATE_SECTION log written');",
+                  "} else {",
+                  "    console.error('❌ No sectionId in response:', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 1 – Introduction\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- title (string) ✅\n\n→ Writes: CREATE_SECTION audit log\n→ Saves {{sectionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Update Section → UPDATE_SECTION log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Section updated (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ UPDATE_SECTION log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 1 – Introduction (Updated)\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled, IDs auto-set.\n\nRequired fields:\n- title (string) ✅\n\n→ Writes: UPDATE_SECTION audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "03 Delete Section → DELETE_SECTION log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Section deleted (200 or 204)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('✅ DELETE_SECTION log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – IDs auto-set.\n\n⚠️ Run folder 04 steps first and DELETE the lecture before deleting its section.\n\n→ Writes: DELETE_SECTION audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Creates a section, updates it, then deletes it.\nRequires {{courseId}} from folder 02."
+    },
+    {
+      "name": "04 – Lecture CRUD (CREATE_LECTURE, UPDATE_LECTURE, DELETE_LECTURE)",
+      "item": [
+        {
+          "name": "00 Re-create Section (skip if sectionId still valid)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const id = json?.courseSection_insert?.id ?? json?.section_insert?.id ?? json?.id;",
+                  "if (id) {",
+                  "    pm.collectionVariables.set('sectionId', id);",
+                  "    console.log('✅ Fresh sectionId saved:', id);",
+                  "} else {",
+                  "    console.warn('⚠️ Could not extract sectionId:', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Module 2 – Core Concepts\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections"
+              ]
+            },
+            "description": "📌 Only run this if the section from folder 03 was already deleted.\nCreates a fresh section. Also writes CREATE_SECTION log."
+          },
+          "response": []
+        },
+        {
+          "name": "01 Create Lecture (READING type) → CREATE_LECTURE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lecture created (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const id = json?.lecture_insert?.id ?? json?.courseLecture_insert?.id ?? json?.id;",
+                  "if (id) {",
+                  "    pm.collectionVariables.set('lectureId', id);",
+                  "    console.log('✅ lectureId saved:', id, '| CREATE_LECTURE log written');",
+                  "} else {",
+                  "    console.error('❌ No lectureId in response:', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture 1 – Welcome\",\n  \"type\": \"READING\",\n  \"content\": \"# Welcome\\nThis is the first lecture created by the audit log test.\",\n  \"duration\": 600,\n  \"isFreePreview\": true\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- title (string) ✅\n- type: VIDEO | READING | INTERACTIVE | QUIZ ✅\n\nOptional fields:\n- content (string – markdown for READING lectures)\n- videoUrl (string – for VIDEO lectures)\n- duration (integer, seconds)\n- transcriptUrl (string)\n- isFreePreview (boolean)\n\n→ Writes: CREATE_LECTURE audit log\n→ Saves {{lectureId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Create Lecture (VIDEO type) → CREATE_LECTURE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Video lecture created (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ CREATE_LECTURE (VIDEO) log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture 2 – Core Video\",\n  \"type\": \"VIDEO\",\n  \"videoUrl\": \"https://example.com/sample-video.mp4\",\n  \"duration\": 1800,\n  \"isFreePreview\": false\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled.\nCreates a VIDEO lecture. videoUrl is a placeholder.\n→ Writes: CREATE_LECTURE audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "03 Update Lecture → UPDATE_LECTURE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lecture updated (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ UPDATE_LECTURE log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture 1 – Welcome (Updated)\",\n  \"content\": \"# Welcome (Updated)\\nThis was updated by the audit log test.\",\n  \"duration\": 720\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures/{{lectureId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures",
+                "{{lectureId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body pre-filled, all IDs auto-set.\n\nAll UpdateLectureDto fields are optional:\ntitle, type, videoUrl, content, duration, transcriptUrl, isFreePreview\n\n→ Writes: UPDATE_LECTURE audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "04 Delete Lecture → DELETE_LECTURE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lecture deleted (200 or 204)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('✅ DELETE_LECTURE log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/sections/{{sectionId}}/lectures/{{lectureId}}",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "sections",
+                "{{sectionId}}",
+                "lectures",
+                "{{lectureId}}"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – IDs auto-set.\nSoft-deletes the lecture.\n→ Writes: DELETE_LECTURE audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Creates two lectures (READING + VIDEO), updates one, deletes it.\nRequires {{courseId}} and {{sectionId}}.\n\n⚠️ Run step 00 (Re-create Section) only if you already deleted the section in folder 03 step 03."
+    },
+    {
+      "name": "05 – Role Change (UPDATE_ROLE)",
+      "item": [
+        {
+          "name": "01 Promote student to instructor → UPDATE_ROLE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role changed (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "console.log('✅ UPDATE_ROLE log written. Role now:', json.role);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"instructor\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/users/test-student-001/role",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "test-student-001",
+                "role"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – body and UID pre-filled.\n\nChanges test-student-001 (student1@test.com) role to instructor.\n\nRequired field:\n- role: student | instructor | admin | super_admin ✅\n\n⚠️ Rate limited: 5 requests / 60 seconds.\n\n→ Writes: UPDATE_ROLE audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Revert role back to student → UPDATE_ROLE log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Role reverted (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ UPDATE_ROLE log written (reverted to student)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/users/test-student-001/role",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "test-student-001",
+                "role"
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – reverts role so tests remain consistent.\n→ Writes: UPDATE_ROLE audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Changes the role of test-student-001 and reverts it.\nRequires {{adminToken}}. Rate limited to 5 requests / 60s."
+    },
+    {
+      "name": "06 – Uploads (UPLOAD_SIGNED_URL, UPLOAD_CONFIRMED)",
+      "item": [
+        {
+          "name": "01 Request Signed URL → UPLOAD_SIGNED_URL log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Signed URL returned (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "console.log('✅ UPLOAD_SIGNED_URL log written. Upload URL:', json.uploadUrl);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"COURSE_THUMBNAIL\",\n  \"courseId\": \"{{courseId}}\",\n  \"filename\": \"test-thumbnail.jpg\",\n  \"contentType\": \"image/jpeg\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/uploads/signed-url",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "signed-url"
+              ]
+            },
+            "description": "📌 Requires {{courseId}} from folder 02.\n\nRequests a signed URL for uploading a course thumbnail.\n\n→ Writes: UPLOAD_SIGNED_URL audit log"
+          },
+          "response": []
+        },
+        {
+          "name": "02 Confirm Upload → UPLOAD_CONFIRMED log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Upload confirmed (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ UPLOAD_CONFIRMED log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entityType\": \"COURSE_THUMBNAIL\",\n  \"courseId\": \"{{courseId}}\",\n  \"filename\": \"test-thumbnail.jpg\",\n  \"storagePath\": \"courses/{{courseId}}/thumbnail-test-thumbnail.jpg\",\n  \"contentType\": \"image/jpeg\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/uploads/confirm",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "confirm"
+              ]
+            },
+            "description": "📌 Uses {{courseId}} from folder 02.\n\nConfirms the upload and links it to the course.\n\n→ Writes: UPLOAD_CONFIRMED audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests the upload flow for course thumbnails.\nRequires {{courseId}} from folder 02. Requires admin/instructor role."
+    },
+    {
+      "name": "07 – Enrollment (ENROLLMENT_CREATED)",
+      "item": [
+        {
+          "name": "01 Enroll admin1 in course → ENROLLMENT_CREATED log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Enrolled (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ ENROLLMENT_CREATED log written');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/courses/{{courseId}}/enroll",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "enroll"
+              ]
+            },
+            "description": "📌 Requires {{courseId}} from folder 02.\n\nEnrolls the authenticated user (admin1) in the course.\n\n→ Writes: ENROLLMENT_CREATED audit log"
+          },
+          "response": []
+        }
+      ],
+      "description": "Enrolls the admin user in the test course.\nRequires {{courseId}} from folder 02."
+    },
+    {
+      "name": "08 – Payments (PAYMENT_INITIATED, PAYMENT_SUCCESS, PAYMENT_FAILED)",
+      "item": [
+        {
+          "name": "01 Initiate Checkout → PAYMENT_INITIATED log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Checkout URL returned (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Has checkoutUrl', function () {",
+                  "    pm.expect(json).to.have.property('checkoutUrl');",
+                  "});",
+                  "console.log('✅ PAYMENT_INITIATED log written. Checkout URL:', json.checkoutUrl);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"targetType\": \"COURSE\",\n      \"courseId\": \"{{courseId}}\"\n    }\n  ],\n  \"billingData\": {\n    \"email\": \"admin1@test.com\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"Admin\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/checkout",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "payments",
+                "checkout"
+              ]
+            },
+            "description": "📌 Requires {{courseId}} from folder 02.\n\nInitiates a Paymob checkout for the course.\n\n→ Writes: PAYMENT_INITIATED audit log\n\nNote: PAYMENT_SUCCESS / PAYMENT_FAILED are written by the webhook when Paymob calls back."
+          },
+          "response": []
+        },
+        {
+          "name": "02 Simulate Webhook – Payment Success → PAYMENT_SUCCESS + ENROLLMENT_CREATED logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Webhook accepted (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ PAYMENT_SUCCESS + ENROLLMENT_CREATED logs written (if reference found)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "hmac",
+                "value": "test-hmac-ignore-in-emulator"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": true,\n    \"intention_id\": \"test-intention-123\",\n    \"order\": {\n      \"id\": \"test-order-123\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook?hmac=test-hmac-ignore-in-emulator",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ],
+              "query": [
+                {
+                  "key": "hmac",
+                  "value": "test-hmac-ignore-in-emulator"
+                }
+              ]
+            },
+            "description": "📌 Simulates a successful Paymob webhook.\n\n⚠️ This will NOT actually enroll anyone unless a payment with referenceId 'test-intention-123' exists in the database.\nThis is a structural test to verify the webhook logs PAYMENT_SUCCESS and ENROLLMENT_CREATED.\n\n→ Writes: PAYMENT_SUCCESS audit log (if payment found)\n→ Writes: ENROLLMENT_CREATED audit log (if payment found)"
+          },
+          "response": []
+        },
+        {
+          "name": "03 Simulate Webhook – Payment Failed → PAYMENT_FAILED log",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Webhook accepted (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "console.log('✅ PAYMENT_FAILED log written (if reference found)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "hmac",
+                "value": "test-hmac-ignore-in-emulator"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": false,\n    \"intention_id\": \"test-intention-fail-456\",\n    \"order\": {\n      \"id\": \"test-order-456\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook?hmac=test-hmac-ignore-in-emulator",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ],
+              "query": [
+                {
+                  "key": "hmac",
+                  "value": "test-hmac-ignore-in-emulator"
+                }
+              ]
+            },
+            "description": "📌 Simulates a failed Paymob webhook.\n\n→ Writes: PAYMENT_FAILED audit log (if payment found)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests the payment flow. Requires a valid Paymob HMAC secret configured.\nNote: PAYMENT_SUCCESS and PAYMENT_FAILED are written by the webhook, not the checkout endpoint."
+    },
+    {
+      "name": "09 – Read Audit Logs (super_admin only – run anytime after logs exist)",
+      "item": [
+        {
+          "name": "01 GET /admin/logs – View all logs as JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logs returned (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Response has logs array', function () {",
+                  "    pm.expect(json).to.have.property('logs');",
+                  "    pm.expect(json.logs).to.be.an('array');",
+                  "});",
+                  "console.log('Total logs:', json.count);",
+                  "if (json.count === 0) {",
+                  "    console.warn('⚠️ 0 logs found. Did you run folders 01-08 yet?');",
+                  "    console.warn('   Also check: http://localhost:4000 → Firestore → system_audit_logs');",
+                  "} else {",
+                  "    console.log('Latest action:', json.logs[0].action);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/logs?limit=50",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Max logs to return (default 50)"
+                },
+                {
+                  "key": "after",
+                  "value": "",
+                  "description": "ISO 8601 start filter e.g. 2026-07-01T00:00:00.000Z",
+                  "disabled": true
+                },
+                {
+                  "key": "before",
+                  "value": "",
+                  "description": "ISO 8601 end filter",
+                  "disabled": true
+                },
+                {
+                  "key": "action",
+                  "value": "",
+                  "description": "Filter by action e.g. CREATE_COURSE",
+                  "disabled": true
+                },
+                {
+                  "key": "adminUid",
+                  "value": "",
+                  "description": "Filter by admin Firebase UID",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED.\n\nReturns: { success, count, logs[] }\n\nEach log has:\n- id (Firestore doc ID)\n- action (e.g. CREATE_COURSE)\n- adminUid (who made the call)\n- targetUid (entity created/updated/deleted)\n- timestamp\n- ipAddress\n- details (the request body)\n\n⚠️ Returns count:0 if no actions have been logged yet (run folders 01-08 first).\n\n💡 TIP: You can also see these directly in the Firebase Emulator UI:\nhttp://localhost:4000 → Firestore tab → system_audit_logs collection"
+          },
+          "response": []
+        },
+        {
+          "name": "02 GET /admin/logs/download – Download as .txt file",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Download OK (200)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type is text/plain', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/plain');",
+                  "});",
+                  "const body = pm.response.text();",
+                  "console.log('Downloaded file size:', body.length, 'chars');",
+                  "if (body.includes('No logs found')) {",
+                  "    console.warn('⚠️ EMPTY LOG FILE – Firestore has no audit entries.');",
+                  "    console.warn('   Steps to fix:');",
+                  "    console.warn('   1. Check http://localhost:4000 → Firestore → system_audit_logs');",
+                  "    console.warn('   2. If collection is empty, run folders 01-08 first');",
+                  "    console.warn('   3. Confirm backend connects to emulator (FIRESTORE_EMULATOR_HOST set)');",
+                  "} else {",
+                  "    console.log('✅ Log file has content. Preview:', body.substring(0, 300));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/logs/download?limit=1000",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "logs",
+                "download"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1000",
+                  "description": "Max entries in download (default 1000)"
+                },
+                {
+                  "key": "after",
+                  "value": "",
+                  "description": "ISO 8601 start time",
+                  "disabled": true
+                },
+                {
+                  "key": "before",
+                  "value": "",
+                  "description": "ISO 8601 end time",
+                  "disabled": true
+                },
+                {
+                  "key": "action",
+                  "value": "",
+                  "description": "Filter by action name",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED.\n\nReturns a formatted text file (Content-Disposition: attachment).\nPostman saves it when you click Send and choose 'Save Response'.\n\n❓ WHY IS THE .TXT FILE EMPTY?\nThe file content comes from Firestore. If it says 'No logs found':\n1. The system_audit_logs Firestore collection is empty\n2. This means the backend never wrote any logs – NOT a bug in the download endpoint\n\nFix:\n- Open http://localhost:4000 → Firestore → check if system_audit_logs exists\n- If empty: run folders 01-08 to generate logs\n- Make sure FIRESTORE_EMULATOR_HOST is set in backend .env"
+          },
+          "response": []
+        },
+        {
+          "name": "03 GET /admin/logs – Filter: CREATE_COURSE only",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/logs?action=CREATE_COURSE&limit=20",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "action",
+                  "value": "CREATE_COURSE"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "📌 NO DATA NEEDED – change the action value to filter by any type.\n\nAll valid action filter values:\nUSER_SYNC | CREATE_COURSE | UPDATE_COURSE | DELETE_COURSE | CREATE_SECTION | UPDATE_SECTION | DELETE_SECTION | CREATE_LECTURE | UPDATE_LECTURE | DELETE_LECTURE | UPDATE_ROLE | UPLOAD_SIGNED_URL | UPLOAD_CONFIRMED | ENROLLMENT_CREATED | PAYMENT_INITIATED | PAYMENT_SUCCESS | PAYMENT_FAILED"
+          },
+          "response": []
+        },
+        {
+          "name": "04 GET /admin/logs – Filter: DELETE actions only (time range example)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/logs?action=DELETE_COURSE&limit=20",
+              "host": [
+                "{{backendUrl}}"
+              ],
+              "path": [
+                "admin",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "action",
+                  "value": "DELETE_COURSE"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "after",
+                  "value": "2026-07-01T00:00:00.000Z",
+                  "disabled": true
+                },
+                {
+                  "key": "before",
+                  "value": "2026-12-31T23:59:59.000Z",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "📌 Example of combining action + time-range filters.\nEnable the after/before query params and set your ISO 8601 time range.\nExample: after=2026-07-01T00:00:00.000Z"
+          },
+          "response": []
+        }
+      ],
+      "description": "Reads logs from Firestore via the admin API.\nRequires {{superAdminToken}} from folder 00 step 01.\nBoth endpoints require super_admin role."
+    }
+  ],
+  "variable": [
+    {
+      "key": "backendUrl",
+      "value": "http://localhost:3001/api/v1"
+    },
+    {
+      "key": "firebaseProject",
+      "value": "learning-management-syst-3cc3a"
+    },
+    {
+      "key": "firebaseApiKey",
+      "value": "{{google_api_key_0uq1}}"
+    },
+    {
+      "key": "superAdminToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "instructorToken",
+      "value": ""
+    },
+    {
+      "key": "studentToken",
+      "value": ""
+    },
+    {
+      "key": "courseId",
+      "value": ""
+    },
+    {
+      "key": "sectionId",
+      "value": ""
+    },
+    {
+      "key": "lectureId",
+      "value": ""
+    },
+    {
+      "key": "google_api_key_0uq1",
+      "secret": true
+    }
+  ]
+}

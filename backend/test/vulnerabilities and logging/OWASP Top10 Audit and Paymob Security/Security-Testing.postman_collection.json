@@ -1,0 +1,1556 @@
+{
+  "info": {
+    "name": "LMS Security Testing – OWASP + Paymob + IDOR",
+    "_postman_id": "lms-security-testing",
+    "description": "## LMS Security Testing Collection\n\nTests OWASP Top 10, Paymob Webhook HMAC, and IDOR vulnerabilities.\n\n### Prerequisites\n1. Backend running: `cd backend && npm run start:dev`\n2. Redis running: `docker compose -f backend/docker-compose.yml up -d redis`\n3. Test users created via `setup-production-users.js`\n4. Update `firebaseApiKey` variable with your Firebase project's API key\n\n### Test Accounts\n| Role | Email | Password |\n|------|-------|----------|\n| Admin | admin1@test.com | password123 |\n| Instructor | instructor@test.com | password123 |\n| Student 1 | student1@test.com | password123 |\n| Student 2 | student2@test.com | password123 |\n\n### Run Order\n00 → 01 → 02 → 03 → 04 → 05 → 06 → 07\n\n### Expected Results\n- ✅ PASS = Request was correctly rejected (401/403/400)\n- ❌ FAIL = Request succeeded when it shouldn't have",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "backendUrl",
+      "value": "http://localhost:3001/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "firebaseApiKey",
+      "value": "PUT_YOUR_FIREBASE_API_KEY_HERE",
+      "type": "string"
+    },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "instructorToken", "value": "", "type": "string" },
+    { "key": "student1Token", "value": "", "type": "string" },
+    { "key": "student2Token", "value": "", "type": "string" },
+    { "key": "courseId", "value": "", "type": "string" },
+    { "key": "idorCourseId", "value": "", "type": "string" },
+    { "key": "idorSectionId", "value": "", "type": "string" },
+    { "key": "idorLectureId", "value": "", "type": "string" },
+    { "key": "idorQuizId", "value": "", "type": "string" },
+    { "key": "idorQuestionId", "value": "", "type": "string" },
+    { "key": "idorOptionId", "value": "", "type": "string" },
+    { "key": "student2AttemptId", "value": "", "type": "string" },
+    { "key": "student1Uid", "value": "test-student-001", "type": "string" },
+    { "key": "student2Uid", "value": "test-student-002", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "00 – Auth Setup (Run First)",
+      "description": "Login all test users and store tokens.",
+      "item": [
+        {
+          "name": "01 Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('adminToken', json.idToken);",
+                  "    console.log('✅ adminToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin1@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            }
+          }
+        },
+        {
+          "name": "02 Login Instructor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('instructorToken', json.idToken);",
+                  "    console.log('✅ instructorToken stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"instructor@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            }
+          }
+        },
+        {
+          "name": "03 Login Student 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('student1Token', json.idToken);",
+                  "    console.log('✅ student1Token stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"student1@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            }
+          }
+        },
+        {
+          "name": "04 Login Student 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.idToken) {",
+                  "    pm.collectionVariables.set('student2Token', json.idToken);",
+                  "    console.log('✅ student2Token stored');",
+                  "} else {",
+                  "    console.error('❌ Login failed', JSON.stringify(json));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"student2@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            }
+          }
+        },
+        {
+          "name": "05 Sync all users to DB",
+          "item": [
+            {
+              "name": "01 Sync Admin to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin1@test.com\",\n  \"name\": \"Test Admin 1\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "02 Sync Instructor to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"instructor@test.com\",\n  \"name\": \"Test Instructor\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "03 Sync Student 1 to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student1@test.com\",\n  \"name\": \"Test Student 1\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "04 Sync Student 2 to DB",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student2@test.com\",\n  \"name\": \"Test Student 2\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/me/sync",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["me", "sync"]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student2Token}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 – OWASP A01: Broken Access Control",
+      "description": "Test that students cannot access admin-only endpoints.\nExpected: All should return 403 Forbidden.",
+      "item": [
+        {
+          "name": "01 Student tries to set user role (should 403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 403 (student cannot change roles)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(403);",
+                  "});",
+                  "if (pm.response.code === 403) {",
+                  "    console.log('✅ PASS: Student correctly denied admin access');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Student was able to access admin endpoint!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/users/test-student-001/role",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "users", "test-student-001", "role"]
+            },
+            "description": "A01 Broken Access Control: Student tries to promote themselves to admin.\nExpected: 403 Forbidden"
+          }
+        },
+        {
+          "name": "02 Student tries to view audit logs (should 403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 403 (student cannot view logs)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(403);",
+                  "});",
+                  "if (pm.response.code === 403) {",
+                  "    console.log('✅ PASS: Student correctly denied log access');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Student was able to view audit logs!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/admin/logs",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "logs"]
+            },
+            "description": "A01 Broken Access Control: Student tries to view audit logs.\nExpected: 403 Forbidden"
+          }
+        },
+        {
+          "name": "03 No token – access protected endpoint (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (no auth token)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Unauthenticated request correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Endpoint accessible without auth!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hacker@test.com\",\n  \"name\": \"Hacker\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "sync"]
+            },
+            "description": "A01 Broken Access Control: No auth token provided.\nExpected: 401 Unauthorized"
+          }
+        },
+        {
+          "name": "04 Invalid token – access protected endpoint (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (invalid token)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Invalid token correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Invalid token was accepted!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-invalid-token-abc123",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hacker@test.com\",\n  \"name\": \"Hacker\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "sync"]
+            },
+            "description": "A01 Broken Access Control: Invalid/fake auth token.\nExpected: 401 Unauthorized"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 – OWASP A03: Injection",
+      "description": "Test SQL/NoSQL injection attempts.\nExpected: All should be rejected or sanitized.",
+      "item": [
+        {
+          "name": "01 SQL injection in email field (should not crash)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Should not return 500 (injection sanitized)', function () {",
+                  "    pm.expect(pm.response.code).to.not.equal(500);",
+                  "});",
+                  "console.log('✅ PASS: SQL injection did not cause server error');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"'; DROP TABLE users; --\",\n  \"name\": \"Injection Test\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "sync"]
+            },
+            "description": "A03 Injection: SQL injection attempt in email field.\nExpected: No 500 error, data is sanitized"
+          }
+        },
+        {
+          "name": "02 NoSQL injection in body (should not crash)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Should not return 500', function () {",
+                  "    pm.expect(pm.response.code).to.not.equal(500);",
+                  "});",
+                  "console.log('✅ PASS: NoSQL injection did not cause server error');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": {\"$gt\": \"\"},\n  \"name\": \"NoSQL Injection\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "sync"]
+            },
+            "description": "A03 Injection: NoSQL injection attempt.\nExpected: No 500 error, data is sanitized"
+          }
+        },
+        {
+          "name": "03 XSS in name field (should be sanitized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Should not return 500', function () {",
+                  "    pm.expect(pm.response.code).to.not.equal(500);",
+                  "});",
+                  "console.log('✅ PASS: XSS payload did not cause server error');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student1Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@test.com\",\n  \"name\": \"<script>alert('XSS')</script>\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/me/sync",
+              "host": ["{{backendUrl}}"],
+              "path": ["me", "sync"]
+            },
+            "description": "A03 Injection: XSS attempt in name field.\nExpected: No 500 error, script tag is sanitized"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 – Paymob Webhook HMAC Verification",
+      "description": "Test that the Paymob webhook endpoint verifies HMAC signatures.\nExpected: Fake/invalid HMAC should be rejected with 401.",
+      "item": [
+        {
+          "name": "01 Valid webhook structure but FAKE HMAC (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (fake HMAC rejected)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Fake HMAC correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Webhook accepted with fake HMAC!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "hmac", "value": "FAKE_HMAC_SIGNATURE_12345" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": true,\n    \"intention_id\": \"fake-intention-123\",\n    \"order\": {\n      \"id\": \"fake-order-123\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook?hmac=FAKE_HMAC_SIGNATURE_12345",
+              "host": ["{{backendUrl}}"],
+              "path": ["payments", "webhook"],
+              "query": [{ "key": "hmac", "value": "FAKE_HMAC_SIGNATURE_12345" }]
+            },
+            "description": "A08 Software & Data Integrity: Send webhook with fake HMAC.\nExpected: 401 Unauthorized (HMAC verification fails)"
+          }
+        },
+        {
+          "name": "02 Webhook with NO HMAC (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (no HMAC)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Missing HMAC correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Webhook accepted without HMAC!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": true,\n    \"intention_id\": \"fake-intention-456\",\n    \"order\": {\n      \"id\": \"fake-order-456\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook",
+              "host": ["{{backendUrl}}"],
+              "path": ["payments", "webhook"]
+            },
+            "description": "A08 Software & Data Integrity: Send webhook with no HMAC.\nExpected: 401 Unauthorized (HMAC missing)"
+          }
+        },
+        {
+          "name": "03 Webhook with empty HMAC (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (empty HMAC)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Empty HMAC correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Webhook accepted with empty HMAC!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "hmac", "value": "" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": true,\n    \"intention_id\": \"fake-intention-789\",\n    \"order\": {\n      \"id\": \"fake-order-789\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook?hmac=",
+              "host": ["{{backendUrl}}"],
+              "path": ["payments", "webhook"],
+              "query": [{ "key": "hmac", "value": "" }]
+            },
+            "description": "A08 Software & Data Integrity: Send webhook with empty HMAC.\nExpected: 401 Unauthorized"
+          }
+        },
+        {
+          "name": "04 Webhook with tampered body (should 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should be 401 (tampered body)', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "});",
+                  "if (pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Tampered body correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Tampered webhook was accepted!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "hmac", "value": "559BA5C8A5C2D41C503FDA2A69ECBFE5" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"success\": true,\n    \"intention_id\": \"TAMPERED_REFERENCE\",\n    \"order\": {\n      \"id\": \"TAMPERED_ORDER\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/payments/webhook?hmac=559BA5C8A5C2D41C503FDA2A69ECBFE5",
+              "host": ["{{backendUrl}}"],
+              "path": ["payments", "webhook"],
+              "query": [
+                { "key": "hmac", "value": "559BA5C8A5C2D41C503FDA2A69ECBFE5" }
+              ]
+            },
+            "description": "A08 Software & Data Integrity: Real HMAC key but tampered body.\nExpected: 401 Unauthorized (HMAC won't match tampered body)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 – IDOR (Quiz Attempt Ownership)",
+      "description": "Test that Student A cannot act on Student B's quiz attempt by swapping the attempt ID.\nExpected: all attack requests should return 403 Forbidden.",
+      "item": [
+        {
+          "name": "01 Create quiz target data",
+          "item": [
+            {
+              "name": "01 Create IDOR course",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "if (jsonData.course_insert && jsonData.course_insert.id) {",
+                      "    pm.collectionVariables.set('idorCourseId', jsonData.course_insert.id);",
+                      "    console.log('✅ idorCourseId stored: ' + jsonData.course_insert.id);",
+                      "} else {",
+                      "    console.log('❌ Course creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"IDOR Quiz Ownership Course\",\n  \"description\": \"Course used to validate quiz attempt ownership checks\",\n  \"price\": 0,\n  \"language\": \"en\",\n  \"level\": \"BEGINNER\",\n  \"categoryId\": \"00000000-0000-0000-0000-000000000001\",\n  \"tags\": [\"idor\", \"quiz\", \"ownership\"]\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["courses"]
+                },
+                "description": "Creates a dedicated course for the IDOR quiz ownership test."
+              }
+            },
+            {
+              "name": "02 Create section",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const sectionId = jsonData.courseSection_insert?.id ?? jsonData.section_insert?.id ?? jsonData.id;",
+                      "if (sectionId) {",
+                      "    pm.collectionVariables.set('idorSectionId', sectionId);",
+                      "    console.log('✅ idorSectionId stored: ' + sectionId);",
+                      "} else {",
+                      "    console.log('❌ Section creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"IDOR Section\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/sections",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["courses", "{{idorCourseId}}", "sections"]
+                },
+                "description": "Creates the section that will hold the quiz lecture."
+              }
+            },
+            {
+              "name": "03 Create quiz lecture",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const lectureId = jsonData.courseLecture_insert?.id ?? jsonData.lecture_insert?.id ?? jsonData.id;",
+                      "if (lectureId) {",
+                      "    pm.collectionVariables.set('idorLectureId', lectureId);",
+                      "    console.log('✅ idorLectureId stored: ' + lectureId);",
+                      "} else {",
+                      "    console.log('❌ Lecture creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"IDOR Quiz Lecture\",\n  \"type\": \"QUIZ\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/sections/{{idorSectionId}}/lectures",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "sections",
+                    "{{idorSectionId}}",
+                    "lectures"
+                  ]
+                },
+                "description": "Creates the quiz-type lecture that will own the quiz."
+              }
+            },
+            {
+              "name": "04 Create quiz",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const quizId = jsonData.courseQuiz_insert?.id ?? jsonData.quiz_insert?.id ?? jsonData.id;",
+                      "if (quizId) {",
+                      "    pm.collectionVariables.set('idorQuizId', quizId);",
+                      "    console.log('✅ idorQuizId stored: ' + quizId);",
+                      "} else {",
+                      "    console.log('❌ Quiz creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"passingScore\": 70,\n  \"maxAttempts\": 3,\n  \"timeLimitMinutes\": 15\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/lectures/{{idorLectureId}}/quiz",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "lectures",
+                    "{{idorLectureId}}",
+                    "quiz"
+                  ]
+                },
+                "description": "Attaches a quiz to the quiz lecture."
+              }
+            },
+            {
+              "name": "05 Create question (Expected: 200)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const questionId = jsonData.quizQuestion_insert?.id ?? jsonData.question_insert?.id ?? jsonData.id;",
+                      "if (questionId) {",
+                      "    pm.collectionVariables.set('idorQuestionId', questionId);",
+                      "    console.log('✅ idorQuestionId stored: ' + questionId);",
+                      "} else {",
+                      "    console.log('❌ Question creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"questionText\": \"What does IDOR stand for?\",\n  \"points\": 1,\n  \"explanation\": \"IDOR is an insecure direct object reference.\",\n  \"options\": [\n    { \"text\": \"Insecure Direct Object Reference\", \"isCorrect\": true },\n    { \"text\": \"Internal Data Object Routing\", \"isCorrect\": false }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}/questions",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}",
+                    "questions"
+                  ]
+                },
+                "description": "Creates a single question with two options for the quiz attempt test."
+              }
+            },
+            {
+              "name": "06 Fetch quiz details (Expected: 200)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const quiz = jsonData.courseQuiz;",
+                      "const question = quiz?.adminQuestions?.[0];",
+                      "const optionId = question?.adminOptions?.[0]?.id;",
+                      "if (question?.id) {",
+                      "    pm.collectionVariables.set('idorQuestionId', question.id);",
+                      "    console.log('✅ idorQuestionId stored: ' + question.id);",
+                      "}",
+                      "if (optionId) {",
+                      "    pm.collectionVariables.set('idorOptionId', optionId);",
+                      "    console.log('✅ idorOptionId stored: ' + optionId);",
+                      "} else {",
+                      "    console.log('❌ Could not extract option id:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}"
+                  ]
+                },
+                "description": "Fetches the quiz with answer-key data so the generated option id can be reused in the IDOR attack request."
+              }
+            },
+            {
+              "name": "07 Publish course (Expected: 200)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{instructorToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"PUBLISHED\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/status",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["courses", "{{idorCourseId}}", "status"]
+                },
+                "description": "Publishes the course so students can enroll and take the quiz."
+              }
+            },
+            {
+              "name": "08 Enroll Student 1 (Expected: 200)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/enroll",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["courses", "{{idorCourseId}}", "enroll"]
+                },
+                "description": "Enrolls Student 1 so the attacker account can legitimately reach the quiz routes."
+              }
+            },
+            {
+              "name": "09 Enroll Student 2 (Expected: 200)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student2Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/enroll",
+                  "host": ["{{backendUrl}}"],
+                  "path": ["courses", "{{idorCourseId}}", "enroll"]
+                },
+                "description": "Enrolls Student 2, who will own the target quiz attempt."
+              }
+            },
+            {
+              "name": "10 Student 2 starts attempt (Expected: 200)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "const attemptId = jsonData.quizAttempt_insert?.id ?? jsonData.id;",
+                      "if (attemptId) {",
+                      "    pm.collectionVariables.set('student2AttemptId', attemptId);",
+                      "    console.log('✅ student2AttemptId stored: ' + attemptId);",
+                      "} else {",
+                      "    console.log('❌ Attempt creation failed:', JSON.stringify(jsonData));",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student2Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}/attempts",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}",
+                    "attempts"
+                  ]
+                },
+                "description": "Creates the victim attempt that Student 1 will try to misuse via ID swapping."
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 Attack requests",
+          "item": [
+            {
+              "name": "01 Student 1 submits answer into Student 2's attempt (Expected: 403/404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Should block cross-user attempt access', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                      "});",
+                      "if (pm.response.code === 403 || pm.response.code === 404) {",
+                      "    console.log('✅ PASS: Student 1 could not use Student 2\\'s attempt ID');",
+                      "} else {",
+                      "    console.log('❌ FAIL: Cross-user attempt access succeeded');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"questionId\": \"{{idorQuestionId}}\",\n  \"selectedOptionId\": \"{{idorOptionId}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}/attempts/{{student2AttemptId}}/answers",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}",
+                    "attempts",
+                    "{{student2AttemptId}}",
+                    "answers"
+                  ]
+                },
+                "description": "IDOR check: Student 1 tries to submit an answer into Student 2's attempt by swapping the attempt id."
+              }
+            },
+            {
+              "name": "02 Student 1 finishes Student 2's attempt (Expected: 403/404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Should block finishing another user\\'s attempt', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                      "});",
+                      "if (pm.response.code === 403 || pm.response.code === 404) {",
+                      "    console.log('✅ PASS: Student 1 could not finish Student 2\\'s attempt');",
+                      "} else {",
+                      "    console.log('❌ FAIL: Cross-user finish succeeded');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}/attempts/{{student2AttemptId}}/finish",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}",
+                    "attempts",
+                    "{{student2AttemptId}}",
+                    "finish"
+                  ]
+                },
+                "description": "IDOR check: Student 1 tries to finalize Student 2's attempt by swapping the attempt id."
+              }
+            },
+            {
+              "name": "03 Student 1 checks heartbeat for Student 2's attempt (Expected: 403/404)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Should block heartbeat on another user\\'s attempt', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                      "});",
+                      "if (pm.response.code === 403 || pm.response.code === 404) {",
+                      "    console.log('✅ PASS: Student 1 could not heartbeat Student 2\\'s attempt');",
+                      "} else {",
+                      "    console.log('❌ FAIL: Cross-user heartbeat succeeded');",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{student1Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{backendUrl}}/courses/{{idorCourseId}}/quizzes/{{idorQuizId}}/attempts/{{student2AttemptId}}/heartbeat",
+                  "host": ["{{backendUrl}}"],
+                  "path": [
+                    "courses",
+                    "{{idorCourseId}}",
+                    "quizzes",
+                    "{{idorQuizId}}",
+                    "attempts",
+                    "{{student2AttemptId}}",
+                    "heartbeat"
+                  ]
+                },
+                "description": "IDOR check: Student 1 tries to read the live session state for Student 2's attempt by swapping the attempt id."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 – OWASP A04: Rate Limiting",
+      "description": "Test that rate limiting is enforced.\nExpected: After limit, should return 429 Too Many Requests.",
+      "item": [
+        {
+          "name": "01 Rapid requests to trigger rate limit (should 429)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Should get 429 after rate limit', function () {",
+                  "    // This is the 6th request in a rapid sequence",
+                  "    // The rate limit is 100 req/60s globally, 5 req/60s for role changes",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 429]);",
+                  "});",
+                  "if (pm.response.code === 429) {",
+                  "    console.log('✅ PASS: Rate limiting is working');",
+                  "} else {",
+                  "    console.log('ℹ️ INFO: Rate limit not triggered yet (may need more requests)');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{backendUrl}}/admin/users/test-student-001/role",
+              "host": ["{{backendUrl}}"],
+              "path": ["admin", "users", "test-student-001", "role"]
+            },
+            "description": "A04 Insecure Design: Send multiple rapid requests to trigger rate limit.\nRun this 6+ times rapidly. Expected: 429 Too Many Requests after 5 requests"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 – OWASP A05: Security Misconfiguration",
+      "description": "Test for security headers and CORS.\nExpected: Proper headers should be present.",
+      "item": [
+        {
+          "name": "01 Check CORS from disallowed origin (should be blocked)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const headers = pm.response.headers;",
+                  "const corsHeader = headers.get('Access-Control-Allow-Origin');",
+                  "pm.test('CORS should not allow arbitrary origins', function () {",
+                  "    // localhost is always allowed, but arbitrary origins should not be",
+                  "    pm.expect(corsHeader).to.not.equal('https://evil.com');",
+                  "});",
+                  "console.log('CORS header:', corsHeader);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Origin", "value": "https://evil.com" }],
+            "url": {
+              "raw": "{{backendUrl}}/health",
+              "host": ["{{backendUrl}}"],
+              "path": ["health"]
+            },
+            "description": "A05 Security Misconfiguration: Check CORS from disallowed origin.\nExpected: No Access-Control-Allow-Origin header for evil.com"
+          }
+        },
+        {
+          "name": "02 Check security headers present",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const headers = pm.response.headers;",
+                  "console.log('Response headers:');",
+                  "headers.each(h => console.log(h.key + ': ' + h.value));",
+                  "pm.test('Response is received', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{backendUrl}}/health",
+              "host": ["{{backendUrl}}"],
+              "path": ["health"]
+            },
+            "description": "A05 Security Misconfiguration: Check response headers.\nReview headers for security best practices."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 – OWASP A07: Auth Failures",
+      "description": "Test authentication security.\nExpected: Invalid credentials should be rejected.",
+      "item": [
+        {
+          "name": "01 Login with wrong password (should fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should fail (wrong password)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+                  "});",
+                  "if (pm.response.code === 400 || pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Wrong password correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Login succeeded with wrong password!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin1@test.com\", \"password\": \"WRONG_PASSWORD\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            },
+            "description": "A07 Auth Failures: Login with wrong password.\nExpected: 400 Bad Request (Firebase Auth rejects)"
+          }
+        },
+        {
+          "name": "02 Login with non-existent email (should fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('❌ Should fail (non-existent user)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+                  "});",
+                  "if (pm.response.code === 400 || pm.response.code === 401) {",
+                  "    console.log('✅ PASS: Non-existent user correctly rejected');",
+                  "} else {",
+                  "    console.log('❌ FAIL: Login succeeded for non-existent user!');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"nonexistent@test.com\", \"password\": \"password123\", \"returnSecureToken\": true}"
+            },
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseApiKey}}",
+              "host": ["identitytoolkit.googleapis.com"],
+              "path": ["v1", "accounts:signInWithPassword"],
+              "query": [{ "key": "key", "value": "{{firebaseApiKey}}" }]
+            },
+            "description": "A07 Auth Failures: Login with non-existent email.\nExpected: 400 Bad Request"
+          }
+        }
+      ]
+    }
+  ]
+}

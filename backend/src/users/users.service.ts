@@ -12,11 +12,13 @@ export class UsersService {
   constructor(private readonly dc: DataConnectService) {}
 
   async sync(dto: SyncUserDto, authToken: string) {
-    return this.dc.executeMutation(
-      'SyncUser',
-      { email: dto.email, name: dto.name, avatar: dto.avatar ?? null },
-      authToken,
-    );
+    const variables: any = { email: dto.email, name: dto.name, avatar: dto.avatar ?? null };
+
+    // Only pass acceptedToS if explicitly provided (for initial registration)
+    // For existing users, the tosAcceptedAt field is already set in the database
+    if (dto.acceptedToS !== undefined) { variables.acceptedToS = dto.acceptedToS; }
+
+    return this.dc.executeMutation('SyncUser', variables, authToken);
   }
 
   async getMe(authToken: string) {
