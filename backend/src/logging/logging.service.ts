@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { FirebaseService } from '../firebase/firebase.service';
 
@@ -6,16 +7,29 @@ import { FirebaseService } from '../firebase/firebase.service';
 export class AuditLoggingService {
   private readonly logger = new Logger(AuditLoggingService.name);
   private readonly collectionName = 'system_audit_logs';
-  // The (default) database doesn't exist — the project uses a named database.
-  // The Firestore database ID, e.g. "(default)" or a custom name like "optimatech-lms".
-  private readonly databaseId = 'optimatech-lms';
+  // The Firestore database ID. Production uses a named database ("optimatech-lms"),
+  // while the local emulator uses "(default)". Configurable via FIRESTORE_DATABASE_ID.
+  private readonly databaseId: string;
 
   /**
    * NOTE: A TTL (Time-to-Live) Policy must be set in Google Cloud Console for this collection.
    * Set it to automatically delete documents 90 days after their 'timestamp' field
    * to comply with Phase 2 requirements and GDPR data minimization.
    */
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(
+    private readonly firebaseService: FirebaseService,
+    private readonly configService: ConfigService,
+  ) {
+    // When FIREBASE_EMULATOR_LOCAL=true, use the emulator's "(default)" database.
+    // Otherwise use the production named database ("optimatech-lms").
+    // FIRESTORE_DATABASE_ID can override either if needed.
+    const useEmulator =
+      this.configService.get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
+        ?.toLowerCase() === 'true';
+    this.databaseId =
+      this.configService.get<string>('FIRESTORE_DATABASE_ID', '') ||
+      (useEmulator ? '(default)' : 'optimatech-lms');
+  }
 
   private get firestore(): FirebaseFirestore.Firestore {
     // Access the private firebaseApp via type assertion — needed for Firestore init.

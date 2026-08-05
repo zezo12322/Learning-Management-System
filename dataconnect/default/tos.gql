@@ -7,7 +7,7 @@ mutation CreateToS(
   $documentUrl: String!
   $effectiveDate: Timestamp
 ) @auth(level: NO_ACCESS) {
-  tosVersion_insert(
+  termsOfService_insert(
     data: {
       version: $version
       title: $title
@@ -20,12 +20,12 @@ mutation CreateToS(
 
 mutation PublishToS($tosId: UUID!) @auth(level: NO_ACCESS) {
   # Archive all current ToS versions
-  tosVersion_updateMany(
+  termsOfService_updateMany(
     where: { isCurrent: { eq: true } }
     data: { isCurrent: false, updatedAt_expr: "request.time" }
   )
   # Set the new one as current with publishedAt timestamp
-  tosVersion_update(
+  termsOfService_update(
     id: $tosId
     data: {
       isCurrent: true
@@ -40,22 +40,20 @@ mutation UpdateToS(
   $version: String
   $title: String
   $documentUrl: String
-  $effectiveDate: Timestamp
 ) @auth(level: NO_ACCESS) {
-  tosVersion_update(
+  termsOfService_update(
     id: $tosId
     data: {
       version: $version
       title: $title
       documentUrl: $documentUrl
-      effectiveAt: $effectiveDate
       updatedAt_expr: "request.time"
     }
   )
 }
 
 query GetCurrentToS @auth(level: NO_ACCESS) {
-  tosVersions(where: { isCurrent: { eq: true } }, limit: 1) {
+  termsOfServices(where: { isCurrent: { eq: true } }, limit: 1) {
     id
     version
     title
@@ -67,7 +65,7 @@ query GetCurrentToS @auth(level: NO_ACCESS) {
 }
 
 query GetToSById($tosId: UUID!) @auth(level: NO_ACCESS) {
-  tosVersions(where: { id: { eq: $tosId } }, limit: 1) {
+  termsOfServices(where: { id: { eq: $tosId } }, limit: 1) {
     id
     version
     title
@@ -80,7 +78,7 @@ query GetToSById($tosId: UUID!) @auth(level: NO_ACCESS) {
 }
 
 query GetAllToS @auth(level: NO_ACCESS) {
-  tosVersions(orderBy: { effectiveAt: DESC }) {
+  termsOfServices(orderBy: { effectiveAt: DESC }) {
     id
     version
     title
@@ -104,9 +102,9 @@ query GetUserToSStatus($uid: String!) @auth(level: NO_ACCESS) {
 }
 
 mutation AcceptCurrentToS($tosId: UUID!) @auth(level: USER) {
-  user_upsert(
+  user_update(
+    id_expr: "auth.uid"
     data: {
-      id_expr: "auth.uid"
       acceptedTosId: $tosId
       tosAcceptedAt_expr: "request.time"
     }

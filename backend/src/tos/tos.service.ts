@@ -12,25 +12,42 @@ export class ToSService {
   constructor(private readonly dc: DataConnectService) {}
 
   async create(dto: CreateToSDto, createdById: string) {
-    return this.dc.executeMutation('CreateToS', {
+    const variables: Record<string, unknown> = {
       version: dto.version,
       title: dto.title,
       documentUrl: dto.documentUrl,
-      effectiveDate: dto.effectiveDate || null,
-    });
+    };
+    // Only include effectiveDate if the client actually provided it.
+    if (dto.effectiveDate) {
+      variables.effectiveDate = dto.effectiveDate;
+    }
+
+    return this.dc.executeMutation('CreateToS', variables);
   }
 
   async publish(tosId: string) {
-    return this.dc.executeMutation('PublishToS', { tosId });
+    // Validate the target ToS exists first.
+    const existing = await this.getById(tosId);
+    const tos = existing?.termsOfServices?.[0] ?? existing?.tosVersions?.[0];
+    if (!tos) {
+      throw new NotFoundException(`ToS ${tosId} not found`);
+    }
+
+    // Execute the publish mutation (archives all current + sets this one as current).
+    await this.dc.executeMutation('PublishToS', { tosId });
+    return {
+      id: tosId,
+      published: true,
+      version: tos.version,
+      title: tos.title,
+    };
   }
 
   async update(tosId: string, dto: UpdateToSDto) {
-    const variables: any = { tosId };
+    const variables: Record<string, unknown> = { tosId };
     if (dto.version !== undefined) variables.version = dto.version;
     if (dto.title !== undefined) variables.title = dto.title;
     if (dto.documentUrl !== undefined) variables.documentUrl = dto.documentUrl;
-    if (dto.effectiveDate !== undefined)
-      variables.effectiveDate = dto.effectiveDate;
 
     return this.dc.executeMutation('UpdateToS', variables);
   }
@@ -45,7 +62,7 @@ export class ToSService {
 
   async getCurrent() {
     const data = await this.dc.executeQuery('GetCurrentToS');
-    return data?.tosVersions?.[0] ?? null;
+    return data?.termsOfServices?.[0] ?? data?.tosVersions?.[0] ?? null;
   }
 
   /**

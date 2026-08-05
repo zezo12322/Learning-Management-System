@@ -24,6 +24,8 @@ export class DataConnectService {
   private readonly serviceBaseUrl: string;
   private readonly apiKey: string;
   private readonly timeoutMs: number;
+  /** True when running against the local Firebase Data Connect emulator. */
+  private readonly isEmulator: boolean;
 
   constructor(
     private readonly configService: ConfigService,
@@ -46,14 +48,32 @@ export class DataConnectService {
       'default',
     );
 
-    this.serviceBaseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
-    this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
+    // Use the single FIREBASE_EMULATOR_LOCAL toggle. When true, point all
+    // Data Connect requests at the local emulator; otherwise use the cloud.
+    this.isEmulator =
+      this.configService.get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
+        ?.toLowerCase() === 'true';
+
+    if (this.isEmulator) {
+      const emulatorHost = this.configService.get<string>(
+        'FDC_EMULATOR_HOST',
+        'http://127.0.0.1:9399',
+      );
+      const base = emulatorHost.replace(/\/+$/, '');
+      this.serviceBaseUrl = `${base}/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
+      this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
+      this.logger.log( `Data Connect emulator detected — using ${this.baseUrl}`, );
+    } else {
+      this.serviceBaseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
+      this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
+    }
+
     this.apiKey = this.configService.get<string>('FIREBASE_API_KEY', '');
     this.timeoutMs = Number(
       this.configService.get<string>('FDC_TIMEOUT_MS', '15000'),
     );
 
-    if (!this.apiKey) {
+    if (!this.apiKey && !this.isEmulator) {
       this.logger.warn(
         'FIREBASE_API_KEY is not set — Data Connect requests will be rejected by the API.',
       );

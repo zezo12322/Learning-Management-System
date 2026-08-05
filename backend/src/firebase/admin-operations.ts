@@ -1446,6 +1446,115 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       }
     }
   `,
+
+  // --- Terms of Service (admin-only, @auth NO_ACCESS) ---
+  CreateToS: /* GraphQL */ `
+    mutation CreateToS(
+      $version: String!
+      $title: String!
+      $documentUrl: String!
+      $effectiveDate: Timestamp
+    ) {
+      termsOfService_insert(
+        data: {
+          version: $version
+          title: $title
+          documentUrl: $documentUrl
+          effectiveAt: $effectiveDate
+          isCurrent: false
+        }
+      )
+    }
+  `,
+
+  PublishToS: /* GraphQL */ `
+    mutation PublishToS($tosId: UUID!) {
+      termsOfService_updateMany(
+        where: { isCurrent: { eq: true } }
+        data: { isCurrent: false, updatedAt_expr: "request.time" }
+      )
+      termsOfService_update(
+        id: $tosId
+        data: {
+          isCurrent: true
+          publishedAt_expr: "request.time"
+          updatedAt_expr: "request.time"
+        }
+      )
+    }
+  `,
+
+  UpdateToS: /* GraphQL */ `
+    mutation UpdateToS(
+      $tosId: UUID!
+      $version: String
+      $title: String
+      $documentUrl: String
+    ) {
+      termsOfService_update(
+        id: $tosId
+        data: {
+          version: $version
+          title: $title
+          documentUrl: $documentUrl
+          updatedAt_expr: "request.time"
+        }
+      )
+    }
+  `,
+
+  GetCurrentToS: /* GraphQL */ `
+    query GetCurrentToS {
+      termsOfServices(where: { isCurrent: { eq: true } }, limit: 1) {
+        id
+        version
+        title
+        documentUrl
+        effectiveAt
+        createdAt
+        publishedAt
+      }
+    }
+  `,
+
+  GetToSById: /* GraphQL */ `
+    query GetToSById($tosId: UUID!) {
+      termsOfServices(where: { id: { eq: $tosId } }, limit: 1) {
+        id
+        version
+        title
+        documentUrl
+        effectiveAt
+        isCurrent
+        createdAt
+        publishedAt
+      }
+    }
+  `,
+
+  GetAllToS: /* GraphQL */ `
+    query GetAllToS {
+      termsOfServices(orderBy: { effectiveAt: DESC }) {
+        id
+        version
+        title
+        documentUrl
+        effectiveAt
+        isCurrent
+        createdAt
+      }
+    }
+  `,
+
+  GetUserToSStatus: /* GraphQL */ `
+    query GetUserToSStatus($uid: String!) {
+      user(id: $uid) {
+        id
+        acceptedTosId
+        tosAcceptedAt
+      }
+    }
+  `,
 };
 
 /**
@@ -1554,4 +1663,12 @@ export const FORCE_ADMIN_OPERATIONS: ReadonlySet<string> = new Set([
   'LogPayment',
   'UpdatePaymentStatusByReference',
   'GetPaymentDetailsByReference',
+  // Terms of Service (admin-only, @auth NO_ACCESS)
+  'CreateToS',
+  'PublishToS',
+  'UpdateToS',
+  'GetCurrentToS',
+  'GetToSById',
+  'GetAllToS',
+  'GetUserToSStatus',
 ]);

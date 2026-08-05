@@ -11,6 +11,30 @@ export class FirebaseService implements OnModuleInit {
   constructor(private configService: ConfigService) {}
 
   onModuleInit() {
+    // Single toggle: when FIREBASE_EMULATOR_LOCAL=true, point all Firebase
+    // services (Auth, Firestore, Data Connect) at the local emulators.
+    // When false (or unset), use production Firebase.
+    const useEmulator =
+      this.configService.get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
+        ?.toLowerCase() === 'true';
+
+    if (useEmulator) {
+      // Set process.env BEFORE initializeApp so the Admin SDK picks up the
+      // emulator hosts. These must be host:port (NO http://).
+      process.env.FIREBASE_AUTH_EMULATOR_HOST =
+        this.configService.get<string>('FIREBASE_AUTH_EMULATOR_HOST', '127.0.0.1:9099');
+      process.env.FIRESTORE_EMULATOR_HOST =
+        this.configService.get<string>('FIRESTORE_EMULATOR_HOST', '127.0.0.1:8081');
+      // Storage emulator
+      process.env.FIREBASE_STORAGE_EMULATOR_HOST =
+        this.configService.get<string>('FIREBASE_STORAGE_EMULATOR_HOST', '127.0.0.1:9199');
+
+      console.log('🔧 Firebase Emulator mode ENABLED (FIREBASE_EMULATOR_LOCAL=true)');
+      console.log(`   Auth:      ${process.env.FIREBASE_AUTH_EMULATOR_HOST}`);
+      console.log(`   Firestore: ${process.env.FIRESTORE_EMULATOR_HOST}`);
+      console.log(`   Storage:   ${process.env.FIREBASE_STORAGE_EMULATOR_HOST}`);
+    }
+
     const encodedServiceAccount = this.configService.get<string>(
       'FIREBASE_SERVICE_ACCOUNT_BASE64',
     );

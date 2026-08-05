@@ -46,7 +46,7 @@ type TermsOfService @table(name: "terms_of_service") {
   createdAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index
   publishedAt: Timestamp
-  isCurrent: Boolean! @default(value: "false") @index
+  isCurrent: Boolean! @default(value: false) @index
 }
 
 type Profile @table(name: "profiles", key: ["user"]) {
