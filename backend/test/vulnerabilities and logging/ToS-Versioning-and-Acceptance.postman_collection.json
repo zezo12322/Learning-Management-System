@@ -197,14 +197,14 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"version\": \"1.0\",\n  \"title\": \"Terms of Service v1.0\",\n  \"documentUrl\": \"https://optimatech.app/legal/tos-v1.0.pdf\"\n}"
+  "raw": "{\n  \"version\": \"1.0\",\n  \"title\": \"Terms of Service v1.0\",\n  \"contentHtml\": \"<h1>Terms of Service</h1><p>This is the HTML content of the ToS.</p>\"\n}"
             },
             "url": {
               "raw": "{{backendUrl}}/admin/tos",
               "host": ["{{backendUrl}}"],
               "path": ["admin", "tos"]
             },
-            "description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- version (string) ✅\n- title (string) ✅\n- documentUrl (string) ✅\n\nOptional: effectiveDate\n\n→ Saves {{tosId}}"
+"description": "📌 NO DATA NEEDED – body pre-filled.\n\nRequired fields:\n- version (string) ✅\n- title (string) ✅\n- contentHtml (string) ✅\n\nOptional: effectiveDate\n\n→ Saves {{tosId}}"
           }
         },
         {
@@ -279,7 +279,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Terms of Service v1.0 (Revised)\",\n  \"documentUrl\": \"https://optimatech.app/legal/tos-v1.0-rev.pdf\"\n}"
+  "raw": "{\n  \"title\": \"Terms of Service v1.0 (Revised)\",\n  \"contentHtml\": \"<h1>Terms of Service (Revised)</h1><p>Updated HTML content.</p>\"\n}"
             },
             "url": {
               "raw": "{{backendUrl}}/admin/tos/{{tosId}}",

@@ -11,7 +11,7 @@ export class CreateToSDto {
 
   @IsString()
   @IsNotEmpty()
-  documentUrl: string;
+  contentHtml: string;
 
   @IsOptional()
   @IsString()
@@ -29,7 +29,7 @@ export class UpdateToSDto {
 
   @IsOptional()
   @IsString()
-  documentUrl?: string;
+  contentHtml?: string;
 
   @IsOptional()
   @IsString()

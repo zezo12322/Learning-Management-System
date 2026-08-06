@@ -4,14 +4,14 @@
 mutation CreateToS(
   $version: String!
   $title: String!
-  $documentUrl: String!
+  $contentHtml: String!
   $effectiveDate: Timestamp
 ) @auth(level: NO_ACCESS) {
   termsOfService_insert(
     data: {
       version: $version
       title: $title
-      documentUrl: $documentUrl
+      contentHtml: $contentHtml
       effectiveAt: $effectiveDate
       isCurrent: false
     }
@@ -39,14 +39,14 @@ mutation UpdateToS(
   $tosId: UUID!
   $version: String
   $title: String
-  $documentUrl: String
+  $contentHtml: String
 ) @auth(level: NO_ACCESS) {
   termsOfService_update(
     id: $tosId
     data: {
       version: $version
       title: $title
-      documentUrl: $documentUrl
+      contentHtml: $contentHtml
       updatedAt_expr: "request.time"
     }
   )
@@ -57,7 +57,7 @@ query GetCurrentToS @auth(level: NO_ACCESS) {
     id
     version
     title
-    documentUrl
+    contentHtml
     effectiveAt
     createdAt
     publishedAt
@@ -69,7 +69,7 @@ query GetToSById($tosId: UUID!) @auth(level: NO_ACCESS) {
     id
     version
     title
-    documentUrl
+    contentHtml
     effectiveAt
     isCurrent
     createdAt
@@ -82,7 +82,7 @@ query GetAllToS @auth(level: NO_ACCESS) {
     id
     version
     title
-    documentUrl
+    contentHtml
     effectiveAt
     isCurrent
     createdAt

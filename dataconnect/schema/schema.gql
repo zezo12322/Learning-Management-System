@@ -41,7 +41,7 @@ type TermsOfService @table(name: "terms_of_service") {
   id: UUID! @default(expr: "uuidV4()")
   version: String! @unique
   title: String!
-  documentUrl: String!
+  contentHtml: String!
   effectiveAt: Timestamp! @default(expr: "request.time") @index
   createdAt: Timestamp! @default(expr: "request.time") @index
   updatedAt: Timestamp! @default(expr: "request.time") @index

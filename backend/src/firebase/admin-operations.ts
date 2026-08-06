@@ -1452,14 +1452,14 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     mutation CreateToS(
       $version: String!
       $title: String!
-      $documentUrl: String!
+      $contentHtml: String!
       $effectiveDate: Timestamp
     ) {
       termsOfService_insert(
         data: {
           version: $version
           title: $title
-          documentUrl: $documentUrl
+          contentHtml: $contentHtml
           effectiveAt: $effectiveDate
           isCurrent: false
         }
@@ -1489,14 +1489,14 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $tosId: UUID!
       $version: String
       $title: String
-      $documentUrl: String
+      $contentHtml: String
     ) {
       termsOfService_update(
         id: $tosId
         data: {
           version: $version
           title: $title
-          documentUrl: $documentUrl
+          contentHtml: $contentHtml
           updatedAt_expr: "request.time"
         }
       )
@@ -1509,7 +1509,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
         id
         version
         title
-        documentUrl
+        contentHtml
         effectiveAt
         createdAt
         publishedAt
@@ -1523,7 +1523,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
         id
         version
         title
-        documentUrl
+        contentHtml
         effectiveAt
         isCurrent
         createdAt
@@ -1538,7 +1538,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
         id
         version
         title
-        documentUrl
+        contentHtml
         effectiveAt
         isCurrent
         createdAt

@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { TosGuard } from '../tos/tos.guard';
 
 /**
  * Self-service identity endpoints for the authenticated user. No role required
@@ -17,6 +18,7 @@ export class UsersController {
 
   // Strict rate limit: 5 sync requests per 60 seconds (brute-force protection).
   @Post('sync')
+  @UseGuards(TosGuard)
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   async sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
     return this.usersService.sync(dto, token);

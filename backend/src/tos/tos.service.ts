@@ -15,7 +15,7 @@ export class ToSService {
     const variables: Record<string, unknown> = {
       version: dto.version,
       title: dto.title,
-      documentUrl: dto.documentUrl,
+      contentHtml: dto.contentHtml,
     };
     // Only include effectiveDate if the client actually provided it.
     if (dto.effectiveDate) {
@@ -47,7 +47,7 @@ export class ToSService {
     const variables: Record<string, unknown> = { tosId };
     if (dto.version !== undefined) variables.version = dto.version;
     if (dto.title !== undefined) variables.title = dto.title;
-    if (dto.documentUrl !== undefined) variables.documentUrl = dto.documentUrl;
+    if (dto.contentHtml !== undefined) variables.contentHtml = dto.contentHtml;
 
     return this.dc.executeMutation('UpdateToS', variables);
   }
@@ -110,7 +110,7 @@ export class ToSService {
         id: currentTos.id,
         version: currentTos.version,
         title: currentTos.title,
-        documentUrl: currentTos.documentUrl,
+        contentHtml: currentTos.contentHtml,
       },
     };
   }
