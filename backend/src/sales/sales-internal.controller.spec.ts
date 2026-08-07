@@ -59,7 +59,13 @@ describe('SalesInternalController', () => {
   it('coerces malformed rows instead of passing junk to the agent', async () => {
     dc.executeQueryAsAdmin.mockResolvedValue({
       subscriptionTiers: [
-        { id: 't2', name: 'Basic', price: '200', billingCycle: null, features: null },
+        {
+          id: 't2',
+          name: 'Basic',
+          price: '200',
+          billingCycle: null,
+          features: null,
+        },
       ],
     });
 

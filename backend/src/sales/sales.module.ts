@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FirebaseModule } from '../firebase/firebase.module';
-import { LoggingModule } from '../logging/logging.module';
+import { AuditLoggingModule } from '../logging/logging.module';
 import { SalesInternalController } from './sales-internal.controller';
 import { SalesUpsellController } from './sales-upsell.controller';
 import { SalesController } from './sales.controller';
@@ -17,8 +17,12 @@ import { SalesService } from './sales.service';
  * one decorator away from being admin-only, or worse.
  */
 @Module({
-  imports: [FirebaseModule, LoggingModule],
-  controllers: [SalesController, SalesUpsellController, SalesInternalController],
+  imports: [FirebaseModule, AuditLoggingModule],
+  controllers: [
+    SalesController,
+    SalesUpsellController,
+    SalesInternalController,
+  ],
   providers: [SalesService],
   exports: [SalesService],
 })

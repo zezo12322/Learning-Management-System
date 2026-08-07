@@ -54,8 +54,24 @@ export class SalesService {
     const url = new URL(`${this.baseUrl}${path}`);
     const apiKey = this.apiKey;
     for (const [key, value] of Object.entries(options.query ?? {})) {
-      if (value !== undefined && value !== null && value !== '') {
-        url.searchParams.set(key, String(value));
+      if (value === undefined || value === null || value === '') {
+        continue;
+      }
+      // Only primitives belong in a query string. `String()` on an object would
+      // silently send "[object Object]" and the filter would appear to work
+      // while matching nothing, so a bad value is dropped and logged instead.
+      if (typeof value === 'string') {
+        url.searchParams.set(key, value);
+      } else if (
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        typeof value === 'bigint'
+      ) {
+        url.searchParams.set(key, value.toString());
+      } else {
+        this.logger.warn(
+          `Ignoring non-primitive query parameter '${key}' for ${path}`,
+        );
       }
     }
 
@@ -67,13 +83,16 @@ export class SalesService {
           'Content-Type': 'application/json',
           'X-Internal-Api-Key': apiKey,
         },
-        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        body:
+          options.body === undefined ? undefined : JSON.stringify(options.body),
         // The agent may call a model and a provider before answering; a short
         // default timeout would turn a slow reply into a spurious failure.
         signal: AbortSignal.timeout(30_000),
       });
     } catch (err: any) {
-      this.logger.error(`Sales agent ${method} ${path} failed: ${err?.message}`);
+      this.logger.error(
+        `Sales agent ${method} ${path} failed: ${err?.message}`,
+      );
       throw new BadGatewayException('Could not reach the sales agent service.');
     }
 
@@ -115,9 +134,13 @@ export class SalesService {
   }
 
   patchLead(leadId: string, body: unknown) {
-    return this.request('PATCH', `/v1/sales/leads/${encodeURIComponent(leadId)}`, {
-      body,
-    });
+    return this.request(
+      'PATCH',
+      `/v1/sales/leads/${encodeURIComponent(leadId)}`,
+      {
+        body,
+      },
+    );
   }
 
   sendMessage(leadId: string, body: unknown) {

@@ -22,7 +22,10 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
   // time. Mirrors ListActiveSubscriptionTiers in dataconnect/default/financials.gql.
   ListActiveSubscriptionTiers: /* GraphQL */ `
     query ListActiveSubscriptionTiers {
-      subscriptionTiers(where: { isActive: { eq: true } }, orderBy: [{ price: ASC }]) {
+      subscriptionTiers(
+        where: { isActive: { eq: true } }
+        orderBy: [{ price: ASC }]
+      ) {
         id
         name
         price

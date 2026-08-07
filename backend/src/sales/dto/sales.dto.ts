@@ -41,11 +41,11 @@ export const AUDIENCES = ['ALL', 'B2B', 'B2C'] as const;
 
 export class ListLeadsQueryDto {
   @IsOptional()
-  @IsIn(LEAD_STAGES as unknown as string[])
+  @IsIn(LEAD_STAGES)
   stage?: string;
 
   @IsOptional()
-  @IsIn(CHANNELS as unknown as string[])
+  @IsIn(CHANNELS)
   channel?: string;
 
   @IsOptional()
@@ -86,11 +86,11 @@ export class ListLeadsQueryDto {
 
 export class PatchLeadDto {
   @IsOptional()
-  @IsIn(LEAD_STAGES as unknown as string[])
+  @IsIn(LEAD_STAGES)
   stage?: string;
 
   @IsOptional()
-  @IsIn(SEGMENTS as unknown as string[])
+  @IsIn(SEGMENTS)
   segment?: string;
 
   @IsOptional()
@@ -146,7 +146,7 @@ export class SendMessageDto {
   text!: string;
 
   @IsOptional()
-  @IsIn(CHANNELS as unknown as string[])
+  @IsIn(CHANNELS)
   channel?: string;
 
   /**
@@ -183,11 +183,11 @@ export class AddKnowledgeDto {
   content!: string;
 
   @IsOptional()
-  @IsIn(DOC_TYPES as unknown as string[])
+  @IsIn(DOC_TYPES)
   doc_type?: string;
 
   @IsOptional()
-  @IsIn(AUDIENCES as unknown as string[])
+  @IsIn(AUDIENCES)
   audience?: string;
 
   @IsOptional()

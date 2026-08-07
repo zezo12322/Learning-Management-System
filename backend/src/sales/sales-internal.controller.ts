@@ -44,7 +44,9 @@ export class SalesInternalController {
       // Not an error — a deployment with no published plans is a valid state, and
       // the agent handles it by escalating pricing questions to a human. Worth a
       // log line because it is also what a broken seed looks like.
-      this.logger.warn('No active subscription tiers to serve to the sales agent');
+      this.logger.warn(
+        'No active subscription tiers to serve to the sales agent',
+      );
     }
 
     return { tiers };

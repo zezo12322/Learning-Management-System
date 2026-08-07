@@ -33,7 +33,8 @@ describe('SalesService', () => {
     global.fetch = originalFetch;
     if (originalUrl === undefined) delete process.env.SALES_AGENT_URL;
     else process.env.SALES_AGENT_URL = originalUrl;
-    if (originalKey === undefined) delete process.env.SALES_AGENT_INTERNAL_API_KEY;
+    if (originalKey === undefined)
+      delete process.env.SALES_AGENT_INTERNAL_API_KEY;
     else process.env.SALES_AGENT_INTERNAL_API_KEY = originalKey;
   });
 
@@ -51,7 +52,12 @@ describe('SalesService', () => {
   it('omits empty query parameters rather than sending blanks', async () => {
     fetchMock.mockResolvedValue(jsonResponse({}));
 
-    await service.listLeads({ stage: undefined, q: '', channel: null, limit: 10 });
+    await service.listLeads({
+      stage: undefined,
+      q: '',
+      channel: null,
+      limit: 10,
+    });
 
     const [url] = fetchMock.mock.calls[0];
     expect(url).toBe('https://agent.test/v1/sales/leads?limit=10');
@@ -83,14 +89,16 @@ describe('SalesService', () => {
   it('preserves the upstream status code and error body', async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(
-        { error: { code: 'LEAD_OPTED_OUT', message: 'They asked us to stop.' } },
+        {
+          error: { code: 'LEAD_OPTED_OUT', message: 'They asked us to stop.' },
+        },
         409,
       ),
     );
 
-    await expect(service.sendMessage('lead-1', { text: 'hi' })).rejects.toMatchObject(
-      { status: 409 },
-    );
+    await expect(
+      service.sendMessage('lead-1', { text: 'hi' }),
+    ).rejects.toMatchObject({ status: 409 });
   });
 
   it('wraps a non-JSON error body instead of throwing on parse', async () => {

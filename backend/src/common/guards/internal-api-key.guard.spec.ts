@@ -28,7 +28,9 @@ describe('InternalApiKeyGuard', () => {
   });
 
   it('allows a request carrying the configured key', () => {
-    const ctx = ctxFor({ 'x-internal-api-key': 'correct-horse-battery-staple' });
+    const ctx = ctxFor({
+      'x-internal-api-key': 'correct-horse-battery-staple',
+    });
     expect(guard.canActivate(ctx)).toBe(true);
   });
 

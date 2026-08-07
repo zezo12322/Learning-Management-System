@@ -69,7 +69,7 @@ export class SalesController {
     const result = await this.sales.patchLead(leadId, { ...body, actor: uid });
 
     // fire-and-forget — logging failures must never affect the API response
-    this.audit.createLog({
+    void this.audit.createLog({
       action: 'SALES_LEAD_UPDATE',
       adminUid: uid,
       targetUid: leadId,
@@ -91,9 +91,12 @@ export class SalesController {
     body: SendMessageDto,
     @CurrentUser('uid') uid: string,
   ) {
-    const result = await this.sales.sendMessage(leadId, { ...body, actor: uid });
+    const result = await this.sales.sendMessage(leadId, {
+      ...body,
+      actor: uid,
+    });
 
-    this.audit.createLog({
+    void this.audit.createLog({
       action: 'SALES_HUMAN_MESSAGE',
       adminUid: uid,
       targetUid: leadId,
@@ -150,7 +153,7 @@ export class SalesController {
     @CurrentUser('uid') uid: string,
   ) {
     const result = await this.sales.addKnowledge(body);
-    this.audit.createLog({
+    void this.audit.createLog({
       action: 'SALES_KB_ADD',
       adminUid: uid,
       targetUid: body.title.slice(0, 200),
@@ -166,7 +169,7 @@ export class SalesController {
     @CurrentUser('uid') uid: string,
   ) {
     const result = await this.sales.retireKnowledge(documentId);
-    this.audit.createLog({
+    void this.audit.createLog({
       action: 'SALES_KB_RETIRE',
       adminUid: uid,
       targetUid: documentId,
