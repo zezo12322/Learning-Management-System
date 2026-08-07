@@ -13,6 +13,7 @@ lms/
 ├── backend/         # NestJS (Backend API - 21 Modules)
 ├── functions/       # Firebase Cloud Functions (Auth triggers, Admin Tasks)
 ├── dataconnect/     # Firebase Data Connect (PostgreSQL Schema & GraphQL)
+├── docs/            # تقارير وأدلة التشغيل
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
@@ -150,3 +151,11 @@ docker compose --profile tools up -d
 | **Cloud Functions** | Node.js 22 (CommonJS) | `firebase-functions`, `@upstash/ratelimit` (Redis), `zod` (Validation) |
 | **Database** | PostgreSQL | Firebase Data Connect (GraphQL), Redis (for BullMQ & Rate Limiting) |
 | **Auth & Storage** | Firebase | Firebase Auth (ID Tokens/Custom Claims), Firebase Storage (AES-128 HLS) |
+
+## 🤝 وكيل المبيعات (AI Sales Agent)
+
+المنصة مربوطة بوكيل مبيعات بالذكاء الاصطناعي بيشتغل على واتساب وفيسبوك ماسنجر
+(خدمة مستقلة في ريبو [OptimaLearn_Sales_Agent](https://github.com/zezo12322/OptimaLearn_Sales_Agent)).
+
+الجزء الموجود هنا: موديول `backend/src/sales/` ولوحة CRM في `web/src/app/(app)/sales/`.
+خطوات الربط والمتغيرات المطلوبة: **[docs/SALES_AGENT_INTEGRATION.md](docs/SALES_AGENT_INTEGRATION.md)**.

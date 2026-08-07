@@ -30,6 +30,7 @@ import { CatalogModule } from './catalog/catalog.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AiModule } from './ai/ai.module';
+import { SalesModule } from './sales/sales.module';
 import { RedisThrottlerStorage } from './common/guards/redis-throttler.storage';
 import { FailClosedThrottlerGuard } from './common/guards/fail-closed-throttler.guard';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -106,6 +107,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     RatingsModule,
     PaymentsModule,
     AiModule,
+    SalesModule,
   ],
   // Health endpoints moved to HealthModule (KAN-147); AppController is gone.
   controllers: [],

@@ -72,3 +72,18 @@ query GetPaymentDetailsByReference($referenceId: String!) @auth(level: NO_ACCESS
     }
   }
 }
+# NO_ACCESS: read exclusively by the backend service account, on behalf of the
+# sales agent, so it can quote live prices instead of a stored copy. Kept off the
+# USER/PUBLIC paths deliberately — if a public pricing page needs these later it
+# should get its own PUBLIC operation with an explicit insecureReason, rather than
+# widening this one.
+query ListActiveSubscriptionTiers @auth(level: NO_ACCESS) {
+  subscriptionTiers(where: { isActive: { eq: true } }, orderBy: [{ price: ASC }]) {
+    id
+    name
+    price
+    billingCycle
+    features
+    isActive
+  }
+}

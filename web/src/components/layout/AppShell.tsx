@@ -5,17 +5,18 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import {
-  BookOpen,
-  Bot,
-  Bookmark,
   BarChart3,
-  UploadCloud,
-  UserRound,
-  UserPlus,
+  BookOpen,
+  Bookmark,
+  Bot,
+  Handshake,
   LayoutDashboard,
   LibraryBig,
   LogOut,
   Plus,
+  UploadCloud,
+  UserPlus,
+  UserRound,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { authoringApi } from '@/lib/api/services'
@@ -61,6 +62,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         0,
         { href: '/students', label: 'nav.students', icon: UserPlus },
         { href: '/insights', label: 'nav.insights', icon: BarChart3 },
+        { href: '/sales', label: 'nav.sales', icon: Handshake },
       )
     }
     if (firstCourseId) {

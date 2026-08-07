@@ -17,6 +17,22 @@
  * existing connector path unchanged.
  */
 export const ADMIN_OPERATIONS: Record<string, string> = {
+  // --- Sales agent live pricing (SalesInternalController) ---
+  // The agent must never store a price; it reads the published tiers at answer
+  // time. Mirrors ListActiveSubscriptionTiers in dataconnect/default/financials.gql.
+  ListActiveSubscriptionTiers: /* GraphQL */ `
+    query ListActiveSubscriptionTiers {
+      subscriptionTiers(where: { isActive: { eq: true } }, orderBy: [{ price: ASC }]) {
+        id
+        name
+        price
+        billingCycle
+        features
+        isActive
+      }
+    }
+  `,
+
   // --- Readiness probe (HealthService, KAN-147) ---
   // The cheapest real read available: one row from a small reference table.
   // Proves in a single round trip that Data Connect is reachable, that the
