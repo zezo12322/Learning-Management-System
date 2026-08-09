@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:easy_localization/easy_localization.dart' as esay;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -77,8 +78,17 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         });
       }
 
+      // The manifest and the AES key are both served by our API behind
+      // FirebaseAuthGuard, so the player has to carry the ID token — without it
+      // the key request comes back 401 and playback dies on the first segment.
+      // Segment URLs are pre-signed GCS links; they ignore this header.
+      final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+
       final controller = VideoPlayerController.networkUrl(
         Uri.parse(url),
+        httpHeaders: {
+          if (idToken != null) 'Authorization': 'Bearer $idToken',
+        },
       );
       await controller.initialize();
 
