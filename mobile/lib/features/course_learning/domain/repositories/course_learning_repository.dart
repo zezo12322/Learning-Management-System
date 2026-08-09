@@ -19,7 +19,7 @@ abstract class CourseLearningRepository {
   Future<Either<Failure, void>> updateLectureProgress({
     required String lectureId,
     required int lastWatchedSecond,
-    bool completed = false,
+    int? watchedSeconds,
   });
   // Future<Either<Failure, bool>> getCourseAccess({
   //   required String courseId,

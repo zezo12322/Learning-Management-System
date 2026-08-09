@@ -7,15 +7,17 @@ class UpdateLectureProgressUseCase {
 
   UpdateLectureProgressUseCase(this.repository);
 
+  /// [watchedSeconds] is time actually spent playing, which the server needs
+  /// alongside the position before it will mark a lecture complete.
   Future<Either<Failure, void>> call({
     required String lectureId,
     required int lastWatchedSecond,
-    bool completed = false,
+    int? watchedSeconds,
   }) {
     return repository.updateLectureProgress(
       lectureId: lectureId,
       lastWatchedSecond: lastWatchedSecond,
-      completed: completed,
+      watchedSeconds: watchedSeconds,
     );
   }
 }

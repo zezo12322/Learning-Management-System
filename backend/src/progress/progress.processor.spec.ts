@@ -66,6 +66,55 @@ describe('ProgressProcessor', () => {
     expect(completion.checkCourseCompletionAsAdmin).not.toHaveBeenCalled();
   });
 
+  // Position alone says nothing about how the playhead got there. These three
+  // pin the rule that closed the hole where dragging the scrubber to the end,
+  // or playing at 8x, certified a lecture nobody watched.
+  it('does NOT complete when the position clears the bar but the watch time does not', async () => {
+    dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
+    await proc.process(
+      // Scrubbed to the end after 5 seconds of actual playback.
+      job({
+        userId: 'u1',
+        lectureId: 'L1',
+        lastWatchedSecond: 100,
+        watchedSeconds: 5,
+      }),
+    );
+
+    expect(dc.executeMutationAsAdmin.mock.calls[0][1].completedAt).toBeNull();
+    expect(completion.checkCourseCompletionAsAdmin).not.toHaveBeenCalled();
+  });
+
+  it('completes when position and watch time both clear the bar', async () => {
+    dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
+    await proc.process(
+      job({
+        userId: 'u1',
+        lectureId: 'L1',
+        lastWatchedSecond: 95,
+        watchedSeconds: 92,
+      }),
+    );
+
+    expect(
+      dc.executeMutationAsAdmin.mock.calls[0][1].completedAt,
+    ).not.toBeNull();
+    expect(completion.checkCourseCompletionAsAdmin).toHaveBeenCalled();
+  });
+
+  it('falls back to the position-only rule when watchedSeconds is absent', async () => {
+    // Clients that predate the field — an installed mobile build — must keep
+    // completing lectures rather than silently stalling at 99%.
+    dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
+    await proc.process(
+      job({ userId: 'u1', lectureId: 'L1', lastWatchedSecond: 90 }),
+    );
+
+    expect(
+      dc.executeMutationAsAdmin.mock.calls[0][1].completedAt,
+    ).not.toBeNull();
+  });
+
   it('clamps the stored position to the lecture duration', async () => {
     dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
     await proc.process(
