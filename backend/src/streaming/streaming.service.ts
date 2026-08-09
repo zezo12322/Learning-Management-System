@@ -408,7 +408,12 @@ export class StreamingService {
     if (/#EXT-X-KEY/i.test(line)) {
       // Bind a fresh, short-lived key token to this user + lecture + key file.
       const keyRel = this.joinRel(ctx.playlistDirRel, uri);
-      const keyUrl = this.signKeyUrl(ctx.lectureId, ctx.uid, keyRel, ctx.baseUrl);
+      const keyUrl = this.signKeyUrl(
+        ctx.lectureId,
+        ctx.uid,
+        keyRel,
+        ctx.baseUrl,
+      );
       return line.replace(/URI="[^"]*"/i, `URI="${keyUrl}"`);
     }
 
