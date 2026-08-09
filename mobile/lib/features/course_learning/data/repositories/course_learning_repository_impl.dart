@@ -63,10 +63,11 @@ class CourseLearningRepositoryImpl implements CourseLearningRepository {
   Future<Either<Failure, void>> updateLectureProgress({
     required String lectureId,
     required int lastWatchedSecond,
-    bool completed = false,
+    int? watchedSeconds,
   }) async {
     try {
-      await _remoteDataSource.updateLectureProgress(lectureId, lastWatchedSecond, completed: completed);
+      await _remoteDataSource.updateLectureProgress(lectureId, lastWatchedSecond,
+          watchedSeconds: watchedSeconds);
       return const Right(null);
     } on CustomExceptions catch (e) {
       return Left(ServerFailure(e.message));

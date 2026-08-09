@@ -148,29 +148,56 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     await selectLectureById(nextLecture.id);
   }
 
+  /// The learner pressing "mark complete" in the bottom bar.
+  ///
+  /// Deliberately omits `watchedSeconds`, which puts the server on its
+  /// position-only rule and completes the lecture. That is the point: someone
+  /// choosing to tick a lesson off is not the player certifying that it was
+  /// watched, and this button predates the watch-time check. Remove the button
+  /// if the course policy is that only real viewing counts.
   Future<void> markCurrentLectureAsCompleted() async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
     final duration = state.currentLecture?.duration ?? 0;
-    
-    // We optimistically mark it as complete by hitting the synchronous PUT endpoint.
-    // The NestJS backend will accept this since it's the explicit "mark complete" action.
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: duration > 0 ? (duration * 60) : 0, // Fallback if duration is in minutes
-      completed: true,
+      lastWatchedSecond: duration > 0 ? (duration * 60) : 0,
     );
   }
 
-  Future<void> syncLectureHeartbeat(int currentSecond) async {
+  /// The playhead reaching the end of the video.
+  ///
+  /// This used to call the method above, which sends a position large enough to
+  /// trip the server's threshold no matter what — so dragging the scrubber to
+  /// the end finished a lecture nobody had watched. It now reports the real
+  /// position and the credited watch time and lets the server decide, matching
+  /// the web player.
+  Future<void> reportLectureFinished({
+    required int lastWatchedSecond,
+    required int watchedSeconds,
+  }) async {
+    final currentLectureId = state.currentLecture?.id;
+    if (currentLectureId == null) return;
+
+    await updateLectureProgressUseCase(
+      lectureId: currentLectureId,
+      lastWatchedSecond: lastWatchedSecond,
+      watchedSeconds: watchedSeconds,
+    );
+  }
+
+  Future<void> syncLectureHeartbeat(
+    int currentSecond, {
+    required int watchedSeconds,
+  }) async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
       lastWatchedSecond: currentSecond,
-      completed: false, // Don't aggressively mark as completed on heartbeat
+      watchedSeconds: watchedSeconds,
     );
   }
 }
