@@ -79,6 +79,11 @@ export default function LoginPage() {
       // that are fixable, and log the rest so a console screenshot is enough
       // to diagnose the next one.
       const code = (err as { code?: string } | null)?.code
+      // Closing the popup, or clicking the button twice, is a choice rather
+      // than a failure — say nothing.
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        return
+      }
       if (code === 'auth/unauthorized-domain') {
         setError(t('auth.err.googleUnauthorizedDomain'))
       } else if (code === 'auth/operation-not-allowed') {
