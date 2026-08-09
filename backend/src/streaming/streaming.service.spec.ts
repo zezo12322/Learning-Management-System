@@ -116,6 +116,32 @@ describe('StreamingService', () => {
       );
     });
 
+    it('keeps the API prefix in the key URL so the player can fetch it', async () => {
+      dc.executeQuery.mockResolvedValue(lecture());
+      firebase.downloadFile.mockResolvedValue(
+        Buffer.from(
+          ['#EXTM3U', '#EXT-X-KEY:METHOD=AES-128,URI="enc.key",IV=0x00'].join(
+            '\n',
+          ),
+        ),
+      );
+
+      const out = await svc.getManifest({
+        lectureId: 'L1',
+        uid: 'u1',
+        token: 't',
+        isAdmin: false,
+        // what the controller derives: scheme + host + global prefix
+        origin: 'https://api.example.com/api/v1',
+      });
+
+      // Dropping the prefix here 404s the key request and playback dies on the
+      // first segment.
+      expect(out).toContain(
+        'URI="https://api.example.com/api/v1/lectures/L1/stream/key?kt=KT"',
+      );
+    });
+
     it('prefers a configured API_PUBLIC_URL over the request origin', async () => {
       const pinned = new StreamingService(
         dc as any,
