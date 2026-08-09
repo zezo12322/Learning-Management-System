@@ -148,31 +148,14 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     await selectLectureById(nextLecture.id);
   }
 
-  /// The learner pressing "mark complete" in the bottom bar.
+  /// The playhead reaching the end of the video — now the only way a lecture is
+  /// completed from this app.
   ///
-  /// Deliberately omits `watchedSeconds`, which puts the server on its
-  /// position-only rule and completes the lecture. That is the point: someone
-  /// choosing to tick a lesson off is not the player certifying that it was
-  /// watched, and this button predates the watch-time check. Remove the button
-  /// if the course policy is that only real viewing counts.
-  Future<void> markCurrentLectureAsCompleted() async {
-    final currentLectureId = state.currentLecture?.id;
-    if (currentLectureId == null) return;
-
-    final duration = state.currentLecture?.duration ?? 0;
-    await updateLectureProgressUseCase(
-      lectureId: currentLectureId,
-      lastWatchedSecond: duration > 0 ? (duration * 60) : 0,
-    );
-  }
-
-  /// The playhead reaching the end of the video.
-  ///
-  /// This used to call the method above, which sends a position large enough to
-  /// trip the server's threshold no matter what — so dragging the scrubber to
-  /// the end finished a lecture nobody had watched. It now reports the real
-  /// position and the credited watch time and lets the server decide, matching
-  /// the web player.
+  /// It used to route through a `markCurrentLectureAsCompleted` that posted a
+  /// position large enough to trip the server's threshold regardless of what had
+  /// been watched. That method is gone along with the bottom-bar button that
+  /// called it. This reports the real position and the credited watch time and
+  /// lets the server decide, matching the web player.
   Future<void> reportLectureFinished({
     required int lastWatchedSecond,
     required int watchedSeconds,

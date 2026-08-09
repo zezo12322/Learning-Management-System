@@ -276,7 +276,6 @@ const en: Dict = {
   'learn.playerComingSoon': 'The secure video player is being set up',
   'learn.reading': 'Reading',
   'learn.readingEmpty': 'This lesson has no content yet.',
-  'learn.completeLesson': 'Complete lesson',
 
   // Profile
   'profile.loadingUser': 'Loading the signed-in user…',
@@ -760,7 +759,7 @@ const en: Dict = {
   'learn.previous': 'Previous',
   'learn.next': 'Next',
   'learn.completed': 'Completed',
-  'learn.completeError': 'This lesson could not be marked complete.',
+  'learn.completeInProgress': 'Completes as you watch',
   'learn.completeHint': 'Watch to the end of the lesson to complete it.',
   'learn.previewOnly': 'You are previewing this course — only free lessons are shown.',
   'learn.enrollForFull': 'Enroll for full access',
@@ -1200,7 +1199,6 @@ const ar: Dict = {
   'learn.playerComingSoon': 'مشغّل الفيديو الآمن قيد الإعداد',
   'learn.reading': 'قراءة',
   'learn.readingEmpty': 'لا يوجد محتوى لهذا الدرس بعد.',
-  'learn.completeLesson': 'إتمام الدرس',
 
   // Profile
   'profile.loadingUser': 'جارٍ تحميل المستخدم المسجَّل…',
@@ -1680,7 +1678,7 @@ const ar: Dict = {
   'learn.previous': 'السابق',
   'learn.next': 'التالي',
   'learn.completed': 'مكتمل',
-  'learn.completeError': 'تعذّر تعليم هذا الدرس كمكتمل.',
+  'learn.completeInProgress': 'يكتمل مع المشاهدة',
   'learn.completeHint': 'شاهد الدرس حتى نهايته لإتمامه.',
   'learn.previewOnly': 'أنت تشاهد معاينة لهذه الدورة — تظهر الدروس المجانية فقط.',
   'learn.enrollForFull': 'التحق للوصول الكامل',
