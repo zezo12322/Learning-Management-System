@@ -9,7 +9,8 @@ import 'package:optimatech_lms/features/course_learning/data/models/lecture_cont
 abstract class CourseLearningRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
   Future<LectureContentModel> getLectureContent(String lectureId);
-  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false});
+  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds});
 }
 
 class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
@@ -65,13 +66,20 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   }
 
   @override
-  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false}) async {
+  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds}) async {
     try {
       await _setAuthToken();
       // NestJS route: PUT /api/v1/lectures/:lectureId/progress
+      // `completed` is gone: the server ignored it and derives completion from
+      // the position plus the credited watch time below.
+      //
+      // The key is omitted rather than sent as null when there is no watch time
+      // to report — the server reads an absent field as "not reported" and an
+      // explicit value as a measurement, and null is the former.
       await apiService.put('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
-        'completed': completed,
+        if (watchedSeconds != null) 'watchedSeconds': watchedSeconds,
       });
     } catch (e) {
       throw CustomExceptions(message: 'Failed to update lecture progress: $e');

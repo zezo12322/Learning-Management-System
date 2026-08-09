@@ -67,6 +67,10 @@ const en: Dict = {
   'auth.err.emailFirst': 'Enter your email address first, then request a password reset.',
   'auth.err.resetFailed': 'We could not send password reset instructions right now.',
   'auth.err.googleUnavailable': 'Google sign-in is currently unavailable.',
+  'auth.err.googleUnauthorizedDomain':
+    'Google sign-in is not allowed from this address yet. Add this domain to the Firebase Authentication authorized domains list.',
+  'auth.err.googleProviderDisabled':
+    'Google sign-in is switched off for this project. Enable the Google provider in Firebase Authentication.',
   'auth.notice.resetSent': 'Password reset instructions were sent if an account exists for this email.',
   'auth.val.email': 'Enter a valid email address.',
   'auth.val.passwordRequired': 'Password is required.',
@@ -272,7 +276,6 @@ const en: Dict = {
   'learn.playerComingSoon': 'The secure video player is being set up',
   'learn.reading': 'Reading',
   'learn.readingEmpty': 'This lesson has no content yet.',
-  'learn.completeLesson': 'Complete lesson',
 
   // Profile
   'profile.loadingUser': 'Loading the signed-in user…',
@@ -756,7 +759,7 @@ const en: Dict = {
   'learn.previous': 'Previous',
   'learn.next': 'Next',
   'learn.completed': 'Completed',
-  'learn.completeError': 'This lesson could not be marked complete.',
+  'learn.completeInProgress': 'Completes as you watch',
   'learn.completeHint': 'Watch to the end of the lesson to complete it.',
   'learn.previewOnly': 'You are previewing this course — only free lessons are shown.',
   'learn.enrollForFull': 'Enroll for full access',
@@ -987,6 +990,10 @@ const ar: Dict = {
   'auth.err.emailFirst': 'أدخل بريدك الإلكتروني أولًا ثم اطلب إعادة تعيين كلمة المرور.',
   'auth.err.resetFailed': 'تعذّر إرسال تعليمات إعادة التعيين الآن.',
   'auth.err.googleUnavailable': 'تسجيل الدخول عبر Google غير متاح حاليًا.',
+  'auth.err.googleUnauthorizedDomain':
+    'تسجيل الدخول عبر Google غير مسموح من هذا العنوان بعد. أضِف هذا النطاق إلى قائمة النطاقات المصرّح بها في Firebase Authentication.',
+  'auth.err.googleProviderDisabled':
+    'تسجيل الدخول عبر Google معطّل في هذا المشروع. فعّل مزوّد Google من Firebase Authentication.',
   'auth.notice.resetSent': 'تم إرسال تعليمات إعادة التعيين إذا كان هناك حساب لهذا البريد.',
   'auth.val.email': 'أدخل بريدًا إلكترونيًا صحيحًا.',
   'auth.val.passwordRequired': 'كلمة المرور مطلوبة.',
@@ -1192,7 +1199,6 @@ const ar: Dict = {
   'learn.playerComingSoon': 'مشغّل الفيديو الآمن قيد الإعداد',
   'learn.reading': 'قراءة',
   'learn.readingEmpty': 'لا يوجد محتوى لهذا الدرس بعد.',
-  'learn.completeLesson': 'إتمام الدرس',
 
   // Profile
   'profile.loadingUser': 'جارٍ تحميل المستخدم المسجَّل…',
@@ -1672,7 +1678,7 @@ const ar: Dict = {
   'learn.previous': 'السابق',
   'learn.next': 'التالي',
   'learn.completed': 'مكتمل',
-  'learn.completeError': 'تعذّر تعليم هذا الدرس كمكتمل.',
+  'learn.completeInProgress': 'يكتمل مع المشاهدة',
   'learn.completeHint': 'شاهد الدرس حتى نهايته لإتمامه.',
   'learn.previewOnly': 'أنت تشاهد معاينة لهذه الدورة — تظهر الدروس المجانية فقط.',
   'learn.enrollForFull': 'التحق للوصول الكامل',

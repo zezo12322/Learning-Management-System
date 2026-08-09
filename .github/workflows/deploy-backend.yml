@@ -70,15 +70,48 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_SERVICE: ${{ vars.RAILWAY_SERVICE }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           missing=""
           [ -z "$RAILWAY_TOKEN" ] && missing="$missing RAILWAY_TOKEN(secret)"
           [ -z "$RAILWAY_SERVICE" ] && missing="$missing RAILWAY_SERVICE(variable)"
+          # Either credential works for the schema deploy below. A service
+          # account is the supported path; FIREBASE_TOKEN is the older CI token
+          # and is accepted so an existing setup keeps working.
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ] && [ -z "$FIREBASE_TOKEN" ]; then
+            missing="$missing FIREBASE_SERVICE_ACCOUNT-or-FIREBASE_TOKEN(secret)"
+          fi
           if [ -n "$missing" ]; then
             echo "::error::Missing:$missing — see docs/OPERATIONS.md §1."
             exit 1
           fi
-          echo "Railway credentials present."
+          echo "Railway and Firebase credentials present."
+
+      # THE SCHEMA GOES FIRST. The backend's queries are written against the
+      # schema in dataconnect/, so a release that adds a column has to migrate
+      # the database before the code that selects it starts serving traffic.
+      #
+      # Nothing used to deploy the schema at all: every workflow ran only
+      # `dataconnect:sdk:generate`, which is client codegen and never touches the
+      # database. A release adding a field therefore shipped a backend querying a
+      # column that did not exist, and every request through it would fail.
+      #
+      # Deliberately no `--force`. A non-destructive migration — a new nullable
+      # column — applies on its own, and anything Data Connect judges destructive
+      # stops the deploy instead of quietly dropping data. A blocked release is
+      # recoverable; a dropped column is not. If a destructive change is genuinely
+      # intended, run it by hand and consciously.
+      - name: Deploy Data Connect schema
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
+            export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+          fi
+          npx firebase-tools deploy --only dataconnect --non-interactive
 
       # `up --detach` uploads this checkout and returns once the build is queued;
       # the health gate below is what decides whether it worked. Railway will not

@@ -296,9 +296,6 @@ class _BottomBarSection extends StatelessWidget {
 
         return LessonBottomBar(
           onPrevious: cubit.hasPreviousLecture ? cubit.goToPreviousLecture : () {},
-          onMarkComplete: state.currentLecture == null
-              ? null
-              : cubit.markCurrentLectureAsCompleted,
           onNext: cubit.hasNextLecture ? cubit.goToNextLecture : () {},
         );
       },

@@ -148,29 +148,39 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     await selectLectureById(nextLecture.id);
   }
 
-  Future<void> markCurrentLectureAsCompleted() async {
+  /// The playhead reaching the end of the video — now the only way a lecture is
+  /// completed from this app.
+  ///
+  /// It used to route through a `markCurrentLectureAsCompleted` that posted a
+  /// position large enough to trip the server's threshold regardless of what had
+  /// been watched. That method is gone along with the bottom-bar button that
+  /// called it. This reports the real position and the credited watch time and
+  /// lets the server decide, matching the web player.
+  Future<void> reportLectureFinished({
+    required int lastWatchedSecond,
+    required int watchedSeconds,
+  }) async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
-    final duration = state.currentLecture?.duration ?? 0;
-    
-    // We optimistically mark it as complete by hitting the synchronous PUT endpoint.
-    // The NestJS backend will accept this since it's the explicit "mark complete" action.
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: duration > 0 ? (duration * 60) : 0, // Fallback if duration is in minutes
-      completed: true,
+      lastWatchedSecond: lastWatchedSecond,
+      watchedSeconds: watchedSeconds,
     );
   }
 
-  Future<void> syncLectureHeartbeat(int currentSecond) async {
+  Future<void> syncLectureHeartbeat(
+    int currentSecond, {
+    required int watchedSeconds,
+  }) async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
       lastWatchedSecond: currentSecond,
-      completed: false, // Don't aggressively mark as completed on heartbeat
+      watchedSeconds: watchedSeconds,
     );
   }
 }

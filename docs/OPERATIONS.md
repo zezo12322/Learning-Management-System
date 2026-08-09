@@ -33,8 +33,8 @@ Railway deploy config lives in `backend/railway.json`. Cloudflare config lives i
 |---|---|---|
 | `.github/workflows/ci.yml` | every PR + push to `main` | Per-package lint / type-check / build / test. On a PR only the packages the diff touches run; `main` always runs everything. Backend publishes a coverage summary + artifact. The aggregate **`CI`** job is the one to require in branch protection — the package jobs are skipped (not passed) on unrelated PRs, which would otherwise stall a required check. |
 | `.github/workflows/security.yml` | every PR + push to `main` + weekly (Mon 06:00 UTC) | Secret scan (gitleaks — **blocking** on PRs over the commits the PR adds, informational full-history sweep otherwise; see §6), dependency review of what a PR adds, and `npm audit` per package. |
-| `.github/workflows/deploy-web.yml` | **manual only** (`workflow_dispatch`) | Reproducible Cloudflare deploy of `web/`, replacing `npm run deploy` from a laptop. Runs in the `production` GitHub Environment, then health-checks the result. |
-| `.github/workflows/deploy-backend.yml` | **manual only** (`workflow_dispatch`) | Lint + build + test, then `railway up` into the `production` Environment, then verifies **liveness and readiness** before reporting success. |
+| `.github/workflows/deploy-web.yml` | push to `development` touching `web/`, `dataconnect/`, this workflow, or the `setup-node-package` action + `workflow_dispatch` | Reproducible Cloudflare deploy of `web/`, replacing `npm run deploy` from a laptop. Runs in the `production` GitHub Environment, then health-checks the result. A pre-flight step refuses to build unless the Cloudflare credentials and the six **required** `NEXT_PUBLIC_*` values are set (the optional `NEXT_PUBLIC_AI_*` and `NEXT_PUBLIC_DEFAULT_CATEGORY_ID` are not checked). Those values are inlined into the bundle, so a missing one ships a broken app rather than failing the build. Each is read from a repository **variable or secret**, whichever exists. |
+| `.github/workflows/deploy-backend.yml` | push to `main` touching `backend/` or `dataconnect/` + `workflow_dispatch` | Lint + build + test, then **deploys the Data Connect schema**, then `railway up` into the `production` Environment, then verifies **liveness and readiness** before reporting success. The schema goes first on purpose — see the note below. |
 | `.github/workflows/build-apk.yml` | **manual** + `v*` tags | Signed, obfuscated Android release build (APK / AAB) plus the de-obfuscation symbols. See `docs/MOBILE_RELEASE.md`. |
 | `.github/dependabot.yml` | weekly (Mon) | Grouped dependency PRs for the three npm packages, Flutter `pub`, and the GitHub Actions themselves. |
 
@@ -336,11 +336,29 @@ Under **Settings → Secrets and variables → Actions**. Scope the secrets to t
 | `API_HEALTH_URL` | variable | `deploy-backend.yml` | `https://learning-management-system-production-a97c.up.railway.app/api/v1/health` |
 | `API_READY_URL` | variable | `deploy-backend.yml` | `https://learning-management-system-production-a97c.up.railway.app/api/v1/health/ready` |
 | `ALERT_WEBHOOK_URL` | secret | `deploy-backend.yml` | Same webhook as the app (§5.4). Optional — without it the failure notification is skipped. |
+| `FIREBASE_SERVICE_ACCOUNT` **or** `FIREBASE_TOKEN` | secret | `deploy-backend.yml` | Required. Authenticates the Data Connect schema deploy. `FIREBASE_SERVICE_ACCOUNT` is the whole service-account JSON and is the supported path; `FIREBASE_TOKEN` is the older `firebase login:ci` token, accepted so an existing setup keeps working. |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `NEXT_PUBLIC_FIREBASE_API_KEY` | secrets | `deploy-web.yml` | As before. |
 | `NEXT_PUBLIC_API_URL`, other `NEXT_PUBLIC_*`, `WEB_HEALTH_URL` | variables | `deploy-web.yml` | As before. |
 
 Both workflows fail fast naming exactly what is missing, so a wrong name shows up
 in seconds rather than 20 minutes into a build.
+
+### Why the schema deploys before Railway
+
+The backend's queries are written against the schema in `dataconnect/`, so a
+release that adds a column has to migrate the database before the code selecting
+it starts serving traffic.
+
+Nothing used to deploy the schema at all. Every workflow ran only
+`dataconnect:sdk:generate`, which is client codegen and never touches the
+database — so a release that added a field shipped a backend querying a column
+that did not exist, and every request through it failed. Ordering the two steps
+inside one job is what makes that impossible rather than merely remembered.
+
+The step runs **without `--force`**. A non-destructive migration (a new nullable
+column) applies on its own; anything Data Connect judges destructive stops the
+deploy instead of quietly dropping data. A blocked release is recoverable, a
+dropped column is not — so a genuinely intended destructive change is run by hand.
 
 Also, under **Settings → Branches**, require the **`CI`** and **`Security`**
 checks on `main` in branch protection.
