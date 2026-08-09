@@ -334,7 +334,6 @@
     },
     "actions": {
       "previous": "السابق",
-      "mark_complete": "إكمال الدرس",
       "next": "التالي"
     },
     "tabs": {
@@ -355,6 +354,9 @@
     "reading": {
       "title": "قراءة",
       "empty": "لا يوجد محتوى لهذا الدرس بعد."
+    },
+    "status": {
+      "completed": "مكتمل"
     }
   },
   "quiz": {

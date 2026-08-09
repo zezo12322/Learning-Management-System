@@ -334,7 +334,6 @@
     },
     "actions": {
       "previous": "Previous",
-      "mark_complete": "Mark Complete",
       "next": "Next"
     },
     "tabs": {
@@ -355,6 +354,9 @@
     "reading": {
       "title": "Reading",
       "empty": "This lesson has no content yet."
+    },
+    "status": {
+      "completed": "Completed"
     }
   },
   "quiz": {
