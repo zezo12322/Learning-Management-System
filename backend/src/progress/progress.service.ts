@@ -60,12 +60,22 @@ export class ProgressService {
 
     const duration = lecture?.duration ?? 0;
 
+    // Same monotonic banking as the async worker: never let a client that
+    // starts counting from zero erase watch time recorded on another device.
+    const existing = await this.getLectureProgress(lectureId, authToken);
+    const storedWatched =
+      (existing as { watchedSeconds?: number | null })?.watchedSeconds ?? null;
+    const bankedSeconds =
+      dto.watchedSeconds == null
+        ? storedWatched
+        : Math.max(dto.watchedSeconds, storedWatched ?? 0);
+
     // Only a positive duration can complete; lectures with unknown/zero duration
     // never auto-complete here.
     const completed = isLectureComplete(
       duration,
       dto.lastWatchedSecond,
-      dto.watchedSeconds,
+      bankedSeconds ?? undefined,
     );
     const completedAt = completed ? new Date().toISOString() : null;
 
@@ -84,6 +94,7 @@ export class ProgressService {
       {
         lectureId,
         lastWatchedSecond: storedSecond,
+        watchedSeconds: bankedSeconds,
         completedAt,
         userId: uid,
       },
@@ -107,9 +118,13 @@ export class ProgressService {
       { lectureId },
       authToken,
     );
+    // watchedSeconds is part of the response so the player can seed its
+    // accumulator from time already banked instead of from the position, which
+    // is what let a scrubbed-to-the-end lecture complete itself on reload.
     return (
       data?.lectureProgresses?.[0] ?? {
         lastWatchedSecond: 0,
+        watchedSeconds: null,
         completedAt: null,
       }
     );

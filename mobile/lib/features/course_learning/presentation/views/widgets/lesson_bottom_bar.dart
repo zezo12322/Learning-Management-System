@@ -12,13 +12,11 @@ class LessonBottomBar extends StatelessWidget {
     super.key,
     this.isCompleted = false,
     required this.onPrevious,
-    this.onMarkComplete,
     required this.onNext,
   });
 
   final bool isCompleted;
   final VoidCallback onPrevious;
-  final VoidCallback? onMarkComplete;
   final VoidCallback onNext;
 
   @override
@@ -47,12 +45,7 @@ class LessonBottomBar extends StatelessWidget {
             ),
           ),
           Gap(4.w),
-          Flexible(
-            child: _MarkCompleteButton(
-              isCompleted: isCompleted,
-              onTap: onMarkComplete,
-            ),
-          ),
+          Flexible(child: _CompletionStatus(isCompleted: isCompleted)),
           Gap(4.w),
           Expanded(
             child: SizedBox(
@@ -69,32 +62,29 @@ class LessonBottomBar extends StatelessWidget {
   }
 }
 
-class _MarkCompleteButton extends StatelessWidget {
-  const _MarkCompleteButton({required this.isCompleted, this.onTap});
+/// Shows whether the lecture is complete. Completion is earned by watching and
+/// is awarded by the server, so there is nothing here to tap — this used to be a
+/// button that marked the lecture done outright, which meant the watch-time rule
+/// could be walked straight past.
+class _CompletionStatus extends StatelessWidget {
+  const _CompletionStatus({required this.isCompleted});
 
   final bool isCompleted;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final primary = context.theme.colorScheme.primary;
+    if (!isCompleted) return const SizedBox.shrink();
 
-    return TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 10.h),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 10.h),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Flexible(
             child: Text(
-              isCompleted
-                  ? 'Completed'
-                  : 'lesson_learning.actions.mark_complete'.tr(),
+              'lesson_learning.status.completed'.tr(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.labelLarge?.copyWith(

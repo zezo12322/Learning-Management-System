@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   ArrowLeft,
   ArrowRight,
@@ -35,12 +35,12 @@ type Tab = 'CURRICULUM' | 'NOTES' | 'RESOURCES' | 'DISCUSSION'
 /**
  * Course learning screen (Figma "8. Course Learning" + tabs 9–11): secure video
  * player on top, then the lesson header and the Curriculum / Notes / Resources /
- * Discussion tabs, with Previous / Mark complete / Next at the foot.
+ * Discussion tabs, with Previous / Next at the foot. Completion is not an action
+ * here — the server awards it from watch time reported by the player.
  */
 export default function LearnPage() {
   const t = useT()
   const { courseId } = useParams<{ courseId: string }>()
-  const qc = useQueryClient()
   const [activeId, setActiveId] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('CURRICULUM')
   /** Live playback position for the active lecture, reported by the player. */
@@ -104,6 +104,8 @@ export default function LearnPage() {
   }, [activeId])
 
   const storedSecond = lectureState.data?.lastWatchedSecond ?? 0
+  /** Watch time already banked server-side, which seeds the player's accumulator. */
+  const storedWatchedSeconds = lectureState.data?.watchedSeconds ?? 0
   /**
    * Never send a position behind what the server already has. The sync write
    * re-derives completion from the position it receives and overwrites
@@ -111,15 +113,6 @@ export default function LearnPage() {
    * un-complete a lecture the heartbeat had already finished.
    */
   const furthestSecond = Math.max(position, storedSecond)
-
-  const complete = useMutation({
-    mutationFn: (lectureId: string) => progressApi.markComplete(lectureId, furthestSecond),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['course-progress', courseId] })
-      qc.invalidateQueries({ queryKey: ['lecture-progress', activeId] })
-      qc.invalidateQueries({ queryKey: ['continue-learning'] })
-    },
-  })
 
   if (curriculum.isLoading || enrollment.isLoading) return <PageSpinner />
 
@@ -157,10 +150,9 @@ export default function LearnPage() {
   const completedAt = lectureState.data?.completedAt ?? null
   const lessonNumber = activeIndex + 1
   /**
-   * Completion is derived server-side at 90% of the lecture's stored duration,
-   * and the `completed` flag a client sends is ignored. So the button is only
-   * offered once the learner has actually reached that point — otherwise it
-   * would report success while changing nothing.
+   * Whether the learner has reached the point where completion becomes possible.
+   * Only drives the explanatory hint below — nothing here can grant completion,
+   * which the server derives from position and credited watch time together.
    */
   const duration = active?.duration ?? 0
   const canComplete = duration > 0 && furthestSecond >= duration * 0.9
@@ -184,6 +176,7 @@ export default function LearnPage() {
           title={active.title}
           posterSeed={active.id}
           resumeAtSecond={storedSecond}
+          watchedSecondsSoFar={storedWatchedSeconds}
           onPosition={setPosition}
           onEnded={() => next && setActiveId(next.id)}
         />
@@ -332,27 +325,26 @@ export default function LearnPage() {
           <ArrowLeft size={15} className="rtl:rotate-180" /> {t('learn.previous')}
         </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          loading={complete.isPending}
-          disabled={!active || previewOnly || Boolean(completedAt) || !canComplete}
-          title={!canComplete && !completedAt ? t('learn.completeHint') : undefined}
-          onClick={() => active && complete.mutate(active.id)}
-          className={completedAt ? 'text-success' : 'text-primary'}
-        >
-          {t(completedAt ? 'learn.completed' : 'learn.completeLesson')}
-          <CheckCircle2 size={16} />
-        </Button>
+        {/* Status, not an action. This was a button that marked the lecture
+            complete outright, which walked straight past the watch-time rule the
+            server enforces. Completion is earned by watching and awarded by the
+            heartbeat; there is nothing here to press. */}
+        {completedAt ? (
+          <span className="flex items-center gap-1.5 px-3 text-sm font-medium text-success">
+            {t('learn.completed')}
+            <CheckCircle2 size={16} />
+          </span>
+        ) : (
+          <span className="px-3 text-sm text-content-secondary">
+            {t('learn.completeInProgress')}
+          </span>
+        )}
 
         <Button size="sm" disabled={!next} onClick={() => next && setActiveId(next.id)}>
           {t('learn.next')} <ArrowRight size={15} className="rtl:rotate-180" />
         </Button>
       </Card>
 
-      {complete.isError && (
-        <p className="text-center text-xs text-error">{t('learn.completeError')}</p>
-      )}
       {active && !previewOnly && !completedAt && !canComplete && (
         <p className="text-center text-xs text-content-secondary">
           {duration > 0 ? t('learn.completeHint') : t('learn.completeNoDuration')}

@@ -115,6 +115,47 @@ describe('ProgressProcessor', () => {
     ).not.toBeNull();
   });
 
+  it('banks watch time monotonically and persists it', async () => {
+    // A device that counts from zero — the mobile player always does — must not
+    // erase time already banked from another session.
+    dc.executeQueryAsAdmin.mockResolvedValue({
+      ...lecture(100),
+      lectureProgresses: [{ watchedSeconds: 80 }],
+    });
+    await proc.process(
+      job({
+        userId: 'u1',
+        lectureId: 'L1',
+        lastWatchedSecond: 95,
+        watchedSeconds: 12,
+      }),
+    );
+
+    const vars = dc.executeMutationAsAdmin.mock.calls[0][1];
+    expect(vars.watchedSeconds).toBe(80);
+    // 80 is still short of the 90 bar, so this does not complete either.
+    expect(vars.completedAt).toBeNull();
+  });
+
+  it('completes once banked watch time crosses the bar', async () => {
+    dc.executeQueryAsAdmin.mockResolvedValue({
+      ...lecture(100),
+      lectureProgresses: [{ watchedSeconds: 85 }],
+    });
+    await proc.process(
+      job({
+        userId: 'u1',
+        lectureId: 'L1',
+        lastWatchedSecond: 95,
+        watchedSeconds: 91,
+      }),
+    );
+
+    const vars = dc.executeMutationAsAdmin.mock.calls[0][1];
+    expect(vars.watchedSeconds).toBe(91);
+    expect(vars.completedAt).not.toBeNull();
+  });
+
   it('clamps the stored position to the lecture duration', async () => {
     dc.executeQueryAsAdmin.mockResolvedValue(lecture(100));
     await proc.process(

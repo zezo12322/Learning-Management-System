@@ -165,46 +165,14 @@ class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<Cours
     await selectLectureById(nextLecture.id);
   }
 
-  /// The learner pressing "mark complete" in the bottom bar.
+  /// The playhead reaching the end of the video — now the only way a lecture is
+  /// completed from this app.
   ///
-  /// Deliberately omits `watchedSeconds`, which puts the server on its
-  /// position-only rule and completes the lecture. That is the point: someone
-  /// choosing to tick a lesson off is not the player certifying that it was
-  /// watched. Remove the button if the course policy is that only real viewing
-  /// counts.
-  ///
-  /// Sends the lecture length in **seconds**. `CourseLecture.duration` is whole
-  /// seconds — the transcoder probes it that way with ffprobe — so the previous
-  /// `duration * 60` was 60x the real length and only ever worked because
-  /// `progress.service.ts` clamps the stored position to the duration. Plain
-  /// `duration` clears the same threshold and is the honest number.
-  ///
-  /// The zero fallback is gone too: sending 0 rewinds the stored position and
-  /// clears `completedAt`, un-completing a lecture the learner had finished.
-  Future<void> markCurrentLectureAsCompleted() async {
-    final currentLectureId = state.currentLecture?.id;
-    if (currentLectureId == null) return;
-
-    final duration = state.currentLecture?.duration ?? 0;
-    // With an unknown duration the server cannot complete anything, so fall back
-    // to the furthest point actually watched rather than to zero.
-    final target = duration > 0 ? duration : _lastKnownSecond;
-    if (target <= 0) return;
-
-    await updateLectureProgressUseCase(
-      lectureId: currentLectureId,
-      lastWatchedSecond: target > _lastKnownSecond ? target : _lastKnownSecond,
-    );
-    _lastKnownSecond = target > _lastKnownSecond ? target : _lastKnownSecond;
-  }
-
-  /// The playhead reaching the end of the video.
-  ///
-  /// This used to call the method above, which sends a position large enough to
-  /// trip the server's threshold no matter what — so dragging the scrubber to
-  /// the end finished a lecture nobody had watched. It now reports the real
-  /// position and the credited watch time and lets the server decide, matching
-  /// the web player.
+  /// It used to route through a `markCurrentLectureAsCompleted` that posted a
+  /// position large enough to trip the server's threshold regardless of what had
+  /// been watched. That method is gone along with the bottom-bar button that
+  /// called it. This reports the real position and the credited watch time and
+  /// lets the server decide, matching the web player.
   Future<void> reportLectureFinished({
     required int lastWatchedSecond,
     required int watchedSeconds,

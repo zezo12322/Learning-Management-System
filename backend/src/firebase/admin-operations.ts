@@ -34,7 +34,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
 
   // --- Granular progress worker (ProgressProcessor) ---
   GetLectureDuration: /* GraphQL */ `
-    query GetLectureDuration($lectureId: UUID!) {
+    query GetLectureDuration($lectureId: UUID!, $userId: String!) {
       courseLecture(id: $lectureId) {
         id
         duration
@@ -44,6 +44,11 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           }
         }
       }
+      lectureProgresses(
+        where: { userId: { eq: $userId }, lectureId: { eq: $lectureId } }
+      ) {
+        watchedSeconds
+      }
     }
   `,
 
@@ -52,6 +57,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       $userId: String!
       $lectureId: UUID!
       $lastWatchedSecond: Int!
+      $watchedSeconds: Int
       $completedAt: Timestamp
     ) {
       lectureProgress_upsert(
@@ -59,6 +65,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           userId: $userId
           lectureId: $lectureId
           lastWatchedSecond: $lastWatchedSecond
+          watchedSeconds: $watchedSeconds
           completedAt: $completedAt
         }
       )
@@ -1248,6 +1255,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
     mutation UpdateLectureProgress(
       $lectureId: UUID!
       $lastWatchedSecond: Int!
+      $watchedSeconds: Int
       $completedAt: Timestamp
       $userId: String!
     ) {
@@ -1256,6 +1264,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
           userId: $userId
           lectureId: $lectureId
           lastWatchedSecond: $lastWatchedSecond
+          watchedSeconds: $watchedSeconds
           completedAt: $completedAt
         }
       )

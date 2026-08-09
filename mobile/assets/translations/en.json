@@ -335,7 +335,6 @@
     },
     "actions": {
       "previous": "Previous",
-      "mark_complete": "Mark Complete",
       "next": "Next"
     },
     "tabs": {
@@ -366,6 +365,9 @@
       "description": "Check what you learned in this lesson.",
       "start": "Start quiz",
       "unavailable": "This lesson has no quiz yet."
+    },
+    "status": {
+      "completed": "Completed"
     },
     "interactive": {
       "unavailable": "This interactive lesson is not available in the app yet."
