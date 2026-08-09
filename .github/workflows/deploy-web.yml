@@ -66,30 +66,30 @@ jobs:
         with:
           package: web
 
-      - name: Generate Data Connect SDKs
-        run: npx firebase-tools dataconnect:sdk:generate
-        working-directory: ${{ github.workspace }}
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
-      # Fail fast with an actionable message instead of a confusing wrangler
-      # error 20 minutes into a build.
+      # Runs before SDK generation so a misconfigured repository is reported in
+      # seconds, not after a minute of downloading firebase-tools.
       #
-      # The NEXT_PUBLIC_* checks matter more now that a merge deploys on its own:
-      # those values are inlined at build time, so an unset one does not fail the
-      # build — it ships a bundle that cannot reach Firebase or the API, and the
-      # only symptom is a broken app. Better to stop here and say which one.
+      # These checks matter more now that a merge deploys on its own: NEXT_PUBLIC_*
+      # values are inlined at build time, so an unset one does not fail the build —
+      # it ships a bundle that cannot reach Firebase or the API, and the only
+      # symptom is a broken app. Better to stop here and say which one.
+      #
+      # Each NEXT_PUBLIC_* is read as `vars.X || secrets.X`. None of them are
+      # secret — they are inlined into a bundle any visitor can read — so
+      # Variables is the natural home, but storing them as Actions secrets is a
+      # reasonable reflex and works identically at build time. Accepting both
+      # means a deploy is never blocked by which of the two tabs someone used.
       - name: Verify deploy credentials are configured
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID || secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
         run: |
           missing=""
           for name in \
@@ -108,10 +108,20 @@ jobs:
             fi
           done
           if [ -n "$missing" ]; then
-            echo "::error::Not configured:$missing — add them under Settings → Secrets and variables → Actions (secrets for the API keys, variables for the rest). See docs/OPERATIONS.md."
+            echo "::error::Not configured:$missing — add each under Settings → Secrets and variables → Actions. The CLOUDFLARE_* ones must be secrets; every NEXT_PUBLIC_* is read from either tab, so put them wherever you prefer. See docs/OPERATIONS.md."
             exit 1
           fi
           echo "Cloudflare credentials and build-time config present."
+
+      # FIREBASE_TOKEN is deliberately not in the check above: SDK generation
+      # reads the committed dataconnect/ schema and succeeds without it (run
+      # 31327854843 generated all four SDKs with the token unset). Requiring it
+      # would fail deploys over a credential the step does not use.
+      - name: Generate Data Connect SDKs
+        run: npx firebase-tools dataconnect:sdk:generate
+        working-directory: ${{ github.workspace }}
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       # NEXT_PUBLIC_* values are inlined at build time, so they must be present
       # here rather than at runtime. Anything unset falls back to the app's own
@@ -121,13 +131,13 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID || secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_AI_ENABLED: ${{ vars.NEXT_PUBLIC_AI_ENABLED }}
           NEXT_PUBLIC_AI_API_URL: ${{ vars.NEXT_PUBLIC_AI_API_URL }}
           NEXT_PUBLIC_AI_PROVIDER: ${{ vars.NEXT_PUBLIC_AI_PROVIDER }}
