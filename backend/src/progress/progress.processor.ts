@@ -7,7 +7,7 @@ import { EnrollmentService } from '../enrollment/enrollment.service';
 import {
   LECTURE_PROGRESS_QUEUE,
   RecordProgressJob,
-  COMPLETION_THRESHOLD,
+  isLectureComplete,
 } from './lecture-progress.queue';
 
 /**
@@ -36,7 +36,7 @@ export class ProgressProcessor extends WorkerHost {
   }
 
   async process(job: Job<RecordProgressJob>): Promise<void> {
-    const { userId, lectureId, lastWatchedSecond } = job.data;
+    const { userId, lectureId, lastWatchedSecond, watchedSeconds } = job.data;
 
     // 1. Load the authoritative duration (+ owning course) as admin.
     const lectureData = await this.dc.executeQueryAsAdmin<{
@@ -75,10 +75,14 @@ export class ProgressProcessor extends WorkerHost {
     }
 
     // 3. Derive completion server-side. Only a positive duration can complete;
-    //    lectures with unknown/zero duration never auto-complete here.
+    //    lectures with unknown/zero duration never auto-complete here. Position
+    //    alone is not enough — see isLectureComplete for why watch time matters.
     const duration = lecture.duration ?? 0;
-    const reachedThreshold =
-      duration > 0 && lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
+    const reachedThreshold = isLectureComplete(
+      duration,
+      lastWatchedSecond,
+      watchedSeconds,
+    );
     const completedAt = reachedThreshold ? new Date().toISOString() : null;
 
     // 4. Upsert on the composite key (user, lecture). Clamp the stored position

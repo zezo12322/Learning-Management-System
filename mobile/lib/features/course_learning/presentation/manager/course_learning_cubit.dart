@@ -165,17 +165,22 @@ class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<Cours
     await selectLectureById(nextLecture.id);
   }
 
-  /// Marks the open lecture complete.
+  /// The learner pressing "mark complete" in the bottom bar.
   ///
-  /// The server does not trust `completed` — `progress.service.ts:65` derives it
-  /// from `lastWatchedSecond >= duration * threshold` and clamps the stored
-  /// position to the lecture length. So what this sends is the whole fix: the
-  /// end of the lecture, in **seconds** (`CourseLecture.duration` is seconds —
-  /// the transcoder probes whole seconds with ffprobe).
+  /// Deliberately omits `watchedSeconds`, which puts the server on its
+  /// position-only rule and completes the lecture. That is the point: someone
+  /// choosing to tick a lesson off is not the player certifying that it was
+  /// watched. Remove the button if the course policy is that only real viewing
+  /// counts.
   ///
-  /// The previous `duration * 60` only survived because of that clamp, and the
-  /// zero fallback was worse than useless: sending 0 rewinds the stored position
-  /// and clears `completedAt`, un-completing a lecture the learner had finished.
+  /// Sends the lecture length in **seconds**. `CourseLecture.duration` is whole
+  /// seconds — the transcoder probes it that way with ffprobe — so the previous
+  /// `duration * 60` was 60x the real length and only ever worked because
+  /// `progress.service.ts` clamps the stored position to the duration. Plain
+  /// `duration` clears the same threshold and is the honest number.
+  ///
+  /// The zero fallback is gone too: sending 0 rewinds the stored position and
+  /// clears `completedAt`, un-completing a lecture the learner had finished.
   Future<void> markCurrentLectureAsCompleted() async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
@@ -189,12 +194,40 @@ class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<Cours
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
       lastWatchedSecond: target > _lastKnownSecond ? target : _lastKnownSecond,
-      completed: true,
     );
     _lastKnownSecond = target > _lastKnownSecond ? target : _lastKnownSecond;
   }
 
-  Future<void> syncLectureHeartbeat(int currentSecond) async {
+  /// The playhead reaching the end of the video.
+  ///
+  /// This used to call the method above, which sends a position large enough to
+  /// trip the server's threshold no matter what — so dragging the scrubber to
+  /// the end finished a lecture nobody had watched. It now reports the real
+  /// position and the credited watch time and lets the server decide, matching
+  /// the web player.
+  Future<void> reportLectureFinished({
+    required int lastWatchedSecond,
+    required int watchedSeconds,
+  }) async {
+    final currentLectureId = state.currentLecture?.id;
+    if (currentLectureId == null) return;
+
+    // Never report a position behind the furthest point reached: the server
+    // clamps and re-derives completion from what it is sent, so a late, smaller
+    // position silently rewinds progress.
+    if (lastWatchedSecond > _lastKnownSecond) _lastKnownSecond = lastWatchedSecond;
+
+    await updateLectureProgressUseCase(
+      lectureId: currentLectureId,
+      lastWatchedSecond: _lastKnownSecond,
+      watchedSeconds: watchedSeconds,
+    );
+  }
+
+  Future<void> syncLectureHeartbeat(
+    int currentSecond, {
+    required int watchedSeconds,
+  }) async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
@@ -208,6 +241,7 @@ class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<Cours
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
       lastWatchedSecond: _lastKnownSecond,
+      watchedSeconds: watchedSeconds,
       heartbeat: true,
     );
   }

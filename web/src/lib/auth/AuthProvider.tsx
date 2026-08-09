@@ -14,10 +14,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  getRedirectResult,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signInWithRedirect,
   signOut as fbSignOut,
   type User as FirebaseUser,
@@ -91,6 +93,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    // Completes a sign-in that came back through the redirect fallback. Nothing
+    // called this before, so a redirect that failed on the return leg — an
+    // unauthorized domain, state dropped in transit — resolved to no user and
+    // no error, and the app simply rendered the login page again with nothing
+    // to show for the round trip. onAuthStateChanged still delivers the user on
+    // success; this is what makes the failures visible.
+    getRedirectResult(getFirebaseAuth()).catch((err: unknown) => {
+      // eslint-disable-next-line no-console
+      console.error('[auth] Google redirect sign-in failed', (err as { code?: string } | null)?.code ?? err)
+    })
+
     const unsub = onAuthStateChanged(getFirebaseAuth(), async (user) => {
       const uid = user?.uid ?? null
       // Whenever the account changes — including sign-out — drop everything
@@ -136,11 +149,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password)
   }
 
+  /**
+   * Popup first, redirect only as a fallback.
+   *
+   * The redirect flow sends the browser to `<authDomain>/__/auth/handler` and
+   * back, which makes `<project>.firebaseapp.com` an intermediate site in the
+   * navigation chain. Chrome's bounce-tracking mitigation clears state for
+   * exactly that shape, so the user completes Google sign-in and returns with
+   * nothing — landing back on the login page as if they had never signed in.
+   * (Chrome reports this in DevTools → Issues: "may soon delete state for
+   * intermediate websites in a recent navigation chain".) It cannot be fixed
+   * from the app side while the auth domain differs from the site's own.
+   *
+   * The popup keeps the exchange in one window and hands the credential back
+   * through `window.opener`, which the `Cross-Origin-Opener-Policy:
+   * same-origin-allow-popups` header in next.config.mjs deliberately preserves.
+   *
+   * Redirect stays as the fallback for browsers that block or cannot open the
+   * popup — worse odds there than none at all.
+   */
   const loginWithGoogle = async () => {
     if (!firebaseConfigured) {
       throw new Error('Firebase Web authentication is not configured.')
     }
-    await signInWithRedirect(getFirebaseAuth(), googleProvider)
+    const auth = getFirebaseAuth()
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code
+      const popupUnavailable =
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      if (!popupUnavailable) throw err
+      await signInWithRedirect(auth, googleProvider)
+    }
   }
 
   const resetPassword = async (email: string) => {

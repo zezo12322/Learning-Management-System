@@ -72,8 +72,27 @@ export default function LoginPage() {
     try {
       await loginWithGoogle()
       router.push('/home')
-    } catch {
-      setError(t('auth.err.googleUnavailable'))
+    } catch (err) {
+      // Every Google sign-in failure used to collapse into one message, which
+      // made the two setup mistakes that actually cause it indistinguishable
+      // from a network blip. The code is Firebase's and stable; name the two
+      // that are fixable, and log the rest so a console screenshot is enough
+      // to diagnose the next one.
+      const code = (err as { code?: string } | null)?.code
+      // Closing the popup, or clicking the button twice, is a choice rather
+      // than a failure — say nothing.
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        return
+      }
+      if (code === 'auth/unauthorized-domain') {
+        setError(t('auth.err.googleUnauthorizedDomain'))
+      } else if (code === 'auth/operation-not-allowed') {
+        setError(t('auth.err.googleProviderDisabled'))
+      } else {
+        setError(t('auth.err.googleUnavailable'))
+      }
+      // eslint-disable-next-line no-console
+      console.error('[auth] Google sign-in failed', code ?? err)
     }
   }
 

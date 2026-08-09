@@ -11,12 +11,15 @@ abstract class CourseLearningRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
   Future<LectureContentModel> getLectureContent(String lectureId);
 
-  /// Synchronous write, for the explicit "mark complete" action where the
-  /// caller needs the result now.
-  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false});
+  /// Synchronous write, for the events where the caller needs the server's
+  /// decision now: the explicit "mark complete" button and the playhead
+  /// reaching the end.
+  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds});
 
-  /// Fire-and-forget heartbeat while the video plays.
-  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond);
+  /// Queued write, for the heartbeat that fires while the video plays.
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds});
 }
 
 class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
@@ -78,14 +81,22 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   }
 
   @override
-  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false}) async {
+  Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds}) async {
     try {
       await _setAuthToken();
       // PUT is the synchronous path — it writes through Data Connect and
-      // returns the derived completion, which is what "mark complete" needs.
+      // returns the derived completion, which is what the explicit actions need.
+      //
+      // `completed` is gone: the server ignored it and derives completion from
+      // the position plus the credited watch time below.
+      //
+      // The key is omitted rather than sent as null when there is no watch time
+      // to report — `isLectureComplete` reads an absent field as "not reported"
+      // and an explicit value as a measurement, and null is the former.
       await apiService.put('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
-        'completed': completed,
+        if (watchedSeconds != null) 'watchedSeconds': watchedSeconds,
       });
     } catch (e) {
       throw CustomExceptions(message: userFacingMessage(e));
@@ -99,11 +110,17 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   /// tick. The controller says as much: heartbeats belong here, and the
   /// synchronous PUT is kept for explicit actions.
   @override
-  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond) async {
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds}) async {
     try {
       await _setAuthToken();
       await apiService.post('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
+        // Carried here as well: `RecordProgressJob` has the field and the worker
+        // runs the same `isLectureComplete`, so the queued route enforces the
+        // watch-time rule exactly like the synchronous one. Dropping it would
+        // have made the heartbeat the soft way to complete a lecture.
+        if (watchedSeconds != null) 'watchedSeconds': watchedSeconds,
       });
     } catch (e) {
       throw CustomExceptions(message: userFacingMessage(e));

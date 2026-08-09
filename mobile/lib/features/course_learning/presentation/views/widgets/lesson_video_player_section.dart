@@ -36,6 +36,19 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
   // after the playhead reaches the end (which spammed PUT /lectures/:id/progress).
   bool _completedSent = false;
 
+  /// Seconds of playback the server may credit, mirroring
+  /// MAX_CREDITED_PLAYBACK_RATE in the backend's lecture-progress queue and the
+  /// web player. Each tick credits how far the timeline moved, capped at what
+  /// real elapsed time allows: 2x still completes a lecture, 8x credits only a
+  /// quarter of what it covers, and a scrubber drag credits nothing because no
+  /// real time passed. Starts at zero, which needs no resume seeding here
+  /// because this player always opens a lecture from the beginning — position
+  /// and credit therefore advance together.
+  static const double _maxCreditedPlaybackRate = 2;
+  double _creditedSeconds = 0;
+  Duration _prevPosition = Duration.zero;
+  DateTime _prevTick = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -127,17 +140,42 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
             value.position >= value.duration &&
             value.duration > Duration.zero) {
           _completedSent = true;
-          context.read<CourseLearningCubit>().markCurrentLectureAsCompleted();
+          // Reaching the end reports the position and the credited watch time
+          // and lets the server decide. It used to post duration * 60 to force
+          // completion, which meant dragging to the end finished a lecture
+          // nobody had watched.
+          context.read<CourseLearningCubit>().reportLectureFinished(
+                lastWatchedSecond: value.position.inSeconds,
+                watchedSeconds: _creditedSeconds.floor(),
+              );
         }
       });
+
+      _prevPosition = controller.value.position;
+      _prevTick = DateTime.now();
 
       // Start the heartbeat timer (e.g. every 10 seconds)
       _heartbeatTimer?.cancel();
       _heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
         if (!mounted) return;
-        if (controller.value.isPlaying) {
-          final currentSecond = controller.value.position.inSeconds;
-          context.read<CourseLearningCubit>().syncLectureHeartbeat(currentSecond);
+        final value = controller.value;
+        final now = DateTime.now();
+        final timelineDelta =
+            (value.position - _prevPosition).inMilliseconds / 1000;
+        final realDelta = now.difference(_prevTick).inMilliseconds / 1000;
+        _prevPosition = value.position;
+        _prevTick = now;
+
+        if (value.isPlaying && timelineDelta > 0) {
+          final allowed = realDelta * _maxCreditedPlaybackRate;
+          _creditedSeconds += timelineDelta < allowed ? timelineDelta : allowed;
+        }
+
+        if (value.isPlaying) {
+          context.read<CourseLearningCubit>().syncLectureHeartbeat(
+                value.position.inSeconds,
+                watchedSeconds: _creditedSeconds.floor(),
+              );
         }
       });
 

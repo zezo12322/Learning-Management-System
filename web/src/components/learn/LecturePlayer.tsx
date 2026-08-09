@@ -12,6 +12,16 @@ import { cn } from '@/lib/utils'
 
 /** How often the player reports its position to the progress heartbeat. */
 const HEARTBEAT_MS = 10_000
+/**
+ * Seconds of watch-time credit a single real second can earn. Mirrors
+ * MAX_CREDITED_PLAYBACK_RATE in the backend's lecture-progress queue, which is
+ * where the rule is documented; keep the two in step.
+ *
+ * Watching at 1.5x or 2x still completes a lecture. Beyond that the surplus is
+ * not credited, and a scrubber drag credits nothing at all, because a jump
+ * moves the timeline without any real time passing.
+ */
+const MAX_CREDITED_PLAYBACK_RATE = 2
 /** How often the forensic watermark moves, so it cannot be cropped out. */
 const WATERMARK_MOVE_MS = 15_000
 
@@ -142,19 +152,46 @@ export function LecturePlayer({
     }
   }, [started, lectureId])
 
-  // Report the furthest position. Completion is derived server-side at 90%, so
-  // the client never asserts it.
+  // Report the furthest position AND the time actually spent playing.
+  // Completion is derived server-side from both, so the client never asserts it.
+  //
+  // Each tick credits the distance the timeline moved, capped at what real
+  // elapsed time allows. One rule covers both ways of cheating the old
+  // position-only check: at 8x the timeline outruns the clock and only the
+  // capped share counts, and a scrubber drag moves the timeline while no real
+  // time passes, so it credits nothing.
+  //
+  // The accumulator starts at the resume position, because a lecture watched
+  // over two sittings has to be able to finish. That is also its limit: the
+  // credit is not persisted, so reloading re-seeds it from wherever the stored
+  // position sits. Closing that needs a watched-seconds column on
+  // LectureProgress — see the note in the PR.
   useEffect(() => {
     if (state !== 'ready') return
     const video = videoRef.current
     if (!video) return
     let furthest = resumeRef.current
+    let credited = resumeRef.current
+    let prevTime = video.currentTime
+    let prevAt = Date.now()
+
     const timer = window.setInterval(() => {
-      const position = Math.floor(video.currentTime)
+      const now = Date.now()
+      const currentTime = video.currentTime
+      const timelineDelta = currentTime - prevTime
+      const realDelta = (now - prevAt) / 1000
+      prevTime = currentTime
+      prevAt = now
+
+      if (!video.paused && timelineDelta > 0) {
+        credited += Math.min(timelineDelta, realDelta * MAX_CREDITED_PLAYBACK_RATE)
+      }
+
+      const position = Math.floor(currentTime)
       positionRef.current?.(position)
       if (position <= furthest || video.paused) return
       furthest = position
-      void progressApi.heartbeat(lectureId, position).catch(() => {
+      void progressApi.heartbeat(lectureId, position, Math.floor(credited)).catch(() => {
         /* a dropped heartbeat is not worth interrupting playback for */
       })
     }, HEARTBEAT_MS)
