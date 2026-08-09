@@ -165,7 +165,7 @@ jobs:
       # Reuse Next's build cache across runs; keyed on lockfile + sources so a
       # source change still rebuilds what it must.
       - name: Cache Next.js build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: web/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('web/package-lock.json') }}-${{ hashFiles('web/src/**') }}
