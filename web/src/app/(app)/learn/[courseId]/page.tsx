@@ -104,6 +104,8 @@ export default function LearnPage() {
   }, [activeId])
 
   const storedSecond = lectureState.data?.lastWatchedSecond ?? 0
+  /** Watch time already banked server-side, which seeds the player's accumulator. */
+  const storedWatchedSeconds = lectureState.data?.watchedSeconds ?? 0
   /**
    * Never send a position behind what the server already has. The sync write
    * re-derives completion from the position it receives and overwrites
@@ -184,6 +186,7 @@ export default function LearnPage() {
           title={active.title}
           posterSeed={active.id}
           resumeAtSecond={storedSecond}
+          watchedSecondsSoFar={storedWatchedSeconds}
           onPosition={setPosition}
           onEnded={() => next && setActiveId(next.id)}
         />
