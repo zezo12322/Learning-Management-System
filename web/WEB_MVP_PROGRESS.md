@@ -41,7 +41,9 @@ Design = mobile layout; web adapts to RTL + responsive (sidebar desktop / bottom
 - [x] Home dashboard → `(app)/home`
 - [x] Courses catalog → `(app)/courses`
 - [x] Course details → `(app)/courses/[id]`
-- [ ] Course learning (lecture player) → `(app)/learn/[courseId]`
+- [x] Course learning → `(app)/learn/[courseId]` (Figma 8–11): secure AES-128 HLS player
+      (`components/learn/LecturePlayer`, API §19), Curriculum / Notes / Resources /
+      Discussion tabs, resume position and progress heartbeat
 - [x] Student home → `(app)/home` (Figma 5)
 - [x] My courses (enrolled + progress) → `(app)/learning` (Figma 6)
 - [x] Assignments → `(app)/assignments` (Figma 13, backed by `GET /me/submissions`)
@@ -49,8 +51,15 @@ Design = mobile layout; web adapts to RTL + responsive (sidebar desktop / bottom
 - [x] Notifications → `(app)/notifications` (Figma 15, empty shell — no backend endpoint)
 - [x] Profile → `(app)/profile` (Figma 16)
 - [x] Role-aware navigation: learner nav for everyone, "Teaching" group for instructors/admins
-- [ ] Quiz experience refit to the 4-step Figma flow
-- [ ] Course learning Notes / Resources / Discussion tabs (Figma 9–11)
+- [x] Quiz experience refit to the 4-step Figma flow (Figma 12), and the quiz id now
+      comes from `GET /courses/:courseId/lectures/:lectureId/quiz` — it used to be read
+      from a localStorage map written by the authoring screen, so no learner could open
+      a quiz at all
+- [x] Paid enrollment via `POST /payments/checkout` (the `/payment-*` landing pages
+      finally have something linking to them)
+- [x] Security pass: CSP + HSTS, sanitised untrusted URLs (`lib/safeUrl`), per-account
+      browser storage (`lib/localStore`), React Query cache cleared on account change,
+      and `/api/ai/chat` authenticated + enrollment-gated
 
 ## How to run
 ```bash

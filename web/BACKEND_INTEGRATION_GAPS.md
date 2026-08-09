@@ -36,7 +36,16 @@ No backend source files were changed by this integration.
    - There is no certificates endpoint. `(app)/certificates` projects a certificate from each COMPLETED enrollment and uses the enrollment id as the credential reference; "Download PDF" prints the certificate sheet client-side.
    - A real endpoint would supply the issued date, credential id and a signed PDF/verification URL.
 
-9. **Learning aggregates**
+9. **Course discussions**
+   - There is no discussions module: no threads, replies, votes or view counts. The Discussion tab on `(app)/learn/[courseId]` states this rather than shipping a question box that drops what a learner types. Replacing `components/learn/DiscussionTab.tsx` is the whole job once endpoints exist.
+
+10. **Lecture notes**
+   - No notes endpoint. `lib/notes.ts` keeps notes per account in the browser, behind one module so a future `GET/POST /lectures/:id/notes` changes only that file.
+
+11. **Lecture attachments**
+   - The only per-lecture file the API exposes is `transcriptUrl`. The design's "Helpful links" block on the Resources tab has no data source and is omitted.
+
+12. **Learning aggregates**
    - No watch-time, streak, or per-lecture recency aggregate exists, so the Home screen's "Hours learned", "Day streak" and "Recent lessons" blocks from the design are substituted with values that can be derived from `GET /courses/continue-learning` (courses enrolled, lessons completed, certificates, in progress).
 
 4. **Catalog list fields**

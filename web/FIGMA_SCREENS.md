@@ -51,10 +51,15 @@ Shared pieces live in `src/components/student/` (`StatCard`, `SectionHeader`, `F
 `InfoRow`/`SettingsRow`). Navigation is role-aware: every account gets the learner nav, and
 instructors/admins additionally get a "Teaching" group (`AppShell`).
 
+| 8 · Course Learning (`201:11`) | `/learn/[courseId]` | Secure HLS player, lesson header, Curriculum / Notes / Resources / Discussion tabs, About this lesson, Previous / Mark complete / Next |
+| 9 · Course notes (`201:12`) | `/learn/[courseId]` → Notes | Counters, search, add/edit/delete, star; per-account and browser-local |
+| 10 · Resources (`201:13`) | `/learn/[courseId]` → Resources | Lecture transcripts with type-coloured tiles and sanitised download links |
+| 11 · Discussion (`201:14`) | `/learn/[courseId]` → Discussion | Honest unavailable state — no discussions module exists in the backend |
+| 12 · Quiz experience (`201:15`) | `/quiz/[courseId]/[lectureId]/take` | Intro → Question → Review → Result, countdown with auto-submit, score gauge |
+
 ### Still to refine
-- Course Learning tabs (Notes / Resources / Discussion — screens 9–11) and prev/next + "About this lesson".
-- Quiz experience (screen 12) — `/quiz/...` exists but does not yet follow the 4-step Intro → Question → Review → Result flow.
 - Splash / Onboarding (screens 1–2) — intentionally skipped on web.
+- The Figma "Helpful links" block on Resources has no data source (no attachments endpoint) and is left out.
 
 ### Design elements the backend cannot supply yet
 - **Home** "Hours learned" and "Day streak" tiles → no watch-time or streak aggregate; the web shows *Lessons completed* and *In progress* instead.
