@@ -7,18 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
-/** Letter grade for a percentage, matching the A/A-/B+ scale shown in Figma. */
-export function gradeLetter(percentage: number): string {
-  if (percentage >= 93) return 'A+'
-  if (percentage >= 88) return 'A'
-  if (percentage >= 83) return 'A-'
-  if (percentage >= 78) return 'B+'
-  if (percentage >= 73) return 'B'
-  if (percentage >= 68) return 'B-'
-  if (percentage >= 60) return 'C'
-  return 'D'
-}
-
 function formatDateTime(value: string, locale: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
@@ -45,10 +33,6 @@ export function AssignmentCard({
 }) {
   const t = useT()
   const graded = submission.status === 'GRADED' && submission.totalScore != null
-  const percentage =
-    graded && submission.maxPoints
-      ? Math.round((submission.totalScore as number) * 100 / submission.maxPoints)
-      : null
 
   const Icon = graded ? CheckCircle2 : submission.status === 'PENDING' ? Send : FileText
   const tone =
@@ -93,10 +77,13 @@ export function AssignmentCard({
           </p>
         )}
 
+        {/* Points are summed over the criteria the instructor actually scored.
+            The API does not return the full rubric, so a letter grade — which
+            implies a percentage of the whole rubric — would be a claim we
+            cannot stand behind. */}
         {graded && (
           <p className="mt-2 text-xs font-bold text-success">
             {t('assignments.score')}: {submission.totalScore}/{submission.maxPoints}
-            {percentage != null && ` · ${gradeLetter(percentage)}`}
           </p>
         )}
 

@@ -748,6 +748,7 @@ const en: Dict = {
   'learn.next': 'Next',
   'learn.completed': 'Completed',
   'learn.completeError': 'This lesson could not be marked complete.',
+  'learn.loadError': 'This course could not be loaded. Check your connection and try again.',
   'learn.quizIntro': 'This lesson is a quiz. Open it when you are ready to start.',
   'learn.openQuiz': 'Open quiz',
 
@@ -1561,6 +1562,7 @@ const ar: Dict = {
   'learn.next': 'التالي',
   'learn.completed': 'مكتمل',
   'learn.completeError': 'تعذّر تعليم هذا الدرس كمكتمل.',
+  'learn.loadError': 'تعذّر تحميل هذه الدورة. تحقّق من اتصالك وحاول مرة أخرى.',
   'learn.quizIntro': 'هذا الدرس عبارة عن اختبار. افتحه عندما تكون مستعدًا.',
   'learn.openQuiz': 'فتح الاختبار',
 

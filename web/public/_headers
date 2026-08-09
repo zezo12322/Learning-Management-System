@@ -1,6 +1,15 @@
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
 
+# Cloudflare serves static assets without running the Next.js `headers()`
+# config, so the same protections are repeated here. Keep the two in sync —
+# see next.config.mjs. The CSP is intentionally the tighter static-asset
+# variant: assets never make requests of their own.
 /*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://lh3.googleusercontent.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'

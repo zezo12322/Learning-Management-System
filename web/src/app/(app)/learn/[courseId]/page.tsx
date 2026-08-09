@@ -90,6 +90,25 @@ export default function LearnPage() {
 
   if (curriculum.isLoading || enrollment.isLoading) return <PageSpinner />
 
+  // A failed lookup is not a negative answer: locking an enrolled learner out
+  // of a lesson they paid for because a request dropped is the worse failure.
+  if (enrollment.isError || curriculum.isError) {
+    return (
+      <Card className="mx-auto max-w-lg space-y-3 p-8 text-center">
+        <p className="text-sm text-error">{t('learn.loadError')}</p>
+        <Button
+          variant="outline"
+          onClick={() => {
+            void enrollment.refetch()
+            void curriculum.refetch()
+          }}
+        >
+          {t('learn.player.retry')}
+        </Button>
+      </Card>
+    )
+  }
+
   if (!isEnrolled) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">

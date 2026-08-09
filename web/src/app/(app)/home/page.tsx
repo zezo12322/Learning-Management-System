@@ -70,8 +70,8 @@ export default function StudentHomePage() {
   const [search, setSearch] = useState('')
 
   const enrollments = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning })
-  const popular = useQuery({ queryKey: ['popular-courses'], queryFn: () => coursesApi.popular(8) })
-  const recommended = useQuery({ queryKey: ['recommended-courses'], queryFn: () => coursesApi.recommended(6) })
+  const popular = useQuery({ queryKey: ['popular-courses', 8], queryFn: () => coursesApi.popular(8) })
+  const recommended = useQuery({ queryKey: ['recommended-courses', 6], queryFn: () => coursesApi.recommended(6) })
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
 
   const items = useMemo(() => enrollments.data ?? [], [enrollments.data])
@@ -123,9 +123,15 @@ export default function StudentHomePage() {
         />
       </form>
 
+      {enrollments.isError && (
+        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+          {t('learning.loadError')}
+        </Card>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {enrollments.isLoading ? (
+        {enrollments.isLoading || enrollments.isError ? (
           Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} className="h-[118px] rounded-card" />)
         ) : (
           <>
@@ -187,7 +193,7 @@ export default function StudentHomePage() {
         <SectionHeader title={t('student.continueLearning')} href="/learning" actionLabel={t('student.viewAll')} />
         {enrollments.isLoading ? (
           <Skeleton className="h-32 rounded-card" />
-        ) : active.length ? (
+        ) : enrollments.isError ? null : active.length ? (
           <div className="grid gap-3 xl:grid-cols-2">
             {active.slice(0, 2).map((item) => (
               <ContinueLearningCard key={item.enrollmentId} item={item} />

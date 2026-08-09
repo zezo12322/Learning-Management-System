@@ -18,6 +18,13 @@ const TEACHING_ROUTES: { path: string; exact?: boolean }[] = [
   { path: '/studio' },
 ]
 
+/**
+ * The quiz authoring editor lives at /quiz/:courseId/:lectureId while the
+ * learner's take flow is the /take child of the same path — so this one cannot
+ * be expressed as a prefix and gets its own matcher.
+ */
+const QUIZ_EDITOR = /^\/quiz\/[^/]+\/[^/]+\/?$/
+
 /** Where a learner is sent when they land on a teaching route. */
 export const LEARNER_HOME = '/home'
 
@@ -27,6 +34,7 @@ export function canTeach(roles: Role[]): boolean {
 
 /** True when `pathname` belongs to the instructor/admin side of the app. */
 export function isTeachingRoute(pathname: string): boolean {
+  if (QUIZ_EDITOR.test(pathname)) return true
   return TEACHING_ROUTES.some(({ path, exact }) =>
     exact ? pathname === path : pathname === path || pathname.startsWith(`${path}/`),
   )

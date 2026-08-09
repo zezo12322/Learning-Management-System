@@ -10,7 +10,6 @@ import {
   Bell,
   BookOpen,
   Building2,
-  CalendarDays,
   ChevronRight,
   ClipboardCheck,
   ClipboardList,
@@ -130,7 +129,7 @@ export default function ProfilePage() {
               <GraduationCap size={14} /> {roleLabel}
             </Badge>
             <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-content-secondary">
-              <CalendarDays size={13} /> {user.email}
+              <Mail size={13} /> {user.email}
             </p>
           </div>
           <Link href="/notifications" className="sm:ms-auto" aria-label={t('notifications.title')}>
@@ -244,7 +243,7 @@ export default function ProfilePage() {
             <InfoRow
               icon={ShieldCheck}
               label={t('profile.stat.roles')}
-              value={roles.length ? roles.join(', ') : t('profile.noRole')}
+              value={roles.length ? roles.map((role) => t(`role.${role}`, role)).join(', ') : t('profile.noRole')}
             />
           </Card>
         )}

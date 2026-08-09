@@ -6,6 +6,7 @@ import { AlertTriangle, Loader2, PlayCircle } from 'lucide-react'
 import { isApiUrl } from '@/lib/api/client'
 import { progressApi, streamingApi } from '@/lib/api/services'
 import { getFirebaseAuth } from '@/lib/firebase'
+import { useAuth } from '@/lib/auth/AuthProvider'
 import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
@@ -48,6 +49,7 @@ export function LecturePlayer({
   onEnded?: () => void
 }) {
   const t = useT()
+  const { firebaseUser } = useAuth()
   const videoRef = useRef<HTMLVideoElement>(null)
   const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [errorKey, setErrorKey] = useState<string>('learn.player.error')
@@ -56,11 +58,15 @@ export function LecturePlayer({
 
   // Only fetched once playback is requested — an unwatched lecture should not
   // mint a forensic watermark session.
+  // Keyed by uid as well as lecture: the watermark carries the viewer's email,
+  // so it must never be replayed from cache for a different account. gcTime 0
+  // drops the forensic token as soon as the player unmounts.
   const watermark = useQuery({
-    queryKey: ['stream-watermark', lectureId],
+    queryKey: ['stream-watermark', firebaseUser?.uid, lectureId],
     queryFn: () => streamingApi.watermark(lectureId),
-    enabled: started,
+    enabled: started && Boolean(firebaseUser),
     staleTime: 5 * 60_000,
+    gcTime: 0,
     retry: false,
   })
 

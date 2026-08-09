@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -22,11 +22,8 @@ import {
   Plus,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
-import {
-  LEARNER_HOME,
-  canTeach as canTeachRoles,
-  isRouteForbidden,
-} from '@/lib/auth/routeAccess'
+import { canTeach as canTeachRoles } from '@/lib/auth/routeAccess'
+import { useRouteGuard } from '@/lib/auth/useRouteGuard'
 import { authoringApi } from '@/lib/api/services'
 import { PageSpinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
@@ -83,15 +80,14 @@ function NavLink({ item, active, t }: { item: NavItem; active: boolean; t: (key:
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { me, roles, loading, isAuthenticated, logout } = useAuth()
+  const { me, roles, isAuthenticated, logout } = useAuth()
   const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
   const canTeach = canTeachRoles(roles)
-  // A learner who lands on an instructor screen — by URL, bookmark or an old
-  // link — must never see it. `loading` only clears after the profile and role
-  // claims have resolved, so this cannot bounce a real instructor.
-  const forbidden = !loading && isAuthenticated && isRouteForbidden(pathname, roles)
+  // Shared with BuilderShell so every authenticated surface is gated the same
+  // way — see useRouteGuard for why it lives in one place.
+  const { blocked } = useRouteGuard()
   const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
@@ -130,14 +126,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ? t('workspace.instructor')
       : t('workspace.learning')
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) router.replace('/login')
-    else if (forbidden) router.replace(LEARNER_HOME)
-  }, [loading, isAuthenticated, forbidden, router])
-
-  // Hold the spinner while redirecting so the instructor workspace never paints
-  // for a learner, not even for a frame.
-  if (loading || !isAuthenticated || forbidden) return <PageSpinner />
+  // Hold the spinner while the guard redirects, so a protected screen never
+  // paints for the wrong role — not even for a frame.
+  if (blocked) return <PageSpinner />
 
   const signOut = async () => {
     await logout()

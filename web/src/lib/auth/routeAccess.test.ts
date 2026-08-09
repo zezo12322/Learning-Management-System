@@ -43,10 +43,18 @@ describe('isTeachingRoute', () => {
       '/certificates/abc-123',
       '/notifications',
       '/learn/abc-123',
-      '/quiz/abc-123/def-456',
+      '/quiz/abc-123/def-456/take',
     ]) {
       expect(isTeachingRoute(path), path).toBe(false)
     }
+  })
+
+  it('guards the quiz authoring editor but not the learner take flow', () => {
+    // /quiz/:courseId/:lectureId is the instructor editor; its /take child is
+    // where learners sit the quiz.
+    expect(isTeachingRoute('/quiz/abc-123/def-456')).toBe(true)
+    expect(isTeachingRoute('/quiz/abc-123/def-456/')).toBe(true)
+    expect(isTeachingRoute('/quiz/abc-123/def-456/take')).toBe(false)
   })
 
   it('treats /courses/:id as a learner page even though /courses is not', () => {

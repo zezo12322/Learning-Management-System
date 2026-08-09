@@ -74,8 +74,11 @@ export function mapCourseCard(value: unknown): CourseCard {
     language: stringValue(raw.language) || undefined,
     level: stringValue(raw.level, 'BEGINNER') as CourseLevel,
     thumbnail: typeof raw.thumbnail === 'string' ? raw.thumbnail : null,
-    avgRating: numberValue(raw.avgRating),
-    ratingCount: numberValue(raw.ratingCount),
+    // Left undefined when the feed carries no rating, so the `!= null` guards
+    // at the call sites actually gate. Coercing to 0 rendered "0.0 (0)" stars
+    // on every course that simply has not been rated yet.
+    avgRating: typeof raw.avgRating === 'number' ? raw.avgRating : undefined,
+    ratingCount: typeof raw.ratingCount === 'number' ? raw.ratingCount : undefined,
     tags: arrayValue(raw.tags).filter((tag): tag is string => typeof tag === 'string'),
     category: stringValue(category.name) ? { name: stringValue(category.name) } : undefined,
     author: stringValue(author.name)

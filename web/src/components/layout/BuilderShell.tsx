@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, HelpCircle, Save } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import { useRouteGuard } from '@/lib/auth/useRouteGuard'
 import { authoringApi } from '@/lib/api/services'
 import { Button } from '@/components/ui/button'
 import { PageSpinner } from '@/components/ui/spinner'
@@ -28,7 +29,11 @@ function activeStep(pathname: string) {
 export function BuilderShell({ courseId, children }: { courseId: string; children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { loading, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
+  // The course builder is instructor/admin only. This shell used to check
+  // authentication and nothing else, which left the whole (builder) route
+  // group open to any signed-in learner.
+  const { blocked } = useRouteGuard()
   const [saved, setSaved] = useState('All changes saved')
   const active = activeStep(pathname)
   const course = useQuery({
@@ -43,10 +48,6 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
   const canContinue = active !== 1 || curriculumReady
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) router.replace('/login')
-  }, [loading, isAuthenticated, router])
-
-  useEffect(() => {
     if (courseId !== 'new' && course.data && active > 1 && !curriculumReady) {
       router.replace(`/studio/${courseId}/curriculum`)
     }
@@ -59,7 +60,7 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
     return `/studio/${courseId}/${next.key}`
   }, [active, courseId, pathname])
 
-  if (loading || !isAuthenticated) return <PageSpinner />
+  if (blocked) return <PageSpinner />
 
   const saveDraft = () => {
     setSaved('Saved just now')
