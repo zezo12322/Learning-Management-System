@@ -29,7 +29,8 @@
     },
     "egp": "EGP {}",
     "duration_hm": "{}h {}m",
-    "duration_m": "{} min"
+    "duration_m": "{} min",
+    "search_hint": "Search for courses, lessons, quizzes..."
   },
   "errors": {
     "network": "No internet connection. Please check your network.",
@@ -355,6 +356,19 @@
     "reading": {
       "title": "Reading",
       "empty": "This lesson has no content yet."
+    },
+    "header": {
+      "status_in_progress": "In Progress",
+      "lesson_x_of_y": "Lesson {} of {}"
+    },
+    "quiz": {
+      "title": "Lesson quiz",
+      "description": "Check what you learned in this lesson.",
+      "start": "Start quiz",
+      "unavailable": "This lesson has no quiz yet."
+    },
+    "interactive": {
+      "unavailable": "This interactive lesson is not available in the app yet."
     }
   },
   "quiz": {

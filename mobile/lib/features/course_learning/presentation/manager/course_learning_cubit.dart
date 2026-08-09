@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_course_curriculum_usecase.dart';
@@ -20,6 +21,12 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
   String? _lastRequestedLectureId;
   String? _initialLectureId;
 
+  /// Furthest position reported by the player for the lecture now open, in
+  /// seconds. Kept because the server derives completion from the position it
+  /// is sent and clamps what it stores — so sending a position *behind* the
+  /// real one silently rewinds progress and clears `completedAt`.
+  int _lastKnownSecond = 0;
+
   List<CurriculumLectureEntity> get _flatLectures {
     final curriculum = state.curriculum;
     if (curriculum == null) return const [];
@@ -40,6 +47,11 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     return index >= 0 && index < _flatLectures.length - 1;
   }
 
+  /// The course being studied. Exposed so widgets that need to call a
+  /// course-scoped endpoint (the quiz lookup, for one) do not have to thread the
+  /// id down from the route.
+  String? get courseId => _courseId;
+
   String get currentLessonProgressLabel {
     final curriculum = state.curriculum;
     if (curriculum == null || state.currentLecture == null) return '';
@@ -47,7 +59,8 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     final index = currentLectureIndex;
     if (index < 0) return '';
 
-    return 'Lesson ${index + 1} of ${_flatLectures.length}';
+    return 'lesson_learning.header.lesson_x_of_y'
+        .tr(args: ['${index + 1}', '${_flatLectures.length}']);
   }
 
   /// [initialLectureId] opens a specific lecture instead of the first one —
@@ -87,6 +100,9 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
 
   Future<void> fetchLectureContent(String lectureId) async {
     _lastRequestedLectureId = lectureId;
+    // A new lecture starts from an unknown position; carrying the previous
+    // lecture's watched seconds over would mark this one complete on open.
+    if (state.currentLecture?.id != lectureId) _lastKnownSecond = 0;
 
     emit(state.copyWith(lectureState: Status.loading, lectureErrorMessage: null));
     final result = await getLectureContentUseCase.call(lectureId);
@@ -148,28 +164,46 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     await selectLectureById(nextLecture.id);
   }
 
+  /// Marks the open lecture complete.
+  ///
+  /// The server does not trust `completed` — `progress.service.ts:65` derives it
+  /// from `lastWatchedSecond >= duration * threshold` and clamps the stored
+  /// position to the lecture length. So what this sends is the whole fix: the
+  /// end of the lecture, in **seconds** (`CourseLecture.duration` is seconds —
+  /// the transcoder probes whole seconds with ffprobe).
+  ///
+  /// The previous `duration * 60` only survived because of that clamp, and the
+  /// zero fallback was worse than useless: sending 0 rewinds the stored position
+  /// and clears `completedAt`, un-completing a lecture the learner had finished.
   Future<void> markCurrentLectureAsCompleted() async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
     final duration = state.currentLecture?.duration ?? 0;
-    
-    // We optimistically mark it as complete by hitting the synchronous PUT endpoint.
-    // The NestJS backend will accept this since it's the explicit "mark complete" action.
+    // With an unknown duration the server cannot complete anything, so fall back
+    // to the furthest point actually watched rather than to zero.
+    final target = duration > 0 ? duration : _lastKnownSecond;
+    if (target <= 0) return;
+
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: duration > 0 ? (duration * 60) : 0, // Fallback if duration is in minutes
+      lastWatchedSecond: target > _lastKnownSecond ? target : _lastKnownSecond,
       completed: true,
     );
+    _lastKnownSecond = target > _lastKnownSecond ? target : _lastKnownSecond;
   }
 
   Future<void> syncLectureHeartbeat(int currentSecond) async {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
+    // Seeking backwards must not report a position behind the furthest point
+    // reached, or the next heartbeat undoes a completion the learner earned.
+    if (currentSecond > _lastKnownSecond) _lastKnownSecond = currentSecond;
+
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: currentSecond,
+      lastWatchedSecond: _lastKnownSecond,
       completed: false, // Don't aggressively mark as completed on heartbeat
     );
   }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
@@ -25,7 +26,7 @@ class CustomSearchBar extends StatelessWidget {
             onChanged: onChanged,
             style: context.textTheme.bodyMedium,
             decoration: InputDecoration(
-              hintText: 'Search for courses, lessons, quizzes...',
+              hintText: 'common.search_hint'.tr(),
               hintStyle: context.textTheme.bodyMedium?.copyWith(
                 color: AppColors.placeholder,
               ),

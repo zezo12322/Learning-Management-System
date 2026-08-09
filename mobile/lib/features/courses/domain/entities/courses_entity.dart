@@ -2,6 +2,9 @@ class CourseEntity {
   final String id;
   final String title;
   final String? description;
+
+  /// Pounds, not piastres. The API transports piastres; conversion happens once
+  /// in the data layer via `core/utils/money.dart`.
   final double price;
   final String courseStatus; // DRAFT | PUBLISHED | ARCHIVED
   final String language;

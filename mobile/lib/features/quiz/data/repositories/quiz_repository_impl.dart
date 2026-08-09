@@ -10,6 +10,10 @@ class QuizRepositoryImpl implements QuizRepository {
   const QuizRepositoryImpl({required this.remoteDataSource});
 
   @override
+  Future<String?> getQuizIdForLecture(String courseId, String lectureId) =>
+      remoteDataSource.getQuizIdForLecture(courseId, lectureId);
+
+  @override
   Future<TakeQuizModel> getQuizForTaking(String courseId, String quizId) =>
       remoteDataSource.getQuizForTaking(courseId, quizId);
 

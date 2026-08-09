@@ -172,7 +172,7 @@ class CurriculumLectureModel {
       title: title,
       type: type,
       content: content,
-      durationMinutes: duration,
+      durationSeconds: duration,
       isFreePreview: isFreePreview,
     );
   }

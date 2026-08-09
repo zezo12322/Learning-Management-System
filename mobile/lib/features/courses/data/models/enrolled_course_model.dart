@@ -1,3 +1,4 @@
+import 'package:optimatech_lms/core/utils/money.dart';
 import 'package:optimatech_lms/features/courses/data/models/courses_model.dart';
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/enrolled_course_entity.dart';
@@ -57,7 +58,7 @@ class EnrolledCourseModel {
       course: CourseModel(
         id: courseResult?.id ?? '',
         title: courseResult?.title ?? '',
-        price: courseResult?.price.toDouble() ?? 0.0,
+        price: egpFromPiastres(courseResult?.price ?? 0),
         level: courseResult?.level.stringValue ?? '',
         thumbnail: courseResult?.thumbnail,
         tags: const [], // Not requested in this specific query

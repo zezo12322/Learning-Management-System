@@ -5,6 +5,10 @@ import 'package:optimatech_lms/features/quiz/data/models/quiz_result_model.dart'
 import 'package:optimatech_lms/features/quiz/data/models/take_quiz_model.dart';
 
 abstract class QuizRemoteDataSource {
+  /// Resolves the quiz attached to a lecture, so a QUIZ lecture in the player
+  /// can open the quiz screen. Returns `null` when the lecture has no quiz.
+  Future<String?> getQuizIdForLecture(String courseId, String lectureId);
+
   Future<TakeQuizModel> getQuizForTaking(String courseId, String quizId);
   Future<QuizAttemptModel> startAttempt(String courseId, String quizId);
   Future<void> submitAnswer(
@@ -45,6 +49,29 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
   Map<String, dynamic> _asMap(dynamic data) =>
       data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
 
+  /// `GET /courses/:courseId/lectures/:lectureId/quiz`
+  /// (`backend/src/quizzes/quizzes.controller.ts:68`). It is gated to the course
+  /// owner, an admin previewing, or an actively-enrolled student, and answers
+  /// 404 when the lecture has no quiz — which is a normal outcome here, not an
+  /// error, so it maps to `null`.
+  ///
+  /// This endpoint is why the quiz screen can have an entry point at all: the
+  /// note on `QuizViewArgs` said no such route existed, and that stopped being
+  /// true when this one shipped.
+  @override
+  Future<String?> getQuizIdForLecture(String courseId, String lectureId) async {
+    try {
+      await _setAuthToken();
+      final response = await apiService
+          .get('/courses/${_fmt(courseId)}/lectures/${_fmt(lectureId)}/quiz');
+      final id = _asMap(response.data)['id']?.toString();
+      return (id == null || id.isEmpty) ? null : id;
+    } catch (_) {
+      // No quiz for this lecture, or it is not visible to this caller.
+      return null;
+    }
+  }
+
   @override
   Future<TakeQuizModel> getQuizForTaking(String courseId, String quizId) async {
     try {
@@ -82,8 +109,12 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     try {
       await _setAuthToken();
       await apiService.post(
-        '/courses/${_fmt(courseId)}/quizzes/${_fmt(quizId)}/attempts/$attemptId/answers',
-        data: {'questionId': questionId, 'optionId': optionId},
+        '/courses/${_fmt(courseId)}/quizzes/${_fmt(quizId)}/attempts/${_fmt(attemptId)}/answers',
+        // `selectedOptionId`, not `optionId`: that is the field name on
+        // `SubmitAnswerDto` (backend/src/quizzes/dto/quiz.dto.ts:138), and the
+        // global ValidationPipe runs with `forbidNonWhitelisted: true` — so an
+        // unknown key is a 400, not a silently ignored extra.
+        data: {'questionId': questionId, 'selectedOptionId': optionId},
       );
     } catch (e) {
       throw Exception('Failed to submit answer: $e');
@@ -99,7 +130,7 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     try {
       await _setAuthToken();
       final response = await apiService.post(
-        '/courses/${_fmt(courseId)}/quizzes/${_fmt(quizId)}/attempts/$attemptId/finish',
+        '/courses/${_fmt(courseId)}/quizzes/${_fmt(quizId)}/attempts/${_fmt(attemptId)}/finish',
         data: {},
       );
       return QuizResultModel.fromJson(_asMap(response.data));

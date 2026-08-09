@@ -48,7 +48,9 @@ class CurriculumLectureEntity {
   final String title;
   final LectureContentType type;
   final String? content;
-  final int? durationMinutes;
+  /// Lecture length in **seconds**, as the API stores it. Render through
+  /// `formatSeconds` in `core/utils/duration_format.dart`.
+  final int? durationSeconds;
   final bool isFreePreview;
 
   const CurriculumLectureEntity({
@@ -56,7 +58,7 @@ class CurriculumLectureEntity {
     required this.title,
     required this.type,
     this.content,
-    this.durationMinutes,
+    this.durationSeconds,
     required this.isFreePreview,
   });
 }
