@@ -38,8 +38,15 @@ Design = mobile layout; web adapts to RTL + responsive (sidebar desktop / bottom
 - [x] Courses catalog → `(app)/courses`
 - [x] Course details → `(app)/courses/[id]`
 - [ ] Course learning (lecture player) → `(app)/learn/[courseId]`
-- [ ] Profile → `(app)/profile`
-- [ ] Quiz flow, submissions, certificates
+- [x] Student home → `(app)/home` (Figma 5)
+- [x] My courses (enrolled + progress) → `(app)/learning` (Figma 6)
+- [x] Assignments → `(app)/assignments` (Figma 13, backed by `GET /me/submissions`)
+- [x] Certificates list + detail → `(app)/certificates` (Figma 14, derived from COMPLETED enrollments)
+- [x] Notifications → `(app)/notifications` (Figma 15, empty shell — no backend endpoint)
+- [x] Profile → `(app)/profile` (Figma 16)
+- [x] Role-aware navigation: learner nav for everyone, "Teaching" group for instructors/admins
+- [ ] Quiz experience refit to the 4-step Figma flow
+- [ ] Course learning Notes / Resources / Discussion tabs (Figma 9–11)
 
 ## How to run
 ```bash

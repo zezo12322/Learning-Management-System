@@ -78,3 +78,26 @@
     scrollbar-width: none;
   }
 }
+
+/**
+ * Certificate printing. "Download PDF" on the certificate details screen calls
+ * window.print(); this isolates the certificate sheet so the app shell, nav and
+ * action buttons are not carried into the printed page.
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificate-print,
+  #certificate-print * {
+    visibility: visible;
+  }
+  #certificate-print {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+  }
+}
