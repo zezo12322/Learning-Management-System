@@ -1,9 +1,17 @@
 name: Deploy Web
 
-# Manual only — never on push. The web app currently ships by someone running
-# `npm run deploy` from their laptop, which means the build environment (and the
-# NEXT_PUBLIC_* values baked into the bundle) differs per person. This makes the
-# deploy reproducible without handing the trigger to every merge.
+# Every push to `development` that touches the web app deploys it, so the
+# `optima-lms-web` Worker always matches the branch. Before this, the app shipped
+# by someone running `npm run deploy` from their laptop — which is why every
+# version in the Cloudflare dashboard reads "Manually deployed", and why the
+# NEXT_PUBLIC_* values baked into the bundle differed per person.
+#
+# The dispatch trigger stays for deploying a different ref (a tag, a hotfix
+# branch) and for re-running a deploy without an empty commit.
+#
+# `development` and not `main`: it is the branch the app is released from, and
+# the one the release mirror syncs. Correctness still comes from CI, which runs
+# on every pull request — a direct push to `development` deploys unreviewed.
 #
 # Backend deploys are NOT here on purpose: Railway already deploys from `main`,
 # and adding a second path would double-deploy.
@@ -13,7 +21,16 @@ on:
       ref:
         description: Branch or tag to deploy
         required: false
-        default: main
+        default: development
+  push:
+    branches: [development]
+    # dataconnect/ is here because the build generates the Data Connect SDKs the
+    # bundle imports; a schema change alone can change what ships.
+    paths:
+      - 'web/**'
+      - 'dataconnect/**'
+      - '.github/workflows/deploy-web.yml'
+      - '.github/actions/setup-node-package/**'
 
 concurrency:
   # Never two web deploys at once, and do not cancel one midway.
@@ -35,10 +52,15 @@ jobs:
     defaults:
       run:
         working-directory: web
+    env:
+      # On dispatch this is whatever ref was asked for. On push it is the exact
+      # commit that triggered the run, not the branch name — two pushes in quick
+      # succession would otherwise both build the newer one.
+      DEPLOY_REF: ${{ inputs.ref || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref || github.sha }}
 
       - uses: ./.github/actions/setup-node-package
         with:
@@ -52,19 +74,44 @@ jobs:
 
       # Fail fast with an actionable message instead of a confusing wrangler
       # error 20 minutes into a build.
+      #
+      # The NEXT_PUBLIC_* checks matter more now that a merge deploys on its own:
+      # those values are inlined at build time, so an unset one does not fail the
+      # build — it ships a bundle that cannot reach Firebase or the API, and the
+      # only symptom is a broken app. Better to stop here and say which one.
       - name: Verify deploy credentials are configured
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
         run: |
           missing=""
-          [ -z "$CLOUDFLARE_API_TOKEN" ] && missing="$missing CLOUDFLARE_API_TOKEN"
-          [ -z "$CLOUDFLARE_ACCOUNT_ID" ] && missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          for name in \
+            CLOUDFLARE_API_TOKEN \
+            CLOUDFLARE_ACCOUNT_ID \
+            NEXT_PUBLIC_API_URL \
+            NEXT_PUBLIC_FIREBASE_API_KEY \
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN \
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID \
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET \
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID \
+            NEXT_PUBLIC_FIREBASE_APP_ID
+          do
+            if [ -z "${!name}" ]; then
+              missing="$missing $name"
+            fi
+          done
           if [ -n "$missing" ]; then
-            echo "::error::Missing repository secret(s):$missing — add them under Settings → Secrets and variables → Actions."
+            echo "::error::Not configured:$missing — add them under Settings → Secrets and variables → Actions (secrets for the API keys, variables for the rest). See docs/OPERATIONS.md."
             exit 1
           fi
-          echo "Cloudflare credentials present."
+          echo "Cloudflare credentials and build-time config present."
 
       # NEXT_PUBLIC_* values are inlined at build time, so they must be present
       # here rather than at runtime. Anything unset falls back to the app's own
@@ -111,7 +158,8 @@ jobs:
             echo
             echo "| Field | Value |"
             echo "|---|---|"
-            echo "| Ref | \`${{ inputs.ref }}\` |"
+            echo "| Trigger | \`${{ github.event_name }}\` |"
+            echo "| Ref | \`$DEPLOY_REF\` |"
             echo "| Commit | \`${{ github.sha }}\` |"
             echo "| Result | ${{ job.status }} |"
             echo
