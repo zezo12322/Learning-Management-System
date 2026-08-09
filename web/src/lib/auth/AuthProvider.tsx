@@ -21,6 +21,7 @@ import {
 } from 'firebase/auth'
 import { getFirebaseAuth, googleProvider } from '@/lib/firebase'
 import { meApi } from '@/lib/api/services'
+import { setStoreUid } from '@/lib/localStore'
 import { callCloudFunction } from '@/lib/auth/cloudFunctions'
 import type { Me, Role } from '@/lib/types'
 
@@ -73,6 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsub = onAuthStateChanged(getFirebaseAuth(), async (user) => {
       setFirebaseUser(user)
+      // Point the per-account local stores (bookmarks, notes) at this uid before
+      // anything renders, so a shared browser never shows the previous
+      // account's data.
+      setStoreUid(user?.uid ?? null)
       if (user) {
         try {
           // Pick up role changes made while this browser session was active.

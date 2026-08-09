@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { apiBaseUrl, apiClient } from './client'
 import type {
   Category,
   Certificate,
@@ -204,6 +204,22 @@ export const progressApi = {
     apiClient.put(`/lectures/${lectureId}/progress`, { lastWatchedSecond, completed: true }).then((response) => response.data),
 }
 
+// ── Secure video streaming (AES-128 HLS) ─────────────────────────────
+/**
+ * Playback is a guarded handshake (API_DOCUMENTATION §19): the manifest and the
+ * AES key are served by our API behind Firebase auth, while the segments are
+ * pre-signed GCS URLs on a different host that must NOT receive the token.
+ * `LecturePlayer` wires that split; these helpers only expose the URLs and the
+ * forensic watermark.
+ */
+export const streamingApi = {
+  manifestUrl: (lectureId: string) => `${apiBaseUrl()}/lectures/${lectureId}/stream/manifest`,
+  watermark: (lectureId: string) =>
+    apiClient
+      .get<{ text: string; expiresAt: string }>(`/lectures/${lectureId}/stream/watermark`)
+      .then((response) => response.data),
+}
+
 export const ratingsApi = {
   summary: (courseId: string) =>
     apiClient.get<RatingSummary>(`/courses/${courseId}/ratings/summary`).then((response) => response.data),
@@ -324,6 +340,27 @@ export const quizApi = {
     apiClient
       .get(`/courses/${courseId}/quizzes/${quizId}`)
       .then((response) => mapQuiz(response.data)),
+
+  /**
+   * Resolve the quiz attached to a lecture. Student-accessible (the service
+   * gates on enrollment), and the only way a learner can reach a quiz at all —
+   * the curriculum response carries no quiz id.
+   */
+  forLecture: (courseId: string, lectureId: string) =>
+    apiClient
+      .get(`/courses/${courseId}/lectures/${lectureId}/quiz`)
+      .then((response) => {
+        const raw = objectValue(response.data)
+        const quiz = objectValue(raw.quiz ?? raw.courseQuiz ?? raw)
+        const id = stringValue(quiz.id)
+        if (!id) return null
+        return {
+          id,
+          passingScore: numberValue(quiz.passingScore, 70),
+          maxAttempts: numberValue(quiz.maxAttempts, 0),
+          timeLimitMinutes: quiz.timeLimitMinutes == null ? undefined : numberValue(quiz.timeLimitMinutes),
+        }
+      }),
 
   /** Create the quiz shell on a QUIZ-type lecture; returns the new quiz id. */
   create: (courseId: string, lectureId: string, settings: QuizSettings) =>
