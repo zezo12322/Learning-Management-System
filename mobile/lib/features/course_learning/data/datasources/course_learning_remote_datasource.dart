@@ -5,6 +5,7 @@ import 'package:optimatech_lms/core/helper_function/lecture_type.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/curriculum_model.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/lecture_content_model.dart';
+import 'package:optimatech_lms/core/error/user_facing_message.dart';
 
 abstract class CourseLearningRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
@@ -35,7 +36,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       final response = await apiService.get('/catalog/courses/$courseId/curriculum');
       return CourseCurriculumModel.fromJson(response.data);
     } catch (e){
-      throw CustomExceptions(message: 'Failed to fetch Course Curriculum: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -66,7 +67,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       }
       return model;
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to fetch Lecture Content: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -80,7 +81,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
         'completed': completed,
       });
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to update lecture progress: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 }

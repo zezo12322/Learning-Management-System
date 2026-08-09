@@ -30,7 +30,7 @@ class CourseContentTabs extends StatelessWidget {
         children: List.generate(tabKeys.length, (index) {
           final isSelected = index == selectedIndex;
           return Padding(
-            padding: EdgeInsets.only(right: 8.w),
+            padding: EdgeInsetsDirectional.only(end: 8.w),
             child: Material(
               color: isSelected
                   ? colorScheme.primary.withValues(alpha: 0.1)

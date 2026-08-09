@@ -50,7 +50,7 @@ class ProfileCertificatesSection extends StatelessWidget {
             return Column(
               children: certificates.map((cert) {
                 final date = cert.issuedAt.toDateTime();
-                final formattedDate = DateFormat('MMM dd, yyyy').format(date);
+                final formattedDate = DateFormat('MMM dd, yyyy', context.locale.toLanguageTag()).format(date);
                 final title = cert.course?.title ?? cert.mission?.title ?? 'Unknown Certificate';
 
                 return Padding(

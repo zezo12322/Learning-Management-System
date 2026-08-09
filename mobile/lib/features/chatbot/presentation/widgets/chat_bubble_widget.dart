@@ -109,7 +109,8 @@ class ChatBubbleWidget extends StatelessWidget {
 
               const SizedBox(height: 4),
               Text(
-                DateFormat('hh:mm a').format(message.timestamp),
+                DateFormat('hh:mm a', context.locale.toLanguageTag())
+                    .format(message.timestamp),
                 style: TextStyle(
                   fontSize: 10,
                   color: isUser 

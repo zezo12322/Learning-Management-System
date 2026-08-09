@@ -9,7 +9,6 @@ import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
 import 'package:optimatech_lms/features/home/data/models/continue_learning_model.dart';
 import 'package:optimatech_lms/features/home/data/models/popular_course_model.dart';
 import 'package:optimatech_lms/features/home/data/models/recommended_course_model.dart';
-import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_course_state.dart';
 import 'package:optimatech_lms/features/home/presentation/manager/home_courses_cubit/home_courses_cubit.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/assignments_section.dart';
@@ -18,7 +17,6 @@ import 'package:optimatech_lms/features/home/presentation/widgets/build_popular_
 import 'package:optimatech_lms/features/home/presentation/widgets/build_recommended_courses_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_shimmer_skeleton.dart';
 import '../../../courses/presentation/views/widgets/show_courses_filter_bottom_sheet.dart';
-import 'package:optimatech_lms/features/home/domain/entities/student_progress_entity.dart';
 
 // ============================================================================
 // HomeBody — Main content area for the Home tab.
@@ -85,12 +83,6 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
 
   @override
   Widget build(BuildContext context) {
-    final HomeCourseEntity? continueCourse = widget.popularCourses.isNotEmpty
-        ? widget.popularCourses.first
-        : widget.recommendedCourses.isNotEmpty
-            ? widget.recommendedCourses.first
-            : null;
-
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -121,24 +113,15 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               Gap(24.h),
 
               // ------------- Continue Learning Section -------------
+              // Shown only when there is real progress to continue. There used
+              // to be a fallback branch here that took the first popular or
+              // recommended course — one the learner had never enrolled in —
+              // and rendered it as "2 of 10 lessons, 45 mins left, 20%". Those
+              // numbers were literals, not data.
               if (widget.continueLearning.isNotEmpty) ...[
                 buildContinueLearningSection(
                   context,
                   widget.continueLearning.first,
-                ),
-                Gap(28.h),
-              ] else if (continueCourse != null) ...[
-                buildContinueLearningSection(
-                  context,
-                  StudentProgressEntity(
-                    watchedLessons: 2,
-                    totalLessons: 10,
-                    timeLeft: '45 mins',
-                    progressPercent: 0.2,
-                    courseId: continueCourse.id,
-                    title: continueCourse.title,
-                    thumbnail: continueCourse.image,
-                  ),
                 ),
                 Gap(28.h),
               ],

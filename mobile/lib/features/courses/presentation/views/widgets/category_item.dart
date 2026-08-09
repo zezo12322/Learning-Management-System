@@ -21,9 +21,15 @@ class CategoryItem extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 72.w,
-        height: 42.w,
-        padding: EdgeInsets.symmetric(vertical: 12.h),
+        // A fixed 72x42 box with `maxLines: 1` truncated most Arabic category
+        // names to an ellipsis, and clipped at larger system font sizes. The box
+        // keeps the same look for short labels and grows for the rest.
+        constraints: BoxConstraints(
+          minWidth: 72.w,
+          maxWidth: 148.w,
+          minHeight: 42.w,
+        ),
+        padding: EdgeInsets.symmetric(vertical: 8.h),
         decoration: BoxDecoration(
           color: isSelected
               ? context.theme.colorScheme.primary.withValues(alpha: 0.06)
@@ -35,6 +41,8 @@ class CategoryItem extends StatelessWidget {
           ),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icon(
             //   category.icon,
@@ -54,7 +62,7 @@ class CategoryItem extends StatelessWidget {
                   fontSize: 10.sp,
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),

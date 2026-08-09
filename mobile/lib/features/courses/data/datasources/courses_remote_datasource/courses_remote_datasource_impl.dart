@@ -6,6 +6,7 @@ import 'package:optimatech_lms/features/courses/data/models/courses_model.dart';
 import 'package:optimatech_lms/features/courses/data/models/enrolled_course_model.dart';
 
 import '../../../../../core/error/exceptions.dart';
+import 'package:optimatech_lms/core/error/user_facing_message.dart';
 
 class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
   final DefaultConnector _connector;
@@ -17,9 +18,9 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
       final result = await _connector.listPublishedCourses().execute();
       return result.data.courses.map(CourseModel.fromConnectorResult).toList();
     } on DataConnectError catch (e) {
-      throw CustomExceptions(message: e.message ?? 'Data Connect error');
+      throw CustomExceptions(message: userFacingMessage(e));
     } catch (e){
-      throw CustomExceptions(message: 'Failed to fetch courses: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -42,9 +43,9 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
 
       return enrollments;
     } on DataConnectError catch (e) {
-      throw CustomExceptions(message: e.message ?? 'Data Connect error');
+      throw CustomExceptions(message: userFacingMessage(e));
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to fetch continue learning: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -130,9 +131,9 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
 
       return recommendedCourses;
     } on DataConnectError catch (e) {
-      throw CustomExceptions(message: e.message ?? 'Data Connect error');
+      throw CustomExceptions(message: userFacingMessage(e));
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to fetch recommendations: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 }
