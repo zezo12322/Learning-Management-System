@@ -67,6 +67,10 @@ const en: Dict = {
   'auth.err.emailFirst': 'Enter your email address first, then request a password reset.',
   'auth.err.resetFailed': 'We could not send password reset instructions right now.',
   'auth.err.googleUnavailable': 'Google sign-in is currently unavailable.',
+  'auth.err.googleUnauthorizedDomain':
+    'Google sign-in is not allowed from this address yet. Add this domain to the Firebase Authentication authorized domains list.',
+  'auth.err.googleProviderDisabled':
+    'Google sign-in is switched off for this project. Enable the Google provider in Firebase Authentication.',
   'auth.notice.resetSent': 'Password reset instructions were sent if an account exists for this email.',
   'auth.val.email': 'Enter a valid email address.',
   'auth.val.passwordRequired': 'Password is required.',
@@ -987,6 +991,10 @@ const ar: Dict = {
   'auth.err.emailFirst': 'أدخل بريدك الإلكتروني أولًا ثم اطلب إعادة تعيين كلمة المرور.',
   'auth.err.resetFailed': 'تعذّر إرسال تعليمات إعادة التعيين الآن.',
   'auth.err.googleUnavailable': 'تسجيل الدخول عبر Google غير متاح حاليًا.',
+  'auth.err.googleUnauthorizedDomain':
+    'تسجيل الدخول عبر Google غير مسموح من هذا العنوان بعد. أضِف هذا النطاق إلى قائمة النطاقات المصرّح بها في Firebase Authentication.',
+  'auth.err.googleProviderDisabled':
+    'تسجيل الدخول عبر Google معطّل في هذا المشروع. فعّل مزوّد Google من Firebase Authentication.',
   'auth.notice.resetSent': 'تم إرسال تعليمات إعادة التعيين إذا كان هناك حساب لهذا البريد.',
   'auth.val.email': 'أدخل بريدًا إلكترونيًا صحيحًا.',
   'auth.val.passwordRequired': 'كلمة المرور مطلوبة.',
