@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/language_service.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
@@ -81,11 +82,30 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
       // The manifest and the AES key are both served by our API behind
       // FirebaseAuthGuard, so the player has to carry the ID token — without it
       // the key request comes back 401 and playback dies on the first segment.
-      // Segment URLs are pre-signed GCS links; they ignore this header.
-      final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+      //
+      // The header is attached only when the URL is our API. That is not the
+      // whole story, and the previous comment here ("segment URLs are pre-signed
+      // GCS links; they ignore this header") was wrong: `video_player` installs
+      // this map on the platform data source, which replays it on *every*
+      // request, including the pre-signed `storage.googleapis.com` segment URLs
+      // the manifest points at. API_DOCUMENTATION.md §19.5 says segment requests
+      // must stay header-free.
+      //
+      // Scoping at creation stops the token going out when a non-API URL is
+      // ever passed here, but it cannot stop the replay — that needs a player
+      // with per-request header control (`better_player`, per §19.5) or a
+      // loopback proxy that injects the header only for the API host. Tracked
+      // separately; not changed blind, because getting it wrong breaks playback
+      // outright.
+      final uri = Uri.parse(url);
+      final isApiUrl =
+          uri.origin == Uri.parse(AppConstants.baseUrl).origin;
+      final idToken = isApiUrl
+          ? await FirebaseAuth.instance.currentUser?.getIdToken()
+          : null;
 
       final controller = VideoPlayerController.networkUrl(
-        Uri.parse(url),
+        uri,
         httpHeaders: {
           if (idToken != null) 'Authorization': 'Bearer $idToken',
         },

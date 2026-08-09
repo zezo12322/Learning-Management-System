@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:optimatech_lms/core/config/app_config.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:optimatech_lms/core/helper_function/lecture_type.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
@@ -55,7 +55,13 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       // URL, so video lectures are pointed at that instead.
       if (model.type == LectureContentType.video && model.videoUrl != null) {
         return model.copyWith(
-          videoUrl: '${AppConfig.apiBaseUrl}/lectures/$lectureId/stream/manifest',
+          // `AppConstants.baseUrl`, not `AppConfig.apiBaseUrl`: those are two
+          // independent sources of truth that only agree by coincidence. The
+          // rest of the app (ApiService) uses AppConstants, so with
+          // `useLocalBackend = true` the manifest would point at production
+          // while every other call went to localhost — and the player scopes
+          // the auth header to the host AppConstants names.
+          videoUrl: '${AppConstants.baseUrl}/lectures/$lectureId/stream/manifest',
         );
       }
       return model;
