@@ -32,7 +32,11 @@ Design = mobile layout; web adapts to RTL + responsive (sidebar desktop / bottom
 - [x] Domain types → `lib/types.ts`
 - [x] Typed API services → `lib/api/services/*`
 - [x] Auth context + hooks → `lib/auth/*`
-- [ ] Middleware / route protection
+- [x] Route protection → `lib/auth/routeAccess.ts`, enforced in `AppShell`: a learner
+      who opens an instructor route (`/dashboard`, `/courses`, `/students`,
+      `/insights`, `/uploads`, `/studio/*`) is redirected to `/home` without the
+      workspace ever painting. This is a UI guard — the NestJS API remains the
+      authorization boundary and answers 403 on authoring endpoints regardless.
 - [x] Auth pages → `(auth)/login`, `(auth)/register`
 - [x] Home dashboard → `(app)/home`
 - [x] Courses catalog → `(app)/courses`

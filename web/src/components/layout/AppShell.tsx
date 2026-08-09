@@ -22,6 +22,11 @@ import {
   Plus,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import {
+  LEARNER_HOME,
+  canTeach as canTeachRoles,
+  isRouteForbidden,
+} from '@/lib/auth/routeAccess'
 import { authoringApi } from '@/lib/api/services'
 import { PageSpinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
@@ -82,7 +87,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
-  const canTeach = roles.includes('admin') || roles.includes('instructor')
+  const canTeach = canTeachRoles(roles)
+  // A learner who lands on an instructor screen — by URL, bookmark or an old
+  // link — must never see it. `loading` only clears after the profile and role
+  // claims have resolved, so this cannot bounce a real instructor.
+  const forbidden = !loading && isAuthenticated && isRouteForbidden(pathname, roles)
   const authoringQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
@@ -123,9 +132,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) router.replace('/login')
-  }, [loading, isAuthenticated, router])
+    else if (forbidden) router.replace(LEARNER_HOME)
+  }, [loading, isAuthenticated, forbidden, router])
 
-  if (loading || !isAuthenticated) return <PageSpinner />
+  // Hold the spinner while redirecting so the instructor workspace never paints
+  // for a learner, not even for a frame.
+  if (loading || !isAuthenticated || forbidden) return <PageSpinner />
 
   const signOut = async () => {
     await logout()
