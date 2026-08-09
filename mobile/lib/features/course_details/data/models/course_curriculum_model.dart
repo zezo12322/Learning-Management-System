@@ -69,7 +69,7 @@ class CourseLessonModel extends CourseLessonEntity {
     required super.id,
     required super.number,
     required super.title,
-    required super.durationMinutes,
+    required super.durationSeconds,
     super.videoUrl,
     super.isFreePreview,
     required super.status,
@@ -81,7 +81,7 @@ class CourseLessonModel extends CourseLessonEntity {
         id: '',
         number: 0,
         title: '',
-        durationMinutes: 0,
+        durationSeconds: 0,
         status: LessonStatus.locked,
       );
     }
@@ -98,8 +98,8 @@ class CourseLessonModel extends CourseLessonEntity {
       id: json['id']?.toString() ?? '',
       number: number,
       title: json['title']?.toString() ?? '',
-      // Bare number in the API payload, minutes by convention.
-      durationMinutes: _asMinutes(json['duration']),
+      // Whole seconds in the API payload — see `duration_format.dart`.
+      durationSeconds: _asSeconds(json['duration']),
       // The curriculum outline never carries a playable URL: the player fetches
       // it per lecture from GET /lectures/:id. `content` is the gated text body
       // for READING lectures, not a video source.
@@ -109,7 +109,7 @@ class CourseLessonModel extends CourseLessonEntity {
     );
   }
 
-  static int _asMinutes(dynamic raw) {
+  static int _asSeconds(dynamic raw) {
     if (raw is num) return raw.round();
     return int.tryParse(raw?.toString() ?? '') ?? 0;
   }

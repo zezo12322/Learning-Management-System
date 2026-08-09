@@ -71,7 +71,7 @@ class CustomTextField extends StatelessWidget {
         // الـ Leading Icon
         prefixIcon: prefixIcon != null
             ? Padding(
-          padding: const EdgeInsets.only(left: 16, right: 12),
+          padding: const EdgeInsetsDirectional.only(start: 16, end: 12),
           child: Icon(
             prefixIcon,
             size: 20,
@@ -87,7 +87,7 @@ class CustomTextField extends StatelessWidget {
         // clear icon
         suffixIcon: showClear && enabled
             ? Padding(
-          padding: const EdgeInsets.only(right: 16, left: 12),
+          padding: const EdgeInsetsDirectional.only(end: 16, start: 12),
           child: IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),

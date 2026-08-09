@@ -2,8 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'signup_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class SignupCubit extends Cubit<SignupState> {
+class SignupCubit extends Cubit<SignupState> with SafeEmit<SignupState> {
   SignupCubit({required AuthRepository authRepository}) : _authRepository = authRepository, super(const SignupState());
   final AuthRepository _authRepository;
 

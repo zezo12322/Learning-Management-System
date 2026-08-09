@@ -13,11 +13,13 @@ class UpdateLectureProgressUseCase {
     required String lectureId,
     required int lastWatchedSecond,
     int? watchedSeconds,
+    bool heartbeat = false,
   }) {
     return repository.updateLectureProgress(
       lectureId: lectureId,
       lastWatchedSecond: lastWatchedSecond,
       watchedSeconds: watchedSeconds,
+      heartbeat: heartbeat,
     );
   }
 }

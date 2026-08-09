@@ -10,8 +10,9 @@ import 'package:optimatech_lms/features/home/domain/entities/student_progress_en
 import '../../../domain/usecases/get_continue_learning_courses_use_case.dart';
 import '../../../domain/usecases/get_popular_courses_use_case.dart';
 import '../../../domain/usecases/get_recommended_courses_use_case.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class HomeCoursesCubit extends Cubit<HomeCourseState> {
+class HomeCoursesCubit extends Cubit<HomeCourseState> with SafeEmit<HomeCourseState> {
   HomeCoursesCubit({
     required this.getContinueLearningCoursesUseCase,
     required this.getPopularCoursesUseCase,
@@ -21,6 +22,31 @@ class HomeCoursesCubit extends Cubit<HomeCourseState> {
   final GetContinueLearningCoursesUseCase getContinueLearningCoursesUseCase;
   final GetPopularCoursesUseCase getPopularCoursesUseCase;
   final GetRecommendedCoursesUseCase getRecommendedCoursesUseCase;
+
+  /// Fetches only the popular list.
+  ///
+  /// The course-details screen shows a "You might also like" strip and used to
+  /// get it by calling [fetchHomeCourses], which also runs the continue-learning
+  /// and recommended queries — and the recommended one is itself two round trips
+  /// (enrolled categories, then the recommendation). So opening any course
+  /// detail cost four queries to render one carousel. This costs one.
+  Future<void> fetchPopularCourses() async {
+    emit(const HomeCourseState.loading());
+
+    final result = await getPopularCoursesUseCase(null);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(HomeCourseState.error(failure.message)),
+      (courses) => emit(
+        HomeCourseState.loaded(
+          continueLearning: const [],
+          popularCourses: courses.cast<PopularCourseModel>(),
+          recommendedCourses: const [],
+        ),
+      ),
+    );
+  }
 
   Future<void> fetchHomeCourses() async {
     emit(const HomeCourseState.loading());
@@ -34,6 +60,9 @@ class HomeCoursesCubit extends Cubit<HomeCourseState> {
       popularCoursesFuture,
       recommendedCoursesFuture,
     ]);
+    // The user can leave Home before these land; emitting into a closed cubit
+    // throws a StateError.
+    if (isClosed) return;
 
     final continueLearningResultRaw =
         results[0] as Either<Failure, List<StudentProgressEntity>>;

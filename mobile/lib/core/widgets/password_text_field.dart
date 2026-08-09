@@ -65,7 +65,7 @@ class PasswordTextField extends StatelessWidget {
         ),
         // الـ Leading Icon
         prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 12),
+          padding: const EdgeInsetsDirectional.only(start: 16, end: 12),
           child: Icon(
             Icons.lock_outline,
             size: 20,
@@ -79,7 +79,7 @@ class PasswordTextField extends StatelessWidget {
 
         // clear icon
         suffixIcon: Padding(
-          padding: const EdgeInsets.only(right: 16, left: 12),
+          padding: const EdgeInsetsDirectional.only(end: 16, start: 12),
           child: IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),

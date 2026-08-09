@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
+import 'package:optimatech_lms/core/utils/duration_format.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
 
@@ -69,9 +70,9 @@ class CurriculumLessonTile extends StatelessWidget {
                 ),
               ),
               Gap(8.w),
-              if (lecture.durationMinutes != null)
+              if (formatSeconds(lecture.durationSeconds).isNotEmpty)
                 Text(
-                  '${lecture.durationMinutes} min',
+                  formatSeconds(lecture.durationSeconds),
                   style: context.textTheme.bodySmall?.copyWith(
                     color: context.theme.colorScheme.onSurfaceVariant,
                   ),

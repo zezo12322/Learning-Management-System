@@ -9,8 +9,9 @@ import 'package:optimatech_lms/features/chatbot/domain/usecases/send_message_use
 import 'package:optimatech_lms/features/chatbot/domain/usecases/get_chat_history_usecase.dart';
 import 'package:optimatech_lms/features/chatbot/domain/usecases/save_chat_history_usecase.dart';
 import 'chat_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class ChatCubit extends Cubit<ChatState> {
+class ChatCubit extends Cubit<ChatState> with SafeEmit<ChatState> {
   final SendMessageUseCase sendMessageUseCase;
   final GetChatHistoryUseCase getChatHistoryUseCase;
   final SaveChatHistoryUseCase saveChatHistoryUseCase;

@@ -93,7 +93,7 @@ class _LessonTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              formatMinutes(lesson.durationMinutes),
+              formatSeconds(lesson.durationSeconds),
               style: TextStyles.labelSmall.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -208,7 +208,7 @@ class _LessonTile extends StatelessWidget {
               ),
               if (!isActive) ...[
                 Text(
-                  formatMinutes(lesson.durationMinutes),
+                  formatSeconds(lesson.durationSeconds),
                   style: TextStyles.labelSmall.copyWith(
                     color: durationColor,
                   ),

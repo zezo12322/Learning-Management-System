@@ -52,10 +52,11 @@ class CourseLessonEntity extends Equatable {
   final int number;
   final String title;
 
-  /// Lesson length in **minutes**. The API stores a bare number and the whole
-  /// app treats that number as minutes; keeping it typed as int stops the
-  /// unit from being re-guessed at each call site.
-  final int durationMinutes;
+  /// Lesson length in **seconds**, exactly as the API stores it — the
+  /// transcoder writes whole seconds from ffprobe. Named for the unit so the
+  /// next call site cannot re-guess it; render it through
+  /// `formatSeconds` in `core/utils/duration_format.dart`.
+  final int durationSeconds;
   final String? videoUrl;
   final bool isFreePreview;
   final LessonStatus status;
@@ -64,7 +65,7 @@ class CourseLessonEntity extends Equatable {
     required this.id,
     required this.number,
     required this.title,
-    required this.durationMinutes,
+    required this.durationSeconds,
     this.videoUrl,
     this.isFreePreview = false,
     required this.status,
@@ -72,5 +73,5 @@ class CourseLessonEntity extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, number, title, durationMinutes, videoUrl, isFreePreview, status];
+      [id, number, title, durationSeconds, videoUrl, isFreePreview, status];
 }

@@ -1,9 +1,13 @@
+import 'package:optimatech_lms/core/utils/money.dart';
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 
 class CourseModel {
   final String id;
   final String title;
+
+  /// Price in **pounds**, converted from the API's piastres exactly once, in
+  /// [CourseModel.fromConnectorResult]. See `core/utils/money.dart`.
   final double price;
   final String level;
   final String? thumbnail;
@@ -34,7 +38,7 @@ class CourseModel {
     return CourseModel(
       id: result.id,
       title: result.title,
-      price: result.price.toDouble(),
+      price: egpFromPiastres(result.price),
       level: result.level.stringValue,
       thumbnail: result.thumbnail,
       tags: result.tags,
@@ -49,6 +53,8 @@ class CourseModel {
     );
   }
 
+  /// Round-trips [toJson], which writes the already-converted pound value — so
+  /// `price` is read verbatim here. Converting again would divide twice.
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
       id: json['id'] as String,

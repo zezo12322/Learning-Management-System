@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:optimatech_lms/core/utils/money.dart';
 import 'package:optimatech_lms/features/course_details/domain/repositories/course_details_repository.dart';
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
 
@@ -32,6 +33,9 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
 
   /// Paid course: fetch the Paymob checkout URL from the backend and expose it
   /// as a one-shot [CourseDetailsLoaded.checkoutUrl] for the view to open.
+  ///
+  /// [price] is in pounds (see `core/utils/money.dart`); the checkout endpoint
+  /// wants piastres, which is the only place that conversion happens.
   Future<void> buyCourse(String courseId, double price) async {
     if (state is! CourseDetailsLoaded) return;
     final currentState = state as CourseDetailsLoaded;
@@ -40,7 +44,7 @@ class CourseDetailsCubit extends Cubit<CourseDetailsState> {
     try {
       final checkoutUrl = await repository.createCourseCheckoutUrl(
         courseId: courseId,
-        amountCents: (price * 100).round(),
+        amountCents: piastresFromEgp(price),
       );
       if (isClosed || state is! CourseDetailsLoaded) return;
       emit((state as CourseDetailsLoaded)

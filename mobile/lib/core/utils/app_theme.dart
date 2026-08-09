@@ -4,9 +4,24 @@ import 'package:optimatech_lms/core/utils/app_colors.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
 
 class AppTheme {
-  static final ThemeData light = ThemeData(
-    useMaterial3: true,
-    fontFamily: 'Poppins',
+  /// The bundled Poppins family has **no Arabic block**, and no fallback family
+  /// was declared — so every Arabic string was already being drawn by the
+  /// platform's fallback face, one glyph at a time, with the six bundled weights
+  /// doing nothing for the product's primary language.
+  ///
+  /// Returning `null` for Arabic hands the whole UI to the platform's own Arabic
+  /// face (SF Arabic on iOS, Noto Naskh on Android) instead: one coherent family
+  /// with real weights, rather than Latin metrics with substituted glyphs.
+  ///
+  /// Replace this with a bundled Arabic family (Cairo, IBM Plex Sans Arabic)
+  /// when one is added to `pubspec.yaml`; the switch stays in one place either
+  /// way.
+  static String? _fontFamilyFor(Locale locale) =>
+      locale.languageCode == 'ar' ? null : 'Poppins';
+
+  static ThemeData light(Locale locale) => ThemeData(
+        useMaterial3: true,
+        fontFamily: _fontFamilyFor(locale),
 
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
@@ -157,9 +172,9 @@ class AppTheme {
     ),
   );
 
-  static final ThemeData dark = ThemeData(
-    useMaterial3: true,
-    fontFamily: 'Poppins',
+  static ThemeData dark(Locale locale) => ThemeData(
+        useMaterial3: true,
+        fontFamily: _fontFamilyFor(locale),
 
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
