@@ -9,11 +9,27 @@ import 'package:optimatech_lms/features/course_learning/presentation/views/widge
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/custom_course_learning_appbar.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/views/widgets/lesson_tap_row.dart';
 import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
+/// Route arguments for [CourseLearningView]. A bare course id is still
+/// accepted for callers that just want to resume the course.
+class CourseLearningArgs {
+  const CourseLearningArgs({required this.courseId, this.lectureId});
+
+  final String courseId;
+  final String? lectureId;
+}
+
 class CourseLearningView extends StatefulWidget {
-  const CourseLearningView({super.key, required this.courseId});
+  const CourseLearningView({
+    super.key,
+    required this.courseId,
+    this.initialLectureId,
+  });
 
   static const String routeName = '/course-learning';
   final String courseId;
+
+  /// Lecture to open on arrival. Null resumes at the first lecture.
+  final String? initialLectureId;
 
   @override
   State<CourseLearningView> createState() => _CourseLearningViewState();
@@ -27,7 +43,10 @@ class _CourseLearningViewState extends State<CourseLearningView> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<CourseLearningCubit>()
-        ..fetchCourseCurriculum(widget.courseId),
+        ..fetchCourseCurriculum(
+          widget.courseId,
+          initialLectureId: widget.initialLectureId,
+        ),
       child: Scaffold(
         appBar: const CustomCourseLearningAppbar(),
         backgroundColor: Colors.black,

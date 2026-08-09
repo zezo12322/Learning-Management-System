@@ -45,7 +45,7 @@ export default function LoginPage() {
     setNotice(null)
     try {
       await login(values.email, values.password, values.remember)
-      router.push('/dashboard')
+      router.push('/home')
     } catch {
       setError(t('auth.err.signIn'))
     }
@@ -71,7 +71,7 @@ export default function LoginPage() {
     setError(null)
     try {
       await loginWithGoogle()
-      router.push('/dashboard')
+      router.push('/home')
     } catch {
       setError(t('auth.err.googleUnavailable'))
     }

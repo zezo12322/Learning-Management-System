@@ -1,8 +1,12 @@
-import { apiClient } from './client'
+import { apiBaseUrl, apiClient } from './client'
+import { safeLinkUrl } from '@/lib/safeUrl'
 import type {
   Category,
+  Certificate,
   ContinueLearningItem,
   CourseLevel,
+  MySubmission,
+  SubmissionStatus,
   CourseProgress,
   Curriculum,
   Enrollment,
@@ -115,6 +119,62 @@ export const coursesApi = {
     ),
 }
 
+// ── Assignments (student view of mission submissions) ────────────────
+function mapSubmission(value: unknown): MySubmission {
+  const raw = objectValue(value)
+  const mission = objectValue(raw.mission)
+  const scores = arrayValue(
+    raw.missionSubmissionScores_on_submission ?? raw.scores,
+  ).map((entry) => {
+    const rawScore = objectValue(entry)
+    const criterion = objectValue(rawScore.criterion)
+    return {
+      criterionName: stringValue(criterion.criterionName ?? rawScore.criterionId),
+      score: numberValue(rawScore.score),
+      maxPoints: numberValue(criterion.maxPoints),
+    }
+  })
+  const graded = scores.length > 0
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(mission.title ?? raw.title, 'Assignment'),
+    difficulty: stringValue(mission.difficulty) || undefined,
+    fileUrl: stringValue(raw.fileUrl),
+    status: (stringValue(raw.status, 'PENDING') as SubmissionStatus) || 'PENDING',
+    feedback: typeof raw.feedback === 'string' ? raw.feedback : null,
+    submittedAt: stringValue(raw.submittedAt),
+    scores,
+    totalScore: graded ? scores.reduce((sum, entry) => sum + entry.score, 0) : null,
+    maxPoints: graded ? scores.reduce((sum, entry) => sum + entry.maxPoints, 0) : null,
+  }
+}
+
+export const submissionsApi = {
+  /** The signed-in student's own assignment submissions, newest first. */
+  mine: () =>
+    apiClient.get('/me/submissions').then((response) => arrayValue(response.data).map(mapSubmission)),
+}
+
+// ── Certificates ─────────────────────────────────────────────────────
+/**
+ * Completion certificates. There is no certificates endpoint yet (see
+ * web/BACKEND_INTEGRATION_GAPS.md), so a certificate is projected from a
+ * COMPLETED enrollment: the enrollment is the server's own record that this
+ * learner finished this course, and its id is the credential reference.
+ */
+export function certificatesFromEnrollments(items: ContinueLearningItem[]): Certificate[] {
+  return items
+    .filter((item) => item.status === 'COMPLETED' && item.completedAt)
+    .sort((a, b) => (b.completedAt ?? '').localeCompare(a.completedAt ?? ''))
+    .map((item) => ({
+      enrollmentId: item.enrollmentId,
+      course: item.course,
+      completedAt: item.completedAt as string,
+      totalLessons: item.totalLessons,
+      credentialId: `CERT-${item.enrollmentId.replace(/-/g, '').slice(0, 12).toUpperCase()}`,
+    }))
+}
+
 export const enrollmentApi = {
   enroll: (courseId: string) =>
     apiClient.post(`/courses/${courseId}/enroll`).then((response): Enrollment => {
@@ -132,6 +192,112 @@ export const enrollmentApi = {
     apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
 }
 
+// ── Payments (Paymob hosted checkout) ────────────────────────────────
+export type CheckoutItem = {
+  targetType: 'COURSE' | 'MISSION' | 'SUBSCRIPTION'
+  courseId?: string
+  missionId?: string
+  subscriptionTierId?: string
+}
+
+/**
+ * Paymob's full billing block. The backend substitutes its placeholder set only
+ * when `billingData` is absent *entirely* (`body.billingData || {…}` in
+ * payments.controller.ts) — it does not fill in individual missing fields. So a
+ * partial object is worse than none: it reaches Paymob with `street`,
+ * `phone_number`, `city` and the rest undefined and the intention is rejected.
+ * Every field is therefore required here, and the helper below either produces
+ * a complete block or nothing at all.
+ */
+export type CheckoutBillingData = {
+  first_name: string
+  last_name: string
+  email: string
+  phone_number: string
+  apartment: string
+  floor: string
+  street: string
+  building: string
+  shipping_method: string
+  postal_code: string
+  city: string
+  state: string
+  country: string
+}
+
+/**
+ * Build a complete billing block from the signed-in profile, or `undefined` so
+ * the backend applies its own placeholders. Never returns a partial object —
+ * see CheckoutBillingData.
+ */
+export function checkoutBillingFromMe(
+  me: { name?: string; email?: string; profile?: { phone?: string } } | null,
+): CheckoutBillingData | undefined {
+  const email = me?.email?.trim()
+  if (!email) return undefined
+  const parts = (me?.name ?? '').trim().split(/\s+/).filter(Boolean)
+  return {
+    first_name: parts[0] || 'Customer',
+    last_name: parts.slice(1).join(' ') || 'Name',
+    email,
+    phone_number: me?.profile?.phone?.trim() || '+201000000000',
+    // Paymob requires the address block to be present; the LMS collects none of
+    // it, so these carry the same 'NA' the backend would have used.
+    apartment: 'NA',
+    floor: 'NA',
+    street: 'NA',
+    building: 'NA',
+    shipping_method: 'NA',
+    postal_code: 'NA',
+    city: 'Cairo',
+    state: 'NA',
+    country: 'EG',
+  }
+}
+
+export const paymentsApi = {
+  /**
+   * Start a Paymob checkout and return the hosted-checkout URL to navigate to
+   * (API_DOCUMENTATION §24.1). The endpoint is token-authenticated, so it
+   * answers with JSON instead of a 302 — a browser navigation straight to it
+   * would arrive unauthenticated, and following a redirect from XHR trips CORS.
+   *
+   * Prices are resolved server-side from the course row; nothing sent from here
+   * influences the amount charged. `returnUrl` is the origin the payment
+   * callback bounces back to, which then appends /payment-success | /payment-failed.
+   *
+   * Returns null when the response carries no usable URL, so the caller can
+   * report a failure rather than navigate somewhere unintended.
+   */
+  checkout: (payload: {
+    items: CheckoutItem[]
+    billingData?: CheckoutBillingData
+    returnUrl?: string
+  }): Promise<string | null> =>
+    apiClient
+      .post('/payments/checkout', payload)
+      .then((response) => safeLinkUrl(stringValue(objectValue(response.data).checkoutUrl))),
+}
+
+export const lecturesApi = {
+  /**
+   * Full lecture content, including the signed `transcriptUrl`. The curriculum
+   * response deliberately omits it, so this is the only way to reach a lesson's
+   * attachments. Access-gated server-side (free preview, course owner/admin, or
+   * an ACTIVE/COMPLETED enrollment).
+   */
+  content: (lectureId: string) =>
+    apiClient.get(`/lectures/${lectureId}`).then((response) => {
+      const raw = objectValue(response.data)
+      return {
+        id: stringValue(raw.id),
+        title: stringValue(raw.title),
+        transcriptUrl: stringValue(raw.transcriptUrl) || null,
+        courseId: stringValue(objectValue(objectValue(raw.section).course).id) || null,
+      }
+    }),
+}
+
 export const progressApi = {
   course: (courseId: string) =>
     apiClient.get<CourseProgress>(`/courses/${courseId}/progress`).then((response) => response.data),
@@ -143,6 +309,22 @@ export const progressApi = {
     apiClient.post(`/lectures/${lectureId}/progress`, { lastWatchedSecond, watchedSeconds }).then((response) => response.data),
   markComplete: (lectureId: string, lastWatchedSecond = 0) =>
     apiClient.put(`/lectures/${lectureId}/progress`, { lastWatchedSecond, completed: true }).then((response) => response.data),
+}
+
+// ── Secure video streaming (AES-128 HLS) ─────────────────────────────
+/**
+ * Playback is a guarded handshake (API_DOCUMENTATION §19): the manifest and the
+ * AES key are served by our API behind Firebase auth, while the segments are
+ * pre-signed GCS URLs on a different host that must NOT receive the token.
+ * `LecturePlayer` wires that split; these helpers only expose the URLs and the
+ * forensic watermark.
+ */
+export const streamingApi = {
+  manifestUrl: (lectureId: string) => `${apiBaseUrl()}/lectures/${lectureId}/stream/manifest`,
+  watermark: (lectureId: string) =>
+    apiClient
+      .get<{ text: string; expiresAt: string }>(`/lectures/${lectureId}/stream/watermark`)
+      .then((response) => response.data),
 }
 
 export const ratingsApi = {
@@ -265,6 +447,27 @@ export const quizApi = {
     apiClient
       .get(`/courses/${courseId}/quizzes/${quizId}`)
       .then((response) => mapQuiz(response.data)),
+
+  /**
+   * Resolve the quiz attached to a lecture. Student-accessible (the service
+   * gates on enrollment), and the only way a learner can reach a quiz at all —
+   * the curriculum response carries no quiz id.
+   */
+  forLecture: (courseId: string, lectureId: string) =>
+    apiClient
+      .get(`/courses/${courseId}/lectures/${lectureId}/quiz`)
+      .then((response) => {
+        const raw = objectValue(response.data)
+        const quiz = objectValue(raw.quiz ?? raw.courseQuiz ?? raw)
+        const id = stringValue(quiz.id)
+        if (!id) return null
+        return {
+          id,
+          passingScore: numberValue(quiz.passingScore, 70),
+          maxAttempts: numberValue(quiz.maxAttempts, 0),
+          timeLimitMinutes: quiz.timeLimitMinutes == null ? undefined : numberValue(quiz.timeLimitMinutes),
+        }
+      }),
 
   /** Create the quiz shell on a QUIZ-type lecture; returns the new quiz id. */
   create: (courseId: string, lectureId: string, settings: QuizSettings) =>

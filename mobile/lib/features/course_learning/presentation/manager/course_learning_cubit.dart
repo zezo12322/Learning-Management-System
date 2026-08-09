@@ -18,6 +18,7 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
 
   String? _courseId;
   String? _lastRequestedLectureId;
+  String? _initialLectureId;
 
   List<CurriculumLectureEntity> get _flatLectures {
     final curriculum = state.curriculum;
@@ -49,9 +50,15 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     return 'Lesson ${index + 1} of ${_flatLectures.length}';
   }
 
-  Future<void> fetchCourseCurriculum(String courseId) async {
+  /// [initialLectureId] opens a specific lecture instead of the first one —
+  /// used when the learner taps a lesson in the course-details curriculum.
+  Future<void> fetchCourseCurriculum(
+    String courseId, {
+    String? initialLectureId,
+  }) async {
     _courseId = courseId;
     _lastRequestedLectureId = null;
+    _initialLectureId = initialLectureId;
 
     emit(
       state.copyWith(
@@ -106,7 +113,19 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     final lectures = _flatLectures;
     if (lectures.isEmpty) return;
 
-    await fetchLectureContent(lectures.first.id);
+    // Honour the requested lecture when it exists in this curriculum; a stale
+    // or unknown id falls back to the first lecture rather than failing.
+    final requested = _initialLectureId;
+    final target = requested == null
+        ? lectures.first.id
+        : lectures
+            .firstWhere(
+              (l) => l.id == requested,
+              orElse: () => lectures.first,
+            )
+            .id;
+
+    await fetchLectureContent(target);
   }
 
   Future<void> selectLectureById(String lectureId) async {

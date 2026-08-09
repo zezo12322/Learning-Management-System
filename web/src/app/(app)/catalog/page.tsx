@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpen, Search, Star, UserRound } from 'lucide-react'
 import { catalogApi, coursesApi } from '@/lib/api/services'
@@ -10,18 +11,30 @@ import { PageHeader } from '@/components/workspace/PageHeader'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { StatusPill } from '@/components/workspace/StatusPill'
+import { safeMediaUrl } from '@/lib/safeUrl'
 
 export default function CatalogPage() {
+  // useSearchParams needs a Suspense boundary during static prerender.
+  return (
+    <Suspense fallback={null}>
+      <CatalogView />
+    </Suspense>
+  )
+}
+
+function CatalogView() {
   const t = useT()
-  const [search, setSearch] = useState('')
+  // The student Home search box submits into the catalog as ?q=…
+  const initialQuery = useSearchParams().get('q') ?? ''
+  const [search, setSearch] = useState(initialQuery)
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const serverSearch = useQuery({
     queryKey: ['course-search', search.trim()],
     queryFn: () => coursesApi.search(search.trim()),
     enabled: search.trim().length > 0,
   })
-  const popular = useQuery({ queryKey: ['popular-courses'], queryFn: () => coursesApi.popular(6) })
-  const recommended = useQuery({ queryKey: ['recommended-courses'], queryFn: () => coursesApi.recommended(6) })
+  const popular = useQuery({ queryKey: ['popular-courses', 6], queryFn: () => coursesApi.popular(6) })
+  const recommended = useQuery({ queryKey: ['recommended-courses', 6], queryFn: () => coursesApi.recommended(6) })
   const continueLearning = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning })
   const courses = useMemo(() => catalog.data ?? [], [catalog.data])
   const filtered = useMemo(() => {
@@ -63,8 +76,13 @@ export default function CatalogPage() {
         {filtered.map((course, index) => (
           <Link key={course.id} href={`/catalog/${course.id}`}>
             <Card hover className="h-full overflow-hidden">
-              {course.thumbnail ? (
-                <div className="h-40 bg-cover bg-center" style={{ backgroundImage: `url(${course.thumbnail})` }} />
+              {safeMediaUrl(course.thumbnail) ? (
+                <div
+                  className="h-40 bg-cover bg-center"
+                  // Quoted: the URL is instructor-supplied and would otherwise
+                  // be able to close url() and inject further CSS.
+                  style={{ backgroundImage: `url(${JSON.stringify(safeMediaUrl(course.thumbnail))})` }}
+                />
               ) : (
                 <div className="flex h-40 items-center justify-center bg-gradient-to-br from-primary-500 to-primary-800 text-3xl font-bold text-white">
                   {course.title.split(/\s+/).slice(0, 2).map((word) => word[0]).join('').toUpperCase() || index + 1}

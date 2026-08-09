@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { safeMediaUrl } from '@/lib/safeUrl'
 
 const GRADIENTS = [
   'from-indigo-500 to-purple-600',
@@ -27,9 +28,12 @@ export function CourseThumbnail({
   label?: string
   className?: string
 }) {
-  if (src) {
+  // Instructor-supplied URL — validate before it reaches <img src>, and fall
+  // back to the brand gradient when it is not a usable image source.
+  const safeSrc = safeMediaUrl(src)
+  if (safeSrc) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={label ?? ''} className={cn('object-cover', className)} />
+    return <img src={safeSrc} alt={label ?? ''} className={cn('object-cover', className)} />
   }
   return (
     <div

@@ -73,33 +73,12 @@ class CourseEnrollBottomBar extends StatelessWidget {
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    Text(
-                      'common.egp'
-                          .tr(args: [(price * 1.25).toStringAsFixed(2)]),
-                      style: TextStyles.labelMedium.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        decoration: TextDecoration.lineThrough,
-                        decorationColor: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Text(
-                        '25% OFF',
-                        style: TextStyles.labelSmall.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeights.bold,
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                    ),
+                    // A struck-through `price * 1.25` and a fixed "25% OFF"
+                    // badge were rendered here for every course. No such
+                    // reference price exists in the data or was ever charged,
+                    // and a free course showed "EGP 0.00" struck through at
+                    // 25% off. Re-add only when the API carries a real
+                    // list price and discount.
                   ],
                 ),
               ],

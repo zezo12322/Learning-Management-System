@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { safeMediaUrl } from '@/lib/safeUrl'
 
 interface AvatarProps {
   src?: string | null
@@ -21,11 +22,15 @@ function initials(name?: string | null) {
 }
 
 export function Avatar({ src, name, size = 40, online, className }: AvatarProps) {
+  // Avatar URLs come from the API (and ultimately from user profiles), so an
+  // unvalidated value would put an arbitrary scheme into <img src>. An
+  // unusable URL falls back to the initials rather than a broken image.
+  const safeSrc = safeMediaUrl(src)
   return (
     <span className={cn('relative inline-block shrink-0', className)} style={{ width: size, height: size }}>
-      {src ? (
+      {safeSrc ? (
         <Image
-          src={src}
+          src={safeSrc}
           alt={name ?? ''}
           width={size}
           height={size}
