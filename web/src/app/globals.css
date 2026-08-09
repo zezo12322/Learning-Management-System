@@ -83,16 +83,19 @@
  * Certificate printing. "Download PDF" on the certificate details screen calls
  * window.print(); this isolates the certificate sheet so the app shell, nav and
  * action buttons are not carried into the printed page.
+ *
+ * Scoped with :has() so it only applies on a page that actually renders a
+ * certificate — printing any other page must stay unaffected.
  */
 @media print {
-  body * {
+  body:has(#certificate-print) * {
     visibility: hidden;
   }
-  #certificate-print,
-  #certificate-print * {
+  body:has(#certificate-print) #certificate-print,
+  body:has(#certificate-print) #certificate-print * {
     visibility: visible;
   }
-  #certificate-print {
+  body:has(#certificate-print) #certificate-print {
     position: absolute;
     inset-inline-start: 0;
     top: 0;

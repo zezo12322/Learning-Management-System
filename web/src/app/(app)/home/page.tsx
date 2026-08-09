@@ -7,8 +7,10 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Award,
   BadgeCheck,
+  Bell,
   BookOpen,
   ChevronRight,
+  ClipboardList,
   GraduationCap,
   Search,
   TrendingUp,
@@ -159,6 +161,27 @@ export default function StudentHomePage() {
         )}
       </div>
 
+      {/* Quick links. The sidebar is desktop-only and the mobile tab bar keeps
+          the four tabs from the design, so Home carries the entry points to the
+          remaining student screens — mirroring the Flutter home, which also
+          surfaces assignments from here. */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { href: '/assignments', label: t('nav.assignments'), icon: ClipboardList },
+          { href: '/certificates', label: t('nav.certificates'), icon: Award },
+          { href: '/notifications', label: t('notifications.title'), icon: Bell },
+        ].map((link) => (
+          <Link key={link.href} href={link.href}>
+            <Card hover className="flex h-full flex-col items-center gap-2 p-4 text-center">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-primary">
+                <link.icon size={18} strokeWidth={1.9} />
+              </span>
+              <span className="text-xs font-semibold text-content">{link.label}</span>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
       {/* Continue learning */}
       <section className="space-y-3">
         <SectionHeader title={t('student.continueLearning')} href="/learning" actionLabel={t('student.viewAll')} />
@@ -184,7 +207,7 @@ export default function StudentHomePage() {
       </section>
 
       {/* Popular courses */}
-      {(popular.isLoading || popular.data?.length) && (
+      {(popular.isLoading || (popular.data?.length ?? 0) > 0) && (
         <section className="space-y-3">
           <SectionHeader title={t('student.popularCourses')} href="/catalog" actionLabel={t('student.viewAll')} />
           {popular.isLoading ? (

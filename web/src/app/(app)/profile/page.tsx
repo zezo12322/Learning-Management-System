@@ -13,8 +13,8 @@ import {
   CalendarDays,
   ChevronRight,
   ClipboardCheck,
+  ClipboardList,
   GraduationCap,
-  HelpCircle,
   LifeBuoy,
   LogOut,
   Mail,
@@ -372,8 +372,11 @@ export default function ProfilePage() {
         <Card className="divide-y divide-border">
           <SettingsRow icon={Settings} label={t('profile.accountSettings')} onClick={() => setEditing(true)} />
           <SettingsRow icon={Bell} label={t('profile.notificationPreferences')} href="/notifications" />
-          <SettingsRow icon={ShieldCheck} label={t('profile.privacySecurity')} href="/profile" />
-          <SettingsRow icon={HelpCircle} label={t('profile.helpSupport')} href="/catalog" />
+          <SettingsRow icon={ClipboardList} label={t('nav.assignments')} href="/assignments" />
+          <SettingsRow icon={Award} label={t('nav.certificates')} href="/certificates" />
+          {/* Privacy & security and Help & support appear in the Figma settings
+              list but have no destination on the web yet — omitted rather than
+              shipped as dead links. */}
           <SettingsRow icon={LogOut} label={t('nav.signOut')} onClick={signOut} danger />
         </Card>
         <p className="flex items-center gap-1.5 px-1 text-[11px] text-content-muted">

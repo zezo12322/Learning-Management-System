@@ -58,7 +58,10 @@ export default function CertificateDetailPage() {
       }
       await navigator.clipboard.writeText(url)
       setShareNote(t('certificates.linkCopied'))
-    } catch {
+    } catch (error) {
+      // Dismissing the native share sheet rejects with AbortError — that is a
+      // deliberate cancel, not a failure worth reporting.
+      if (error instanceof DOMException && error.name === 'AbortError') return
       setShareNote(t('certificates.shareFailed'))
     }
   }
@@ -69,6 +72,14 @@ export default function CertificateDetailPage() {
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-72 rounded-card" />
       </div>
+    )
+  }
+
+  if (enrollments.isError) {
+    return (
+      <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">
+        {t('certificates.loadError')}
+      </Card>
     )
   }
 
