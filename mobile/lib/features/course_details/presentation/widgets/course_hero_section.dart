@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -6,6 +7,7 @@ import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.d
 
 class CourseHeroSection extends StatefulWidget {
   const CourseHeroSection({
+    this.description,
     super.key,
     required this.course,
     required this.onPlayTap,
@@ -13,6 +15,11 @@ class CourseHeroSection extends StatefulWidget {
   });
 
   final CourseEntity course;
+
+  /// Real course description, supplied by the curriculum response. Null while
+  /// the curriculum is still loading — the subtitle is simply omitted then,
+  /// rather than filled with invented marketing copy.
+  final String? description;
   final VoidCallback onPlayTap;
   final VoidCallback? onBack;
 
@@ -24,6 +31,18 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
+
+  /// Prefer the description that came with the curriculum, fall back to
+  /// anything the course entity already carries, otherwise show nothing.
+  String? get _subtitle {
+    final fromCurriculum = widget.description?.trim();
+    if (fromCurriculum != null && fromCurriculum.isNotEmpty) {
+      return fromCurriculum;
+    }
+    final fromCourse = widget.course.description?.trim();
+    if (fromCourse != null && fromCourse.isNotEmpty) return fromCourse;
+    return null;
+  }
 
   @override
   void initState() {
@@ -124,18 +143,18 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             height: 1.25,
                           ),
                         ),
-                        Gap(8.h),
-                        Text(
-                          // description is always null from the API, so we use a mock description as a fallback
-                          widget.course.description ??
-                              'Master core concepts and practical workflows through real-world projects designed to build your expertise from the ground up.',
-                          style: TextStyles.bodySmall.copyWith(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            height: 1.45,
+                        if (_subtitle != null) ...[
+                          Gap(8.h),
+                          Text(
+                            _subtitle!,
+                            style: TextStyles.bodySmall.copyWith(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              height: 1.45,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        ],
                         Gap(12.h),
                         Row(
                           children: [
@@ -161,7 +180,13 @@ class _CourseHeroSectionState extends State<CourseHeroSection>
                             Gap(4.w),
                             Flexible(
                               child: Text(
-                                '${_formatCount(widget.course.enrollmentCount)} Students',
+                                'course_details.students'.tr(
+                                  args: [
+                                    _formatCount(
+                                      widget.course.enrollmentCount,
+                                    ),
+                                  ],
+                                ),
                                 style: TextStyles.labelSmall.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),

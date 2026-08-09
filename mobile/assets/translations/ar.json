@@ -27,7 +27,9 @@
       "confirm": "تأكيد",
       "cancel": "إلغاء"
     },
-    "egp": "{} ج.م"
+    "egp": "{} ج.م",
+    "duration_hm": "{}س {}د",
+    "duration_m": "{} دقيقة"
   },
   "errors": {
     "network": "لا يوجد اتصال بالإنترنت. تحقق من الشبكة.",
@@ -142,6 +144,10 @@
       "submitted_desc": "بانتظار المراجعة",
       "graded_desc": "عرض الملاحظات",
       "empty_desc": "أنت منجز كل شيء"
+    },
+    "error": {
+      "something_went_wrong": "حدث خطأ ما",
+      "try_again": "إعادة المحاولة"
     }
   },
   "nav_bar": {
@@ -157,218 +163,42 @@
   },
   "course_details": {
     "you_might_also_like": "قد يعجبك أيضاً",
+    "price": "السعر",
     "enroll_now": "سجّل الآن",
     "buy_now": "اشترِ الآن",
-    "price": "السعر"
+    "overview": "نظرة عامة",
+    "curriculum": "المنهج",
+    "reviews": "التقييمات",
+    "resources": "الملفات",
+    "total_duration": "المدة الإجمالية",
+    "lessons": "المحاضرات",
+    "level": "المستوى",
+    "students": "{} دارس",
+    "about_this_course": "عن الكورس",
+    "no_description": "لا يوجد وصف لهذا الكورس.",
+    "language": "اللغة",
+    "access": "المشاهدة",
+    "access_value": "موبايل وكمبيوتر",
+    "top_instructor": "محاضر مميّز",
+    "view_profile": "عرض الملف",
+    "view_all_lessons": "كل المحاضرات",
+    "now_playing": "يُعرض الآن",
+    "reviews_count": "التقييمات ({})",
+    "no_reviews_title": "لا توجد تقييمات بعد",
+    "no_reviews_body": "كن أول من يقيّم هذا الكورس بعد إتمامه.",
+    "resources_title": "ملفات للتحميل",
+    "no_resources_title": "لا توجد ملفات",
+    "no_resources_body": "لم يرفق المحاضر أي ملفات مع هذا الكورس.",
+    "enrolled_success": "تم التسجيل بنجاح!",
+    "enroll_failed": "فشل التسجيل: {}",
+    "level_beginner": "مبتدئ",
+    "level_intermediate": "متوسط",
+    "level_advanced": "متقدم"
   },
   "payment": {
     "start_failed": "تعذّر بدء عملية الدفع. حاول مرة أخرى.",
     "could_not_open": "تعذّر فتح صفحة الدفع. حاول مرة أخرى.",
     "pending_hint": "جارٍ تأكيد الدفع. أعد المحاولة بعد لحظات — سيتم فتح الكورس تلقائياً فور تأكيد الدفع."
-  },
-  "courses": {
-    "title": "الكورسات",
-    "searchHint": "ابحث عن كورسات أو دروس أو اختبارات...",
-    "categories": {
-      "title": "التصنيفات",
-      "viewAll": "عرض الكل",
-      "empty": "لا توجد تصنيفات"
-    },
-    "list": {
-      "empty": "لا توجد كورسات",
-      "lessonsCount": "{count} درس"
-    },
-    "filters": {
-      "all": "الكل",
-      "inProgress": "قيد التقدم",
-      "completed": "مكتمل",
-      "popular": "الأكثر شيوعًا",
-      "new": "جديد"
-    },
-    "status": {
-      "inProgress": "قيد التقدم",
-      "completed": "مكتمل",
-      "popular": "الأكثر شيوعًا",
-      "new": "جديد"
-    },
-    "errors": {
-      "unexpected": "حدث خطأ غير متوقع"
-    },
-    "filterSheet": {
-      "title": "تصفية",
-      "courseStatus": "حالة الكورس",
-      "sortBy": "الترتيب حسب",
-      "reset": "إعادة تعيين",
-      "apply": "تطبيق"
-    },
-    "sort": {
-      "newest": "الأحدث",
-      "oldest": "الأقدم",
-      "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
-      "priceHighToLow": "السعر: من الأعلى إلى الأقل"
-    }
-  },
-  "wishlist": {
-    "title": "المفضلة",
-    "empty": "أضف كورساتك المفضّلة إلى قائمتك"
-  },
-  "profile": {
-    "title": "ملفي الشخصي",
-    "common": {
-      "edit": "تعديل",
-      "view_all": "عرض الكل"
-    },
-    "header": {
-      "role": "طالب",
-      "joined": "انضم في {}",
-      "stats": {
-        "courses": "الكورسات المسجل بها",
-        "courses_subtitle": "تعلّم نشط",
-        "hours": "ساعات التعلّم",
-        "hours_subtitle": "+12 هذا الأسبوع",
-        "assessments": "التقييمات المكتملة",
-        "assessments_subtitle": "متوسط 85%",
-        "certificates": "الشهادات المكتسبة",
-        "certificates_subtitle": "استمر!"
-      }
-    },
-    "sections": {
-      "user_information": "معلومات المستخدم",
-      "learning_statistics": "إحصائيات التعلّم",
-      "certificates": "الشهادات",
-      "completed_courses": "الكورسات المكتملة",
-      "settings": "الإعدادات"
-    },
-    "info": {
-      "full_name": "الاسم الكامل",
-      "email": "البريد الإلكتروني",
-      "phone": "رقم الهاتف",
-      "location": "الموقع",
-      "birth_date": "تاريخ الميلاد"
-    },
-    "statistics": {
-      "hours": "ساعات التعلّم",
-      "hours_subtitle": "+12 هذا الأسبوع",
-      "courses": "الكورسات المسجل بها",
-      "courses_subtitle": "تعلّم نشط",
-      "certificates": "الشهادات",
-      "certificates_subtitle": "مكتملة",
-      "assessments": "التقييمات",
-      "assessments_subtitle": "متوسط 85%"
-    },
-    "certificates": {
-      "issued_on": "تم الإصدار في {date}",
-      "verified": "موثقة",
-      "empty": "لا توجد شهادات بعد.",
-      "load_error": "فشل تحميل الشهادات"
-    },
-    "completed_courses": {
-      "completed_on": "اكتمل في {date}",
-      "completed": "مكتمل"
-    },
-    "settings": {
-      "account": "إعدادات الحساب",
-      "notifications": "تفضيلات الإشعارات",
-      "privacy": "الخصوصية والأمان",
-      "help": "المساعدة والدعم",
-      "logout": "تسجيل الخروج",
-      "logout_dialog": "تسجيل الخروج؟",
-      "log_out_confirmation": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-      "language": "اللغة",
-      "select_language": "اختر اللغة",
-      "change_Theme": " تغيير المظهر",
-      "select_theme": "اختر المظهر",
-      "theme_system": "تلقائي (النظام)",
-      "theme_light": "الوضع الفاتح",
-      "theme_dark": "الوضع الغامق",
-      "delete_account": "حذف الحساب"
-    },
-    "delete": {
-      "title": "حذف حسابك؟",
-      "warning": "هيتحذف حسابك وكل بياناتك نهائيًا — التسجيلات والتقدم والشهادات. الإجراء ده لا رجعة فيه.",
-      "password_label": "أكّد كلمة المرور",
-      "password_required": "أدخل كلمة المرور للتأكيد.",
-      "wrong_password": "كلمة المرور غير صحيحة. حاول مرة أخرى.",
-      "confirm": "حذف الحساب"
-    }
-  },
-  "lesson_learning": {
-    "video": {
-      "error_lesson": "فشل تحميل الدرس، يرجى المحاولة مرة أخرى لاحقًا.",
-      "error_playing": "خطأ في تشغيل الفيديو",
-      "unavailable": "الفيديو غير متاح حاليًا."
-    },
-    "actions": {
-      "previous": "السابق",
-      "mark_complete": "إكمال الدرس",
-      "next": "التالي"
-    },
-    "tabs": {
-      "curriculum": "المحتوى",
-      "notes": "الملاحظات",
-      "resources": "الموارد",
-      "discussion": "النقاش"
-    },
-    "curriculum": {
-      "title": "محتوى الدورة",
-      "lessons_count": "{count} درس",
-      "now_playing": "يتم تشغيله الآن"
-    },
-    "about": {
-      "title": "حول هذا الدرس",
-      "description": "تعرّف على أساليب مختلفة لبحث المستخدم وكيف تختار الأنسب لمشروعك."
-    },
-    "reading": {
-      "title": "قراءة",
-      "empty": "لا يوجد محتوى لهذا الدرس بعد."
-    }
-  },
-  "quiz": {
-    "title": "الاختبار",
-    "empty": "هذا الاختبار لا يحتوي على أسئلة بعد.",
-    "error_title": "تعذّر تحميل الاختبار",
-    "question_of": "السؤال {} من {}",
-    "answered": "تمت إجابة {}/{}",
-    "points": "{} نقطة",
-    "previous": "السابق",
-    "next": "التالي",
-    "finish": "إنهاء",
-    "result_title": "نتيجة الاختبار",
-    "score_of": "{}/{}",
-    "passed": "ناجح",
-    "failed": "واصل التدريب",
-    "back": "رجوع"
-  },
-  "notifications": {
-    "title": "الإشعارات",
-    "empty": "لا توجد إشعارات بعد",
-    "empty_hint": "أنت على اطّلاع بكل جديد. ستظهر التحديثات الجديدة هنا."
-  },
-  "ai_tutor": {
-    "assignments": {
-      "available": "متاحة",
-      "submitted": "تم التسليم",
-      "graded": "تم التقييم",
-      "empty": "لا توجد تكليفات",
-      "available_desc": "مفتوحة للتسليم",
-      "submitted_desc": "بانتظار المراجعة",
-      "graded_desc": "عرض الملاحظات",
-      "empty_desc": "أنت منجز كل شيء"
-    }
-  },
-  "nav_bar": {
-    "home": "الرئيسية",
-    "courses": "الكورسات",
-    "wishlist": "المفضلة",
-    "profile": "الملف الشخصي"
-  },
-  "navigation": {
-    "not_found": "الصفحة غير موجودة",
-    "not_found_msg": "المسار الذي طلبته غير موجود.",
-    "go_home": "الذهاب للرئيسية"
-  },
-  "course_details": {
-    "you_might_also_like": "قد يعجبك أيضاً"
   },
   "courses": {
     "title": "الكورسات",
@@ -560,6 +390,7 @@
     "empty_state": "كيف يمكنني مساعدتك اليوم؟",
     "welcome_message": "أهلاً بك يا {name}! 👋 كيف يمكنني مساعدتك اليوم؟",
     "thinking": "يفكر...",
-    "offline_error": "لا يوجد اتصال بالإنترنت. الذكاء الاصطناعي يتطلب اتصالاً نشطاً."
+    "offline_error": "لا يوجد اتصال بالإنترنت. الذكاء الاصطناعي يتطلب اتصالاً نشطاً.",
+    "welcome_user": "أهلاً بك يا {}! 👋 كيف يمكنني مساعدتك اليوم؟"
   }
 }

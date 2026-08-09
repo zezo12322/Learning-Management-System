@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -86,7 +87,7 @@ class InstructorProfileCard extends StatelessWidget {
                       ),
                       Gap(4.w),
                       Text(
-                        'Top Instructor',
+                        'course_details.top_instructor'.tr(),
                         style: TextStyles.labelSmall.copyWith(
                           color: colorScheme.secondary,
                           fontWeight: FontWeights.semiBold,
@@ -112,7 +113,7 @@ class InstructorProfileCard extends StatelessWidget {
               ),
             ),
             child: Text(
-              'View Profile',
+              'course_details.view_profile'.tr(),
               style: TextStyles.labelSmall.copyWith(
                 color: colorScheme.primary,
                 fontWeight: FontWeights.semiBold,

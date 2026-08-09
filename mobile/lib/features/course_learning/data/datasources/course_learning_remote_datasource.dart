@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:optimatech_lms/core/config/app_config.dart';
 import 'package:optimatech_lms/core/error/exceptions.dart';
+import 'package:optimatech_lms/core/helper_function/lecture_type.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/curriculum_model.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/lecture_content_model.dart';
@@ -43,7 +45,20 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       await _setAuthToken();
       // NestJS route: GET /api/v1/lectures/:lectureId
       final response = await apiService.get('/lectures/$lectureId');
-      return LectureContentModel.fromJson(response.data);
+      final model = LectureContentModel.fromJson(response.data);
+
+      // The `videoUrl` this endpoint returns is a signed URL to the raw
+      // master.m3u8 in storage, whose segment and key URIs are *relative*. A
+      // player resolving them drops the signature and every segment comes back
+      // 403, so the raw URL is unplayable. The streaming endpoint serves the
+      // same playlist with absolute signed segment URLs and a tokenised key
+      // URL, so video lectures are pointed at that instead.
+      if (model.type == LectureContentType.video && model.videoUrl != null) {
+        return model.copyWith(
+          videoUrl: '${AppConfig.apiBaseUrl}/lectures/$lectureId/stream/manifest',
+        );
+      }
+      return model;
     } catch (e) {
       throw CustomExceptions(message: 'Failed to fetch Lecture Content: $e');
     }
