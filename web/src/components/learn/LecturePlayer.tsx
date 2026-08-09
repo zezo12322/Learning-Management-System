@@ -50,6 +50,7 @@ export function LecturePlayer({
   title,
   posterSeed,
   resumeAtSecond = 0,
+  watchedSecondsSoFar = 0,
   onEnded,
   onPosition,
 }: {
@@ -57,6 +58,8 @@ export function LecturePlayer({
   title: string
   posterSeed?: string
   resumeAtSecond?: number
+  /** Watch time already banked server-side for this lecture. */
+  watchedSecondsSoFar?: number
   onEnded?: () => void
   /** Live playback position, so the page can stamp notes and complete lessons. */
   onPosition?: (seconds: number) => void
@@ -71,6 +74,7 @@ export function LecturePlayer({
   // Captured once per lecture: a background refetch of the resume position must
   // not tear down and restart a stream the learner is watching.
   const resumeRef = useRef(resumeAtSecond)
+  const watchedRef = useRef(watchedSecondsSoFar)
   const positionRef = useRef(onPosition)
   positionRef.current = onPosition
 
@@ -161,17 +165,16 @@ export function LecturePlayer({
   // capped share counts, and a scrubber drag moves the timeline while no real
   // time passes, so it credits nothing.
   //
-  // The accumulator starts at the resume position, because a lecture watched
-  // over two sittings has to be able to finish. That is also its limit: the
-  // credit is not persisted, so reloading re-seeds it from wherever the stored
-  // position sits. Closing that needs a watched-seconds column on
-  // LectureProgress — see the note in the PR.
+  // The accumulator starts at the watch time the server has banked, so a
+  // lecture watched over two sittings still finishes. Seeding it from the
+  // *position* instead — which is what this did first — handed the whole thing
+  // back: scrub to the end once, reload, and the seed alone cleared the bar.
   useEffect(() => {
     if (state !== 'ready') return
     const video = videoRef.current
     if (!video) return
     let furthest = resumeRef.current
-    let credited = resumeRef.current
+    let credited = watchedRef.current
     let prevTime = video.currentTime
     let prevAt = Date.now()
 

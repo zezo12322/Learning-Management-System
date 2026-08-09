@@ -292,6 +292,7 @@ query GetUserLectureProgress($lectureId: UUID!) @auth(level: USER) {
     }
   ) {
     lastWatchedSecond
+    watchedSeconds
     completedAt
   }
 }

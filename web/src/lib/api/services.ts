@@ -303,7 +303,7 @@ export const progressApi = {
     apiClient.get<CourseProgress>(`/courses/${courseId}/progress`).then((response) => response.data),
   lecture: (lectureId: string) =>
     apiClient
-      .get<{ lastWatchedSecond: number; completedAt: string | null }>(`/lectures/${lectureId}/progress`)
+      .get<{ lastWatchedSecond: number; watchedSeconds: number | null; completedAt: string | null }>(`/lectures/${lectureId}/progress`)
       .then((response) => response.data),
   heartbeat: (lectureId: string, lastWatchedSecond: number, watchedSeconds?: number) =>
     apiClient.post(`/lectures/${lectureId}/progress`, { lastWatchedSecond, watchedSeconds }).then((response) => response.data),

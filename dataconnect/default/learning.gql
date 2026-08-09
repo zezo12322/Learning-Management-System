@@ -23,12 +23,12 @@ mutation EnrollInMission($missionId: UUID!, $userId: String!) @auth(level: NO_AC
 # completion (directly, via the SDK) and then have the backend mark the course
 # COMPLETED. Backend-only now; the progress owner is passed explicitly. (The
 # high-frequency heartbeat path already uses the NO_ACCESS AdminUpsertLectureProgress.)
-mutation UpdateLectureProgress($lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp, $userId: String!) @auth(level: NO_ACCESS) {
-  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
+mutation UpdateLectureProgress($lectureId: UUID!, $lastWatchedSecond: Int!, $watchedSeconds: Int, $completedAt: Timestamp, $userId: String!) @auth(level: NO_ACCESS) {
+  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, watchedSeconds: $watchedSeconds, completedAt: $completedAt })
 }
 
-mutation AdminUpsertLectureProgress($userId: String!, $lectureId: UUID!, $lastWatchedSecond: Int!, $completedAt: Timestamp) @auth(level: NO_ACCESS) {
-  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, completedAt: $completedAt })
+mutation AdminUpsertLectureProgress($userId: String!, $lectureId: UUID!, $lastWatchedSecond: Int!, $watchedSeconds: Int, $completedAt: Timestamp) @auth(level: NO_ACCESS) {
+  lectureProgress_upsert(data: { userId: $userId, lectureId: $lectureId, lastWatchedSecond: $lastWatchedSecond, watchedSeconds: $watchedSeconds, completedAt: $completedAt })
 }
 
 query GetLectureDuration($lectureId: UUID!) @auth(level: NO_ACCESS) {
