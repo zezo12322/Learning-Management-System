@@ -21,11 +21,34 @@ const sizes: Record<Size, string> = {
   icon: 'h-11 w-11',
 }
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+const base =
+  'inline-flex items-center justify-center rounded-btn font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:cursor-not-allowed'
+
+export interface ButtonStyleProps {
   variant?: Variant
   size?: Size
-  loading?: boolean
   fullWidth?: boolean
+  className?: string
+}
+
+/**
+ * Button styling without the <button> element, so an anchor (e.g. next/link)
+ * can look like a button instead of nesting one inside it — nested interactive
+ * elements are invalid HTML and add a dead keyboard focus stop.
+ */
+export function buttonClasses({
+  variant = 'primary',
+  size = 'md',
+  fullWidth,
+  className,
+}: ButtonStyleProps = {}) {
+  return cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)
+}
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    ButtonStyleProps {
+  loading?: boolean
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -36,13 +59,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={cn(
-        'inline-flex items-center justify-center rounded-btn font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:cursor-not-allowed',
-        variants[variant],
-        sizes[size],
-        fullWidth && 'w-full',
-        className
-      )}
+      className={buttonClasses({ variant, size, fullWidth, className })}
       {...props}
     >
       {loading && (

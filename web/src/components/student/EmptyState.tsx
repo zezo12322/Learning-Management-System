@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonClasses } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 /**
@@ -32,8 +32,8 @@ export function EmptyState({
       <h3 className="mt-6 text-lg font-bold text-content">{title}</h3>
       <p className="mt-2 max-w-sm text-sm leading-6 text-content-secondary">{description}</p>
       {actionLabel && actionHref && (
-        <Link href={actionHref} className="mt-6">
-          <Button>{actionLabel}</Button>
+        <Link href={actionHref} className={buttonClasses({ className: 'mt-6' })}>
+          {actionLabel}
         </Link>
       )}
     </div>

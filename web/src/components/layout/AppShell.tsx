@@ -193,7 +193,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSwitcher className="hidden sm:inline-flex" />
+            {/* Visible at every width — an Arabic-first audience needs the
+                language toggle on phones too, not only from sm: up. */}
+            <LanguageSwitcher className="shrink-0 px-2 sm:px-2.5" />
             <Link
               href="/notifications"
               aria-label={t('notifications.title')}

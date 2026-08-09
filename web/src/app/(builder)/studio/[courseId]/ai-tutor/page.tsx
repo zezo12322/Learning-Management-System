@@ -17,10 +17,12 @@ export default function AITutorPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const enabled = isAiTutorEnabled()
 
+  // "new" is a placeholder id until the setup step creates the course.
+  const isNew = courseId === 'new'
   const curriculum = useQuery({
     queryKey: ['curriculum', courseId],
     queryFn: () => catalogApi.curriculum(courseId),
-    enabled: enabled && !!courseId,
+    enabled: enabled && !!courseId && !isNew,
   })
 
   // Only VIDEO lectures can be tutored (the tutor is grounded in transcripts).
@@ -37,22 +39,28 @@ export default function AITutorPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title={t('aiTutor.title')} description={t('aiTutor.description')} />
+      <PageHeader title={t('aiTutor.title', 'AI Tutor')} description={t('aiTutor.description', 'Ask questions grounded in a lesson video transcript.')} />
 
       {!enabled ? (
         <AIUnavailable />
+      ) : isNew ? (
+        <Card className="p-6 text-sm text-content-secondary">
+          {t('aiTutor.needsCourse', 'Save your course details first. The tutor answers from lessons that belong to a saved course.')}
+        </Card>
       ) : curriculum.isLoading ? (
         <PageSpinner />
       ) : videoLectures.length === 0 ? (
         <Card className="p-6 text-sm text-content-secondary">
-          Add a video lecture to this course to use the AI tutor. Tutoring is grounded in video
-          transcripts.
+          {t('aiTutor.noVideoLectures', 'Add a video lecture to this course to use the AI tutor. Tutoring is grounded in video transcripts.')}
         </Card>
       ) : (
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-sm font-medium text-content">Lesson:</label>
+            <label htmlFor="ai-tutor-lesson" className="text-sm font-medium text-content">
+              {t('aiTutor.lessonLabel', 'Lesson')}
+            </label>
             <select
+              id="ai-tutor-lesson"
               value={active?.id ?? ''}
               onChange={(e) => setSelectedId(e.target.value)}
               className="rounded-input border border-border bg-background px-3 py-2 text-sm text-content"

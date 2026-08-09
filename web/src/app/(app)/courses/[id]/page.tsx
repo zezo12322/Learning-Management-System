@@ -4,17 +4,19 @@ import { useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  ArrowRight,
+  ArrowLeft,
   Clock,
   PlayCircle,
   BarChart3,
   Award,
   Lock,
   CheckCircle2,
+  CreditCard,
   Star,
 } from 'lucide-react'
-import { catalogApi, enrollmentApi, ratingsApi } from '@/lib/api/services'
+import { catalogApi, checkoutBillingFromMe, enrollmentApi, paymentsApi, ratingsApi } from '@/lib/api/services'
 import { apiErrorMessage } from '@/lib/api/client'
+import { useAuth } from '@/lib/auth/AuthProvider'
 import { useT } from '@/lib/i18n'
 import type { CourseCard } from '@/lib/types'
 import { Card } from '@/components/ui/card'
@@ -30,6 +32,7 @@ export default function CourseDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const qc = useQueryClient()
+  const { me } = useAuth()
 
   const curriculum = useQuery({
     queryKey: ['curriculum', id],
@@ -66,6 +69,24 @@ export default function CourseDetailsPage() {
     },
   })
 
+  // Paid courses go through Paymob's hosted checkout; the backend's webhook
+  // creates the enrollment once the transaction settles, so there is nothing to
+  // invalidate here — the browser leaves this page entirely.
+  const checkout = useMutation({
+    mutationFn: async () => {
+      const url = await paymentsApi.checkout({
+        items: [{ targetType: 'COURSE', courseId: id }],
+        billingData: checkoutBillingFromMe(me),
+        returnUrl: window.location.origin,
+      })
+      if (!url) throw new Error('Checkout URL missing')
+      window.location.href = url
+    },
+  })
+
+  const actionPending = enroll.isPending || checkout.isPending
+  const actionError = enroll.error ?? checkout.error
+
   if (curriculum.isLoading) {
     return (
       <div className="space-y-4">
@@ -89,7 +110,7 @@ export default function CourseDetailsPage() {
           className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 hover:bg-white/30"
           aria-label={t('courseDetail.back')}
         >
-          <ArrowRight size={18} />
+          <ArrowLeft size={18} className="rtl:rotate-180" />
         </button>
         {meta?.category?.name && (
           <span className="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
@@ -197,7 +218,7 @@ export default function CourseDetailsPage() {
       )}
 
       {/* Sticky enroll bar */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface p-4 md:ms-64">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface p-4 lg:ms-[260px]">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
           <div>
             {meta && (
@@ -210,23 +231,30 @@ export default function CourseDetailsPage() {
             <Button size="lg" onClick={() => router.push(`/learn/${id}`)}>
               <CheckCircle2 size={18} /> {t('courseDetail.continue')}
             </Button>
-          ) : isPaid ? (
-            <Button size="lg" disabled>
-              {t('courseDetail.paymentSoon')}
-            </Button>
           ) : (
             <Button
               size="lg"
-              loading={enroll.isPending}
-              onClick={() => enroll.mutate()}
+              loading={actionPending}
+              onClick={() => (isPaid ? checkout.mutate() : enroll.mutate())}
             >
-              {t('courseDetail.enrollNow')}
+              {isPaid ? (
+                <>
+                  <CreditCard size={18} /> {t('courseDetail.buyNow', 'Buy now')}
+                </>
+              ) : (
+                t('courseDetail.enrollNow')
+              )}
             </Button>
           )}
         </div>
-        {enroll.isError && (
+        {actionError && (
           <p className="mx-auto mt-2 max-w-5xl text-xs text-error">
-            {apiErrorMessage(enroll.error, t('courseDetail.enrollError'))}
+            {apiErrorMessage(
+              actionError,
+              isPaid
+                ? t('courseDetail.checkoutError', 'Could not start checkout. Please try again.')
+                : t('courseDetail.enrollError')
+            )}
           </p>
         )}
       </div>

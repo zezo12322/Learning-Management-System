@@ -1,4 +1,7 @@
+'use client'
+
 import { Award } from 'lucide-react'
+import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
 /**
@@ -24,6 +27,8 @@ export function CertificateArtwork({
   compact?: boolean
   className?: string
 }) {
+  const t = useT()
+
   return (
     <div
       className={cn(
@@ -31,15 +36,17 @@ export function CertificateArtwork({
         className,
       )}
     >
-      {/* Corner wedges */}
+      {/* Corner wedges. clip-path has no logical form, so the triangles are
+          mirrored in RTL to stay attached to the corner the -start/-end
+          offsets move them to. */}
       <span
         aria-hidden
-        className="absolute -start-px -top-px h-[38%] w-[30%] bg-gradient-to-br from-primary-500 to-secondary-500"
+        className="absolute -start-px -top-px h-[38%] w-[30%] bg-gradient-to-br from-primary-500 to-secondary-500 rtl:-scale-x-100"
         style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
       />
       <span
         aria-hidden
-        className="absolute -bottom-px -end-px h-[38%] w-[30%] bg-gradient-to-tl from-primary-500 to-secondary-500"
+        className="absolute -bottom-px -end-px h-[38%] w-[30%] bg-gradient-to-tl from-primary-500 to-secondary-500 rtl:-scale-x-100"
         style={{ clipPath: 'polygon(100% 100%, 100% 0, 0 100%)' }}
       />
 
@@ -55,7 +62,7 @@ export function CertificateArtwork({
             compact ? 'text-[7px]' : 'text-base sm:text-xl',
           )}
         >
-          Certificate
+          {t('certificates.artwork.heading', 'Certificate')}
         </p>
         <p
           className={cn(
@@ -63,10 +70,14 @@ export function CertificateArtwork({
             compact ? 'mt-px text-[4px]' : 'text-[8px] sm:text-[10px]',
           )}
         >
-          of Completion
+          {t('certificates.artwork.subheading', 'of Completion')}
         </p>
 
-        {!compact && <p className="mt-2.5 text-[10px] italic text-slate-500">This is to certify that</p>}
+        {!compact && (
+          <p className="mt-2.5 text-[10px] italic text-slate-500">
+            {t('certificates.artwork.certifyThat', 'This is to certify that')}
+          </p>
+        )}
 
         <p
           className={cn(
@@ -78,7 +89,9 @@ export function CertificateArtwork({
         </p>
 
         {!compact && (
-          <p className="mt-2 text-[10px] text-slate-500">has successfully completed the course</p>
+          <p className="mt-2 text-[10px] text-slate-500">
+            {t('certificates.artwork.completedCourse', 'has successfully completed the course')}
+          </p>
         )}
 
         <p

@@ -504,9 +504,9 @@ const en: Dict = {
 
   // AI Studio / AI Tutor (placeholder pages)
   'aiStudio.title': 'AI Course Studio',
-  'aiStudio.description': 'Course generation tools planned for a future release.',
+  'aiStudio.description': 'Generate learning assets from a lesson video.',
   'aiTutor.title': 'AI Tutor',
-  'aiTutor.description': 'Learner conversations planned for a future release.',
+  'aiTutor.description': 'Ask questions about a lesson and get answers grounded in its content.',
 
   // Quiz editor
   'quizEditor.backToCurriculum': 'Back to curriculum',
@@ -830,6 +830,92 @@ const en: Dict = {
   'quizTake.backToCourse': 'Back to the course',
   'quizTake.notEnrolled': 'You are not enrolled in this course',
   'quizTake.notEnrolledBody': 'Enroll in the course to take its quizzes.',
+
+  // ── Paid enrollment (Paymob checkout) ───────────────────────────────
+  'courseDetail.buyNow': 'Buy now',
+  'courseDetail.checkoutError': 'Could not start checkout. Please try again.',
+  'catalogDetail.buyNow': 'Buy now',
+  'catalogDetail.checkoutFailed': 'Could not start checkout. Please try again.',
+  'catalogDetail.free': 'Free',
+  'catalogDetail.paidNote':
+    'Payment is handled on a secure checkout page. Your enrollment activates as soon as the payment goes through.',
+
+  // ── Builder shell (step navigation) ─────────────────────────────────
+  'builder.shell.backToCourses': 'Courses',
+  'builder.shell.newCourse': 'New course',
+  'builder.shell.loadingCourse': 'Loading course…',
+  'builder.shell.courseFallback': 'Course',
+  'builder.shell.status.DRAFT': 'Draft',
+  'builder.shell.status.IN_REVIEW': 'Needs review',
+  'builder.shell.status.PUBLISHED': 'Published',
+  'builder.shell.status.ARCHIVED': 'Archived',
+  'builder.shell.continue': 'Continue',
+  'builder.shell.continueBlocked': 'Add at least one lesson to every section to continue',
+  'builder.shell.saveSetupFirst': 'Save your course details first',
+  'builder.shell.publishCourse': 'Publish course',
+  'builder.shell.publishBlocked': 'Add at least one lesson to every section before publishing',
+  'builder.shell.eyebrow': 'COURSE BUILDER',
+  'builder.shell.heading': 'Create your course',
+  'builder.shell.subheading': 'Complete the required steps before publishing.',
+  'builder.shell.step.setup': 'Setup',
+  'builder.shell.step.curriculum': 'Curriculum',
+  'builder.shell.step.media': 'Media',
+  'builder.shell.step.ai-studio': 'AI tools',
+  'builder.shell.step.preview': 'Preview',
+  'builder.shell.stepDesc.setup': 'Course details',
+  'builder.shell.stepDesc.curriculum': 'Sections & lessons',
+  'builder.shell.stepDesc.media': 'Uploads & processing',
+  'builder.shell.stepDesc.ai-studio': 'Studio & tutor',
+  'builder.shell.stepDesc.preview': 'Review & publish',
+
+  // ── Builder — draft privacy & cover upload ──────────────────────────
+  'builder.setup.draftPrivate': 'Drafts stay private',
+  'builder.setup.draftPrivateBody':
+    'Nothing is stored until you save. Your course stays private to you until you publish it from the Preview step.',
+  'builder.setup.coverAfterSave': 'Save your course details first to add a cover image.',
+  'builder.setup.coverUploading': 'Uploading cover…',
+  'builder.setup.replaceCover': 'Replace cover image',
+  'builder.setup.coverTooLarge': 'Cover images must be 5 MB or smaller.',
+  'builder.setup.coverUploadError': 'The cover image could not be uploaded. Try again.',
+
+  // ── Builder — steps that need a saved course ────────────────────────
+  'builder.curriculum.needsCourseTitle': 'Save your course details first',
+  'builder.curriculum.needsCourseBody':
+    'Sections and lessons are attached to a saved course. Complete the setup step and save it, then come back to build the curriculum.',
+  'builder.curriculum.goToSetup': 'Go to course setup',
+  'builder.media.needsCourseTitle': 'Save your course details first',
+  'builder.media.needsCourseBody':
+    'Uploads are attached to a saved course. Complete the setup step and save it, then upload your media here.',
+  'builder.media.goToSetup': 'Go to course setup',
+  'builder.preview.needsCourseTitle': 'Save your course details first',
+  'builder.preview.needsCourseBody':
+    'There is nothing to preview until the course exists. Complete the setup step and save it to continue.',
+  'builder.preview.goToSetup': 'Go to course setup',
+
+  // ── AI Studio / AI Tutor (grounded generation) ──────────────────────
+  'aiStudio.needsCourse':
+    'Save your course details first. AI assets are generated from lessons that belong to a saved course.',
+  'aiStudio.noVideoLectures':
+    'Add a video lecture to this course to generate learning assets. Generation is grounded in the video transcript.',
+  'aiStudio.sourceVideoLabel': 'Source video',
+  'aiTutor.needsCourse':
+    'Save your course details first. The tutor answers from lessons that belong to a saved course.',
+  'aiTutor.noVideoLectures':
+    'Add a video lecture to this course to use the AI tutor. Tutoring is grounded in video transcripts.',
+  'aiTutor.lessonLabel': 'Lesson',
+
+  // ── Register — password confirmation & terms ────────────────────────
+  'reg.confirmPassword': 'Confirm password',
+  'reg.val.confirmRequired': 'Please re-enter your password',
+  'reg.val.pwMatch': 'Passwords do not match',
+  'reg.acceptTerms': 'I agree to the Terms of Service and the Privacy Policy',
+  'reg.val.terms': 'Please accept the terms to create an account',
+
+  // ── Certificate artwork ─────────────────────────────────────────────
+  'certificates.artwork.heading': 'Certificate',
+  'certificates.artwork.subheading': 'of Completion',
+  'certificates.artwork.certifyThat': 'This is to certify that',
+  'certificates.artwork.completedCourse': 'has successfully completed the course',
 }
 
 const ar: Dict = {
@@ -1322,9 +1408,9 @@ const ar: Dict = {
 
   // AI Studio / AI Tutor (placeholder pages)
   'aiStudio.title': 'استوديو الدورات بالذكاء الاصطناعي',
-  'aiStudio.description': 'أدوات توليد الدورات مخطَّط لها في إصدار لاحق.',
+  'aiStudio.description': 'ولّد مواد تعليمية من فيديو الدرس.',
   'aiTutor.title': 'المدرّس الذكي',
-  'aiTutor.description': 'محادثات المتعلّمين مخطَّط لها في إصدار لاحق.',
+  'aiTutor.description': 'اسأل عن الدرس واحصل على إجابات مستندة إلى محتواه.',
 
   // Quiz editor
   'quizEditor.backToCurriculum': 'العودة إلى المنهج',
@@ -1644,6 +1730,92 @@ const ar: Dict = {
   'quizTake.backToCourse': 'العودة إلى الدورة',
   'quizTake.notEnrolled': 'أنت غير مُلتحق بهذه الدورة',
   'quizTake.notEnrolledBody': 'التحق بالدورة لتتمكن من أداء اختباراتها.',
+
+  // ── الالتحاق المدفوع (الدفع عبر Paymob) ──────────────────────────────
+  'courseDetail.buyNow': 'اشترِ الآن',
+  'courseDetail.checkoutError': 'تعذّر بدء عملية الدفع. حاول مرة أخرى.',
+  'catalogDetail.buyNow': 'اشترِ الآن',
+  'catalogDetail.checkoutFailed': 'تعذّر بدء عملية الدفع. حاول مرة أخرى.',
+  'catalogDetail.free': 'مجاني',
+  'catalogDetail.paidNote':
+    'تتم عملية الدفع على صفحة دفع آمنة، ويُفعَّل التحاقك بالدورة فور إتمام الدفع.',
+
+  // ── هيكل مُنشئ الدورات (خطوات الإنشاء) ───────────────────────────────
+  'builder.shell.backToCourses': 'الدورات',
+  'builder.shell.newCourse': 'دورة جديدة',
+  'builder.shell.loadingCourse': 'جارٍ تحميل الدورة…',
+  'builder.shell.courseFallback': 'دورة',
+  'builder.shell.status.DRAFT': 'مسودة',
+  'builder.shell.status.IN_REVIEW': 'بحاجة إلى مراجعة',
+  'builder.shell.status.PUBLISHED': 'منشورة',
+  'builder.shell.status.ARCHIVED': 'مؤرشفة',
+  'builder.shell.continue': 'متابعة',
+  'builder.shell.continueBlocked': 'أضِف درسًا واحدًا على الأقل إلى كل قسم للمتابعة',
+  'builder.shell.saveSetupFirst': 'احفظ تفاصيل دورتك أولًا',
+  'builder.shell.publishCourse': 'نشر الدورة',
+  'builder.shell.publishBlocked': 'أضِف درسًا واحدًا على الأقل إلى كل قسم قبل النشر',
+  'builder.shell.eyebrow': 'مُنشئ الدورات',
+  'builder.shell.heading': 'أنشئ دورتك',
+  'builder.shell.subheading': 'أكمل الخطوات المطلوبة قبل النشر.',
+  'builder.shell.step.setup': 'الإعداد',
+  'builder.shell.step.curriculum': 'المنهج',
+  'builder.shell.step.media': 'الوسائط',
+  'builder.shell.step.ai-studio': 'أدوات الذكاء الاصطناعي',
+  'builder.shell.step.preview': 'المعاينة',
+  'builder.shell.stepDesc.setup': 'تفاصيل الدورة',
+  'builder.shell.stepDesc.curriculum': 'الأقسام والدروس',
+  'builder.shell.stepDesc.media': 'الرفع والمعالجة',
+  'builder.shell.stepDesc.ai-studio': 'الاستوديو والمدرّس الذكي',
+  'builder.shell.stepDesc.preview': 'المراجعة والنشر',
+
+  // ── مُنشئ الدورات — خصوصية المسودة ورفع الغلاف ───────────────────────
+  'builder.setup.draftPrivate': 'المسودّات تبقى خاصة',
+  'builder.setup.draftPrivateBody':
+    'لا يُحفظ أي شيء قبل أن تضغط حفظ. وتبقى دورتك خاصة بك حتى تنشرها من خطوة المعاينة.',
+  'builder.setup.coverAfterSave': 'احفظ تفاصيل دورتك أولًا لتتمكن من إضافة صورة غلاف.',
+  'builder.setup.coverUploading': 'جارٍ رفع الغلاف…',
+  'builder.setup.replaceCover': 'استبدال صورة الغلاف',
+  'builder.setup.coverTooLarge': 'يجب أن تكون صورة الغلاف 5 ميجابايت أو أقل.',
+  'builder.setup.coverUploadError': 'تعذّر رفع صورة الغلاف. حاول مرة أخرى.',
+
+  // ── مُنشئ الدورات — خطوات تتطلّب دورة محفوظة ─────────────────────────
+  'builder.curriculum.needsCourseTitle': 'احفظ تفاصيل دورتك أولًا',
+  'builder.curriculum.needsCourseBody':
+    'ترتبط الأقسام والدروس بدورة محفوظة. أكمل خطوة الإعداد واحفظها، ثم عُد لبناء المنهج.',
+  'builder.curriculum.goToSetup': 'الذهاب إلى إعداد الدورة',
+  'builder.media.needsCourseTitle': 'احفظ تفاصيل دورتك أولًا',
+  'builder.media.needsCourseBody':
+    'ترتبط الملفات المرفوعة بدورة محفوظة. أكمل خطوة الإعداد واحفظها، ثم ارفع وسائطك هنا.',
+  'builder.media.goToSetup': 'الذهاب إلى إعداد الدورة',
+  'builder.preview.needsCourseTitle': 'احفظ تفاصيل دورتك أولًا',
+  'builder.preview.needsCourseBody':
+    'لا يوجد ما يمكن معاينته قبل إنشاء الدورة. أكمل خطوة الإعداد واحفظها للمتابعة.',
+  'builder.preview.goToSetup': 'الذهاب إلى إعداد الدورة',
+
+  // ── استوديو الذكاء الاصطناعي والمدرّس الذكي ──────────────────────────
+  'aiStudio.needsCourse':
+    'احفظ تفاصيل دورتك أولًا. تُولَّد أصول الذكاء الاصطناعي من دروس تنتمي إلى دورة محفوظة.',
+  'aiStudio.noVideoLectures':
+    'أضِف محاضرة فيديو إلى هذه الدورة لتوليد الأصول التعليمية. يعتمد التوليد على النص المكتوب للفيديو.',
+  'aiStudio.sourceVideoLabel': 'الفيديو المصدر',
+  'aiTutor.needsCourse':
+    'احفظ تفاصيل دورتك أولًا. يجيب المدرّس الذكي من دروس تنتمي إلى دورة محفوظة.',
+  'aiTutor.noVideoLectures':
+    'أضِف محاضرة فيديو إلى هذه الدورة لاستخدام المدرّس الذكي. يعتمد التدريس على النصوص المكتوبة للفيديوهات.',
+  'aiTutor.lessonLabel': 'الدرس',
+
+  // ── إنشاء الحساب — تأكيد كلمة المرور والشروط ─────────────────────────
+  'reg.confirmPassword': 'تأكيد كلمة المرور',
+  'reg.val.confirmRequired': 'أعِد إدخال كلمة المرور',
+  'reg.val.pwMatch': 'كلمتا المرور غير متطابقتين',
+  'reg.acceptTerms': 'أوافق على شروط الخدمة وسياسة الخصوصية',
+  'reg.val.terms': 'وافق على الشروط لإنشاء الحساب',
+
+  // ── تصميم الشهادة ────────────────────────────────────────────────────
+  'certificates.artwork.heading': 'شهادة',
+  'certificates.artwork.subheading': 'إتمام الدورة',
+  'certificates.artwork.certifyThat': 'نشهد بأنّ',
+  'certificates.artwork.completedCourse': 'قد أتمّ بنجاح دورة',
 }
 
 export const dictionaries: Record<Locale, Dict> = { en, ar }

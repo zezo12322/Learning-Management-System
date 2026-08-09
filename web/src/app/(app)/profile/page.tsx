@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -55,6 +55,36 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('')
   const [company, setCompany] = useState('')
   const [phone, setPhone] = useState('')
+  const userInfoRef = useRef<HTMLElement>(null)
+  const phoneInputRef = useRef<HTMLInputElement>(null)
+  const revealEditorRef = useRef(false)
+
+  /**
+   * The edit form lives far below the fold, so entry points outside the section
+   * (header gear, Settings list) must bring it into view — otherwise the click
+   * looks like it did nothing.
+   */
+  const revealEditor = useCallback(() => {
+    // preventScroll so focusing does not fight the smooth scroll below.
+    phoneInputRef.current?.focus({ preventScroll: true })
+    userInfoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [])
+
+  const openEditor = useCallback(() => {
+    if (editing) {
+      revealEditor()
+      return
+    }
+    // The form is not mounted yet; reveal it once the state change has rendered.
+    revealEditorRef.current = true
+    setEditing(true)
+  }, [editing, revealEditor])
+
+  useEffect(() => {
+    if (!editing || !revealEditorRef.current) return
+    revealEditorRef.current = false
+    revealEditor()
+  }, [editing, revealEditor])
 
   const profileQuery = useQuery({ queryKey: ['me'], queryFn: meApi.get })
   const enrollments = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning })
@@ -132,11 +162,16 @@ export default function ProfilePage() {
               <Mail size={13} /> {user.email}
             </p>
           </div>
-          <Link href="/notifications" className="sm:ms-auto" aria-label={t('notifications.title')}>
+          <button
+            type="button"
+            onClick={openEditor}
+            className="sm:ms-auto"
+            aria-label={t('profile.accountSettings')}
+          >
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-subtle text-content-secondary transition-colors hover:text-primary">
               <Settings size={18} />
             </span>
-          </Link>
+          </button>
         </div>
 
         <div className="grid grid-cols-2 divide-border border-t border-border sm:grid-cols-4 sm:divide-x sm:rtl:divide-x-reverse">
@@ -164,7 +199,7 @@ export default function ProfilePage() {
       </Card>
 
       {/* User information */}
-      <section className="space-y-3">
+      <section ref={userInfoRef} className="space-y-3">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-bold text-content">{t('profile.userInformation')}</h2>
           <button
@@ -192,6 +227,7 @@ export default function ProfilePage() {
                 <Label htmlFor="profile-phone">{t('profile.phone')}</Label>
                 <Input
                   id="profile-phone"
+                  ref={phoneInputRef}
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
                 />
@@ -369,7 +405,7 @@ export default function ProfilePage() {
       <section className="space-y-3">
         <h2 className="text-lg font-bold text-content">{t('profile.settings')}</h2>
         <Card className="divide-y divide-border">
-          <SettingsRow icon={Settings} label={t('profile.accountSettings')} onClick={() => setEditing(true)} />
+          <SettingsRow icon={Settings} label={t('profile.accountSettings')} onClick={openEditor} />
           <SettingsRow icon={Bell} label={t('profile.notificationPreferences')} href="/notifications" />
           <SettingsRow icon={ClipboardList} label={t('nav.assignments')} href="/assignments" />
           <SettingsRow icon={Award} label={t('nav.certificates')} href="/certificates" />

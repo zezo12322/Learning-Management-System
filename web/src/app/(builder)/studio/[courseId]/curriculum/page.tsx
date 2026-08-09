@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, FileText, GripVertical, ListChecks, MoreHorizontal, Pencil, Play, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, FileText, GripVertical, ListChecks, Pencil, Play, Plus, Trash2 } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
 import { useT } from '@/lib/i18n'
@@ -32,9 +32,13 @@ export default function CurriculumPage() {
   const [sectionTitle, setSectionTitle] = useState('')
   const [deleteSectionId, setDeleteSectionId] = useState('')
   const [sectionError, setSectionError] = useState<string | null>(null)
+  // "new" is a placeholder id until the setup step creates the course —
+  // GET /courses/new would just 404, so nothing is fetched until it is real.
+  const isNew = courseId === 'new'
   const course = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
+    enabled: !isNew,
   })
 
   useEffect(() => {
@@ -200,6 +204,23 @@ export default function CurriculumPage() {
   const totalLessons = useMemo(() => sections.reduce((sum, section) => sum + section.lectures.length, 0), [sections])
   const totalSeconds = useMemo(() => sections.flatMap((section) => section.lectures).reduce((sum, lecture) => sum + lecture.duration, 0), [sections])
 
+  if (isNew) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t('builder.curriculum.title')} description={t('builder.curriculum.subtitle')} />
+        <Card className="p-6">
+          <h2 className="text-base font-semibold text-content">{t('builder.curriculum.needsCourseTitle', 'Save your course details first')}</h2>
+          <p className="mt-2 max-w-lg text-xs leading-5 text-content-secondary">
+            {t('builder.curriculum.needsCourseBody', 'Sections and lessons are attached to a saved course. Complete the setup step and save it, then come back to build the curriculum.')}
+          </p>
+          <Link href="/studio/new/setup" className="mt-5 inline-block">
+            <Button>{t('builder.curriculum.goToSetup', 'Go to course setup')}</Button>
+          </Link>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -311,7 +332,6 @@ export default function CurriculumPage() {
                               </Link>
                             )}
                             <StatusPill tone={ready ? 'success' : 'warning'}>{ready ? t('builder.curriculum.ready') : lecture.type === 'VIDEO' ? t('builder.curriculum.needsMedia') : lecture.type === 'QUIZ' ? t('builder.curriculum.type.QUIZ') : t('common.draft')}</StatusPill>
-                            <button className="p-1.5 text-content-muted"><MoreHorizontal size={16} /></button>
                           </div>
                         )
                       })}

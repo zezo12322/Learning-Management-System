@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { BookOpen, Bot, Check, UploadCloud } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { useT } from '@/lib/i18n'
 
 const VALUE_POINTS = [
@@ -60,7 +61,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <p className="relative mt-auto text-xs text-primary-200">{t('auth.hero.footer')}</p>
       </section>
 
-      <section className="flex min-h-screen items-center justify-center bg-surface px-5 py-10 sm:px-10">
+      <section className="relative flex min-h-screen items-center justify-center bg-surface px-5 py-10 sm:px-10">
+        {/* Arabic-first product: the language toggle has to be reachable before
+            sign-in, otherwise a user who cannot read the UI cannot change it. */}
+        <LanguageSwitcher className="absolute end-4 top-4 sm:end-6 sm:top-6" />
         <div className="w-full max-w-[520px]">{children}</div>
       </section>
     </div>

@@ -1,4 +1,5 @@
 import { apiBaseUrl, apiClient } from './client'
+import { safeLinkUrl } from '@/lib/safeUrl'
 import type {
   Category,
   Certificate,
@@ -189,6 +190,93 @@ export const enrollmentApi = {
     }),
   get: (courseId: string) =>
     apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
+}
+
+// ── Payments (Paymob hosted checkout) ────────────────────────────────
+export type CheckoutItem = {
+  targetType: 'COURSE' | 'MISSION' | 'SUBSCRIPTION'
+  courseId?: string
+  missionId?: string
+  subscriptionTierId?: string
+}
+
+/**
+ * Paymob's full billing block. The backend substitutes its placeholder set only
+ * when `billingData` is absent *entirely* (`body.billingData || {…}` in
+ * payments.controller.ts) — it does not fill in individual missing fields. So a
+ * partial object is worse than none: it reaches Paymob with `street`,
+ * `phone_number`, `city` and the rest undefined and the intention is rejected.
+ * Every field is therefore required here, and the helper below either produces
+ * a complete block or nothing at all.
+ */
+export type CheckoutBillingData = {
+  first_name: string
+  last_name: string
+  email: string
+  phone_number: string
+  apartment: string
+  floor: string
+  street: string
+  building: string
+  shipping_method: string
+  postal_code: string
+  city: string
+  state: string
+  country: string
+}
+
+/**
+ * Build a complete billing block from the signed-in profile, or `undefined` so
+ * the backend applies its own placeholders. Never returns a partial object —
+ * see CheckoutBillingData.
+ */
+export function checkoutBillingFromMe(
+  me: { name?: string; email?: string; profile?: { phone?: string } } | null,
+): CheckoutBillingData | undefined {
+  const email = me?.email?.trim()
+  if (!email) return undefined
+  const parts = (me?.name ?? '').trim().split(/\s+/).filter(Boolean)
+  return {
+    first_name: parts[0] || 'Customer',
+    last_name: parts.slice(1).join(' ') || 'Name',
+    email,
+    phone_number: me?.profile?.phone?.trim() || '+201000000000',
+    // Paymob requires the address block to be present; the LMS collects none of
+    // it, so these carry the same 'NA' the backend would have used.
+    apartment: 'NA',
+    floor: 'NA',
+    street: 'NA',
+    building: 'NA',
+    shipping_method: 'NA',
+    postal_code: 'NA',
+    city: 'Cairo',
+    state: 'NA',
+    country: 'EG',
+  }
+}
+
+export const paymentsApi = {
+  /**
+   * Start a Paymob checkout and return the hosted-checkout URL to navigate to
+   * (API_DOCUMENTATION §24.1). The endpoint is token-authenticated, so it
+   * answers with JSON instead of a 302 — a browser navigation straight to it
+   * would arrive unauthenticated, and following a redirect from XHR trips CORS.
+   *
+   * Prices are resolved server-side from the course row; nothing sent from here
+   * influences the amount charged. `returnUrl` is the origin the payment
+   * callback bounces back to, which then appends /payment-success | /payment-failed.
+   *
+   * Returns null when the response carries no usable URL, so the caller can
+   * report a failure rather than navigate somewhere unintended.
+   */
+  checkout: (payload: {
+    items: CheckoutItem[]
+    billingData?: CheckoutBillingData
+    returnUrl?: string
+  }): Promise<string | null> =>
+    apiClient
+      .post('/payments/checkout', payload)
+      .then((response) => safeLinkUrl(stringValue(objectValue(response.data).checkoutUrl))),
 }
 
 export const progressApi = {

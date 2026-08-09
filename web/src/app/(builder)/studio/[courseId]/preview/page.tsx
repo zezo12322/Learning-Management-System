@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { BookOpen, Check, ChevronDown, Clock, Globe2, Play, Rocket } from 'lucide-react'
 import { apiErrorMessage } from '@/lib/api/client'
 import { authoringApi } from '@/lib/api/services'
+import { safeMediaUrl } from '@/lib/safeUrl'
 import { useT } from '@/lib/i18n'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { ReadinessItem } from '@/components/builder/ReadinessItem'
@@ -19,11 +21,15 @@ export default function PreviewPage() {
   const { courseId } = useParams<{ courseId: string }>()
   const [published, setPublished] = useState(false)
   const [openSection, setOpenSection] = useState('')
+  // "new" is a placeholder id until the setup step creates the course.
+  const isNew = courseId === 'new'
   const courseQuery = useQuery({
     queryKey: ['authoring-course', courseId],
     queryFn: () => authoringApi.get(courseId),
+    enabled: !isNew,
   })
   const course = courseQuery.data
+  const thumbnail = safeMediaUrl(course?.thumbnail)
   const sections = useMemo(() => course?.sections ?? [], [course?.sections])
   const lessonCount = sections.reduce((total, section) => total + section.lectures.length, 0)
   const totalSeconds = sections.flatMap((section) => section.lectures).reduce((total, lecture) => total + lecture.duration, 0)
@@ -68,6 +74,23 @@ export default function PreviewPage() {
     }
   }
 
+  if (isNew) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t('builder.preview.title')} description={t('builder.preview.subtitle')} />
+        <Card className="p-6">
+          <h2 className="text-base font-semibold text-content">{t('builder.preview.needsCourseTitle', 'Save your course details first')}</h2>
+          <p className="mt-2 max-w-lg text-xs leading-5 text-content-secondary">
+            {t('builder.preview.needsCourseBody', 'There is nothing to preview until the course exists. Complete the setup step and save it to continue.')}
+          </p>
+          <Link href="/studio/new/setup" className="mt-5 inline-block">
+            <Button>{t('builder.preview.goToSetup', 'Go to course setup')}</Button>
+          </Link>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader title={t('builder.preview.title')} description={t('builder.preview.subtitle')} />
@@ -85,9 +108,9 @@ export default function PreviewPage() {
           <div className="grid gap-6 bg-brand-soft p-5 sm:p-7 lg:grid-cols-[220px_1fr] lg:items-center">
             <div
               className="flex aspect-video items-center justify-center rounded-card bg-surface bg-cover bg-center"
-              style={course?.thumbnail ? { backgroundImage: `url(${JSON.stringify(course.thumbnail)})` } : undefined}
+              style={thumbnail ? { backgroundImage: `url(${JSON.stringify(thumbnail)})` } : undefined}
             >
-              {!course?.thumbnail && <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">{courseInitials}</span>}
+              {!thumbnail && <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">{courseInitials}</span>}
             </div>
             <div>
               <p className="text-[9px] font-semibold tracking-wide text-primary">{course?.category?.toUpperCase() ?? t('builder.preview.uncategorized')} · {course?.level ? t(`level.${course.level}`, course.level) : t('level.BEGINNER')}</p>
@@ -102,8 +125,9 @@ export default function PreviewPage() {
           </div>
 
           <div className="p-5 sm:p-7">
-            <div className="flex gap-5 border-b border-border pb-4 text-xs font-semibold"><button className="text-content-secondary">{t('builder.preview.tabOverview')}</button><button className="text-primary">{t('builder.preview.tabCurriculum')}</button><button className="text-content-secondary">{t('builder.preview.tabInstructor')}</button></div>
-            <h2 className="mt-6 text-lg font-semibold text-content">{t('builder.preview.curriculumTitle')}</h2>
+            {/* The overview/instructor tabs were removed: this preview only
+                renders the curriculum, and the tabs switched nothing. */}
+            <h2 className="text-lg font-semibold text-content">{t('builder.preview.curriculumTitle')}</h2>
             <p className="mt-1 text-[11px] text-content-secondary">{sections.length} {sections.length === 1 ? t('builder.preview.sectionSingular') : t('builder.preview.sectionPlural')} · {lessonCount} {lessonCount === 1 ? t('builder.preview.lessonSingular') : t('builder.preview.lessonPlural')}</p>
 
             <div className="mt-5 space-y-3">
