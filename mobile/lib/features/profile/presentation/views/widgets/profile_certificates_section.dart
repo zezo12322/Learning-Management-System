@@ -8,8 +8,26 @@ import 'package:optimatech_lms/features/profile/presentation/views/widgets/certi
 
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 
-class ProfileCertificatesSection extends StatelessWidget {
+class ProfileCertificatesSection extends StatefulWidget {
   const ProfileCertificatesSection({super.key});
+
+  @override
+  State<ProfileCertificatesSection> createState() =>
+      _ProfileCertificatesSectionState();
+}
+
+class _ProfileCertificatesSectionState
+    extends State<ProfileCertificatesSection> {
+  /// Created once — see the note on `ProfileHeaderCard`. Built inside `build()`,
+  /// this re-queried on every rebuild of a subtree that is deliberately
+  /// non-const so it re-translates on a language switch.
+  late final Future<QueryResult<MyCertificatesData, void>> _certificates;
+
+  @override
+  void initState() {
+    super.initState();
+    _certificates = DefaultConnector.instance.myCertificates().execute();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +41,7 @@ class ProfileCertificatesSection extends StatelessWidget {
         ),
         Gap(12.h),
         FutureBuilder<QueryResult<MyCertificatesData, void>>(
-          future: DefaultConnector.instance.myCertificates().execute(),
+          future: _certificates,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

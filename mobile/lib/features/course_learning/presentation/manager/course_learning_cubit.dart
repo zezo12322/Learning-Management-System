@@ -5,8 +5,9 @@ import 'package:optimatech_lms/features/course_learning/domain/usecases/get_cour
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_lecture_content_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/update_lecture_progress_usecase.dart';
 import 'course_learning_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class CourseLearningCubit extends Cubit<CourseLearningState> {
+class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<CourseLearningState> {
   final GetCourseCurriculumUseCase getCourseCurriculumUseCase;
   final GetLectureContentUseCase getLectureContentUseCase;
   final UpdateLectureProgressUseCase updateLectureProgressUseCase;
@@ -201,10 +202,13 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     // reached, or the next heartbeat undoes a completion the learner earned.
     if (currentSecond > _lastKnownSecond) _lastKnownSecond = currentSecond;
 
+    // Queued transport: the server enqueues and answers 202, and collapses a
+    // burst of positions for this lecture into one write. The synchronous PUT
+    // this used to call went through Data Connect on every tick.
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
       lastWatchedSecond: _lastKnownSecond,
-      completed: false, // Don't aggressively mark as completed on heartbeat
+      heartbeat: true,
     );
   }
 }

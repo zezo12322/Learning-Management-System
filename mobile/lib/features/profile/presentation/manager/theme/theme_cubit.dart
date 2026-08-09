@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/profile/data/datasources/theme_local_data_source.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class ThemeCubit extends Cubit<ThemeMode> {
+class ThemeCubit extends Cubit<ThemeMode> with SafeEmit<ThemeMode> {
   ThemeCubit({required ThemeLocalDataSource themeLocalDataSource})
       : _themeLocalDataSource = themeLocalDataSource,
         super(ThemeMode.system);

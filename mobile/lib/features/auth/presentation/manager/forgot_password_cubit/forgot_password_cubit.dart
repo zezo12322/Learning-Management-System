@@ -2,8 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/core/utils/app_validators.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'forgot_password_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class ForgotPasswordCubit extends Cubit<ForgotPasswordState> {
+class ForgotPasswordCubit extends Cubit<ForgotPasswordState> with SafeEmit<ForgotPasswordState> {
   ForgotPasswordCubit({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(const ForgotPasswordState());

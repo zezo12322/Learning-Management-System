@@ -10,7 +10,13 @@ import 'package:optimatech_lms/core/error/user_facing_message.dart';
 abstract class CourseLearningRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
   Future<LectureContentModel> getLectureContent(String lectureId);
+
+  /// Synchronous write, for the explicit "mark complete" action where the
+  /// caller needs the result now.
   Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false});
+
+  /// Fire-and-forget heartbeat while the video plays.
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond);
 }
 
 class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
@@ -75,10 +81,29 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
   Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond, {bool completed = false}) async {
     try {
       await _setAuthToken();
-      // NestJS route: PUT /api/v1/lectures/:lectureId/progress
+      // PUT is the synchronous path — it writes through Data Connect and
+      // returns the derived completion, which is what "mark complete" needs.
       await apiService.put('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
         'completed': completed,
+      });
+    } catch (e) {
+      throw CustomExceptions(message: userFacingMessage(e));
+    }
+  }
+
+  /// `POST /lectures/:lectureId/progress` — validates, enqueues, and answers
+  /// 202 without touching the database. The queue collapses a burst of
+  /// heartbeats for the same (user, lecture) into one pending job, so a player
+  /// reporting every 10 seconds costs one write per lecture rather than one per
+  /// tick. The controller says as much: heartbeats belong here, and the
+  /// synchronous PUT is kept for explicit actions.
+  @override
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond) async {
+    try {
+      await _setAuthToken();
+      await apiService.post('/lectures/$lectureId/progress', data: {
+        'lastWatchedSecond': lastWatchedSecond,
       });
     } catch (e) {
       throw CustomExceptions(message: userFacingMessage(e));

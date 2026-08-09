@@ -236,7 +236,10 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                                   Gap(32.h),
                                   BlocProvider<HomeCoursesCubit>(
                                     create: (context) =>
-                                        getIt<HomeCoursesCubit>()..fetchHomeCourses(),
+                                        // Only the popular list is rendered
+                                        // here, so only that query runs.
+                                        getIt<HomeCoursesCubit>()
+                                          ..fetchPopularCourses(),
                                     child: BlocBuilder<HomeCoursesCubit, HomeCourseState>(
                                       builder: (context, state) {
                                         return state.maybeWhen(

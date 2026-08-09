@@ -64,9 +64,14 @@ class CourseLearningRepositoryImpl implements CourseLearningRepository {
     required String lectureId,
     required int lastWatchedSecond,
     bool completed = false,
+    bool heartbeat = false,
   }) async {
     try {
-      await _remoteDataSource.updateLectureProgress(lectureId, lastWatchedSecond, completed: completed);
+      if (heartbeat) {
+        await _remoteDataSource.recordLectureProgress(lectureId, lastWatchedSecond);
+      } else {
+        await _remoteDataSource.updateLectureProgress(lectureId, lastWatchedSecond, completed: completed);
+      }
       return const Right(null);
     } on CustomExceptions catch (e) {
       return Left(ServerFailure(e.message));
