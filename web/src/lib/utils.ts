@@ -24,6 +24,14 @@ export function formatDuration(minutes: number | null | undefined): string {
   return `${m}m`
 }
 
+/** Format an ISO date as a locale-aware long date ("May 30, 2025"). */
+export function formatDate(value: string | null | undefined, locale = 'en'): string {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
+}
+
 /** Format a price with optional currency. */
 export function formatPrice(value: number | null | undefined, currency = 'USD'): string {
   if (value == null) return ''

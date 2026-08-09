@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpen, Search, Star, UserRound } from 'lucide-react'
 import { catalogApi, coursesApi } from '@/lib/api/services'
@@ -12,8 +13,19 @@ import { Input } from '@/components/ui/input'
 import { StatusPill } from '@/components/workspace/StatusPill'
 
 export default function CatalogPage() {
+  // useSearchParams needs a Suspense boundary during static prerender.
+  return (
+    <Suspense fallback={null}>
+      <CatalogView />
+    </Suspense>
+  )
+}
+
+function CatalogView() {
   const t = useT()
-  const [search, setSearch] = useState('')
+  // The student Home search box submits into the catalog as ?q=…
+  const initialQuery = useSearchParams().get('q') ?? ''
+  const [search, setSearch] = useState(initialQuery)
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
   const serverSearch = useQuery({
     queryKey: ['course-search', search.trim()],

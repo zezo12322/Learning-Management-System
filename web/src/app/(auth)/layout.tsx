@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && isAuthenticated) router.replace('/dashboard')
+    if (!loading && isAuthenticated) router.replace('/home')
   }, [loading, isAuthenticated, router])
 
   return (

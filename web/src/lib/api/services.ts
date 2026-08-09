@@ -1,8 +1,11 @@
 import { apiClient } from './client'
 import type {
   Category,
+  Certificate,
   ContinueLearningItem,
   CourseLevel,
+  MySubmission,
+  SubmissionStatus,
   CourseProgress,
   Curriculum,
   Enrollment,
@@ -113,6 +116,62 @@ export const coursesApi = {
     apiClient.get('/courses/search', { params: { q: query } }).then((response) =>
       arrayValue(response.data).map(mapCourseCard)
     ),
+}
+
+// ── Assignments (student view of mission submissions) ────────────────
+function mapSubmission(value: unknown): MySubmission {
+  const raw = objectValue(value)
+  const mission = objectValue(raw.mission)
+  const scores = arrayValue(
+    raw.missionSubmissionScores_on_submission ?? raw.scores,
+  ).map((entry) => {
+    const rawScore = objectValue(entry)
+    const criterion = objectValue(rawScore.criterion)
+    return {
+      criterionName: stringValue(criterion.criterionName ?? rawScore.criterionId),
+      score: numberValue(rawScore.score),
+      maxPoints: numberValue(criterion.maxPoints),
+    }
+  })
+  const graded = scores.length > 0
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(mission.title ?? raw.title, 'Assignment'),
+    difficulty: stringValue(mission.difficulty) || undefined,
+    fileUrl: stringValue(raw.fileUrl),
+    status: (stringValue(raw.status, 'PENDING') as SubmissionStatus) || 'PENDING',
+    feedback: typeof raw.feedback === 'string' ? raw.feedback : null,
+    submittedAt: stringValue(raw.submittedAt),
+    scores,
+    totalScore: graded ? scores.reduce((sum, entry) => sum + entry.score, 0) : null,
+    maxPoints: graded ? scores.reduce((sum, entry) => sum + entry.maxPoints, 0) : null,
+  }
+}
+
+export const submissionsApi = {
+  /** The signed-in student's own assignment submissions, newest first. */
+  mine: () =>
+    apiClient.get('/me/submissions').then((response) => arrayValue(response.data).map(mapSubmission)),
+}
+
+// ── Certificates ─────────────────────────────────────────────────────
+/**
+ * Completion certificates. There is no certificates endpoint yet (see
+ * web/BACKEND_INTEGRATION_GAPS.md), so a certificate is projected from a
+ * COMPLETED enrollment: the enrollment is the server's own record that this
+ * learner finished this course, and its id is the credential reference.
+ */
+export function certificatesFromEnrollments(items: ContinueLearningItem[]): Certificate[] {
+  return items
+    .filter((item) => item.status === 'COMPLETED' && item.completedAt)
+    .sort((a, b) => (b.completedAt ?? '').localeCompare(a.completedAt ?? ''))
+    .map((item) => ({
+      enrollmentId: item.enrollmentId,
+      course: item.course,
+      completedAt: item.completedAt as string,
+      totalLessons: item.totalLessons,
+      credentialId: `CERT-${item.enrollmentId.replace(/-/g, '').slice(0, 12).toUpperCase()}`,
+    }))
 }
 
 export const enrollmentApi = {

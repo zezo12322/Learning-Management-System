@@ -29,7 +29,7 @@ export default function PaymentFailedPage() {
             {t('payment.failed.cta')}
           </Link>
           <Link
-            href="/dashboard"
+            href="/home"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-btn border border-border bg-surface px-5 text-sm font-semibold text-content transition-colors hover:bg-background"
           >
             {t('payment.backToDashboard')}

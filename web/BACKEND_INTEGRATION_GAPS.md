@@ -26,6 +26,18 @@ No backend source files were changed by this integration.
 
 3. **Notifications**
    - There are no notification list, unread-count, read-state, or preference endpoints.
+   - `(app)/notifications` therefore renders the designed shell and its empty state. `src/lib/notifications.ts::fetchNotifications` is the only seam to change once `GET /notifications` exists — the Flutter app keeps the same shell in `NotificationsCubit.load()`.
+
+7. **Student-visible assignments**
+   - `GET /missions` lists missions the caller *authored*, so a student cannot enumerate assignments that are open to them. `(app)/assignments` is built on `GET /me/submissions`, which means the design's "Available" state cannot be shown — only Submitted and Graded work.
+   - A `GET /me/assignments` (missions across my active enrollments, with due date and points) would complete the screen.
+
+8. **Certificates**
+   - There is no certificates endpoint. `(app)/certificates` projects a certificate from each COMPLETED enrollment and uses the enrollment id as the credential reference; "Download PDF" prints the certificate sheet client-side.
+   - A real endpoint would supply the issued date, credential id and a signed PDF/verification URL.
+
+9. **Learning aggregates**
+   - No watch-time, streak, or per-lecture recency aggregate exists, so the Home screen's "Hours learned", "Day streak" and "Recent lessons" blocks from the design are substituted with values that can be derived from `GET /courses/continue-learning` (courses enrolled, lessons completed, certificates, in progress).
 
 4. **Catalog list fields**
    - The public catalog list does not include `description` or `language`; those fields are available only from the curriculum response.

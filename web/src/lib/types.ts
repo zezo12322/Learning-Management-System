@@ -279,3 +279,43 @@ export interface QuizResult {
   correctCount: number
   answeredCount: number
 }
+
+// ── Assignments (mission submissions) ────────────────────────────────
+export type SubmissionStatus = 'PENDING' | 'GRADED' | 'RETURNED' | 'REJECTED'
+
+/**
+ * One row of GET /me/submissions — the student's own assignment work.
+ * Shape follows the `MySubmissions` Data Connect query
+ * (dataconnect/default/missions.gql): the mission is embedded and the rubric
+ * scores arrive per criterion, so the totals below are summed client-side.
+ */
+export interface MySubmission {
+  id: string
+  title: string
+  difficulty?: string
+  fileUrl: string
+  status: SubmissionStatus
+  feedback?: string | null
+  submittedAt: string
+  /** Per-criterion rubric scores (empty until an instructor grades it). */
+  scores: { criterionName: string; score: number; maxPoints: number }[]
+  /** Sum of `scores`, or null when the submission has not been graded. */
+  totalScore: number | null
+  /** Sum of the rubric's `maxPoints`, or null when no rubric was scored. */
+  maxPoints: number | null
+}
+
+// ── Certificates ─────────────────────────────────────────────────────
+/**
+ * A completion certificate. The backend has no certificates endpoint yet, so
+ * these are derived from COMPLETED enrollments — the enrollment id doubles as
+ * the credential reference because it is the stable server-side identifier for
+ * "this learner finished this course".
+ */
+export interface Certificate {
+  enrollmentId: string
+  course: CourseCard
+  completedAt: string
+  totalLessons: number
+  credentialId: string
+}

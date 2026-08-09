@@ -40,7 +40,7 @@ export default function RegisterPage() {
     setError(null)
     try {
       await registerUser(values)
-      router.push('/dashboard')
+      router.push('/home')
     } catch (registerError) {
       setError(registerError instanceof Error ? registerError.message : t('reg.err.generic'))
     }

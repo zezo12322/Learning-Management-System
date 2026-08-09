@@ -24,13 +24,13 @@ export default function PaymentSuccessPage() {
 
         <div className="mt-8 flex flex-col gap-3">
           <Link
-            href="/courses"
+            href="/learning"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-btn bg-primary px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600 active:bg-primary-700"
           >
             {t('payment.success.cta')}
           </Link>
           <Link
-            href="/dashboard"
+            href="/home"
             className="inline-flex h-11 items-center justify-center gap-2 rounded-btn border border-border bg-surface px-5 text-sm font-semibold text-content transition-colors hover:bg-background"
           >
             {t('payment.backToDashboard')}
