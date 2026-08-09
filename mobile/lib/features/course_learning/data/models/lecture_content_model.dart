@@ -51,19 +51,6 @@ class LectureContentModel {
     );
   }
 
-  LectureContentModel copyWith({String? videoUrl}) {
-    return LectureContentModel(
-      id: id,
-      title: title,
-      type: type,
-      videoUrl: videoUrl ?? this.videoUrl,
-      content: content,
-      duration: duration,
-      transcriptUrl: transcriptUrl,
-      isFreePreview: isFreePreview,
-    );
-  }
-
   LectureContentEntity toEntity() {
     return LectureContentEntity(
       id: id,

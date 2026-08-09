@@ -108,15 +108,12 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
   }
 
 
-  // open the tapped lesson, not just the course
+  // open videoPlayer Stage screen from current screen
   void _onLessonTap(CourseLessonEntity lesson) {
     Navigator.pushNamed(
       context,
       CourseLearningView.routeName,
-      arguments: CourseLearningArgs(
-        courseId: widget.course.id,
-        lectureId: lesson.id,
-      ),
+      arguments: widget.course.id,
     );
   }
 
@@ -136,13 +133,9 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
         builder: (context, state) {
           List<CourseLessonEntity> allLessons = [];
           bool isEnrolling = false;
-          String? courseDescription;
-          String? courseLanguage;
 
           if (state is CourseDetailsLoaded) {
-            allLessons = state.curriculum.allLessons;
-            courseDescription = state.curriculum.description;
-            courseLanguage = state.curriculum.language;
+            allLessons = state.curriculum.sections.expand((s) => s.lessons).toList();
             isEnrolling = state.isEnrolling ||
                 state.isPurchasing ||
                 state.isConfirmingPayment;
@@ -158,9 +151,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                   _openCheckout(checkoutUrl);
                 } else if (state.enrollmentSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('course_details.enrolled_success'.tr()),
-                    ),
+                    SnackBar(content: Text('Successfully enrolled!')),
                   );
                   Navigator.pushNamed(
                     context,
@@ -169,12 +160,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                   );
                 } else if (state.enrollmentError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'course_details.enroll_failed'
-                            .tr(args: ['${state.enrollmentError}']),
-                      ),
-                    ),
+                    SnackBar(content: Text('Enrollment failed: ${state.enrollmentError}')),
                   );
                 } else if (state.purchaseError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +183,6 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                         // instructor profile card, course stats card, and course content tabs
                         CourseHeroSection(
                           course: widget.course,
-                          description: courseDescription,
                           onPlayTap: _openVideoPlayer,
                         ),
                         Transform.translate(
@@ -229,12 +214,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                                     },
                                   ),
                                   Gap(20.h),
-                                  _buildTabContent(
-                                    state,
-                                    allLessons,
-                                    description: courseDescription,
-                                    language: courseLanguage,
-                                  ),
+                                  _buildTabContent(state, allLessons),
                                   Gap(32.h),
                                   BlocProvider<HomeCoursesCubit>(
                                     create: (context) =>
@@ -286,19 +266,10 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
     );
   }
 
-  Widget _buildTabContent(
-    CourseDetailsState state,
-    List<CourseLessonEntity> allLessons, {
-    String? description,
-    String? language,
-  }) {
+  Widget _buildTabContent(CourseDetailsState state, List<CourseLessonEntity> allLessons) {
     switch (_selectedTabIndex) {
       case 0:
-        return OverviewTab(
-          course: widget.course,
-          description: description,
-          language: language,
-        );
+        return OverviewTab(course: widget.course);
       case 1:
         if (state is CourseDetailsLoading || state is CourseDetailsInitial) {
           return const Center(child: CircularProgressIndicator());
@@ -314,7 +285,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
           onLessonTap: _onLessonTap,
         );
       case 2:
-        return CourseReviewCard(course: widget.course);
+        return const CourseReviewCard();
       case 3:
         return const ResourcesContent();
       default:

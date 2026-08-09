@@ -1,9 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/utils/app_text_styles.dart';
-import 'package:optimatech_lms/core/utils/duration_format.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 import 'package:optimatech_lms/features/course_details/domain/entities/course_curriculum_entity.dart';
 
@@ -17,31 +15,39 @@ class CourseStatsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    var totalMinutes = 0;
-    for (final lesson in lessons) {
-      totalMinutes += lesson.durationMinutes;
+    int totalMinutes = 0;
+    for (var lesson in lessons) {
+      final match = RegExp(r'(\d+)').firstMatch(lesson.duration);
+      if (match != null) {
+        totalMinutes += int.tryParse(match.group(1) ?? '0') ?? 0;
+      }
     }
+    
+    final hours = totalMinutes ~/ 60;
+    final durationString = hours > 0 ? '$hours hours' : '$totalMinutes Min';
 
     final stats = [
       _StatItem(
         icon: Icons.access_time_rounded,
-        value: formatMinutes(totalMinutes),
-        label: 'course_details.total_duration'.tr(),
+        value: durationString,
+        label: 'Total Duration',
       ),
       _StatItem(
         icon: Icons.play_circle_outline_rounded,
-        value: '${lessons.length}',
-        label: 'course_details.lessons'.tr(),
+        value: '${lessons.length} Lessons',
+        label: 'Lessons',
       ),
       _StatItem(
         icon: Icons.bar_chart_rounded,
-        value: _levelLabel(course.level),
-        label: 'course_details.level'.tr(),
+        value: course.level.isNotEmpty ? course.level : 'Beginner',
+        label: 'Level',
       ),
-      // A "Certificate — Included" tile used to sit here with a hardcoded
-      // value. Nothing in the course schema says whether a certificate is
-      // issued, so it promised every learner something the platform may not
-      // deliver. Restore it once the API exposes the field.
+      // TODO: Certificate Should be fetched from the API
+      const _StatItem(
+        icon: Icons.workspace_premium_outlined,
+        value: 'Certificate',
+        label: 'Included',
+      ),
     ];
 
     return Container(
@@ -61,21 +67,6 @@ class CourseStatsCard extends StatelessWidget {
             .toList(),
       ),
     );
-  }
-}
-
-/// The API sends BEGINNER / INTERMEDIATE / ADVANCED; show it in the user's
-/// language and fall back to the raw value for anything unrecognised.
-String _levelLabel(String level) {
-  switch (level.toUpperCase()) {
-    case 'BEGINNER':
-      return 'course_details.level_beginner'.tr();
-    case 'INTERMEDIATE':
-      return 'course_details.level_intermediate'.tr();
-    case 'ADVANCED':
-      return 'course_details.level_advanced'.tr();
-    default:
-      return level.isNotEmpty ? level : 'course_details.level_beginner'.tr();
   }
 }
 

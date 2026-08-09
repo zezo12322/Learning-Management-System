@@ -24,11 +24,6 @@ interface ManifestRequest {
   ip?: string;
   /** User-Agent header, recorded for forensic analysis and bot detection. */
   userAgent?: string;
-  /**
-   * Scheme + host the caller reached us on, used to build the self-referential
-   * key/sub-playlist URLs when API_PUBLIC_URL is not configured.
-   */
-  origin?: string;
 }
 
 /**
@@ -68,19 +63,10 @@ export class StreamingService {
       config.get<string>('STREAM_URL_TTL_MINUTES', '60'),
     );
     // Absolute base for self-referential URLs embedded in the manifest (key +
-    // sub-playlist endpoints). Must be reachable by the player, so it defaults
-    // to the host the request arrived on rather than to localhost: an unset
-    // API_PUBLIC_URL used to ship manifests pointing at http://localhost:3000,
-    // which no device can resolve and which Android blocks as cleartext.
-    // Set the variable to pin a canonical host (e.g. behind a CDN).
+    // sub-playlist endpoints). Must be reachable by the player.
     this.apiBaseUrl = config
-      .get<string>('API_PUBLIC_URL', '')
+      .get<string>('API_PUBLIC_URL', 'http://localhost:3000')
       .replace(/\/+$/, '');
-  }
-
-  /** Configured public base, else the origin this request came in on. */
-  private baseUrlFor(origin?: string): string {
-    return this.apiBaseUrl || (origin ?? '').replace(/\/+$/, '');
   }
 
   /**
@@ -194,7 +180,6 @@ export class StreamingService {
       uid: req.uid,
       hlsDir,
       playlistDirRel,
-      baseUrl: this.baseUrlFor(req.origin),
     });
   }
 
@@ -244,12 +229,7 @@ export class StreamingService {
     );
   }
 
-  private signKeyUrl(
-    lectureId: string,
-    uid: string,
-    keyRel: string,
-    baseUrl: string,
-  ): string {
+  private signKeyUrl(lectureId: string, uid: string, keyRel: string): string {
     const kt = this.keyTokens.sign({
       uid,
       lectureId,
@@ -257,7 +237,7 @@ export class StreamingService {
       exp: Math.floor(Date.now() / 1000) + this.urlTtlMinutes * 60,
     });
     return (
-      `${baseUrl}/lectures/${lectureId}/stream/key` +
+      `${this.apiBaseUrl}/lectures/${lectureId}/stream/key` +
       `?kt=${encodeURIComponent(kt)}`
     );
   }
@@ -346,7 +326,6 @@ export class StreamingService {
       uid: string;
       hlsDir: string;
       playlistDirRel: string;
-      baseUrl: string;
     },
   ): Promise<string> {
     const lines = raw.split(/\r?\n/);
@@ -383,7 +362,7 @@ export class StreamingService {
 
       const relToHls = this.joinRel(ctx.playlistDirRel, trimmed);
       return trimmed.toLowerCase().endsWith('.m3u8')
-        ? this.manifestUrl(ctx.lectureId, relToHls, ctx.baseUrl)
+        ? this.manifestUrl(ctx.lectureId, relToHls)
         : (signed.get(relToHls) as string);
     });
 
@@ -398,7 +377,6 @@ export class StreamingService {
       uid: string;
       hlsDir: string;
       playlistDirRel: string;
-      baseUrl: string;
     },
   ): string {
     const uriMatch = line.match(/URI="([^"]*)"/i);
@@ -408,27 +386,23 @@ export class StreamingService {
     if (/#EXT-X-KEY/i.test(line)) {
       // Bind a fresh, short-lived key token to this user + lecture + key file.
       const keyRel = this.joinRel(ctx.playlistDirRel, uri);
-      const keyUrl = this.signKeyUrl(ctx.lectureId, ctx.uid, keyRel, ctx.baseUrl);
+      const keyUrl = this.signKeyUrl(ctx.lectureId, ctx.uid, keyRel);
       return line.replace(/URI="[^"]*"/i, `URI="${keyUrl}"`);
     }
 
     // Rendition sub-playlist (e.g. alternate audio): route back through us.
     if (uri.toLowerCase().endsWith('.m3u8')) {
       const relToHls = this.joinRel(ctx.playlistDirRel, uri);
-      const url = this.manifestUrl(ctx.lectureId, relToHls, ctx.baseUrl);
+      const url = this.manifestUrl(ctx.lectureId, relToHls);
       return line.replace(/URI="[^"]*"/i, `URI="${url}"`);
     }
 
     return line;
   }
 
-  private manifestUrl(
-    lectureId: string,
-    relToHls: string,
-    baseUrl: string,
-  ): string {
+  private manifestUrl(lectureId: string, relToHls: string): string {
     return (
-      `${baseUrl}/lectures/${lectureId}/stream/manifest` +
+      `${this.apiBaseUrl}/lectures/${lectureId}/stream/manifest` +
       `?v=${encodeURIComponent(relToHls)}`
     );
   }

@@ -20,24 +20,6 @@ import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
-/**
- * Scheme + host this request actually arrived on, honouring the proxy headers
- * Railway/any load balancer sets. Used only to build URLs that point back at
- * this same API, so a spoofed Host cannot redirect a caller anywhere it could
- * not already reach itself.
- */
-function originOf(req: any): string | undefined {
-  const host = req?.headers?.['x-forwarded-host'] ?? req?.headers?.host;
-  if (!host) return undefined;
-  const proto =
-    (req?.headers?.['x-forwarded-proto'] as string | undefined)
-      ?.split(',')[0]
-      ?.trim() ??
-    req?.protocol ??
-    'https';
-  return `${proto}://${host}`;
-}
-
 @Controller()
 @UseGuards(FirebaseAuthGuard)
 export class StreamingController {
@@ -68,7 +50,6 @@ export class StreamingController {
       variant,
       ip,
       userAgent: req?.headers?.['user-agent'],
-      origin: originOf(req),
     });
   }
 

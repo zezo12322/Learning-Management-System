@@ -27,9 +27,7 @@
       "confirm": "Confirm",
       "cancel": "Cancel"
     },
-    "egp": "EGP {}",
-    "duration_hm": "{}h {}m",
-    "duration_m": "{} min"
+    "egp": "EGP {}"
   },
   "errors": {
     "network": "No internet connection. Please check your network.",
@@ -144,10 +142,6 @@
       "submitted_desc": "Awaiting review",
       "graded_desc": "View feedback",
       "empty_desc": "You are all caught up"
-    },
-    "error": {
-      "something_went_wrong": "Something went wrong",
-      "try_again": "Try Again"
     }
   },
   "nav_bar": {
@@ -163,42 +157,218 @@
   },
   "course_details": {
     "you_might_also_like": "You might also like",
-    "price": "Price",
     "enroll_now": "Enroll Now",
     "buy_now": "Buy Now",
-    "overview": "Overview",
-    "curriculum": "Curriculum",
-    "reviews": "Reviews",
-    "resources": "Resources",
-    "total_duration": "Total Duration",
-    "lessons": "Lessons",
-    "level": "Level",
-    "students": "{} Students",
-    "about_this_course": "About This Course",
-    "no_description": "No description available for this course.",
-    "language": "Language",
-    "access": "Access",
-    "access_value": "Mobile & Desktop",
-    "top_instructor": "Top Instructor",
-    "view_profile": "View Profile",
-    "view_all_lessons": "View All Lessons",
-    "now_playing": "Now Playing",
-    "reviews_count": "Reviews ({})",
-    "no_reviews_title": "No reviews yet",
-    "no_reviews_body": "Be the first to review this course after you finish it.",
-    "resources_title": "Downloadable Resources",
-    "no_resources_title": "No resources yet",
-    "no_resources_body": "The instructor has not attached any files to this course.",
-    "enrolled_success": "Successfully enrolled!",
-    "enroll_failed": "Enrollment failed: {}",
-    "level_beginner": "Beginner",
-    "level_intermediate": "Intermediate",
-    "level_advanced": "Advanced"
+    "price": "Price"
   },
   "payment": {
     "start_failed": "Could not start the payment. Please try again.",
     "could_not_open": "Could not open the payment page. Please try again.",
     "pending_hint": "Payment is still being confirmed. Pull to refresh in a moment — your course will unlock automatically once the payment is confirmed."
+  },
+  "courses": {
+    "title": "Courses",
+    "searchHint": "Search for courses, lessons, quizzes...",
+    "categories": {
+      "title": "Categories",
+      "viewAll": "View all",
+      "empty": "No categories found"
+    },
+    "list": {
+      "empty": "No courses found",
+      "lessonsCount": "{count} Lessons"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "popular": "Popular",
+      "new": "New"
+    },
+    "errors": {
+      "unexpected": "Unexpected error occurred"
+    },
+    "filterSheet": {
+      "title": "Filter",
+      "courseStatus": "Course status",
+      "sortBy": "Sort by",
+      "reset": "Reset",
+      "apply": "Apply"
+    },
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low"
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Please add your favorite courses to the wishlist"
+  },
+  "profile": {
+    "title": "My Profile",
+    "common": {
+      "edit": "Edit",
+      "view_all": "View All"
+    },
+    "header": {
+      "role": "Student",
+      "joined": "Joined {}",
+      "stats": {
+        "courses": "Courses Enrolled",
+        "courses_subtitle": "Active learning",
+        "hours": "Hours Learned",
+        "hours_subtitle": "+12 this week",
+        "assessments": "Assessments Completed",
+        "assessments_subtitle": "85% average score",
+        "certificates": "Certificates Earned",
+        "certificates_subtitle": "Keep it up!"
+      }
+    },
+    "sections": {
+      "user_information": "User Information",
+      "learning_statistics": "Learning Statistics",
+      "certificates": "Certificates",
+      "completed_courses": "Completed Courses",
+      "settings": "Settings"
+    },
+    "info": {
+      "full_name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "location": "Location",
+      "birth_date": "Date of Birth"
+    },
+    "statistics": {
+      "hours": "Hours Learned",
+      "hours_subtitle": "+12 this week",
+      "courses": "Courses Enrolled",
+      "courses_subtitle": "Active learning",
+      "certificates": "Certificates",
+      "certificates_subtitle": "Completed",
+      "assessments": "Assessments",
+      "assessments_subtitle": "85% Average"
+    },
+    "certificates": {
+      "issued_on": "Issued on {date}",
+      "verified": "Verified",
+      "empty": "No certificates earned yet.",
+      "load_error": "Failed to load certificates"
+    },
+    "completed_courses": {
+      "completed_on": "Completed on {date}",
+      "completed": "Completed"
+    },
+    "settings": {
+      "account": "Account Settings",
+      "notifications": "Notification Preferences",
+      "privacy": "Privacy & Security",
+      "help": "Help & Support",
+      "logout": "Logout",
+      "logout_dialog": "Logout?",
+      "log_out_confirmation": "Are you sure you want to log out?",
+      "language": "Language",
+      "select_language": "Select Language",
+      "change_Theme": "Change Theme",
+      "select_theme": "Select Theme",
+      "theme_system": "System",
+      "theme_light": "Light Theme",
+      "theme_dark": "Dark Theme",
+      "delete_account": "Delete account"
+    },
+    "delete": {
+      "title": "Delete your account?",
+      "warning": "This permanently deletes your account and all your data — enrollments, progress, and certificates. This action cannot be undone.",
+      "password_label": "Confirm your password",
+      "password_required": "Enter your password to confirm.",
+      "wrong_password": "Incorrect password. Please try again.",
+      "confirm": "Delete account"
+    }
+  },
+  "lesson_learning": {
+    "video": {
+      "error_lesson": "Failed to load the lesson, please try again later.",
+      "error_playing": "Error playing video",
+      "unavailable": "This video isn't available right now."
+    },
+    "actions": {
+      "previous": "Previous",
+      "mark_complete": "Mark Complete",
+      "next": "Next"
+    },
+    "tabs": {
+      "curriculum": "Curriculum",
+      "notes": "Notes",
+      "resources": "Resources",
+      "discussion": "Discussion"
+    },
+    "curriculum": {
+      "title": "Course Curriculum",
+      "lessons_count": "{count} Lessons",
+      "now_playing": "Now Playing"
+    },
+    "about": {
+      "title": "About this lesson",
+      "description": "Learn different user research methods and how to choose the right one for your project."
+    },
+    "reading": {
+      "title": "Reading",
+      "empty": "This lesson has no content yet."
+    }
+  },
+  "quiz": {
+    "title": "Quiz",
+    "empty": "This quiz has no questions yet.",
+    "error_title": "Couldn't load the quiz",
+    "question_of": "Question {} of {}",
+    "answered": "{}/{} answered",
+    "points": "{} pts",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "result_title": "Quiz Result",
+    "score_of": "{}/{}",
+    "passed": "Passed",
+    "failed": "Keep practicing",
+    "back": "Back"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "empty_hint": "You're all caught up. New updates will show up here."
+  },
+  "ai_tutor": {
+    "assignments": {
+      "available": "Available",
+      "submitted": "Submitted",
+      "graded": "Graded",
+      "empty": "No Assignments",
+      "available_desc": "Open for submission",
+      "submitted_desc": "Awaiting review",
+      "graded_desc": "View feedback",
+      "empty_desc": "You are all caught up"
+    }
+  },
+  "nav_bar": {
+    "home": "Home",
+    "courses": "Courses",
+    "wishlist": "Wishlist",
+    "profile": "Profile"
+  },
+  "navigation": {
+    "not_found": "Page Not Found",
+    "not_found_msg": "The route you requested does not exist.",
+    "go_home": "Go to Home"
+  },
+  "course_details": {
+    "you_might_also_like": "You might also like"
   },
   "courses": {
     "title": "Courses",
@@ -390,7 +560,6 @@
     "empty_state": "How can I help you today?",
     "welcome_message": "Welcome {name}! 👋 How can I help you today?",
     "thinking": "Thinking...",
-    "offline_error": "No internet connection. AI requires an active connection.",
-    "welcome_user": "Welcome {}! 👋 How can I help you today?"
+    "offline_error": "No internet connection. AI requires an active connection."
   }
 }

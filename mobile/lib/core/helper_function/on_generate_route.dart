@@ -37,17 +37,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case CoursesView.routeName:
       return MaterialPageRoute(builder: (_) => const CoursesView());
     case CourseLearningView.routeName:
-      final args = settings.arguments;
-      if (args is CourseLearningArgs) {
-        return MaterialPageRoute(
-          builder: (_) => CourseLearningView(
-            courseId: args.courseId,
-            initialLectureId: args.lectureId,
-          ),
-        );
-      }
-      if (args is! String) return _badArgsRoute(settings);
-      return MaterialPageRoute(builder: (_) => CourseLearningView(courseId: args));
+      final courseId = settings.arguments;
+      if (courseId is! String) return _badArgsRoute(settings);
+      return MaterialPageRoute(builder: (_) => CourseLearningView(courseId: courseId,));
     case CourseDetailsView.routeName:
       final course = settings.arguments;
       if (course is! CourseEntity) return _badArgsRoute(settings);
