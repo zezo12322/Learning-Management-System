@@ -105,7 +105,11 @@ function contentSecurityPolicy() {
 
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'",
+    // apis.google.com is Firebase Auth's own dependency, not an analytics tag:
+    // signInWithRedirect loads `https://apis.google.com/js/api.js` to drive the
+    // gapi iframe it uses to talk to `<authDomain>/__/auth/iframe`. Without it
+    // the browser blocks the script and Google sign-in fails before it starts.
+    "script-src 'self' 'unsafe-inline' https://apis.google.com",
     "style-src 'self' 'unsafe-inline'",
     `img-src ${images.join(' ')}`,
     "font-src 'self' data:",
