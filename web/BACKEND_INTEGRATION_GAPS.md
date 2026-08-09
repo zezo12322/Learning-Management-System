@@ -28,35 +28,35 @@ No backend source files were changed by this integration.
    - There are no notification list, unread-count, read-state, or preference endpoints.
    - `(app)/notifications` therefore renders the designed shell and its empty state. `src/lib/notifications.ts::fetchNotifications` is the only seam to change once `GET /notifications` exists — the Flutter app keeps the same shell in `NotificationsCubit.load()`.
 
-7. **Student-visible assignments**
+4. **Student-visible assignments**
    - `GET /missions` lists missions the caller *authored*, so a student cannot enumerate assignments that are open to them. `(app)/assignments` is built on `GET /me/submissions`, which means the design's "Available" state cannot be shown — only Submitted and Graded work.
    - A `GET /me/assignments` (missions across my active enrollments, with due date and points) would complete the screen.
 
-8. **Certificates**
+5. **Certificates**
    - There is no certificates endpoint. `(app)/certificates` projects a certificate from each COMPLETED enrollment and uses the enrollment id as the credential reference; "Download PDF" prints the certificate sheet client-side.
    - A real endpoint would supply the issued date, credential id and a signed PDF/verification URL.
 
-9. **Course discussions**
+6. **Course discussions**
    - There is no discussions module: no threads, replies, votes or view counts. The Discussion tab on `(app)/learn/[courseId]` states this rather than shipping a question box that drops what a learner types. Replacing `components/learn/DiscussionTab.tsx` is the whole job once endpoints exist.
 
-10. **Lecture notes**
+7. **Lecture notes**
    - No notes endpoint. `lib/notes.ts` keeps notes per account in the browser, behind one module so a future `GET/POST /lectures/:id/notes` changes only that file.
 
-11. **Lecture attachments**
+8. **Lecture attachments**
    - The only per-lecture file the API exposes is `transcriptUrl`. The design's "Helpful links" block on the Resources tab has no data source and is omitted.
 
-12. **Learning aggregates**
+9. **Learning aggregates**
    - No watch-time, streak, or per-lecture recency aggregate exists, so the Home screen's "Hours learned", "Day streak" and "Recent lessons" blocks from the design are substituted with values that can be derived from `GET /courses/continue-learning` (courses enrolled, lessons completed, certificates, in progress).
 
-4. **Catalog list fields**
+10. **Catalog list fields**
    - The public catalog list does not include `description` or `language`; those fields are available only from the curriculum response.
    - Adding them to the catalog query would avoid an authenticated detail request just to render catalog metadata.
 
-5. **User directory**
+11. **User directory**
    - The backend exposes self-service `/me` endpoints only; there is no admin/instructor endpoint for listing, searching, or viewing other users.
    - The web profile page is therefore connected to the signed-in database user, but a real users-management page cannot be implemented yet.
 
-6. **Upload history**
+12. **Upload history**
    - Signed upload and confirmation endpoints exist, but there is no endpoint that lists upload jobs or stored files across a course.
    - The web can show media already attached to authenticated course lectures plus uploads made in the current browser session; a complete persistent upload-history view requires a backend list endpoint.
 

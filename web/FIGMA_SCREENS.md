@@ -40,8 +40,13 @@
 |---|---|---|
 | 5 · Home (`201:7`) | `/home` | Greeting, search → catalog, 4 stat tiles, Continue Learning, Popular, Recommended, Top Instructors |
 | 6 · Courses (`201:9`) | `/learning` | Search, state chips, category strip, sort, count, progress rows, pagination |
-| 7 · Course details (`201:10`) | `/courses/[id]` | Pre-existing |
-| 13 · Assignments (`201:16`) | `/assignments` | All / Submitted / Graded tabs, state badges, score + letter grade, empty state |
+| 7 · Course details (`201:10`) | `/courses/[id]` | Hero, instructor, stats, curriculum, reviews, sticky enroll/checkout bar |
+| 8 · Course Learning (`201:11`) | `/learn/[courseId]` | Secure HLS player, lesson header, Curriculum / Notes / Resources / Discussion tabs, About this lesson, Previous / Mark complete / Next |
+| 9 · Course notes (`201:12`) | `/learn/[courseId]` → Notes | Counters, search, add/edit/delete, star; per-account and browser-local |
+| 10 · Resources (`201:13`) | `/learn/[courseId]` → Resources | Lecture transcripts with type-coloured tiles and sanitised download links |
+| 11 · Discussion (`201:14`) | `/learn/[courseId]` → Discussion | Honest unavailable state — no discussions module exists in the backend |
+| 12 · Quiz experience (`201:15`) | `/quiz/[courseId]/[lectureId]/take` | Intro → Question → Review → Result, countdown with auto-submit, score gauge |
+| 13 · Assignments (`201:16`) | `/assignments` | All / Submitted / Graded tabs, state badges, scored points, empty state |
 | 14 · Certificates (`201:17`) | `/certificates`, `/certificates/[enrollmentId]` | List, certificate sheet, credential info, download (print) + share, empty state |
 | 15 · Notifications (`201:18`) | `/notifications` | Search, category tabs, mark-all-read, unread dots, empty state |
 | 16 · Student profile (`201:2`) | `/profile` | Header + 4 stats, User Information (inline edit), Learning Statistics, Certificates, Completed Courses, Settings |
@@ -49,13 +54,9 @@
 Shared pieces live in `src/components/student/` (`StatCard`, `SectionHeader`, `FilterChips`/`TabBar`,
 `EmptyState`, `ContinueLearningCard`, `AssignmentCard`, `CertificateArtwork`, `NotificationRow`,
 `InfoRow`/`SettingsRow`). Navigation is role-aware: every account gets the learner nav, and
-instructors/admins additionally get a "Teaching" group (`AppShell`).
-
-| 8 · Course Learning (`201:11`) | `/learn/[courseId]` | Secure HLS player, lesson header, Curriculum / Notes / Resources / Discussion tabs, About this lesson, Previous / Mark complete / Next |
-| 9 · Course notes (`201:12`) | `/learn/[courseId]` → Notes | Counters, search, add/edit/delete, star; per-account and browser-local |
-| 10 · Resources (`201:13`) | `/learn/[courseId]` → Resources | Lecture transcripts with type-coloured tiles and sanitised download links |
-| 11 · Discussion (`201:14`) | `/learn/[courseId]` → Discussion | Honest unavailable state — no discussions module exists in the backend |
-| 12 · Quiz experience (`201:15`) | `/quiz/[courseId]/[lectureId]/take` | Intro → Question → Review → Result, countdown with auto-submit, score gauge |
+instructors/admins additionally get a "Teaching" group. Learning-screen pieces live in
+`src/components/learn/` (`LecturePlayer`, `NotesTab`, `ResourcesTab`, `DiscussionTab`).
+Both shells gate on the shared `lib/auth/useRouteGuard`.
 
 ### Still to refine
 - Splash / Onboarding (screens 1–2) — intentionally skipped on web.
