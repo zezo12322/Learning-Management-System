@@ -43,6 +43,8 @@ export default function LearnPage() {
   const qc = useQueryClient()
   const [activeId, setActiveId] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('CURRICULUM')
+  /** Live playback position for the active lecture, reported by the player. */
+  const [position, setPosition] = useState(0)
 
   const curriculum = useQuery({
     queryKey: ['curriculum', courseId],
@@ -57,10 +59,27 @@ export default function LearnPage() {
     queryFn: () => progressApi.course(courseId),
   })
 
-  const sections = useMemo(() => curriculum.data?.sections ?? [], [curriculum.data])
-  const lectures = useMemo(() => sections.flatMap((section) => section.lectures), [sections])
+  const allSections = useMemo(() => curriculum.data?.sections ?? [], [curriculum.data])
   const isEnrolled =
     enrollment.data?.status === 'ACTIVE' || enrollment.data?.status === 'COMPLETED'
+
+  // Without an enrollment the screen is limited to the lessons the instructor
+  // marked as free previews — the lecture and stream endpoints open exactly
+  // those to any signed-in user, so this is a real preview, not a teaser.
+  const sections = useMemo(
+    () =>
+      isEnrolled
+        ? allSections
+        : allSections
+            .map((section) => ({
+              ...section,
+              lectures: section.lectures.filter((lecture) => lecture.isFreePreview),
+            }))
+            .filter((section) => section.lectures.length > 0),
+    [allSections, isEnrolled],
+  )
+  const lectures = useMemo(() => sections.flatMap((section) => section.lectures), [sections])
+  const previewOnly = !isEnrolled && lectures.length > 0
 
   useEffect(() => {
     if (!activeId && lectures.length) setActiveId(lectures[0].id)
@@ -78,9 +97,23 @@ export default function LearnPage() {
     enabled: Boolean(activeId) && isEnrolled,
   })
 
+  // Reset the reported position when the lecture changes, so one lesson's
+  // progress can never be written against another.
+  useEffect(() => {
+    setPosition(0)
+  }, [activeId])
+
+  const storedSecond = lectureState.data?.lastWatchedSecond ?? 0
+  /**
+   * Never send a position behind what the server already has. The sync write
+   * re-derives completion from the position it receives and overwrites
+   * `completedAt` — so posting a stale value would rewind the saved place and
+   * un-complete a lecture the heartbeat had already finished.
+   */
+  const furthestSecond = Math.max(position, storedSecond)
+
   const complete = useMutation({
-    mutationFn: (lectureId: string) =>
-      progressApi.markComplete(lectureId, lectureState.data?.lastWatchedSecond ?? 0),
+    mutationFn: (lectureId: string) => progressApi.markComplete(lectureId, furthestSecond),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['course-progress', courseId] })
       qc.invalidateQueries({ queryKey: ['lecture-progress', activeId] })
@@ -109,7 +142,7 @@ export default function LearnPage() {
     )
   }
 
-  if (!isEnrolled) {
+  if (!isEnrolled && lectures.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <Lock size={40} className="text-content-secondary" />
@@ -123,9 +156,26 @@ export default function LearnPage() {
 
   const completedAt = lectureState.data?.completedAt ?? null
   const lessonNumber = activeIndex + 1
+  /**
+   * Completion is derived server-side at 90% of the lecture's stored duration,
+   * and the `completed` flag a client sends is ignored. So the button is only
+   * offered once the learner has actually reached that point — otherwise it
+   * would report success while changing nothing.
+   */
+  const duration = active?.duration ?? 0
+  const canComplete = duration > 0 && furthestSecond >= duration * 0.9
 
   return (
     <div className="mx-auto max-w-5xl space-y-4">
+      {previewOnly && (
+        <Card className="flex flex-wrap items-center justify-between gap-3 bg-brand-soft p-4">
+          <p className="text-sm font-semibold text-primary">{t('learn.previewOnly')}</p>
+          <Link href={`/courses/${courseId}`}>
+            <Button size="sm">{t('learn.enrollForFull')}</Button>
+          </Link>
+        </Card>
+      )}
+
       {/* Player */}
       {active?.type === 'VIDEO' ? (
         <LecturePlayer
@@ -133,7 +183,8 @@ export default function LearnPage() {
           lectureId={active.id}
           title={active.title}
           posterSeed={active.id}
-          resumeAtSecond={lectureState.data?.lastWatchedSecond ?? 0}
+          resumeAtSecond={storedSecond}
+          onPosition={setPosition}
           onEnded={() => next && setActiveId(next.id)}
         />
       ) : active?.type === 'READING' ? (
@@ -154,6 +205,12 @@ export default function LearnPage() {
           <Link href={`/quiz/${courseId}/${active.id}/take`}>
             <Button>{t('learn.openQuiz')}</Button>
           </Link>
+        </Card>
+      ) : active ? (
+        <Card className="flex aspect-video flex-col items-center justify-center gap-2 p-8 text-center">
+          <BookOpen size={36} className="text-content-muted" />
+          <h2 className="text-base font-bold text-content">{active.title}</h2>
+          <p className="text-sm text-content-secondary">{t('learn.unsupportedType')}</p>
         </Card>
       ) : (
         <Card className="flex aspect-video items-center justify-center bg-content/90 text-white">
@@ -256,7 +313,7 @@ export default function LearnPage() {
           lectureId={activeId}
           lectureTitle={active?.title ?? ''}
           lectureIds={lectures.map((lecture) => lecture.id)}
-          currentSecond={lectureState.data?.lastWatchedSecond ?? 0}
+          currentSecond={furthestSecond}
         />
       )}
 
@@ -279,7 +336,8 @@ export default function LearnPage() {
           variant="ghost"
           size="sm"
           loading={complete.isPending}
-          disabled={!active || Boolean(completedAt)}
+          disabled={!active || previewOnly || Boolean(completedAt) || !canComplete}
+          title={!canComplete && !completedAt ? t('learn.completeHint') : undefined}
           onClick={() => active && complete.mutate(active.id)}
           className={completedAt ? 'text-success' : 'text-primary'}
         >
@@ -294,6 +352,11 @@ export default function LearnPage() {
 
       {complete.isError && (
         <p className="text-center text-xs text-error">{t('learn.completeError')}</p>
+      )}
+      {active && !previewOnly && !completedAt && !canComplete && (
+        <p className="text-center text-xs text-content-secondary">
+          {duration > 0 ? t('learn.completeHint') : t('learn.completeNoDuration')}
+        </p>
       )}
     </div>
   )

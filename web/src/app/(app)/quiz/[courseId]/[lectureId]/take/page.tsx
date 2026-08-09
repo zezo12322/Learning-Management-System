@@ -82,8 +82,13 @@ export default function TakeQuizPage() {
   const timeLimit = quizQuery.data?.timeLimitMinutes ?? quizRef.data?.timeLimitMinutes
   const passingScore = quizRef.data?.passingScore ?? 70
 
+  // Submission must happen exactly once per attempt: the countdown fires it,
+  // and the Review button can fire it too.
+  const submittedRef = useRef(false)
+
   const submit = useCallback(async () => {
-    if (!quizId || !attemptId) return
+    if (!quizId || !attemptId || submittedRef.current) return
+    submittedRef.current = true
     setBusy(true)
     setError(null)
     try {
@@ -99,6 +104,8 @@ export default function TakeQuizPage() {
       setResult(await quizApi.finishAttempt(courseId, quizId, attemptId))
       setPhase('result')
     } catch (submitError) {
+      // Let the learner try again — the attempt was not recorded.
+      submittedRef.current = false
       setError(apiErrorMessage(submitError, t('quizTake.submitError')))
     } finally {
       setBusy(false)
@@ -110,20 +117,21 @@ export default function TakeQuizPage() {
   const submitRef = useRef(submit)
   submitRef.current = submit
   useEffect(() => {
-    if (phase !== 'taking' && phase !== 'review') return
+    // Stops once the attempt is submitted: the clock must not keep running
+    // behind the result screen, and it must never re-submit a finished attempt.
+    if ((phase !== 'taking' && phase !== 'review') || result) return
     const timer = window.setInterval(() => {
       setElapsed((value) => value + 1)
       setRemaining((value) => {
         if (value === null) return null
-        if (value <= 1) {
-          void submitRef.current()
-          return 0
-        }
-        return value - 1
+        if (value > 1) return value - 1
+        // Hitting zero submits once; submit() itself is idempotent per attempt.
+        void submitRef.current()
+        return 0
       })
     }, 1000)
     return () => window.clearInterval(timer)
-  }, [phase])
+  }, [phase, result])
 
   const start = async () => {
     if (!quizId) return
@@ -143,6 +151,7 @@ export default function TakeQuizPage() {
   }
 
   const retake = () => {
+    submittedRef.current = false
     setAnswers({})
     setAttemptId(null)
     setResult(null)
@@ -386,9 +395,11 @@ export default function TakeQuizPage() {
           <IntroRow
             icon={RefreshCw}
             title={
-              quizRef.data?.maxAttempts
-                ? t('quizTake.attemptsN').replace('{n}', String(quizRef.data.maxAttempts))
-                : t('quizTake.unlimitedAttempts')
+              !quizRef.data?.maxAttempts
+                ? t('quizTake.unlimitedAttempts')
+                : quizRef.data.maxAttempts === 1
+                  ? t('quizTake.attemptsOne')
+                  : t('quizTake.attemptsN').replace('{n}', String(quizRef.data.maxAttempts))
             }
             subtitle={t('quizTake.keepImproving')}
           />

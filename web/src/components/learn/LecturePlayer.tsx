@@ -41,12 +41,15 @@ export function LecturePlayer({
   posterSeed,
   resumeAtSecond = 0,
   onEnded,
+  onPosition,
 }: {
   lectureId: string
   title: string
   posterSeed?: string
   resumeAtSecond?: number
   onEnded?: () => void
+  /** Live playback position, so the page can stamp notes and complete lessons. */
+  onPosition?: (seconds: number) => void
 }) {
   const t = useT()
   const { firebaseUser } = useAuth()
@@ -55,6 +58,11 @@ export function LecturePlayer({
   const [errorKey, setErrorKey] = useState<string>('learn.player.error')
   const [started, setStarted] = useState(false)
   const [corner, setCorner] = useState(0)
+  // Captured once per lecture: a background refetch of the resume position must
+  // not tear down and restart a stream the learner is watching.
+  const resumeRef = useRef(resumeAtSecond)
+  const positionRef = useRef(onPosition)
+  positionRef.current = onPosition
 
   // Only fetched once playback is requested — an unwatched lecture should not
   // mint a forensic watermark session.
@@ -105,7 +113,7 @@ export function LecturePlayer({
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (disposed) return
         setState('ready')
-        if (resumeAtSecond > 0) video.currentTime = resumeAtSecond
+        if (resumeRef.current > 0) video.currentTime = resumeRef.current
         void video.play().catch(() => {
           /* autoplay may be blocked — the native controls still work */
         })
@@ -132,7 +140,7 @@ export function LecturePlayer({
       disposed = true
       hls?.destroy()
     }
-  }, [started, lectureId, resumeAtSecond])
+  }, [started, lectureId])
 
   // Report the furthest position. Completion is derived server-side at 90%, so
   // the client never asserts it.
@@ -140,9 +148,10 @@ export function LecturePlayer({
     if (state !== 'ready') return
     const video = videoRef.current
     if (!video) return
-    let furthest = resumeAtSecond
+    let furthest = resumeRef.current
     const timer = window.setInterval(() => {
       const position = Math.floor(video.currentTime)
+      positionRef.current?.(position)
       if (position <= furthest || video.paused) return
       furthest = position
       void progressApi.heartbeat(lectureId, position).catch(() => {
@@ -150,7 +159,7 @@ export function LecturePlayer({
       })
     }, HEARTBEAT_MS)
     return () => window.clearInterval(timer)
-  }, [state, lectureId, resumeAtSecond])
+  }, [state, lectureId])
 
   useEffect(() => {
     if (!watermark.data?.text) return
@@ -170,6 +179,8 @@ export function LecturePlayer({
         controlsList="nodownload"
         onContextMenu={(event) => event.preventDefault()}
         onEnded={onEnded}
+        onPause={(event) => onPosition?.(Math.floor(event.currentTarget.currentTime))}
+        onSeeked={(event) => onPosition?.(Math.floor(event.currentTarget.currentTime))}
         className={cn('h-full w-full', started && state === 'ready' ? 'block' : 'hidden')}
       />
 

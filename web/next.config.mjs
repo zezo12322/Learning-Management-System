@@ -85,8 +85,15 @@ function contentSecurityPolicy() {
   const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
     ? `https://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}`
     : null
+  // Registration calls the registerStudent callable directly over HTTPS
+  // (lib/auth/cloudFunctions.ts). Omitting this origin blocks account creation
+  // outright. The region is part of the host, so the wildcard covers whichever
+  // region a callable is deployed to.
+  const cloudFunctions = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    ? `https://*.cloudfunctions.net`
+    : null
 
-  const connect = ["'self'", api, ai, authDomain, ...firebase].filter(Boolean)
+  const connect = ["'self'", api, ai, authDomain, cloudFunctions, ...firebase].filter(Boolean)
   const images = [
     "'self'",
     'data:',

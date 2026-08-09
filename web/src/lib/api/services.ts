@@ -279,6 +279,25 @@ export const paymentsApi = {
       .then((response) => safeLinkUrl(stringValue(objectValue(response.data).checkoutUrl))),
 }
 
+export const lecturesApi = {
+  /**
+   * Full lecture content, including the signed `transcriptUrl`. The curriculum
+   * response deliberately omits it, so this is the only way to reach a lesson's
+   * attachments. Access-gated server-side (free preview, course owner/admin, or
+   * an ACTIVE/COMPLETED enrollment).
+   */
+  content: (lectureId: string) =>
+    apiClient.get(`/lectures/${lectureId}`).then((response) => {
+      const raw = objectValue(response.data)
+      return {
+        id: stringValue(raw.id),
+        title: stringValue(raw.title),
+        transcriptUrl: stringValue(raw.transcriptUrl) || null,
+        courseId: stringValue(objectValue(objectValue(raw.section).course).id) || null,
+      }
+    }),
+}
+
 export const progressApi = {
   course: (courseId: string) =>
     apiClient.get<CourseProgress>(`/courses/${courseId}/progress`).then((response) => response.data),

@@ -1,9 +1,12 @@
 'use client'
 
+import { useQueries } from '@tanstack/react-query'
 import { Download, FileText, FolderOpen } from 'lucide-react'
 import type { Section } from '@/lib/types'
+import { lecturesApi } from '@/lib/api/services'
 import { useT } from '@/lib/i18n'
 import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/student/EmptyState'
 import { fileExtension, fileNameFromUrl, safeLinkUrl } from '@/lib/safeUrl'
 import { cn } from '@/lib/utils'
@@ -23,32 +26,58 @@ const EXTENSION_TONE: Record<string, string> = {
 /**
  * Resources tab (Figma "10. resources").
  *
- * The only per-lecture file the API exposes is the transcript
- * (`Lecture.transcriptUrl`, uploaded as `LECTURE_TRANSCRIPT`), so that is what
- * this lists. There is no attachments endpoint, so the design's "Helpful Links"
- * block has no data source and is left out rather than filled with placeholders.
+ * The only per-lecture file the API exposes is the transcript. It is NOT part of
+ * the curriculum response — `GetCourseCurriculum` does not select
+ * `transcriptUrl` — so each lecture is fetched through `GET /lectures/:id`,
+ * which returns it as a signed URL. Fetching per lecture is also what keeps the
+ * server-side access gate in play.
  *
- * Every href is sanitised: the URL comes from instructor-supplied data.
+ * There is no attachments endpoint, so the design's "Helpful links" block has no
+ * data source and is left out rather than filled with placeholders.
  */
 export function ResourcesTab({ sections }: { sections: Section[] }) {
   const t = useT()
 
-  const files = sections.flatMap((section) =>
-    section.lectures
-      .map((lecture) => {
-        const href = safeLinkUrl(lecture.transcriptUrl)
-        if (!href) return null
-        return {
-          id: lecture.id,
-          href,
-          lectureTitle: lecture.title,
-          sectionTitle: section.title,
-          name: fileNameFromUrl(href, lecture.title),
-          extension: fileExtension(href) || 'FILE',
-        }
-      })
-      .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+  const lectures = sections.flatMap((section) =>
+    section.lectures.map((lecture) => ({ lecture, sectionTitle: section.title })),
   )
+
+  const queries = useQueries({
+    queries: lectures.map(({ lecture }) => ({
+      queryKey: ['lecture-content', lecture.id],
+      queryFn: () => lecturesApi.content(lecture.id),
+      staleTime: 5 * 60_000,
+      retry: false,
+    })),
+  })
+
+  const loading = queries.some((query) => query.isLoading)
+
+  const files = queries
+    .map((query, index) => {
+      const href = safeLinkUrl(query.data?.transcriptUrl)
+      if (!href) return null
+      const { lecture, sectionTitle } = lectures[index]
+      return {
+        id: lecture.id,
+        href,
+        lectureTitle: lecture.title,
+        sectionTitle,
+        name: fileNameFromUrl(href, lecture.title),
+        extension: fileExtension(href) || 'FILE',
+      }
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+
+  if (loading && !files.length) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="h-16 rounded-card" />
+        ))}
+      </div>
+    )
+  }
 
   if (!files.length) {
     return (
@@ -67,7 +96,9 @@ export function ResourcesTab({ sections }: { sections: Section[] }) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-content">{t('learn.resources.title')}</h3>
         <span className="text-xs text-content-secondary">
-          {t('learn.resources.count').replace('{n}', String(files.length))}
+          {files.length === 1
+            ? t('learn.resources.countOne')
+            : t('learn.resources.count').replace('{n}', String(files.length))}
         </span>
       </div>
 
