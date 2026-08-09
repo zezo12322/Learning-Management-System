@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ShutdownService } from './health/shutdown.service';
+import { API_GLOBAL_PREFIX } from './common/constants/api-prefix';
 
 /**
  * How long readiness reports 503 before the HTTP server stops accepting
@@ -74,7 +75,7 @@ async function bootstrap() {
   });
 
   // Global prefix for all routes
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(API_GLOBAL_PREFIX);
 
   await app.listen(process.env.PORT ?? 3000);
 
