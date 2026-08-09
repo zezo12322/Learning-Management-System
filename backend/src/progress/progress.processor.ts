@@ -89,9 +89,7 @@ export class ProgressProcessor extends WorkerHost {
     // erase time banked elsewhere.
     const stored = lectureData?.lectureProgresses?.[0]?.watchedSeconds ?? null;
     const bankedSeconds =
-      watchedSeconds == null
-        ? stored
-        : Math.max(watchedSeconds, stored ?? 0);
+      watchedSeconds == null ? stored : Math.max(watchedSeconds, stored ?? 0);
 
     const reachedThreshold = isLectureComplete(
       duration,
