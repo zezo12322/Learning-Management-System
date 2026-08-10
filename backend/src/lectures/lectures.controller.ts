@@ -17,6 +17,8 @@ import {
   MoveLectureDto,
 } from './dto/lecture.dto';
 import { ReorderDto } from '../common/dto/reorder.dto';
+import { BackfillDurationsDto } from './dto/backfill-durations.dto';
+import { CourseAccessGuard } from '../common/guards/course-access.guard';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
@@ -126,6 +128,29 @@ export class LecturesController {
       sectionId,
       dto.orderedIds,
       token,
+    );
+  }
+
+  /**
+   * Re-derive the lecture lengths in a course from the lectures themselves.
+   *
+   * Defaults to a report: `apply` must be sent explicitly, because a duration
+   * is what completion is credited against and rewriting one moves the bar for
+   * anyone part-way through that lesson. Course-scoped rather than
+   * platform-wide for the same reason — this is reviewed a course at a time.
+   */
+  @Post('courses/:courseId/lectures/durations/backfill')
+  @Roles('admin', 'instructor')
+  @UseGuards(CourseAccessGuard)
+  backfillDurations(
+    @Param('courseId') courseId: string,
+    @Body() dto: BackfillDurationsDto,
+    @AuthToken() token: string,
+  ) {
+    return this.lecturesService.backfillDurations(
+      courseId,
+      token,
+      dto.apply === true,
     );
   }
 
