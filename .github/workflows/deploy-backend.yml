@@ -97,12 +97,24 @@ jobs:
       # database. A release adding a field therefore shipped a backend querying a
       # column that did not exist, and every request through it would fail.
       #
-      # Deliberately no `--force`. A non-destructive migration — a new nullable
-      # column — applies on its own, and anything Data Connect judges destructive
-      # stops the deploy instead of quietly dropping data. A blocked release is
-      # recoverable; a dropped column is not. If a destructive change is genuinely
-      # intended, run it by hand and consciously.
-      - name: Deploy Data Connect schema
+      # TWO commands, in this order. `deploy` does NOT run SQL migrations — it
+      # publishes the schema and connectors, and aborts if the database does not
+      # already match, telling you to run the migrate command. Deploying alone
+      # therefore never applies a column, which is how the first attempt at this
+      # step failed: "Your database schema is incompatible with your SQL Connect
+      # schema. Run `firebase dataconnect:sql:migrate`".
+      #
+      # `--force` on the migrate is a DELIBERATE PROJECT DECISION, taken knowing
+      # what it gives up. Without it a migration Data Connect judges destructive
+      # stops the release; with it, that migration executes unattended — dropping
+      # a column or a table included. The safety here is therefore review, not
+      # tooling: whoever changes dataconnect/schema/schema.gql is the last line of
+      # defence, because CI will carry out whatever that change implies. Read the
+      # SQL the run prints before assuming a schema edit was harmless.
+      #
+      # One global install rather than two `npx` invocations: npx re-downloads
+      # firebase-tools per call, which cost ~25s twice.
+      - name: Migrate and deploy Data Connect schema
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
@@ -111,7 +123,9 @@ jobs:
             printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
             export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
           fi
-          npx firebase-tools deploy --only dataconnect --non-interactive
+          npm install -g firebase-tools@15
+          firebase dataconnect:sql:migrate --force --non-interactive
+          firebase deploy --only dataconnect --non-interactive
 
       # `up --detach` uploads this checkout and returns once the build is queued;
       # the health gate below is what decides whether it worked. Railway will not
