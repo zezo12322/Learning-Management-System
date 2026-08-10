@@ -19,6 +19,11 @@ const config: Config = {
         // same class works in light and dark mode.
         primary: {
           DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          // Theme-aware interaction states. The numbered shades below are raw
+          // palette literals with no dark counterpart, so `hover:bg-primary-600`
+          // inverted the hover direction in dark mode — use these instead.
+          hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+          active: 'rgb(var(--color-primary-active) / <alpha-value>)',
           50: '#eef2ff',
           100: '#e0e7ff',
           200: '#c7d2fe',
@@ -36,16 +41,44 @@ const config: Config = {
           500: '#0ea5e9',
           600: '#0284c7',
         },
-        success: { DEFAULT: '#22c55e', 500: '#22c55e' },
-        warning: { DEFAULT: '#f59e0b', 500: '#f59e0b' },
-        error: { DEFAULT: '#ef4444', 500: '#ef4444' },
+        // Status accents. These carry the TEXT/border value for each status and
+        // are per-theme, because a single literal hex cannot be legible on both
+        // a white and a #1E293B surface. Pair a solid fill with `on-status`, and
+        // use the `-soft` tokens for the tinted banner surfaces — `bg-error/10`
+        // was calibrated for white and went grey over the dark surface.
+        success: {
+          DEFAULT: 'rgb(var(--color-success) / <alpha-value>)',
+          soft: 'rgb(var(--color-success-soft) / <alpha-value>)',
+        },
+        warning: {
+          DEFAULT: 'rgb(var(--color-warning) / <alpha-value>)',
+          soft: 'rgb(var(--color-warning-soft) / <alpha-value>)',
+        },
+        error: {
+          DEFAULT: 'rgb(var(--color-error) / <alpha-value>)',
+          soft: 'rgb(var(--color-error-soft) / <alpha-value>)',
+        },
+        // Informational accent (bg-info / text-info / bg-info-soft).
+        info: {
+          DEFAULT: 'rgb(var(--color-info) / <alpha-value>)',
+          soft: 'rgb(var(--color-info-soft) / <alpha-value>)',
+        },
+        // Legible foreground for a solid status fill, in both themes.
+        'on-status': 'rgb(var(--color-on-status) / <alpha-value>)',
+        // Always-dark media surface and its foreground (bg-stage /
+        // text-on-stage / text-on-stage-muted). Same value in both themes.
+        stage: 'rgb(var(--color-stage) / <alpha-value>)',
+        'on-stage': 'rgb(var(--color-on-stage) / <alpha-value>)',
+        'on-stage-muted': 'rgb(var(--color-on-stage-muted) / <alpha-value>)',
         background: 'rgb(var(--color-background) / <alpha-value>)',
         surface: 'rgb(var(--color-surface) / <alpha-value>)',
         'surface-hover': 'rgb(var(--color-surface-hover) / <alpha-value>)',
         subtle: 'rgb(var(--color-subtle) / <alpha-value>)',
         'brand-soft': 'rgb(var(--color-brand-soft) / <alpha-value>)',
+        'on-brand-soft': 'rgb(var(--color-on-brand-soft) / <alpha-value>)',
         border: 'rgb(var(--color-border) / <alpha-value>)',
         'border-strong': 'rgb(var(--color-border-strong) / <alpha-value>)',
+        track: 'rgb(var(--color-track) / <alpha-value>)',
         content: {
           DEFAULT: 'rgb(var(--color-text-primary) / <alpha-value>)',
           secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
@@ -70,8 +103,10 @@ const config: Config = {
         card: '1.25rem',
       },
       boxShadow: {
-        card: '0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06)',
-        'card-hover': '0 4px 12px -2px rgb(79 70 229 / 0.12)',
+        // Driven by variables so `.dark` can swap a no-op drop shadow for a
+        // visible ring (see globals.css).
+        card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
       },
       keyframes: {
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },

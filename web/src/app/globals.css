@@ -12,11 +12,75 @@
     --color-surface-hover: 248 250 252; /* #F8FAFC */
     --color-subtle: 241 245 249; /* #F1F5F9 */
     --color-brand-soft: 238 242 255; /* #EEF2FF */
+    /* Foreground for anything sitting ON brand-soft. `text-primary` on
+       brand-soft measured 2.56:1 in dark, so the "now playing" / "selected
+       step" chips — the most important item in each list — were the least
+       readable. Same fill+foreground pairing as stage/on-stage below. */
+    --color-on-brand-soft: 55 48 163; /* #3730A3 — 8.9:1 on brand-soft */
     --color-border: 226 232 240; /* #E2E8F0 */
     --color-border-strong: 203 213 225; /* #CBD5E1 */
+    /* Progress-bar track. `bg-border/70` measured 1.09:1 against the card, so
+       a bar at low percentage read as a floating dash with no scale behind it. */
+    --color-track: 203 213 225; /* #CBD5E1 */
     --color-text-primary: 15 23 42; /* #0F172A */
-    --color-text-secondary: 100 116 139; /* #64748B */
-    --color-text-muted: 148 163 184; /* #94A3B8 */
+    /* Three legible text steps. secondary/muted were previously #64748B/#94A3B8,
+       and muted only reached 2.56:1 on white — below 4.5:1 while carrying
+       10-11px load-bearing copy. Every step now clears 4.5:1 on `surface`. */
+    --color-text-secondary: 71 85 105; /* #475569 — 7.7:1 on surface */
+    --color-text-muted: 100 116 139; /* #64748B — 4.8:1 on surface */
+
+    /* Status accents. These are the TEXT/border values — ~120 call sites read
+       them as `text-error` / `border-warning` — so each is tuned to clear
+       4.5:1 on surface and on its own `-soft` tint. The bright hues they
+       replaced (#22C55E / #F59E0B / #EF4444 / #0EA5E9) measured 2.0-3.8:1 on
+       white, so every alert and publish verdict failed in light mode.
+       `info` also aliased `secondary` exactly, making the new token invisible. */
+    --color-success: 22 101 52; /* #166534 — 7.1:1 on surface */
+    --color-warning: 146 64 14; /* #92400E — 7.2:1 on surface */
+    --color-error: 185 28 28; /* #B91C1C — 6.5:1 on surface */
+    --color-info: 3 105 161; /* #0369A1 — 6.0:1 on surface */
+
+    /* Status tints. The old 10%-alpha tints were calibrated for white and washed out to
+       grey over the dark surface, so warning/error/success banners became three
+       near-identical grey boxes in dark. Explicit per-theme surfaces instead. */
+    --color-success-soft: 220 252 231; /* #DCFCE7 */
+    --color-warning-soft: 254 243 199; /* #FEF3C7 */
+    --color-error-soft: 254 226 226; /* #FEE2E2 */
+    --color-info-soft: 224 242 254; /* #E0F2FE */
+
+    /* Foreground for a SOLID status fill (danger button, quiz tick, dots). One
+       token for all four hues: the fills are dark in light mode and bright in
+       dark mode, so the legible foreground flips with the theme, not the hue. */
+    --color-on-status: 255 255 255; /* #FFFFFF */
+
+    /* Primary interaction states. `hover:bg-primary-600` was the literal
+       #4338CA: in dark, primary is the LIGHTER #6366F1, so hover jumped to a
+       duller, darker colour and the button read as receding. Hover now darkens
+       in both themes, which also raises the white-on-primary contrast. */
+    --color-primary-hover: 67 56 202; /* #4338CA */
+    --color-primary-active: 55 48 163; /* #3730A3 */
+
+    /* Media stage — an always-dark surface for video and player chrome, plus
+       its foreground. Deliberately identical in .dark (see below): a player
+       letterboxes against dark in both themes, and hard-coding
+       bg-slate-950/text-white for it is what made "Select a lesson" and the
+       save button white-on-white in dark mode. */
+    --color-stage: 11 17 32; /* #0B1120 */
+    --color-on-stage: 248 250 252; /* #F8FAFC */
+    --color-on-stage-muted: 148 163 184; /* #94A3B8 */
+
+    /* Elevation. A 12%-alpha indigo glow is imperceptible on a #0F172A page, so
+       `<Card hover>` — the primary interactive element on Home, /catalog,
+       /learning and /saved — had no hover feedback at all in dark mode. In dark
+       the separation comes from a ring instead of a shadow (see .dark). */
+    --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+    --shadow-card-hover: 0 4px 12px -2px rgb(79 70 229 / 0.12);
+
+    /* Hero gradient stops, so the one full-bleed brand slab in the app follows
+       the theme instead of staying a fixed bright indigo/violet field. */
+    --gradient-primary-from: #4f46e5;
+    --gradient-primary-to: #7c3aed;
+    --panel-grid-dot: rgb(99 102 241 / 0.12);
   }
 
   .dark {
@@ -26,13 +90,52 @@
     --color-background: 15 23 42; /* #0F172A */
     --color-surface: 30 41 59; /* #1E293B */
     --color-surface-hover: 51 65 85; /* #334155 */
-    --color-subtle: 30 41 59; /* #1E293B */
-    --color-brand-soft: 49 46 129; /* #312E81 */
+    /* Was 30 41 59 — byte-identical to `surface`, so every `bg-subtle` panel
+       nested in a Card had ZERO separation and every `hover:bg-subtle` was a
+       no-op. Deliberately distinct from BOTH surface (1.14:1) and
+       surface-hover (1.22:1), so nested panels read AND still show a hover. */
+    --color-subtle: 39 51 71; /* #273347 */
+    --color-brand-soft: 30 27 75; /* #1E1B4B */
+    --color-on-brand-soft: 199 210 254; /* #C7D2FE — 10.8:1 on brand-soft */
     --color-border: 51 65 85; /* #334155 */
     --color-border-strong: 71 85 105; /* #475569 */
+    --color-track: 15 23 42; /* #0F172A */
     --color-text-primary: 248 250 252; /* #F8FAFC */
-    --color-text-secondary: 148 163 184; /* #94A3B8 */
-    --color-text-muted: 100 116 139; /* #64748B */
+    --color-text-secondary: 203 213 225; /* #CBD5E1 — 9.7:1 on surface */
+    --color-text-muted: 148 163 184; /* #94A3B8 — 5.6:1 on surface */
+
+    --color-success: 74 222 128; /* #4ADE80 — 8.3:1 on surface */
+    --color-warning: 251 191 36; /* #FBBF24 — 8.7:1 on surface */
+    --color-error: 252 165 165; /* #FCA5A5 — 7.7:1 on surface */
+    --color-info: 125 211 252; /* #7DD3FC — 8.7:1 on surface */
+
+    --color-success-soft: 20 83 45; /* #14532D */
+    --color-warning-soft: 120 53 15; /* #78350F */
+    --color-error-soft: 127 29 29; /* #7F1D1D */
+    --color-info-soft: 12 74 110; /* #0C4A6E */
+
+    --color-on-status: 15 23 42; /* #0F172A */
+
+    /* Hover still darkens, as in light mode: dark `primary` is #6366F1, and any
+       LIGHTER hover would drop white-on-primary below 4.5:1. */
+    --color-primary-hover: 79 70 229; /* #4F46E5 */
+    --color-primary-active: 67 56 202; /* #4338CA */
+
+    /* Same stage values as :root, on purpose — the media surface does not
+       follow the theme. */
+    --color-stage: 11 17 32; /* #0B1120 */
+    --color-on-stage: 248 250 252; /* #F8FAFC */
+    --color-on-stage-muted: 148 163 184; /* #94A3B8 */
+
+    /* Dark elevation: a drop shadow does nothing on a dark page, so the resting
+       shadow deepens and the hover state becomes a visible primary ring. */
+    --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.5), 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-card-hover:
+      0 0 0 1px rgb(var(--color-primary) / 0.65), 0 6px 16px -4px rgb(0 0 0 / 0.65);
+
+    --gradient-primary-from: #312e81;
+    --gradient-primary-to: #4c1d95;
+    --panel-grid-dot: rgb(148 163 184 / 0.1);
   }
 
   * {
@@ -64,10 +167,14 @@
 
 @layer utilities {
   .gradient-primary {
-    background-image: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    background-image: linear-gradient(
+      135deg,
+      var(--gradient-primary-from) 0%,
+      var(--gradient-primary-to) 100%
+    );
   }
   .panel-grid {
-    background-image: radial-gradient(circle at 1px 1px, rgb(99 102 241 / 0.12) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, var(--panel-grid-dot) 1px, transparent 0);
     background-size: 24px 24px;
   }
   .no-scrollbar::-webkit-scrollbar {

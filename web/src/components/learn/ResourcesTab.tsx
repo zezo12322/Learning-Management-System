@@ -12,15 +12,15 @@ import { fileExtension, fileNameFromUrl, safeLinkUrl } from '@/lib/safeUrl'
 import { cn } from '@/lib/utils'
 
 const EXTENSION_TONE: Record<string, string> = {
-  PDF: 'bg-error/10 text-error',
+  PDF: 'bg-error-soft text-error',
   DOC: 'bg-secondary/10 text-secondary',
   DOCX: 'bg-secondary/10 text-secondary',
-  PPT: 'bg-warning/10 text-warning',
-  PPTX: 'bg-warning/10 text-warning',
-  ZIP: 'bg-brand-soft text-primary',
-  JPG: 'bg-success/10 text-success',
-  JPEG: 'bg-success/10 text-success',
-  PNG: 'bg-success/10 text-success',
+  PPT: 'bg-warning-soft text-warning',
+  PPTX: 'bg-warning-soft text-warning',
+  ZIP: 'bg-brand-soft text-on-brand-soft',
+  JPG: 'bg-success-soft text-success',
+  JPEG: 'bg-success-soft text-success',
+  PNG: 'bg-success-soft text-success',
 }
 
 /**

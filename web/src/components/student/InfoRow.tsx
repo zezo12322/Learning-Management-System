@@ -20,7 +20,7 @@ export function InfoRow({
 }) {
   return (
     <div className={cn('flex items-center gap-3 px-4 py-3.5', className)}>
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-primary">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
         <Icon size={17} strokeWidth={1.9} />
       </span>
       <span className="shrink-0 text-sm font-semibold text-content">{label}</span>

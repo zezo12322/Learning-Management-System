@@ -203,6 +203,21 @@ export interface AuthoringSection {
   lectures: Lecture[]
 }
 
+/**
+ * Why a queued upload failed. A code rather than a sentence, so one shared
+ * error string cannot describe every file and so the message is translated at
+ * render time. `CANCELLED` is a user action, not a fault: it is reported as
+ * state 'ERROR' with this code, which keeps UploadAssetState unchanged for the
+ * exhaustive maps that already switch on it.
+ */
+export type UploadErrorCode =
+  | 'UNSUPPORTED_TYPE'
+  | 'NO_LECTURE'
+  | 'STORAGE_REJECTED'
+  | 'NETWORK'
+  | 'TOO_LARGE'
+  | 'CANCELLED'
+
 export interface UploadAsset {
   id: string
   name: string
@@ -211,6 +226,11 @@ export interface UploadAsset {
   progress: number
   mimeType: string
   lectureId?: string
+  /** Real byte counters from XHR upload.onprogress (absent for stored assets). */
+  transferredBytes?: number
+  totalBytes?: number
+  /** Set only while `state` is 'ERROR'. */
+  errorCode?: UploadErrorCode
 }
 
 export interface SignedUpload {

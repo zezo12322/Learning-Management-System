@@ -9,11 +9,10 @@ import {
   BadgeCheck,
   Bell,
   BookOpen,
-  ChevronRight,
+  CircleDashed,
   ClipboardList,
   GraduationCap,
   Search,
-  TrendingUp,
 } from 'lucide-react'
 import { catalogApi, coursesApi } from '@/lib/api/services'
 import { useI18n } from '@/lib/i18n'
@@ -22,8 +21,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CourseGridCard } from '@/components/course/CourseCard'
-import { CourseThumbnail } from '@/components/course/CourseThumbnail'
+import { CourseGridCard, CourseListRow } from '@/components/course/CourseCard'
 import { RatingStars } from '@/components/common/RatingStars'
 import { StatCard } from '@/components/student/StatCard'
 import { SectionHeader } from '@/components/student/SectionHeader'
@@ -77,18 +75,37 @@ export default function StudentHomePage() {
   const items = useMemo(() => enrollments.data ?? [], [enrollments.data])
   const stats = useMemo(() => {
     const completed = items.filter((item) => item.status === 'COMPLETED')
+    const activeItems = items.filter((item) => item.status === 'ACTIVE')
     return {
       enrolled: items.length,
-      inProgress: items.filter((item) => item.status === 'ACTIVE').length,
+      inProgress: activeItems.length,
       lessons: items.reduce((total, item) => total + item.completedLessons, 0),
+      // The denominator for "lessons completed" — the figure was previously
+      // reported with nothing to measure it against.
+      totalLessons: items.reduce((total, item) => total + item.totalLessons, 0),
       certificates: completed.length,
+      // What is actually left to watch, rather than repeating the enrolment
+      // count that the first tile's note already carries.
+      remaining: Math.max(
+        0,
+        activeItems.reduce((total, item) => total + (item.totalLessons - item.completedLessons), 0),
+      ),
     }
   }, [items])
 
-  const active = useMemo(
-    () => items.filter((item) => item.status === 'ACTIVE').sort((a, b) => b.percentage - a.percentage),
-    [items],
-  )
+  /**
+   * Ordered by how much is left, so the nearly-finished course is on top.
+   * Completed enrolments follow the active ones instead of being dropped — a
+   * finished course is still somewhere the learner may want to go back to.
+   */
+  const closest = useMemo(() => {
+    const byProgress = (a: { percentage: number }, b: { percentage: number }) =>
+      b.percentage - a.percentage
+    return [
+      ...items.filter((item) => item.status === 'ACTIVE').sort(byProgress),
+      ...items.filter((item) => item.status === 'COMPLETED').sort(byProgress),
+    ]
+  }, [items])
   const instructors = useMemo(
     () => topInstructors(catalog.data?.length ? catalog.data : (popular.data ?? [])),
     [catalog.data, popular.data],
@@ -103,12 +120,15 @@ export default function StudentHomePage() {
 
   return (
     <div className="space-y-7">
-      {/* Greeting */}
+      {/* Greeting. The learner's name is data, not the page's title: the <h1>
+          names the screen so the document outline does not read "Ahmed!". */}
       <div className="flex items-center gap-3">
         <Avatar src={me?.avatar} name={me?.name} size={52} online />
         <div className="min-w-0">
-          <p className="text-sm text-content-secondary">{t(greetingKey())} 👋</p>
-          <h1 className="truncate text-2xl font-bold text-content">{firstName}!</h1>
+          <p className="truncate text-sm text-content-secondary">
+            {t(greetingKey())} {firstName} 👋
+          </p>
+          <h1 className="text-2xl font-bold text-content">{t('student.homeTitle')}</h1>
         </div>
       </div>
 
@@ -124,7 +144,7 @@ export default function StudentHomePage() {
       </form>
 
       {enrollments.isError && (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {t('learning.loadError')}
         </Card>
       )}
@@ -146,7 +166,7 @@ export default function StudentHomePage() {
               icon={GraduationCap}
               value={stats.lessons}
               label={t('student.stat.lessons')}
-              note={t('student.stat.lessonsNote')}
+              note={t('student.stat.lessonsOfTotal').replace('{total}', String(stats.totalLessons))}
               tone="secondary"
             />
             <StatCard
@@ -157,10 +177,10 @@ export default function StudentHomePage() {
               tone="success"
             />
             <StatCard
-              icon={TrendingUp}
-              value={stats.inProgress}
-              label={t('student.stat.inProgress')}
-              note={t('student.stat.inProgressNote')}
+              icon={CircleDashed}
+              value={stats.remaining}
+              label={t('student.stat.remaining')}
+              note={t('student.stat.remainingNote')}
               tone="warning"
             />
           </>
@@ -170,33 +190,50 @@ export default function StudentHomePage() {
       {/* Quick links. The sidebar is desktop-only and the mobile tab bar keeps
           the four tabs from the design, so Home carries the entry points to the
           remaining student screens — mirroring the Flutter home, which also
-          surfaces assignments from here. */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { href: '/assignments', label: t('nav.assignments'), icon: ClipboardList },
-          { href: '/certificates', label: t('nav.certificates'), icon: Award },
-          { href: '/notifications', label: t('notifications.title'), icon: Bell },
-        ].map((link) => (
-          <Link key={link.href} href={link.href}>
-            <Card hover className="flex h-full flex-col items-center gap-2 p-4 text-center">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-primary">
-                <link.icon size={18} strokeWidth={1.9} />
-              </span>
-              <span className="text-xs font-semibold text-content">{link.label}</span>
-            </Card>
-          </Link>
-        ))}
-      </div>
-
-      {/* Continue learning */}
+          surfaces assignments from here. Six columns on desktop so three cards
+          stay card-sized instead of stretching to fill 1500px. */}
       <section className="space-y-3">
-        <SectionHeader title={t('student.continueLearning')} href="/learning" actionLabel={t('student.viewAll')} />
+        <SectionHeader title={t('student.quickLinks')} />
+        <div className="grid grid-cols-3 gap-3 lg:grid-cols-6">
+          {[
+            { href: '/assignments', label: t('nav.assignments'), icon: ClipboardList },
+            { href: '/certificates', label: t('nav.certificates'), icon: Award },
+            { href: '/notifications', label: t('notifications.title'), icon: Bell },
+          ].map((link) => (
+            <Link key={link.href} href={link.href}>
+              <Card hover className="flex h-full flex-col items-center gap-2 p-4 text-center">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
+                  <link.icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                </span>
+                <span className="text-xs font-semibold text-content">{link.label}</span>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Closest to finishing. The list is sorted by percentage, so the heading
+          states that rather than promising the most recently watched course —
+          no endpoint reports last activity. */}
+      <section className="space-y-3">
+        <SectionHeader
+          title={t('student.closestToFinishing')}
+          href="/learning"
+          actionLabel={t('student.viewAll')}
+        />
+        <p className="text-xs text-content-secondary">{t('student.closestToFinishingHint')}</p>
         {enrollments.isLoading ? (
           <Skeleton className="h-32 rounded-card" />
-        ) : enrollments.isError ? null : active.length ? (
-          <div className="grid gap-3 xl:grid-cols-2">
-            {active.slice(0, 2).map((item) => (
-              <ContinueLearningCard key={item.enrollmentId} item={item} />
+        ) : enrollments.isError ? null : closest.length ? (
+          <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
+            {/* Two cards fill one or two columns; the third only exists once
+                there is a third column to put it in. */}
+            {closest.slice(0, 3).map((item, index) => (
+              <ContinueLearningCard
+                key={item.enrollmentId}
+                item={item}
+                className={index === 2 ? 'hidden 2xl:flex' : undefined}
+              />
             ))}
           </div>
         ) : (
@@ -236,27 +273,12 @@ export default function StudentHomePage() {
       {recommended.data?.length ? (
         <section className="space-y-3">
           <SectionHeader title={t('student.recommended')} href="/catalog" actionLabel={t('student.viewAll')} />
+          {/* CourseListRow points at /courses/[id] — the Figma-mapped detail
+              page — instead of /catalog/[id], which is collapsing to a
+              redirect. */}
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {recommended.data.slice(0, 3).map((course) => (
-              <Link key={course.id} href={`/catalog/${course.id}`}>
-                <Card hover className="flex h-full items-center gap-3 p-3">
-                  <CourseThumbnail
-                    src={course.thumbnail}
-                    seed={course.id}
-                    label={course.title}
-                    className="h-12 w-12 shrink-0 rounded-xl text-[10px]"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-content">{course.title}</span>
-                    <span className="mt-0.5 block truncate text-[11px] text-content-secondary">
-                      {[course.category?.name, t(`level.${course.level}`, course.level)]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
-                  </span>
-                  <ChevronRight size={16} className="shrink-0 text-content-muted rtl:rotate-180" />
-                </Card>
-              </Link>
+              <CourseListRow key={course.id} course={course} />
             ))}
           </div>
         </section>

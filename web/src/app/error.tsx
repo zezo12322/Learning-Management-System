@@ -15,7 +15,7 @@ export default function Error({
   const t = useT()
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-error/10 text-2xl">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-error-soft text-2xl">
         ⚠️
       </div>
       <h2 className="text-xl font-semibold text-content">{t('appError.title')}</h2>

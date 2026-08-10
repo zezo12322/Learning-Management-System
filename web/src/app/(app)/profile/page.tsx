@@ -137,7 +137,7 @@ export default function ProfilePage() {
   }
   if (profileQuery.isError || !user) {
     return (
-      <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">{t('profile.loadError')}</Card>
+      <Card className="border-error bg-error-soft p-6 text-sm text-error">{t('profile.loadError')}</Card>
     )
   }
 
@@ -185,7 +185,7 @@ export default function ProfilePage() {
               key={stat.label}
               className={index < 2 ? 'border-b border-border p-4 text-center sm:border-b-0' : 'p-4 text-center'}
             >
-              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-primary">
+              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
                 <stat.icon size={17} />
               </span>
               <p className="mt-2 text-xl font-bold text-content">

@@ -78,7 +78,7 @@ export default function RegisterPage() {
     <Card className="rounded-[24px] p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] sm:p-9">
       <h1 className="text-3xl font-bold tracking-tight text-content">{t('reg.title')}</h1>
       <p className="mb-6 mt-2 text-sm text-content-secondary">{t('reg.subtitle')}</p>
-      {error && <div className="mb-4 rounded-input bg-error/10 px-3 py-2 text-xs text-error">{error}</div>}
+      {error && <div className="mb-4 rounded-input bg-error-soft px-3 py-2 text-xs text-error">{error}</div>}
       {/* method="post" so a pre-hydration native submit sends fields in the
           request body, not the URL query string (avoids leaking password /
           nationalId into history & logs). preventDefault still applies once hydrated. */}

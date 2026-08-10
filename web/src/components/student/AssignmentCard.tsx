@@ -44,7 +44,7 @@ export function AssignmentCard({
           ? 'warning'
           : 'info'
   const tileTone =
-    tone === 'success' ? 'bg-success/10 text-success' : tone === 'warning' ? 'bg-warning/10 text-warning' : 'bg-brand-soft text-primary'
+    tone === 'success' ? 'bg-success-soft text-success' : tone === 'warning' ? 'bg-warning-soft text-warning' : 'bg-brand-soft text-on-brand-soft'
 
   return (
     <Card hover className="flex gap-3 p-4">
