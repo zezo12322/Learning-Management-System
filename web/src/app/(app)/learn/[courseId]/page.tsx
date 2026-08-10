@@ -60,6 +60,20 @@ export default function LearnPage() {
   })
 
   const allSections = useMemo(() => curriculum.data?.sections ?? [], [curriculum.data])
+  /**
+   * Lecture ids the server has marked complete. Built from the course-progress
+   * response so the curriculum list can show at a glance which lessons are done
+   * — before this, that was only visible by opening each one.
+   */
+  const completedIds = useMemo(
+    () =>
+      new Set(
+        (progress.data?.sections ?? []).flatMap((section) =>
+          (section.lectures ?? []).filter((l) => l.completedAt).map((l) => l.lectureId),
+        ),
+      ),
+    [progress.data],
+  )
   const isEnrolled =
     enrollment.data?.status === 'ACTIVE' || enrollment.data?.status === 'COMPLETED'
 
@@ -283,6 +297,7 @@ export default function LearnPage() {
                     lecture={lecture}
                     index={lectures.findIndex((item) => item.id === lecture.id) + 1}
                     active={lecture.id === activeId}
+                    completed={completedIds.has(lecture.id)}
                     onSelect={() => setActiveId(lecture.id)}
                   />
                 ))}
@@ -358,14 +373,19 @@ function LessonRow({
   lecture,
   index,
   active,
+  completed,
   onSelect,
 }: {
   lecture: Lecture
   index: number
   active: boolean
+  completed: boolean
   onSelect: () => void
 }) {
   const t = useT()
+  // A finished lesson shows a filled check in place of its number. Colour alone
+  // would not carry the meaning for anyone who cannot distinguish it, so the
+  // icon is labelled for assistive tech rather than left decorative.
   const Icon = lecture.type === 'VIDEO' ? PlayCircle : lecture.type === 'QUIZ' ? ClipboardList : BookOpen
   return (
     <button
@@ -378,8 +398,19 @@ function LessonRow({
       )}
     >
       <Icon size={17} className="shrink-0" />
-      <span className="shrink-0 text-xs font-semibold text-content-muted">{index}.</span>
-      <span className="flex-1 truncate">{lecture.title}</span>
+      {completed ? (
+        <CheckCircle2
+          size={16}
+          className="shrink-0 text-success"
+          role="img"
+          aria-label={t('learn.lessonCompleted')}
+        />
+      ) : (
+        <span className="shrink-0 text-xs font-semibold text-content-muted">{index}.</span>
+      )}
+      <span className={cn('flex-1 truncate', completed && 'text-content-secondary')}>
+        {lecture.title}
+      </span>
       {lecture.isFreePreview && <Badge tone="info">{t('common.preview')}</Badge>}
       {active && <Badge tone="primary">{t('learn.nowPlaying')}</Badge>}
       <span className="shrink-0 text-xs text-content-secondary">

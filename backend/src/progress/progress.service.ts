@@ -156,6 +156,14 @@ export class ProgressService {
         sectionTitle: section.title,
         totalLectures: sectionTotal,
         completedLectures: sectionCompleted,
+        // Per-lecture completion, so a curriculum list can mark finished
+        // lessons. The query already selects this per lecture; the counts above
+        // used to be all that survived, which meant the only way to know whether
+        // one lesson was done was to open it.
+        lectures: lectures.map((l: any) => ({
+          lectureId: l.id,
+          completedAt: l.userProgress?.[0]?.completedAt ?? null,
+        })),
         percentage:
           sectionTotal > 0
             ? Math.round((sectionCompleted / sectionTotal) * 100)
