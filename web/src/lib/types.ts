@@ -95,6 +95,8 @@ export interface CourseProgress {
     totalLectures: number
     completedLectures: number
     percentage: number
+    /** Per-lecture completion, so a curriculum list can mark finished lessons. */
+    lectures: { lectureId: string; completedAt: string | null }[]
   }[]
 }
 

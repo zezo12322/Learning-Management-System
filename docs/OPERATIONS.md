@@ -34,7 +34,7 @@ Railway deploy config lives in `backend/railway.json`. Cloudflare config lives i
 | `.github/workflows/ci.yml` | every PR + push to `main` | Per-package lint / type-check / build / test. On a PR only the packages the diff touches run; `main` always runs everything. Backend publishes a coverage summary + artifact. The aggregate **`CI`** job is the one to require in branch protection — the package jobs are skipped (not passed) on unrelated PRs, which would otherwise stall a required check. |
 | `.github/workflows/security.yml` | every PR + push to `main` + weekly (Mon 06:00 UTC) | Secret scan (gitleaks — **blocking** on PRs over the commits the PR adds, informational full-history sweep otherwise; see §6), dependency review of what a PR adds, and `npm audit` per package. |
 | `.github/workflows/deploy-web.yml` | push to `development` touching `web/`, `dataconnect/`, this workflow, or the `setup-node-package` action + `workflow_dispatch` | Reproducible Cloudflare deploy of `web/`, replacing `npm run deploy` from a laptop. Runs in the `production` GitHub Environment, then health-checks the result. A pre-flight step refuses to build unless the Cloudflare credentials and the six **required** `NEXT_PUBLIC_*` values are set (the optional `NEXT_PUBLIC_AI_*` and `NEXT_PUBLIC_DEFAULT_CATEGORY_ID` are not checked). Those values are inlined into the bundle, so a missing one ships a broken app rather than failing the build. Each is read from a repository **variable or secret**, whichever exists. |
-| `.github/workflows/deploy-backend.yml` | push to `main` touching `backend/` or `dataconnect/` + `workflow_dispatch` | Lint + build + test, then **deploys the Data Connect schema**, then `railway up` into the `production` Environment, then verifies **liveness and readiness** before reporting success. The schema goes first on purpose — see the note below. |
+| `.github/workflows/deploy-backend.yml` | push to `main` touching `backend/` or `dataconnect/` + `workflow_dispatch` | Lint + build + test, then **migrates and deploys the Data Connect schema**, then `railway up` into the `production` Environment, then verifies **liveness and readiness** before reporting success. The schema goes first on purpose, and a destructive migration fails the release rather than executing — see the note below. |
 | `.github/workflows/build-apk.yml` | **manual** + `v*` tags | Signed, obfuscated Android release build (APK / AAB) plus the de-obfuscation symbols. See `docs/MOBILE_RELEASE.md`. |
 | `.github/dependabot.yml` | weekly (Mon) | Grouped dependency PRs for the three npm packages, Flutter `pub`, and the GitHub Actions themselves. |
 
@@ -355,10 +355,37 @@ database — so a release that added a field shipped a backend querying a column
 that did not exist, and every request through it failed. Ordering the two steps
 inside one job is what makes that impossible rather than merely remembered.
 
-The step runs **without `--force`**. A non-destructive migration (a new nullable
-column) applies on its own; anything Data Connect judges destructive stops the
-deploy instead of quietly dropping data. A blocked release is recoverable, a
-dropped column is not — so a genuinely intended destructive change is run by hand.
+The step runs **two** commands, in order:
+
+```
+firebase dataconnect:sql:migrate --force --non-interactive
+firebase deploy --only dataconnect --non-interactive
+```
+
+`deploy` on its own does **not** apply SQL migrations. It publishes the schema and
+connectors and aborts when the database does not already match — *"Your database
+schema is incompatible with your SQL Connect schema"* — so the migrate command is
+what actually alters the table.
+
+Before migrating, the step runs `dataconnect:sql:diff` to print the pending SQL
+without executing it, and **fails the release if the plan contains a statement
+that destroys data** — `DROP TABLE`, `DROP COLUMN`, `DROP CONSTRAINT`,
+`DROP SCHEMA`, `TRUNCATE`, or a column type change. Additive migrations (a new
+nullable column) pass through and apply automatically.
+
+> **Why `--force` is still there.** Per the CLI it means *"execute any required
+> database changes without prompting"* — so removing it does not make the step
+> safe, it makes the step prompt, and a prompt on a non-interactive runner fails.
+> That would halt every schema release rather than only the dangerous ones. With
+> the diff gate in front, `--force` is only answering a prompt nobody is present
+> to answer.
+
+The gate is a text heuristic over generated DDL, not a proof. It can flag
+something harmless, and an exotic destructive change could slip past it — so it
+errs toward stopping, because a blocked release is recoverable and a dropped
+column is not. **The plan is printed on every run; read it on any release that
+touches `dataconnect/schema/schema.gql`.** When a destructive change is genuinely
+intended, run `firebase dataconnect:sql:migrate` by hand.
 
 Also, under **Settings → Branches**, require the **`CI`** and **`Security`**
 checks on `main` in branch protection.
