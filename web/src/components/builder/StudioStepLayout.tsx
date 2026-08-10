@@ -41,7 +41,7 @@ export function StudioStepLayout({
   return (
     <div
       className={cn(
-        'grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_380px]',
+        'grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rail:grid-cols-[minmax(0,1fr)_340px] rail-wide:grid-cols-[minmax(0,1fr)_380px]',
         className
       )}
     >
@@ -51,7 +51,7 @@ export function StudioStepLayout({
           role={railLabel ? 'region' : undefined}
           aria-label={railLabel}
           tabIndex={railLabel ? 0 : undefined}
-          className="min-w-0 rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 xl:sticky xl:top-[88px] xl:max-h-[calc(100vh-104px)] xl:overflow-y-auto xl:overscroll-contain"
+          className="min-w-0 rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rail:sticky rail:top-[88px] rail:max-h-[calc(100vh-104px)] rail:overflow-y-auto rail:overscroll-contain"
         >
           {rail}
         </div>

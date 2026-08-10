@@ -75,7 +75,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rail:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>

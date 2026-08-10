@@ -53,10 +53,10 @@ export default function LearnPage() {
  * Course learning screen (Figma "8. Course Learning" + tabs 9–11), rebuilt as a
  * work column plus a persistent context rail.
  *
- * From xl the lesson list is a sticky column beside the video instead of a tab
- * that unmounts Notes, and the stage is height-capped so both fit on screen at
- * once. Below xl it is the single stack the phone layout always was, with the
- * curriculum as the default tab.
+ * From the `rail` screen the lesson list is a sticky column beside the video
+ * instead of a tab that unmounts Notes, and the stage is height-capped so both
+ * fit on screen at once. Below it the page is the single stack the phone layout
+ * always was, with the curriculum as the default tab.
  *
  * Completion is not an action here — the server awards it from watch time
  * reported by the player.
@@ -177,7 +177,7 @@ function LearnView() {
     router.replace(`${pathname}?${query}`, { scroll: false })
   }, [activeId, tab, pathname, router, searchParams])
 
-  // At xl the curriculum is the rail, so it is not a tab. If the viewport grows
+  // From `rail` the curriculum is the column, so it is not a tab. If the viewport grows
   // while the Curriculum tab is open, move to Notes rather than leaving an
   // empty panel behind a tab that no longer exists.
   useEffect(() => {
@@ -335,7 +335,7 @@ function LearnView() {
       {/* Work column first in the DOM: grid tracks follow inline direction, so
           it lands on the start side in both locales with no order-* and no
           directional utility, and keyboard order already matches the visuals. */}
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rail:grid-cols-[minmax(0,1fr)_340px] rail-wide:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-4">
           {/* The lesson list is visually at the top of the rail, level with the
               video, but it is the LAST grid column and therefore the last thing
@@ -373,7 +373,7 @@ function LearnView() {
                 watchedSecondsSoFar={storedWatchedSeconds}
                 onPosition={setPosition}
                 onEnded={() => next && selectLesson(next.id)}
-                className="xl:max-h-[min(58vh,640px)]"
+                className="rail:max-h-[min(58vh,640px)]"
               />
             ) : active?.type === 'READING' ? (
               <Card className="p-6">
@@ -403,7 +403,7 @@ function LearnView() {
             ) : (
               // The stage tokens, not bg-content/text-white: this card used to be
               // white text on a white card in dark mode.
-              <Card className="flex aspect-video flex-col items-center justify-center gap-2 bg-stage p-8 text-center text-on-stage xl:max-h-[min(58vh,640px)]">
+              <Card className="flex aspect-video flex-col items-center justify-center gap-2 bg-stage p-8 text-center text-on-stage rail:max-h-[min(58vh,640px)]">
                 <p className="text-sm font-semibold">{t('learn.selectLesson')}</p>
                 <p className="text-xs text-on-stage-muted">{t('learn.selectLessonHint')}</p>
               </Card>
@@ -432,7 +432,19 @@ function LearnView() {
                   tabIndex={-1}
                   className="mt-0.5 break-words text-xl font-bold text-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 >
-                  {active ? `${lessonNumber}. ${active.title}` : t('learn.selectLesson')}
+                  {/* Number and title are separate runs, the same split
+                      LessonRow makes. As one interpolated string in an Arabic
+                      page the leading "4." was a weak digit followed by a
+                      neutral full stop, so bidi resolved it against the Latin
+                      title and rendered "…in practice .4". */}
+                  {active ? (
+                    <>
+                      <span dir="ltr">{lessonNumber}.</span>{' '}
+                      <span dir="auto">{active.title}</span>
+                    </>
+                  ) : (
+                    t('learn.selectLesson')
+                  )}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-content-secondary">
                   {active && <span>{formatSecondsLocalized(active.duration, t)}</span>}

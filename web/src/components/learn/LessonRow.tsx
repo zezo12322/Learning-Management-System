@@ -35,8 +35,8 @@ export interface LessonRowProps {
   locked?: boolean
   /**
    * 'stacked' is the rail default: two lines, so a 340px column still shows the
-   * title. 'row' is the single-line layout used below xl, where the full page
-   * width is available.
+   * title. 'row' is the single-line layout used below the `rail` screen, where
+   * the full page width is available.
    */
   variant?: 'row' | 'stacked'
   onSelect: () => void
@@ -76,6 +76,10 @@ export const LessonRow = React.forwardRef<HTMLButtonElement, LessonRowProps>(fun
       />
     ) : (
       <span
+        // dir="ltr": the trailing full stop is a bidi-neutral character, so in
+        // an Arabic page "4." resolved as ".4" — the marker is a Latin-numeral
+        // ordinal in both locales and reads left-to-right in both.
+        dir="ltr"
         className={cn('shrink-0 text-xs font-semibold tabular-nums text-content-muted', className)}
       >
         {index}.

@@ -14,6 +14,24 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        /**
+         * Where the "work column + persistent context rail" layout turns on.
+         *
+         * Not `xl`. The app shell spends a fixed 260px on the sidebar before
+         * any page gets a pixel, so at 1280 the content area is 1020px and a
+         * 340px rail leaves a 588px work column — narrower than the 947px the
+         * same page gets at 1279 with the curriculum behind a tab. Crossing
+         * into the "bigger" layout made the video smaller. 1536 is the first
+         * width where the rail is paid for out of new space instead of out of
+         * the work column.
+         *
+         * `useIsDesktop` mirrors this number; the two must move together.
+         */
+        rail: '1536px',
+        /** Where the rail can afford its wider measure. */
+        'rail-wide': '1800px',
+      },
       colors: {
         // Semantic tokens driven by CSS variables (see globals.css) so the
         // same class works in light and dark mode.

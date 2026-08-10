@@ -35,7 +35,7 @@ export function LessonNav({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-2 xl:flex-col xl:items-stretch',
+        'flex flex-wrap items-center justify-between gap-2 rail:flex-col rail:items-stretch',
         className,
       )}
     >

@@ -138,7 +138,7 @@ export default function CourseDetailsPage() {
       {/* Work column + persistent context rail. The work column is declared
           first in the DOM, so the grid places it at the start side in both
           locales and the keyboard order already matches the visual one. */}
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rail:grid-cols-[minmax(0,1fr)_340px] rail-wide:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-6">
           {/* Instructor + the course's facts. The four stat tiles that used to
               sit here repeated what the rail now states, and repeated it in a
@@ -246,12 +246,12 @@ export default function CourseDetailsPage() {
         <aside
           aria-labelledby="course-included-heading"
           tabIndex={0}
-          className="rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain"
+          className="rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rail:sticky rail:top-24 rail:max-h-[calc(100vh-7rem)] rail:self-start rail:overflow-y-auto rail:overscroll-contain"
         >
           <Card className="p-5">
             {/* Below xl the bar at the foot of the page owns the price and the
                 CTA, so they are not stated twice on one screen. */}
-            <div className="hidden xl:block">
+            <div className="hidden rail:block">
               <p className="text-2xl font-bold text-content">{priceLabel}</p>
               <div className="mt-4">{cta}</div>
               <div className="my-5 border-t border-border" />
@@ -308,7 +308,7 @@ export default function CourseDetailsPage() {
           inside the column rather than to the viewport, so it needs no copy of
           the shell's sidebar width — and at xl it is gone entirely because the
           rail already holds the CTA. */}
-      <div className="sticky bottom-16 z-20 -mx-4 border-t border-border bg-surface/95 p-4 backdrop-blur sm:-mx-6 lg:bottom-0 lg:-mx-9 xl:hidden">
+      <div className="sticky bottom-16 z-20 -mx-4 border-t border-border bg-surface/95 p-4 backdrop-blur sm:-mx-6 lg:bottom-0 lg:-mx-9 rail:hidden">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
           <p className="text-xl font-bold text-content">{priceLabel}</p>
           <div className="min-w-[200px] flex-1 sm:max-w-xs">{cta}</div>
