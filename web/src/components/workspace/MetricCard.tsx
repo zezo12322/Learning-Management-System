@@ -28,7 +28,7 @@ export function MetricCard({
   const status = stateTones[state]
   return (
     <Card className="min-h-[210px] p-4 sm:p-5">
-      <div className="flex h-16 items-center justify-between rounded-input bg-success/10 px-4">
+      <div className="flex h-16 items-center justify-between rounded-input bg-success-soft px-4">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface text-content-secondary">
           <Icon size={18} />
         </span>

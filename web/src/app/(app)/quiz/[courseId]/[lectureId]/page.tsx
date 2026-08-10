@@ -335,7 +335,7 @@ function QuestionCard({
             <span
               className={
                 option.isCorrect
-                  ? 'inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-white'
+                  ? 'inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-on-status'
                   : 'inline-flex h-4 w-4 items-center justify-center rounded-full border border-border'
               }
             >

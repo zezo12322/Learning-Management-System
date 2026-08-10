@@ -81,7 +81,7 @@ export default function NotificationsPage() {
           ))}
         </div>
       ) : query.isError ? (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {t('notifications.loadError')}
         </Card>
       ) : items.length ? (

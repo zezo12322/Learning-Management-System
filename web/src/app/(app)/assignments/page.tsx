@@ -81,7 +81,7 @@ export default function AssignmentsPage() {
           ))}
         </div>
       ) : submissions.isError ? (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {forbidden ? t('assignments.accessDenied') : t('assignments.loadError')}
         </Card>
       ) : visible.length ? (

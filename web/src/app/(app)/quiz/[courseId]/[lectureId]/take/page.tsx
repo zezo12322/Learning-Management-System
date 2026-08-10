@@ -229,7 +229,7 @@ export default function TakeQuizPage() {
         <Card
           className={cn(
             'flex items-start gap-3 p-4',
-            result.passed ? 'bg-success/5' : 'bg-warning/5',
+            result.passed ? 'bg-success-soft' : 'bg-warning-soft',
           )}
         >
           <Trophy size={20} className={cn('mt-0.5 shrink-0', result.passed ? 'text-success' : 'text-warning')} />
@@ -304,12 +304,12 @@ export default function TakeQuizPage() {
             return (
               <Card
                 key={question.id}
-                className={cn('flex items-start gap-3 p-4', !selected && 'bg-warning/5')}
+                className={cn('flex items-start gap-3 p-4', !selected && 'bg-warning-soft')}
               >
                 <span
                   className={cn(
                     'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
-                    selected ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning',
+                    selected ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning',
                   )}
                 >
                   {selected ? <CheckCircle2 size={15} /> : <XCircle size={15} />}
@@ -369,7 +369,7 @@ export default function TakeQuizPage() {
         </Link>
 
         <Card className="p-6 text-center">
-          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-primary">
+          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-on-brand-soft">
             <ClipboardList size={30} strokeWidth={1.7} />
           </span>
           <h1 className="mt-4 text-xl font-bold text-content">{t('quizTake.title')}</h1>
@@ -534,7 +534,7 @@ function IntroRow({
 }) {
   return (
     <div className="flex items-center gap-3 p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-primary">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
         <Icon size={18} strokeWidth={1.9} />
       </span>
       <span>
@@ -556,7 +556,7 @@ function StatTile({
 }) {
   return (
     <Card className="flex items-center gap-3 p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-primary">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
         <Icon size={18} strokeWidth={1.9} />
       </span>
       <span className="min-w-0">

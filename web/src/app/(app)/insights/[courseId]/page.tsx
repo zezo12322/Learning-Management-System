@@ -48,7 +48,7 @@ export default function CourseInsightsPage() {
     return (
       <div className="space-y-6">
         <PageHeader title={t('insights.title')} />
-        <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">
+        <Card className="border-error bg-error-soft p-6 text-sm text-error">
           {t('insights.accessDenied')}
         </Card>
       </div>
@@ -60,7 +60,7 @@ export default function CourseInsightsPage() {
     return (
       <div className="space-y-6">
         <PageHeader title={t('insights.title')} />
-        <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">
+        <Card className="border-error bg-error-soft p-6 text-sm text-error">
           {denied ? t('insights.accessDenied') : t('insights.loadError')}
         </Card>
         <Link href="/insights" className="inline-flex">
@@ -230,7 +230,9 @@ export default function CourseInsightsPage() {
                       <span className="inline-flex w-8 items-center gap-1 text-xs text-content-secondary">
                         {n} <Star size={11} className="fill-content-muted text-content-muted" />
                       </span>
-                      {/* Scaled to the busiest bucket so small distributions stay readable. */}
+                      {/* Scaled to the busiest bucket so small distributions stay readable.
+                          Deliberately unlabelled, so Progress renders it aria-hidden: the
+                          star level and the count are already text on either side of it. */}
                       <Progress value={(count / maxRatingCount) * 100} className="flex-1" />
                       <span className="w-8 text-end text-xs text-content-secondary">{count}</span>
                     </div>
@@ -271,6 +273,8 @@ function StatBars({
                 {row.value} <span className="text-content-muted">({pct}%)</span>
               </span>
             </div>
+            {/* Unlabelled on purpose (aria-hidden): the row above already
+                states the label, the value and the percentage as text. */}
             <Progress value={pct} />
           </div>
         )

@@ -46,7 +46,7 @@ export default function DashboardPage() {
       />
 
       {catalogQuery.isError && (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {t('dashboard.loadError')}
         </Card>
       )}
@@ -75,7 +75,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 rail:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
@@ -100,7 +100,9 @@ export default function DashboardPage() {
                 return (
                   <Link
                     key={course.id}
-                    href={`/catalog/${course.id}`}
+                    // /catalog/[id] is now only a redirect to /courses/[id], so
+                    // linking straight there saves a client-side bounce.
+                    href={`/courses/${course.id}`}
                     className={index === 0 ? 'flex items-center gap-4 rounded-input bg-brand-soft p-4' : 'flex items-center gap-4 rounded-input bg-subtle p-4'}
                   >
                     <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface text-xs font-bold text-primary">
@@ -130,7 +132,7 @@ export default function DashboardPage() {
 
         <Card className="flex flex-col p-5 sm:p-6">
           <div className="rounded-input bg-brand-soft p-4">
-            <p className="text-[10px] font-semibold tracking-wide text-primary">{t('dashboard.aiStudioEyebrow')}</p>
+            <p className="text-[10px] font-semibold text-on-brand-soft ltr:tracking-wide">{t('dashboard.aiStudioEyebrow')}</p>
             <h2 className="mt-2 text-lg font-semibold text-content">{t('dashboard.aiStudioTitle')}</h2>
             <p className="mt-2 text-xs leading-5 text-content-secondary">{t('dashboard.aiStudioBody')}</p>
           </div>
