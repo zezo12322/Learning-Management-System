@@ -15,6 +15,10 @@ import {
   LectureType,
 } from './dto/lecture.dto';
 import { assertReorderMembership } from '../common/utils/ordering';
+import {
+  hlsPlaylistDurationSeconds,
+  readingDurationSeconds,
+} from './lecture-duration';
 
 @Injectable()
 export class LecturesService {
@@ -289,5 +293,134 @@ export class LecturesService {
     throw new ForbiddenException(
       'You must be enrolled in this course to view this lecture (Status check failed)',
     );
+  }
+
+  /**
+   * Re-derive every lecture length in a course from what the lecture actually
+   * contains, and report what is wrong before changing anything.
+   *
+   * This exists because durations were authored by hand for years while the
+   * transcode was already measuring them, and because until recently the
+   * curriculum editor rewrote `duration` on every save — so a title edit
+   * re-rounded the length to the nearest minute. The stored numbers are
+   * therefore a mix of measured, rounded and invented, and nothing on the
+   * lecture says which is which.
+   *
+   * It is a read-only report unless `apply` is set. A duration is not cosmetic:
+   * completion is credited at `duration * COMPLETION_THRESHOLD`, so rewriting
+   * one moves the bar for learners already part-way through the lesson. The
+   * report is the thing to look at first.
+   */
+  async backfillDurations(
+    courseId: string,
+    authToken: string,
+    apply = false,
+  ): Promise<{
+    courseId: string;
+    applied: boolean;
+    changed: any[];
+    unchanged: number;
+    skipped: any[];
+  }> {
+    const data = await this.dc.executeQuery(
+      'AdminGetCourse',
+      { courseId },
+      authToken,
+    );
+    if (!data?.course) {
+      throw new NotFoundException(`Course ${courseId} not found`);
+    }
+
+    const lectures: any[] = (data.course.adminSections ?? []).flatMap(
+      (section: any) => section.adminLectures ?? [],
+    );
+
+    const changed: any[] = [];
+    const skipped: any[] = [];
+    let unchanged = 0;
+
+    for (const lecture of lectures) {
+      const stored = lecture.duration ?? 0;
+      // Declared without a seed: every branch below either assigns both or
+      // `continue`s, and a placeholder here would only mask a missed branch.
+      let derived: number | null;
+      let source: string;
+
+      if (lecture.type === 'VIDEO' && lecture.videoUrl) {
+        // The packaged playlist, not the source MP4: it is a few hundred bytes
+        // and carries the same figure FFmpeg measured while writing it.
+        try {
+          const playlist = (
+            await this.firebase.downloadFile(lecture.videoUrl)
+          ).toString('utf8');
+          derived = hlsPlaylistDurationSeconds(playlist);
+          source = 'hls';
+          if (derived === null) {
+            skipped.push({
+              id: lecture.id,
+              title: lecture.title,
+              reason: 'playlist carries no segment durations',
+            });
+            continue;
+          }
+        } catch {
+          // A lecture whose playlist cannot be read is reported, never guessed
+          // at: writing a fabricated length here is the failure this endpoint
+          // exists to undo.
+          skipped.push({
+            id: lecture.id,
+            title: lecture.title,
+            reason: 'playlist could not be read from storage',
+          });
+          continue;
+        }
+      } else if (lecture.type === 'READING') {
+        derived = readingDurationSeconds(lecture.content);
+        source = 'reading-time';
+        if (derived === 0) {
+          skipped.push({
+            id: lecture.id,
+            title: lecture.title,
+            reason: 'reading has no body text to time',
+          });
+          continue;
+        }
+      } else {
+        skipped.push({
+          id: lecture.id,
+          title: lecture.title,
+          reason:
+            lecture.type === 'VIDEO'
+              ? 'video has not been packaged yet'
+              : `no way to measure a ${lecture.type} lecture`,
+        });
+        continue;
+      }
+
+      if (derived === stored) {
+        unchanged += 1;
+        continue;
+      }
+
+      changed.push({
+        id: lecture.id,
+        title: lecture.title,
+        type: lecture.type,
+        source,
+        storedSeconds: stored,
+        derivedSeconds: derived,
+      });
+
+      if (apply) {
+        // Partial variables only — Data Connect leaves absent fields alone, the
+        // same way the transcoder writes a duration without touching the title.
+        await this.dc.executeMutationAsAdmin('AdminUpdateLecture', {
+          lectureId: lecture.id,
+          duration: derived,
+        });
+      }
+    }
+
+    return { courseId, applied: apply, changed, unchanged, skipped };
   }
 }

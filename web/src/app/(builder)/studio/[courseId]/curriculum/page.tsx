@@ -64,6 +64,14 @@ export default function CurriculumPage() {
   const [lectureTitle, setLectureTitle] = useState('')
   const [lectureType, setLectureType] = useState<LectureType>('READING')
   const [lectureMinutes, setLectureMinutes] = useState('0')
+  /**
+   * The minutes the editor opened with, so a save can tell whether the author
+   * touched the field at all. Without it every save rewrote `duration` from a
+   * box seeded with `round(seconds / 60)`, so editing a *title* silently
+   * re-rounded the length to the nearest minute — and for a packaged video that
+   * meant discarding the exact figure ffprobe measured during transcode.
+   */
+  const [initialLectureMinutes, setInitialLectureMinutes] = useState('0')
   const [lectureError, setLectureError] = useState<string | null>(null)
   const focusSectionId = useRef('')
   // "new" is a placeholder id until the setup step creates the course —
@@ -278,10 +286,12 @@ export default function CurriculumPage() {
   }
 
   const startEditingLecture = (lecture: Lecture) => {
+    const minutes = String(Math.round(lecture.duration / 60))
     setEditingLectureId(lecture.id)
     setLectureTitle(lecture.title)
     setLectureType(lecture.type)
-    setLectureMinutes(String(Math.round(lecture.duration / 60)))
+    setLectureMinutes(minutes)
+    setInitialLectureMinutes(minutes)
     setLectureError(null)
     updateLecture.reset()
   }
@@ -300,17 +310,29 @@ export default function CurriculumPage() {
       return
     }
 
-    // createLecture hard-codes `duration: 0`, which is why every lesson read
-    // "0 min" and every course total "0h 0m" while duration is a headline stat.
+    // Send the length only when it was actually edited. createLecture still
+    // hard-codes `duration: 0` — which is why a lesson nobody has timed reads
+    // "0m" — but an untouched field must not restate what it was seeded with:
+    // that seed is minute-rounded, and for a packaged video the stored value is
+    // the exact second count ffprobe measured. Restating it loses up to 59
+    // seconds *and* moves the server's completion bar, which is
+    // `duration * COMPLETION_THRESHOLD`.
+    const durationEdited = lectureMinutes !== initialLectureMinutes
     const duration = Math.round(minutes * 60)
     setLectureError(null)
     try {
-      await updateLecture.mutateAsync({ sectionId, lectureId, payload: { title, type: lectureType, duration } })
+      await updateLecture.mutateAsync({
+        sectionId,
+        lectureId,
+        payload: { title, type: lectureType, ...(durationEdited ? { duration } : {}) },
+      })
       setSections((current) => current.map((section) => section.id === sectionId
         ? {
             ...section,
             lectures: section.lectures.map((lecture) =>
-              lecture.id === lectureId ? { ...lecture, title, type: lectureType, duration } : lecture
+              lecture.id === lectureId
+                ? { ...lecture, title, type: lectureType, ...(durationEdited ? { duration } : {}) }
+                : lecture
             ),
           }
         : section))
@@ -602,10 +624,22 @@ export default function CurriculumPage() {
                                       </SelectField>
                                     )}
                                   </FormField>
+                                  {/* A packaged video already has its exact length:
+                                      the transcode probes it with ffprobe and
+                                      writes it to the lecture. Typing over that
+                                      can only make it less accurate, so the field
+                                      states the measured value instead of
+                                      inviting a guess. Switching the lesson away
+                                      from VIDEO hands it back — a reading has no
+                                      media to measure. */}
                                   <FormField
                                     id={`lecture-duration-${lecture.id}`}
                                     label={t('builder.curriculum.durationLabel')}
-                                    hint={t('builder.curriculum.durationHint')}
+                                    hint={
+                                      lectureType === 'VIDEO' && lecture.videoUrl
+                                        ? t('builder.curriculum.durationMeasured')
+                                        : t('builder.curriculum.durationHint')
+                                    }
                                   >
                                     {(field) => (
                                       <Input
@@ -613,6 +647,12 @@ export default function CurriculumPage() {
                                         type="number"
                                         min="0"
                                         inputMode="numeric"
+                                        readOnly={lectureType === 'VIDEO' && Boolean(lecture.videoUrl)}
+                                        className={
+                                          lectureType === 'VIDEO' && lecture.videoUrl
+                                            ? 'bg-subtle text-content-secondary'
+                                            : undefined
+                                        }
                                         value={lectureMinutes}
                                         onChange={(event) => setLectureMinutes(event.target.value)}
                                       />
