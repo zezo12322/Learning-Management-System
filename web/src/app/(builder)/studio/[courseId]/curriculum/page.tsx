@@ -73,6 +73,8 @@ export default function CurriculumPage() {
    */
   const [initialLectureMinutes, setInitialLectureMinutes] = useState('0')
   const [lectureError, setLectureError] = useState<string | null>(null)
+  /** The lesson whose delete is awaiting confirmation, inside its own editor. */
+  const [confirmDeleteLectureId, setConfirmDeleteLectureId] = useState('')
   const focusSectionId = useRef('')
   // "new" is a placeholder id until the setup step creates the course —
   // GET /courses/new would just 404, so nothing is fetched until it is real.
@@ -125,6 +127,17 @@ export default function CurriculumPage() {
   })
   const reorderSections = useMutation({
     mutationFn: (orderedIds: string[]) => authoringApi.reorderSections(courseId, orderedIds),
+  })
+  // Sections could be deleted and reordered from the start; lessons could be
+  // neither, so an instructor who added the wrong lesson had no way back and no
+  // way to fix the order — though the API has supported both all along.
+  const deleteLecture = useMutation({
+    mutationFn: ({ sectionId, lectureId }: { sectionId: string; lectureId: string }) =>
+      authoringApi.deleteLecture(courseId, sectionId, lectureId),
+  })
+  const reorderLectures = useMutation({
+    mutationFn: ({ sectionId, orderedIds }: { sectionId: string; orderedIds: string[] }) =>
+      authoringApi.reorderLectures(courseId, sectionId, orderedIds),
   })
 
   const toggleSection = (sectionId: string) =>
@@ -287,6 +300,7 @@ export default function CurriculumPage() {
 
   const startEditingLecture = (lecture: Lecture) => {
     const minutes = String(Math.round(lecture.duration / 60))
+    setConfirmDeleteLectureId('')
     setEditingLectureId(lecture.id)
     setLectureTitle(lecture.title)
     setLectureType(lecture.type)
@@ -298,6 +312,7 @@ export default function CurriculumPage() {
 
   const cancelEditingLecture = () => {
     setEditingLectureId('')
+    setConfirmDeleteLectureId('')
     setLectureError(null)
     updateLecture.reset()
   }
@@ -342,6 +357,56 @@ export default function CurriculumPage() {
     } catch (error) {
       setLectureError(apiErrorMessage(error, t('builder.curriculum.lessonSaveFailed')))
     }
+  }
+
+  const removeLesson = async (sectionId: string, lectureId: string) => {
+    setLectureError(null)
+    try {
+      await deleteLecture.mutateAsync({ sectionId, lectureId })
+      setSections((current) => current.map((section) => section.id === sectionId
+        ? { ...section, lectures: section.lectures.filter((lecture) => lecture.id !== lectureId) }
+        : section))
+      setConfirmDeleteLectureId('')
+      cancelEditingLecture()
+      await queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
+      showNotice(t('builder.curriculum.lessonDeleted'))
+    } catch (error) {
+      setLectureError(apiErrorMessage(error, t('builder.curriculum.lessonDeleteError')))
+    }
+  }
+
+  /**
+   * Same contract as `moveSection`: swap locally, post the new order, and put
+   * the previous order back if the server rejects it rather than leaving the UI
+   * asserting an order that was never saved.
+   *
+   * `index` is the position within the section's own lecture list, never the
+   * filtered view — a filter must not be able to reorder what it is hiding.
+   */
+  const moveLesson = (sectionId: string, index: number, direction: -1 | 1) => {
+    const section = sections.find((item) => item.id === sectionId)
+    if (!section) return
+    const target = index + direction
+    if (target < 0 || target >= section.lectures.length) return
+    const previous = sections
+    const lectures = [...section.lectures]
+    ;[lectures[index], lectures[target]] = [lectures[target], lectures[index]]
+    const reordered = lectures.map((lecture, order) => ({ ...lecture, order: order + 1 }))
+    setSections((current) => current.map((item) =>
+      item.id === sectionId ? { ...item, lectures: reordered } : item))
+    setLectureError(null)
+    reorderLectures.mutate(
+      { sectionId, orderedIds: reordered.map((lecture) => lecture.id) },
+      {
+        onSuccess: () => announce(t('builder.curriculum.reorderSaved')),
+        onError: () => {
+          setSections(previous)
+          announce(t('builder.curriculum.reorderFailed'))
+          setLectureError(t('builder.curriculum.reorderFailed'))
+          void queryClient.invalidateQueries({ queryKey: ['authoring-course', courseId] })
+        },
+      },
+    )
   }
 
   const allLectures = useMemo(() => sections.flatMap((section) => section.lectures), [sections])
@@ -584,17 +649,30 @@ export default function CurriculumPage() {
                       )}
 
                       <ul role="list" className="divide-y divide-border">
-                        {lessons.map((lecture) => (
+                        {lessons.map((lecture) => {
+                          // Position within the section, not within the filtered
+                          // view, so a filter never renumbers the curriculum — and
+                          // reordering moves the lesson relative to its real
+                          // neighbours rather than the visible ones.
+                          const position = section.lectures.indexOf(lecture)
+                          return (
                           <LectureRow
                             key={lecture.id}
                             lecture={lecture}
-                            // Position within the section, not within the filtered
-                            // view, so a filter never renumbers the curriculum.
-                            index={section.lectures.indexOf(lecture) + 1}
+                            index={position + 1}
                             density="comfortable"
                             readiness={lectureReadiness(lecture)}
                             onEdit={() => startEditingLecture(lecture)}
                             quizHref={lecture.type === 'QUIZ' ? `/quiz/${courseId}/${lecture.id}` : undefined}
+                            reorder={
+                              <ReorderControls
+                                name={lecture.title}
+                                isFirst={position === 0}
+                                isLast={position === section.lectures.length - 1}
+                                onMoveUp={() => moveLesson(section.id, position, -1)}
+                                onMoveDown={() => moveLesson(section.id, position, 1)}
+                              />
+                            }
                           >
                             {editingLectureId === lecture.id && (
                               <div className="space-y-3 bg-subtle p-4">
@@ -660,14 +738,37 @@ export default function CurriculumPage() {
                                   </FormField>
                                 </div>
                                 {lectureError && <p role="alert" className="rounded-input bg-error-soft px-3 py-2 text-xs text-error">{lectureError}</p>}
-                                <div className="flex justify-end gap-2">
-                                  <Button variant="outline" size="sm" onClick={cancelEditingLecture} disabled={updateLecture.isPending}>{t('common.cancel')}</Button>
-                                  <Button size="sm" onClick={() => void saveLecture(section.id, lecture.id)} loading={updateLecture.isPending}>{t('builder.curriculum.saveLesson')}</Button>
-                                </div>
+                                {/* Delete lives in the editor rather than on the
+                                    row: the row is a list of many, and a
+                                    destructive control there is one mis-tap from
+                                    removing the wrong lesson. */}
+                                {confirmDeleteLectureId === lecture.id ? (
+                                  <div className="space-y-3 rounded-input bg-error-soft p-3">
+                                    <p className="text-sm font-semibold text-content">{t('builder.curriculum.deleteLessonPrompt')} “{lecture.title}”?</p>
+                                    <p className="text-xs leading-5 text-content-secondary">{t('builder.curriculum.deleteLessonBody')}</p>
+                                    <div className="flex justify-end gap-2">
+                                      <Button variant="outline" size="sm" onClick={() => setConfirmDeleteLectureId('')} disabled={deleteLecture.isPending}>{t('common.cancel')}</Button>
+                                      <Button variant="danger" size="sm" onClick={() => void removeLesson(section.id, lecture.id)} loading={deleteLecture.isPending}>
+                                        <Trash2 size={14} aria-hidden /> {t('builder.curriculum.deleteLesson')}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteLectureId(lecture.id)}>
+                                      <Trash2 size={14} aria-hidden /> {t('builder.curriculum.deleteLesson')}
+                                    </Button>
+                                    <span className="flex items-center gap-2">
+                                      <Button variant="outline" size="sm" onClick={cancelEditingLecture} disabled={updateLecture.isPending}>{t('common.cancel')}</Button>
+                                      <Button size="sm" onClick={() => void saveLecture(section.id, lecture.id)} loading={updateLecture.isPending}>{t('builder.curriculum.saveLesson')}</Button>
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </LectureRow>
-                        ))}
+                          )
+                        })}
                       </ul>
 
                       {lessonSectionId === section.id ? (

@@ -378,6 +378,19 @@ export const authoringApi = {
   ),
   updateLecture: (courseId: string, sectionId: string, lectureId: string, payload: Record<string, unknown>) =>
     apiClient.patch(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`, payload).then((response) => response.data),
+  /**
+   * Soft-delete a lesson. Sections had delete and reorder from the start while
+   * lessons had neither, so an instructor who added the wrong lesson — or added
+   * them out of order — had no way back even though the API supported both.
+   */
+  deleteLecture: (courseId: string, sectionId: string, lectureId: string) =>
+    apiClient
+      .delete(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`)
+      .then((response) => response.data),
+  reorderLectures: (courseId: string, sectionId: string, orderedIds: string[]) =>
+    apiClient
+      .put(`/courses/${courseId}/sections/${sectionId}/lectures/reorder`, { orderedIds })
+      .then((response) => response.data),
   signedUpload: (payload: {
     entityType: UploadEntityType
     courseId: string
@@ -558,14 +571,71 @@ export const quizApi = {
   finishAttempt: (courseId: string, quizId: string, attemptId: string): Promise<QuizResult> =>
     apiClient
       .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/finish`)
+      .then((response) => quizResultOf(response.data) ?? EMPTY_QUIZ_RESULT),
+
+  /**
+   * Session heartbeat (API_DOCUMENTATION §11.2). The server owns the clock: it
+   * answers with the authoritative `remainingSeconds` derived from the attempt's
+   * own `startedAt`, and once the limit is up it auto-grades and returns the
+   * result with `active: false`.
+   *
+   * The take screen leans on this instead of trusting a client tick counter,
+   * which reset to the full limit on reload and ran slow in a background tab.
+   */
+  attemptHeartbeat: (
+    courseId: string,
+    quizId: string,
+    attemptId: string,
+  ): Promise<{ active: boolean; remainingSeconds: number | null; result: QuizResult | null }> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/heartbeat`)
       .then((response) => {
         const raw = objectValue(response.data)
         return {
-          score: numberValue(raw.score),
-          passed: Boolean(raw.passed),
-          totalQuestions: numberValue(raw.totalQuestions),
-          correctCount: numberValue(raw.correctCount),
-          answeredCount: numberValue(raw.answeredCount),
+          active: raw.active !== false,
+          remainingSeconds:
+            typeof raw.remainingSeconds === 'number' ? Math.max(0, raw.remainingSeconds) : null,
+          result: quizResultOf(raw),
         }
       }),
+}
+
+const EMPTY_QUIZ_RESULT: QuizResult = {
+  score: 0,
+  passed: false,
+  totalQuestions: 0,
+  correctCount: 0,
+  answeredCount: 0,
+}
+
+/**
+ * Read a graded result out of a payload, or `null` when the payload is not a
+ * result at all.
+ *
+ * `totalQuestions` is the tell: every grading path in the backend reports it,
+ * and no other response on this route carries it. That matters because the same
+ * shape arrives three ways — a normal `finish`, a heartbeat that timed out, and
+ * the body of the `410 Gone` thrown when an answer lands after the limit. The
+ * 410 in particular used to surface as a generic "try again" even though the
+ * attempt *had* been graded, leaving the learner staring at an error instead of
+ * their score.
+ */
+export function quizResultOf(value: unknown): QuizResult | null {
+  const raw = objectValue(value)
+  if (typeof raw.totalQuestions !== 'number') return null
+  return {
+    score: numberValue(raw.score),
+    passed: Boolean(raw.passed),
+    totalQuestions: numberValue(raw.totalQuestions),
+    correctCount: numberValue(raw.correctCount),
+    answeredCount: numberValue(raw.answeredCount),
+  }
+}
+
+/** The graded result carried by a `410 Gone` (session timed out, auto-graded). */
+export function quizResultFromError(error: unknown): QuizResult | null {
+  if (typeof error !== 'object' || !error || !('response' in error)) return null
+  const response = objectValue((error as { response?: unknown }).response)
+  if (numberValue(response.status) !== 410) return null
+  return quizResultOf(response.data)
 }
