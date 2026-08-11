@@ -119,5 +119,49 @@ describe('EnrollmentService', () => {
         'tok',
       );
     });
+
+    it('refuses a course-linked mission when the caller is not in that course', async () => {
+      // The gate this covers was dead: it keyed off `mission.courseId`, which
+      // GetMissionForEnrollment did not select, so every course-linked mission
+      // was joinable by anyone — and joining is what unlocks submitting to it.
+      const dc = makeDc({
+        GetMissionForEnrollment: {
+          mission: { id: 'm1', deletedAt: null, course: { id: 'c1' } },
+        },
+      });
+      const admin = { enrollments: [] };
+      const svc = new EnrollmentService({
+        ...dc,
+        executeQueryAsAdmin: jest.fn().mockResolvedValue(admin),
+      } as any);
+      await expect(
+        svc.enrollInMission('m1', 'tok', 'u1'),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(dc.executeMutation).not.toHaveBeenCalled();
+    });
+
+    it('allows a course-linked mission when the caller is enrolled in that course', async () => {
+      const dc = makeDc(
+        {
+          GetMissionForEnrollment: {
+            mission: { id: 'm1', deletedAt: null, course: { id: 'c1' } },
+          },
+          GetUserEnrollmentForMission: { enrollments: [] },
+        },
+        { EnrollInMission: { enrollment_insert: { id: 'new' } } },
+      );
+      const svc = new EnrollmentService({
+        ...dc,
+        executeQueryAsAdmin: jest
+          .fn()
+          .mockResolvedValue({ enrollments: [{ status: 'ACTIVE' }] }),
+      } as any);
+      await svc.enrollInMission('m1', 'tok', 'u1');
+      expect(dc.executeMutation).toHaveBeenCalledWith(
+        'EnrollInMission',
+        { missionId: 'm1', userId: 'u1' },
+        'tok',
+      );
+    });
   });
 });

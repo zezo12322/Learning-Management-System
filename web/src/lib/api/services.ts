@@ -1,11 +1,16 @@
 import { apiBaseUrl, apiClient } from './client'
 import { safeLinkUrl } from '@/lib/safeUrl'
 import type {
+  AuthoredMission,
   Category,
   Certificate,
   ContinueLearningItem,
   CourseLevel,
+  MissionDifficulty,
+  MyAssignment,
   MySubmission,
+  PendingSubmission,
+  RubricCriterion,
   SubmissionStatus,
   CourseProgress,
   Curriculum,
@@ -137,15 +142,62 @@ function mapSubmission(value: unknown): MySubmission {
   const graded = scores.length > 0
   return {
     id: stringValue(raw.id),
+    missionId: stringValue(mission.id ?? raw.missionId),
     title: stringValue(mission.title ?? raw.title, 'Assignment'),
     difficulty: stringValue(mission.difficulty) || undefined,
     fileUrl: stringValue(raw.fileUrl),
     status: (stringValue(raw.status, 'PENDING') as SubmissionStatus) || 'PENDING',
     feedback: typeof raw.feedback === 'string' ? raw.feedback : null,
     submittedAt: stringValue(raw.submittedAt),
+    attemptNumber: numberValue(raw.attemptNumber, 1),
     scores,
     totalScore: graded ? scores.reduce((sum, entry) => sum + entry.score, 0) : null,
     maxPoints: graded ? scores.reduce((sum, entry) => sum + entry.maxPoints, 0) : null,
+  }
+}
+
+export function mapRubricCriterion(value: unknown, index = 0): RubricCriterion {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id),
+    name: stringValue(raw.criterionName ?? raw.name, 'Criterion'),
+    description: stringValue(raw.description) || undefined,
+    maxPoints: numberValue(raw.maxPoints),
+    order: numberValue(raw.order, index + 1),
+  }
+}
+
+function mapMyAssignment(value: unknown): MyAssignment {
+  const raw = objectValue(value)
+  const course = objectValue(raw.course)
+  const criteria = arrayValue(raw.criteria).map(mapRubricCriterion)
+  const attempts = arrayValue(raw.mySubmissions).map((entry) => {
+    const rawAttempt = objectValue(entry)
+    return {
+      id: stringValue(rawAttempt.id),
+      status: (stringValue(rawAttempt.status, 'PENDING') as SubmissionStatus) || 'PENDING',
+      submittedAt: stringValue(rawAttempt.submittedAt),
+      attemptNumber: numberValue(rawAttempt.attemptNumber, 1),
+      feedback: typeof rawAttempt.feedback === 'string' ? rawAttempt.feedback : null,
+    }
+  })
+  // The mission enrollment is a separate record from the course enrollment, and
+  // the API refuses a submission without an ACTIVE one — so the UI has to know
+  // whether it must join the assignment first.
+  const enrollment = objectValue(arrayValue(raw.myMissionEnrollments)[0])
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Assignment'),
+    scenario: stringValue(raw.scenarioDescription),
+    durationMinutes: numberValue(raw.durationMinutes),
+    difficulty: stringValue(raw.difficulty, 'INTERMEDIATE'),
+    skills: arrayValue(raw.skillsTested).filter((skill): skill is string => typeof skill === 'string'),
+    createdAt: stringValue(raw.createdAt),
+    course: stringValue(course.id) ? { id: stringValue(course.id), title: stringValue(course.title) } : null,
+    criteria,
+    totalPoints: criteria.reduce((sum, criterion) => sum + criterion.maxPoints, 0),
+    attempts,
+    missionEnrollmentStatus: stringValue(enrollment.status) || null,
   }
 }
 
@@ -153,6 +205,138 @@ export const submissionsApi = {
   /** The signed-in student's own assignment submissions, newest first. */
   mine: () =>
     apiClient.get('/me/submissions').then((response) => arrayValue(response.data).map(mapSubmission)),
+
+  /**
+   * Assignments open to the signed-in learner (API_DOCUMENTATION §16). Every
+   * mission on a course they are enrolled in, with its rubric and their own
+   * attempts — the only way a learner can obtain a `missionId`, since the
+   * mission-authoring routes are owner-only.
+   */
+  myAssignments: () =>
+    apiClient.get('/me/assignments').then((response) => arrayValue(response.data).map(mapMyAssignment)),
+
+  /**
+   * Hand in an assignment.
+   *
+   * `fileUrl` is a link, not an upload: `POST /uploads/signed-url` is
+   * instructor/admin-only, so there is no learner-facing storage path in this
+   * API. The submit form asks for a link to the work and validates it before it
+   * is sent.
+   */
+  submit: (missionId: string, fileUrl: string) =>
+    apiClient
+      .post(`/missions/${missionId}/submissions`, { fileUrl })
+      .then((response) =>
+        stringValue(
+          mutationEntity(response.data, [
+            'missionSubmission_insert',
+            'missionSubmissionInsert',
+            'submission',
+          ]).id,
+        ),
+      ),
+}
+
+// ── Grading (instructor) ─────────────────────────────────────────────
+function mapPendingSubmission(value: unknown): PendingSubmission {
+  const raw = objectValue(value)
+  const mission = objectValue(raw.mission)
+  const course = objectValue(mission.course)
+  const student = objectValue(raw.student)
+  return {
+    id: stringValue(raw.id),
+    missionId: stringValue(mission.id),
+    missionTitle: stringValue(mission.title, 'Assignment'),
+    difficulty: stringValue(mission.difficulty) || undefined,
+    courseTitle: stringValue(course.title) || undefined,
+    studentName: stringValue(student.name, 'Learner'),
+    studentEmail: stringValue(student.email),
+    fileUrl: stringValue(raw.fileUrl),
+    submittedAt: stringValue(raw.submittedAt),
+    attemptNumber: numberValue(raw.attemptNumber, 1),
+  }
+}
+
+export const gradingApi = {
+  /** Submissions awaiting a grade, scoped server-side to missions I own. */
+  pending: () =>
+    apiClient
+      .get('/submissions/pending')
+      .then((response) => arrayValue(response.data).map(mapPendingSubmission)),
+
+  /**
+   * Grade a submission. Both fields are optional server-side, but the server
+   * rejects a score above its criterion's `maxPoints` and any criterion that
+   * does not belong to the mission — so the form only offers the mission's own
+   * rubric and caps each input.
+   */
+  grade: (submissionId: string, payload: { feedback?: string; scores?: { criterionId: string; score: number }[] }) =>
+    apiClient.post(`/submissions/${submissionId}/grade`, payload).then((response) => response.data),
+}
+
+// ── Assignment authoring (missions) ──────────────────────────────────
+export type MissionWritePayload = {
+  title: string
+  scenarioDescription: string
+  durationMinutes: number
+  categoryId: string
+  difficulty: MissionDifficulty
+  skillsTested: string[]
+  courseId?: string
+}
+
+function mapAuthoredMission(value: unknown): AuthoredMission {
+  const raw = objectValue(value)
+  const category = objectValue(raw.category)
+  const course = objectValue(raw.course)
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled assignment'),
+    scenario: stringValue(raw.scenarioDescription),
+    durationMinutes: numberValue(raw.durationMinutes),
+    difficulty: (stringValue(raw.difficulty, 'INTERMEDIATE') as MissionDifficulty) || 'INTERMEDIATE',
+    skills: arrayValue(raw.skillsTested).filter((skill): skill is string => typeof skill === 'string'),
+    categoryId: stringValue(category.id) || undefined,
+    categoryName: stringValue(category.name) || undefined,
+    course: stringValue(course.id) ? { id: stringValue(course.id), title: stringValue(course.title) } : null,
+    criteria: arrayValue(raw.criteria).map(mapRubricCriterion),
+    updatedAt: stringValue(raw.updatedAt),
+  }
+}
+
+export const missionsApi = {
+  /** Assignments I authored. */
+  list: () =>
+    apiClient.get('/missions').then((response) => arrayValue(response.data).map(mapAuthoredMission)),
+  get: (missionId: string) =>
+    apiClient.get(`/missions/${missionId}`).then((response) => mapAuthoredMission(response.data)),
+  create: (payload: MissionWritePayload) =>
+    apiClient.post('/missions', payload).then((response) =>
+      stringValue(
+        mutationEntity(response.data, ['mission_insert', 'missionInsert', 'mission']).id,
+      ),
+    ),
+  update: (missionId: string, payload: Partial<MissionWritePayload>) =>
+    apiClient.patch(`/missions/${missionId}`, payload).then((response) => response.data),
+  remove: (missionId: string) =>
+    apiClient.delete(`/missions/${missionId}`).then((response) => response.data),
+}
+
+export const rubricApi = {
+  create: (missionId: string, payload: { criterionName: string; description?: string; maxPoints: number }) =>
+    apiClient.post(`/missions/${missionId}/rubric`, payload).then((response) => response.data),
+  update: (
+    missionId: string,
+    criterionId: string,
+    payload: { criterionName?: string; description?: string; maxPoints?: number },
+  ) =>
+    apiClient
+      .patch(`/missions/${missionId}/rubric/${criterionId}`, payload)
+      .then((response) => response.data),
+  remove: (missionId: string, criterionId: string) =>
+    apiClient.delete(`/missions/${missionId}/rubric/${criterionId}`).then((response) => response.data),
+  reorder: (missionId: string, orderedIds: string[]) =>
+    apiClient.put(`/missions/${missionId}/rubric/reorder`, { orderedIds }).then((response) => response.data),
 }
 
 // ── Certificates ─────────────────────────────────────────────────────
@@ -190,6 +374,14 @@ export const enrollmentApi = {
     }),
   get: (courseId: string) =>
     apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
+
+  /**
+   * Join an assignment. Idempotent and reactivating, like the course variant —
+   * and required before the API will accept a submission, which is why the
+   * submit flow calls it first when no ACTIVE mission enrollment exists.
+   */
+  enrollInMission: (missionId: string) =>
+    apiClient.post(`/missions/${missionId}/enroll`).then((response) => response.data),
 }
 
 // ── Payments (Paymob hosted checkout) ────────────────────────────────

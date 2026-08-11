@@ -12,6 +12,7 @@ import {
   BarChart3,
   Bell,
   ClipboardList,
+  GraduationCap,
   Home,
   UploadCloud,
   UserRound,
@@ -52,6 +53,8 @@ const LEARNER_NAV: NavItem[] = [
 const TEACHING_NAV: NavItem[] = [
   { href: '/dashboard', label: 'nav.overview', icon: LayoutDashboard },
   { href: '/courses', label: 'nav.courses', icon: LibraryBig },
+  { href: '/teaching/assignments', label: 'nav.setAssignments', icon: ClipboardList },
+  { href: '/teaching/grading', label: 'nav.grading', icon: GraduationCap },
   { href: '/students', label: 'nav.students', icon: UserPlus },
   { href: '/insights', label: 'nav.insights', icon: BarChart3 },
   { href: '/uploads', label: 'nav.uploads', icon: UploadCloud },

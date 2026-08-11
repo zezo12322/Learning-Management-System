@@ -7,7 +7,9 @@
 # every other instructor's students' submissions (name/email/fileUrl).
 query GetPendingSubmissions @auth(expr: "auth.token.roles != null && 'admin' in auth.token.roles") {
   missionSubmissions(where: { status: { eq: PENDING } }, orderBy: [{ submittedAt: ASC }]) {
-    id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
+    # `mission { id }`: without it the grading screen cannot load the rubric the
+    # submission has to be scored against, since the criteria live on the mission.
+    id fileUrl submittedAt attemptNumber student { name email } mission { id title difficulty course { title } }
   }
 }
 
@@ -33,7 +35,9 @@ query GetMyPendingSubmissions @auth(expr: "auth.token.roles != null && ('admin' 
     },
     orderBy: [{ submittedAt: ASC }]
   ) {
-    id fileUrl submittedAt attemptNumber student { name email } mission { title difficulty course { title } }
+    # `mission { id }`: without it the grading screen cannot load the rubric the
+    # submission has to be scored against, since the criteria live on the mission.
+    id fileUrl submittedAt attemptNumber student { name email } mission { id title difficulty course { title } }
   }
 }
 
