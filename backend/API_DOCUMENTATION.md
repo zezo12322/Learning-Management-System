@@ -980,7 +980,7 @@ are not listed: no enrollment could entitle a learner to them.
   { "id": "…", "title": "Incident Response Drill", "scenarioDescription": "…",
     "durationMinutes": 90, "difficulty": "ADVANCED", "skillsTested": ["debugging"],
     "createdAt": "…", "course": { "id": "…", "title": "…" },
-    "criteria": [ { "id": "…", "criterionName": "Clarity", "description": "…", "maxPoints": 10, "order": 1 } ],
+    "assignmentCriteria": [ { "id": "…", "criterionName": "Clarity", "description": "…", "maxPoints": 10, "order": 1 } ],
     "mySubmissions": [ { "id": "…", "status": "PENDING", "submittedAt": "…", "attemptNumber": 1, "feedback": null } ],
     "myMissionEnrollments": [ { "id": "…", "status": "ACTIVE" } ] }
 ]

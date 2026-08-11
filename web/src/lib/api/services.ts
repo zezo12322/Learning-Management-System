@@ -170,7 +170,10 @@ export function mapRubricCriterion(value: unknown, index = 0): RubricCriterion {
 function mapMyAssignment(value: unknown): MyAssignment {
   const raw = objectValue(value)
   const course = objectValue(raw.course)
-  const criteria = arrayValue(raw.criteria).map(mapRubricCriterion)
+  // `assignmentCriteria` is the alias MyAssignments has to use — see the query
+  // for why it cannot reuse `criteria`. The fallback keeps this mapper working
+  // against any payload that does send `criteria`.
+  const criteria = arrayValue(raw.assignmentCriteria ?? raw.criteria).map(mapRubricCriterion)
   const attempts = arrayValue(raw.mySubmissions).map((entry) => {
     const rawAttempt = objectValue(entry)
     return {

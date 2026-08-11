@@ -62,7 +62,13 @@ query MyAssignments @auth(level: USER) {
   ) {
     id title scenarioDescription durationMinutes difficulty skillsTested createdAt
     course { id title }
-    criteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order }
+    # `assignmentCriteria`, not `criteria`: the SDK generator requires an alias
+    # that carries arguments to be defined exactly once across the connector, so
+    # reusing AdminGetMission's `criteria` fails schema validation even though
+    # the two definitions are byte-identical. Every other repeated relation here
+    # is named for its use for the same reason (publishedSections, videoSections,
+    # userCompletionLectures).
+    assignmentCriteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order }
     mySubmissions: missionSubmissions_on_mission(
       where: { studentId: { eq_expr: "auth.uid" } },
       orderBy: [{ submittedAt: DESC }]
