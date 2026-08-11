@@ -313,18 +313,92 @@ export type SubmissionStatus = 'PENDING' | 'GRADED' | 'RETURNED' | 'REJECTED'
  */
 export interface MySubmission {
   id: string
+  /** The mission this answers — needed to group attempts by assignment. */
+  missionId: string
   title: string
   difficulty?: string
   fileUrl: string
   status: SubmissionStatus
   feedback?: string | null
   submittedAt: string
+  attemptNumber: number
   /** Per-criterion rubric scores (empty until an instructor grades it). */
   scores: { criterionName: string; score: number; maxPoints: number }[]
   /** Sum of `scores`, or null when the submission has not been graded. */
   totalScore: number | null
   /** Sum of the rubric's `maxPoints`, or null when no rubric was scored. */
   maxPoints: number | null
+}
+
+export type MissionDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
+
+/** One rubric criterion an assignment is marked against. */
+export interface RubricCriterion {
+  id: string
+  name: string
+  description?: string
+  maxPoints: number
+  order: number
+}
+
+/**
+ * One row of GET /me/assignments — an assignment open to the signed-in learner,
+ * with the rubric it will be marked against and their own attempts so far.
+ */
+export interface MyAssignment {
+  id: string
+  title: string
+  scenario: string
+  durationMinutes: number
+  difficulty: string
+  skills: string[]
+  createdAt: string
+  course: { id: string; title: string } | null
+  criteria: RubricCriterion[]
+  /** Sum of the rubric's `maxPoints`; 0 when the author set no rubric. */
+  totalPoints: number
+  attempts: Array<{
+    id: string
+    status: SubmissionStatus
+    submittedAt: string
+    attemptNumber: number
+    feedback?: string | null
+  }>
+  /**
+   * The learner's enrollment in this mission, which is separate from the course
+   * enrollment and is what the API requires before accepting a submission.
+   * `null` means they have not joined the assignment yet.
+   */
+  missionEnrollmentStatus: string | null
+}
+
+/** An assignment as its author manages it (GET /missions, GET /missions/:id). */
+export interface AuthoredMission {
+  id: string
+  title: string
+  scenario: string
+  durationMinutes: number
+  difficulty: MissionDifficulty
+  skills: string[]
+  categoryId?: string
+  categoryName?: string
+  course: { id: string; title: string } | null
+  criteria: RubricCriterion[]
+  updatedAt: string
+}
+
+/** One row of the instructor's grading queue (GET /submissions/pending). */
+export interface PendingSubmission {
+  id: string
+  missionId: string
+  missionTitle: string
+  difficulty?: string
+  courseTitle?: string
+  studentName: string
+  studentEmail: string
+  fileUrl: string
+  submittedAt: string
+  attemptNumber: number
 }
 
 // ── Certificates ─────────────────────────────────────────────────────

@@ -1,11 +1,16 @@
 import { apiBaseUrl, apiClient } from './client'
 import { safeLinkUrl } from '@/lib/safeUrl'
 import type {
+  AuthoredMission,
   Category,
   Certificate,
   ContinueLearningItem,
   CourseLevel,
+  MissionDifficulty,
+  MyAssignment,
   MySubmission,
+  PendingSubmission,
+  RubricCriterion,
   SubmissionStatus,
   CourseProgress,
   Curriculum,
@@ -137,15 +142,65 @@ function mapSubmission(value: unknown): MySubmission {
   const graded = scores.length > 0
   return {
     id: stringValue(raw.id),
+    missionId: stringValue(mission.id ?? raw.missionId),
     title: stringValue(mission.title ?? raw.title, 'Assignment'),
     difficulty: stringValue(mission.difficulty) || undefined,
     fileUrl: stringValue(raw.fileUrl),
     status: (stringValue(raw.status, 'PENDING') as SubmissionStatus) || 'PENDING',
     feedback: typeof raw.feedback === 'string' ? raw.feedback : null,
     submittedAt: stringValue(raw.submittedAt),
+    attemptNumber: numberValue(raw.attemptNumber, 1),
     scores,
     totalScore: graded ? scores.reduce((sum, entry) => sum + entry.score, 0) : null,
     maxPoints: graded ? scores.reduce((sum, entry) => sum + entry.maxPoints, 0) : null,
+  }
+}
+
+export function mapRubricCriterion(value: unknown, index = 0): RubricCriterion {
+  const raw = objectValue(value)
+  return {
+    id: stringValue(raw.id),
+    name: stringValue(raw.criterionName ?? raw.name, 'Criterion'),
+    description: stringValue(raw.description) || undefined,
+    maxPoints: numberValue(raw.maxPoints),
+    order: numberValue(raw.order, index + 1),
+  }
+}
+
+function mapMyAssignment(value: unknown): MyAssignment {
+  const raw = objectValue(value)
+  const course = objectValue(raw.course)
+  // `assignmentCriteria` is the alias MyAssignments has to use — see the query
+  // for why it cannot reuse `criteria`. The fallback keeps this mapper working
+  // against any payload that does send `criteria`.
+  const criteria = arrayValue(raw.assignmentCriteria ?? raw.criteria).map(mapRubricCriterion)
+  const attempts = arrayValue(raw.mySubmissions).map((entry) => {
+    const rawAttempt = objectValue(entry)
+    return {
+      id: stringValue(rawAttempt.id),
+      status: (stringValue(rawAttempt.status, 'PENDING') as SubmissionStatus) || 'PENDING',
+      submittedAt: stringValue(rawAttempt.submittedAt),
+      attemptNumber: numberValue(rawAttempt.attemptNumber, 1),
+      feedback: typeof rawAttempt.feedback === 'string' ? rawAttempt.feedback : null,
+    }
+  })
+  // The mission enrollment is a separate record from the course enrollment, and
+  // the API refuses a submission without an ACTIVE one — so the UI has to know
+  // whether it must join the assignment first.
+  const enrollment = objectValue(arrayValue(raw.myMissionEnrollments)[0])
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Assignment'),
+    scenario: stringValue(raw.scenarioDescription),
+    durationMinutes: numberValue(raw.durationMinutes),
+    difficulty: stringValue(raw.difficulty, 'INTERMEDIATE'),
+    skills: arrayValue(raw.skillsTested).filter((skill): skill is string => typeof skill === 'string'),
+    createdAt: stringValue(raw.createdAt),
+    course: stringValue(course.id) ? { id: stringValue(course.id), title: stringValue(course.title) } : null,
+    criteria,
+    totalPoints: criteria.reduce((sum, criterion) => sum + criterion.maxPoints, 0),
+    attempts,
+    missionEnrollmentStatus: stringValue(enrollment.status) || null,
   }
 }
 
@@ -153,6 +208,138 @@ export const submissionsApi = {
   /** The signed-in student's own assignment submissions, newest first. */
   mine: () =>
     apiClient.get('/me/submissions').then((response) => arrayValue(response.data).map(mapSubmission)),
+
+  /**
+   * Assignments open to the signed-in learner (API_DOCUMENTATION §16). Every
+   * mission on a course they are enrolled in, with its rubric and their own
+   * attempts — the only way a learner can obtain a `missionId`, since the
+   * mission-authoring routes are owner-only.
+   */
+  myAssignments: () =>
+    apiClient.get('/me/assignments').then((response) => arrayValue(response.data).map(mapMyAssignment)),
+
+  /**
+   * Hand in an assignment.
+   *
+   * `fileUrl` is a link, not an upload: `POST /uploads/signed-url` is
+   * instructor/admin-only, so there is no learner-facing storage path in this
+   * API. The submit form asks for a link to the work and validates it before it
+   * is sent.
+   */
+  submit: (missionId: string, fileUrl: string) =>
+    apiClient
+      .post(`/missions/${missionId}/submissions`, { fileUrl })
+      .then((response) =>
+        stringValue(
+          mutationEntity(response.data, [
+            'missionSubmission_insert',
+            'missionSubmissionInsert',
+            'submission',
+          ]).id,
+        ),
+      ),
+}
+
+// ── Grading (instructor) ─────────────────────────────────────────────
+function mapPendingSubmission(value: unknown): PendingSubmission {
+  const raw = objectValue(value)
+  const mission = objectValue(raw.mission)
+  const course = objectValue(mission.course)
+  const student = objectValue(raw.student)
+  return {
+    id: stringValue(raw.id),
+    missionId: stringValue(mission.id),
+    missionTitle: stringValue(mission.title, 'Assignment'),
+    difficulty: stringValue(mission.difficulty) || undefined,
+    courseTitle: stringValue(course.title) || undefined,
+    studentName: stringValue(student.name, 'Learner'),
+    studentEmail: stringValue(student.email),
+    fileUrl: stringValue(raw.fileUrl),
+    submittedAt: stringValue(raw.submittedAt),
+    attemptNumber: numberValue(raw.attemptNumber, 1),
+  }
+}
+
+export const gradingApi = {
+  /** Submissions awaiting a grade, scoped server-side to missions I own. */
+  pending: () =>
+    apiClient
+      .get('/submissions/pending')
+      .then((response) => arrayValue(response.data).map(mapPendingSubmission)),
+
+  /**
+   * Grade a submission. Both fields are optional server-side, but the server
+   * rejects a score above its criterion's `maxPoints` and any criterion that
+   * does not belong to the mission — so the form only offers the mission's own
+   * rubric and caps each input.
+   */
+  grade: (submissionId: string, payload: { feedback?: string; scores?: { criterionId: string; score: number }[] }) =>
+    apiClient.post(`/submissions/${submissionId}/grade`, payload).then((response) => response.data),
+}
+
+// ── Assignment authoring (missions) ──────────────────────────────────
+export type MissionWritePayload = {
+  title: string
+  scenarioDescription: string
+  durationMinutes: number
+  categoryId: string
+  difficulty: MissionDifficulty
+  skillsTested: string[]
+  courseId?: string
+}
+
+function mapAuthoredMission(value: unknown): AuthoredMission {
+  const raw = objectValue(value)
+  const category = objectValue(raw.category)
+  const course = objectValue(raw.course)
+  return {
+    id: stringValue(raw.id),
+    title: stringValue(raw.title, 'Untitled assignment'),
+    scenario: stringValue(raw.scenarioDescription),
+    durationMinutes: numberValue(raw.durationMinutes),
+    difficulty: (stringValue(raw.difficulty, 'INTERMEDIATE') as MissionDifficulty) || 'INTERMEDIATE',
+    skills: arrayValue(raw.skillsTested).filter((skill): skill is string => typeof skill === 'string'),
+    categoryId: stringValue(category.id) || undefined,
+    categoryName: stringValue(category.name) || undefined,
+    course: stringValue(course.id) ? { id: stringValue(course.id), title: stringValue(course.title) } : null,
+    criteria: arrayValue(raw.criteria).map(mapRubricCriterion),
+    updatedAt: stringValue(raw.updatedAt),
+  }
+}
+
+export const missionsApi = {
+  /** Assignments I authored. */
+  list: () =>
+    apiClient.get('/missions').then((response) => arrayValue(response.data).map(mapAuthoredMission)),
+  get: (missionId: string) =>
+    apiClient.get(`/missions/${missionId}`).then((response) => mapAuthoredMission(response.data)),
+  create: (payload: MissionWritePayload) =>
+    apiClient.post('/missions', payload).then((response) =>
+      stringValue(
+        mutationEntity(response.data, ['mission_insert', 'missionInsert', 'mission']).id,
+      ),
+    ),
+  update: (missionId: string, payload: Partial<MissionWritePayload>) =>
+    apiClient.patch(`/missions/${missionId}`, payload).then((response) => response.data),
+  remove: (missionId: string) =>
+    apiClient.delete(`/missions/${missionId}`).then((response) => response.data),
+}
+
+export const rubricApi = {
+  create: (missionId: string, payload: { criterionName: string; description?: string; maxPoints: number }) =>
+    apiClient.post(`/missions/${missionId}/rubric`, payload).then((response) => response.data),
+  update: (
+    missionId: string,
+    criterionId: string,
+    payload: { criterionName?: string; description?: string; maxPoints?: number },
+  ) =>
+    apiClient
+      .patch(`/missions/${missionId}/rubric/${criterionId}`, payload)
+      .then((response) => response.data),
+  remove: (missionId: string, criterionId: string) =>
+    apiClient.delete(`/missions/${missionId}/rubric/${criterionId}`).then((response) => response.data),
+  reorder: (missionId: string, orderedIds: string[]) =>
+    apiClient.put(`/missions/${missionId}/rubric/reorder`, { orderedIds }).then((response) => response.data),
 }
 
 // ── Certificates ─────────────────────────────────────────────────────
@@ -190,6 +377,14 @@ export const enrollmentApi = {
     }),
   get: (courseId: string) =>
     apiClient.get<Enrollment | null>(`/courses/${courseId}/enrollment`).then((response) => response.data),
+
+  /**
+   * Join an assignment. Idempotent and reactivating, like the course variant —
+   * and required before the API will accept a submission, which is why the
+   * submit flow calls it first when no ACTIVE mission enrollment exists.
+   */
+  enrollInMission: (missionId: string) =>
+    apiClient.post(`/missions/${missionId}/enroll`).then((response) => response.data),
 }
 
 // ── Payments (Paymob hosted checkout) ────────────────────────────────
@@ -378,6 +573,19 @@ export const authoringApi = {
   ),
   updateLecture: (courseId: string, sectionId: string, lectureId: string, payload: Record<string, unknown>) =>
     apiClient.patch(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`, payload).then((response) => response.data),
+  /**
+   * Soft-delete a lesson. Sections had delete and reorder from the start while
+   * lessons had neither, so an instructor who added the wrong lesson — or added
+   * them out of order — had no way back even though the API supported both.
+   */
+  deleteLecture: (courseId: string, sectionId: string, lectureId: string) =>
+    apiClient
+      .delete(`/courses/${courseId}/sections/${sectionId}/lectures/${lectureId}`)
+      .then((response) => response.data),
+  reorderLectures: (courseId: string, sectionId: string, orderedIds: string[]) =>
+    apiClient
+      .put(`/courses/${courseId}/sections/${sectionId}/lectures/reorder`, { orderedIds })
+      .then((response) => response.data),
   signedUpload: (payload: {
     entityType: UploadEntityType
     courseId: string
@@ -558,14 +766,71 @@ export const quizApi = {
   finishAttempt: (courseId: string, quizId: string, attemptId: string): Promise<QuizResult> =>
     apiClient
       .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/finish`)
+      .then((response) => quizResultOf(response.data) ?? EMPTY_QUIZ_RESULT),
+
+  /**
+   * Session heartbeat (API_DOCUMENTATION §11.2). The server owns the clock: it
+   * answers with the authoritative `remainingSeconds` derived from the attempt's
+   * own `startedAt`, and once the limit is up it auto-grades and returns the
+   * result with `active: false`.
+   *
+   * The take screen leans on this instead of trusting a client tick counter,
+   * which reset to the full limit on reload and ran slow in a background tab.
+   */
+  attemptHeartbeat: (
+    courseId: string,
+    quizId: string,
+    attemptId: string,
+  ): Promise<{ active: boolean; remainingSeconds: number | null; result: QuizResult | null }> =>
+    apiClient
+      .post(`/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/heartbeat`)
       .then((response) => {
         const raw = objectValue(response.data)
         return {
-          score: numberValue(raw.score),
-          passed: Boolean(raw.passed),
-          totalQuestions: numberValue(raw.totalQuestions),
-          correctCount: numberValue(raw.correctCount),
-          answeredCount: numberValue(raw.answeredCount),
+          active: raw.active !== false,
+          remainingSeconds:
+            typeof raw.remainingSeconds === 'number' ? Math.max(0, raw.remainingSeconds) : null,
+          result: quizResultOf(raw),
         }
       }),
+}
+
+const EMPTY_QUIZ_RESULT: QuizResult = {
+  score: 0,
+  passed: false,
+  totalQuestions: 0,
+  correctCount: 0,
+  answeredCount: 0,
+}
+
+/**
+ * Read a graded result out of a payload, or `null` when the payload is not a
+ * result at all.
+ *
+ * `totalQuestions` is the tell: every grading path in the backend reports it,
+ * and no other response on this route carries it. That matters because the same
+ * shape arrives three ways — a normal `finish`, a heartbeat that timed out, and
+ * the body of the `410 Gone` thrown when an answer lands after the limit. The
+ * 410 in particular used to surface as a generic "try again" even though the
+ * attempt *had* been graded, leaving the learner staring at an error instead of
+ * their score.
+ */
+export function quizResultOf(value: unknown): QuizResult | null {
+  const raw = objectValue(value)
+  if (typeof raw.totalQuestions !== 'number') return null
+  return {
+    score: numberValue(raw.score),
+    passed: Boolean(raw.passed),
+    totalQuestions: numberValue(raw.totalQuestions),
+    correctCount: numberValue(raw.correctCount),
+    answeredCount: numberValue(raw.answeredCount),
+  }
+}
+
+/** The graded result carried by a `410 Gone` (session timed out, auto-graded). */
+export function quizResultFromError(error: unknown): QuizResult | null {
+  if (typeof error !== 'object' || !error || !('response' in error)) return null
+  const response = objectValue((error as { response?: unknown }).response)
+  if (numberValue(response.status) !== 410) return null
+  return quizResultOf(response.data)
 }

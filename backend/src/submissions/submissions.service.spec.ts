@@ -62,6 +62,32 @@ describe('SubmissionsService', () => {
     });
   });
 
+  describe('myAssignments', () => {
+    it('returns the missions the query reports, on the caller token', async () => {
+      const dc = makeDc({ MyAssignments: { missions: [{ id: 'm1' }] } });
+      const svc = new SubmissionsService(
+        dc as any,
+        access as any,
+        completion as any,
+      );
+      await expect(svc.myAssignments('tok')).resolves.toEqual([{ id: 'm1' }]);
+      // The caller's own token, not the service account: MyAssignments is
+      // USER-level and self-scopes on auth.uid, which is absent under admin
+      // credentials.
+      expect(dc.executeQuery).toHaveBeenCalledWith('MyAssignments', {}, 'tok');
+    });
+
+    it('returns an empty list rather than undefined when nothing is enrolled', async () => {
+      const dc = makeDc({ MyAssignments: {} });
+      const svc = new SubmissionsService(
+        dc as any,
+        access as any,
+        completion as any,
+      );
+      await expect(svc.myAssignments('tok')).resolves.toEqual([]);
+    });
+  });
+
   describe('grade', () => {
     const submission = {
       GetSubmissionForGrading: {

@@ -2,40 +2,88 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { BookOpenCheck, MessageSquare, Plus, Star } from 'lucide-react'
-import { authoringApi, catalogApi } from '@/lib/api/services'
+import { useQueries, useQuery } from '@tanstack/react-query'
+import { BookOpenCheck, Plus, Star, Users } from 'lucide-react'
+import { analyticsApi, authoringApi } from '@/lib/api/services'
 import { useT } from '@/lib/i18n'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { MetricCard } from '@/components/workspace/MetricCard'
 import { AIUnavailable } from '@/components/workspace/AIUnavailable'
-import { StatusPill } from '@/components/workspace/StatusPill'
+import { StatusPill, courseStatusOf } from '@/components/workspace/StatusPill'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
+/**
+ * How many of the instructor's courses get a per-course analytics request.
+ *
+ * Learner and rating totals come from `GET /courses/:id/overview`, one call per
+ * course, so an instructor with a large catalogue would otherwise fan out
+ * dozens of requests to draw three numbers. When the cap bites, the metric
+ * detail line says how many courses the figure covers rather than presenting a
+ * partial sum as the whole.
+ */
+const MAX_OVERVIEW_FETCH = 12
+
 export default function DashboardPage() {
   const t = useT()
-  const catalogQuery = useQuery({ queryKey: ['catalog'], queryFn: catalogApi.list })
-  const authoringQuery = useQuery({
+  // The instructor's own courses — not the public catalog. Reading the catalog
+  // here meant every metric on this page reported the whole platform's numbers,
+  // so an instructor with one course saw thousands of students that were not
+  // theirs.
+  const coursesQuery = useQuery({
     queryKey: ['authoring-courses'],
     queryFn: authoringApi.list,
   })
-  const courses = useMemo(() => catalogQuery.data ?? [], [catalogQuery.data])
-  const firstAuthoringCourse = authoringQuery.data?.[0]
-  const totalReviews = useMemo(
-    () => courses.reduce((total, course) => total + (course.ratingCount ?? 0), 0),
-    [courses]
-  )
-  const averageRating = useMemo(() => {
-    if (!totalReviews) return null
-    const weightedTotal = courses.reduce(
-      (total, course) => total + (course.avgRating ?? 0) * (course.ratingCount ?? 0),
-      0
-    )
-    return weightedTotal / totalReviews
-  }, [courses, totalReviews])
-  const metricState = catalogQuery.isError ? 'error' : catalogQuery.isLoading ? 'loading' : 'live'
-  const metricValue = (value: string) => catalogQuery.isError ? '—' : catalogQuery.isLoading ? '…' : value
+  const courses = useMemo(() => coursesQuery.data ?? [], [coursesQuery.data])
+  const firstCourse = courses[0]
+
+  const measured = useMemo(() => courses.slice(0, MAX_OVERVIEW_FETCH), [courses])
+  const overviews = useQueries({
+    queries: measured.map((course) => ({
+      queryKey: ['course-overview', course.id],
+      queryFn: () => analyticsApi.courseOverview(course.id),
+      // Same key and freshness as the insights report, so opening one after the
+      // other reuses a single fetch.
+      staleTime: 5 * 60 * 1000,
+    })),
+  })
+
+  const totals = useMemo(() => {
+    const loaded = overviews.flatMap((query) => (query.data ? [query.data] : []))
+    const reviews = loaded.reduce((sum, item) => sum + item.ratings.count, 0)
+    const weighted = loaded.reduce((sum, item) => sum + item.ratings.average * item.ratings.count, 0)
+    return {
+      covered: loaded.length,
+      learners: loaded.reduce((sum, item) => sum + item.enrollments.total, 0),
+      reviews,
+      // Weighted by rating count: averaging the per-course averages would let a
+      // course with a single 5-star review outweigh one with two hundred.
+      rating: reviews ? weighted / reviews : null,
+    }
+  }, [overviews])
+
+  const published = courses.filter((course) => course.status === 'PUBLISHED').length
+  const overviewsPending = overviews.some((query) => query.isPending)
+  const overviewsFailed = overviews.length > 0 && overviews.every((query) => query.isError)
+  const partial = totals.covered > 0 && totals.covered < courses.length
+
+  const coursesState = coursesQuery.isError ? 'error' : coursesQuery.isPending ? 'loading' : 'live'
+  const analyticsState = overviewsFailed
+    ? 'error'
+    : coursesQuery.isPending || overviewsPending
+      ? 'loading'
+      : 'live'
+
+  /** `—` on failure, `…` while loading, so a metric never shows a stale zero. */
+  const show = (state: 'live' | 'loading' | 'error', value: string) =>
+    state === 'error' ? '—' : state === 'loading' ? '…' : value
+  /** Names how much of the catalogue a summed figure actually covers. */
+  const coverage = (fallbackKey: string) =>
+    partial
+      ? t('dashboard.metric.coveredDetail')
+          .replace('{n}', String(totals.covered))
+          .replace('{total}', String(courses.length))
+      : t(fallbackKey)
 
   return (
     <div className="space-y-6">
@@ -45,7 +93,7 @@ export default function DashboardPage() {
         action={<Link href="/studio/new/setup"><Button><Plus size={16} /> {t('common.createCourse')}</Button></Link>}
       />
 
-      {catalogQuery.isError && (
+      {coursesQuery.isError && (
         <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {t('dashboard.loadError')}
         </Card>
@@ -55,23 +103,40 @@ export default function DashboardPage() {
         <MetricCard
           icon={BookOpenCheck}
           label={t('dashboard.metric.published')}
-          value={metricValue(String(courses.length))}
-          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : t('dashboard.metric.publishedDetail')}
-          state={metricState}
+          value={show(coursesState, String(published))}
+          detail={
+            coursesQuery.isError
+              ? t('dashboard.metric.unavailable')
+              : t('dashboard.metric.publishedDetail').replace('{total}', String(courses.length))
+          }
+          state={coursesState}
         />
         <MetricCard
-          icon={MessageSquare}
-          label={t('dashboard.metric.reviews')}
-          value={metricValue(totalReviews.toLocaleString())}
-          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : t('dashboard.metric.reviewsDetail')}
-          state={metricState}
+          icon={Users}
+          label={t('dashboard.metric.learners')}
+          value={show(analyticsState, totals.learners.toLocaleString())}
+          detail={
+            overviewsFailed
+              ? t('dashboard.metric.unavailable')
+              : coverage('dashboard.metric.learnersDetail')
+          }
+          state={analyticsState}
         />
         <MetricCard
           icon={Star}
           label={t('dashboard.metric.rating')}
-          value={metricValue(averageRating == null ? t('dashboard.metric.notRated') : averageRating.toFixed(1))}
-          detail={catalogQuery.isError ? t('dashboard.metric.unavailable') : averageRating == null ? t('dashboard.metric.noRatings') : t('dashboard.metric.ratingDetail')}
-          state={metricState}
+          value={show(
+            analyticsState,
+            totals.rating == null ? t('dashboard.metric.notRated') : totals.rating.toFixed(1),
+          )}
+          detail={
+            overviewsFailed
+              ? t('dashboard.metric.unavailable')
+              : totals.rating == null
+                ? t('dashboard.metric.noRatings')
+                : t('dashboard.metric.ratingDetail').replace('{n}', String(totals.reviews))
+          }
+          state={analyticsState}
         />
       </div>
 
@@ -79,13 +144,13 @@ export default function DashboardPage() {
         <Card className="p-5 sm:p-6">
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-content">{t('dashboard.catalogTitle')}</h2>
-              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.catalogSubtitle')}</p>
+              <h2 className="text-lg font-semibold text-content">{t('dashboard.myCoursesTitle')}</h2>
+              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.myCoursesSubtitle')}</p>
             </div>
-            <Link href="/catalog" className="shrink-0 text-xs font-semibold text-primary">{t('dashboard.viewCatalog')} →</Link>
+            <Link href="/courses" className="shrink-0 text-xs font-semibold text-primary">{t('dashboard.viewAllCourses')} →</Link>
           </div>
 
-          {catalogQuery.isLoading ? (
+          {coursesQuery.isPending ? (
             <div className="rounded-input bg-subtle p-5 text-sm text-content-secondary">{t('dashboard.loadingCourses')}</div>
           ) : courses.length ? (
             <div className="space-y-3">
@@ -96,13 +161,14 @@ export default function DashboardPage() {
                   .slice(0, 2)
                   .map((word) => word[0]?.toUpperCase())
                   .join('')
-                const hasRatings = Boolean(course.ratingCount)
+                // The real lifecycle status. This row used to print "Published"
+                // on every course, including drafts.
+                const status = courseStatusOf(course.status)
+                const overview = overviews[index]?.data
                 return (
                   <Link
                     key={course.id}
-                    // /catalog/[id] is now only a redirect to /courses/[id], so
-                    // linking straight there saves a client-side bounce.
-                    href={`/courses/${course.id}`}
+                    href={`/insights/${course.id}`}
                     className={index === 0 ? 'flex items-center gap-4 rounded-input bg-brand-soft p-4' : 'flex items-center gap-4 rounded-input bg-subtle p-4'}
                   >
                     <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-surface text-xs font-bold text-primary">
@@ -111,21 +177,27 @@ export default function DashboardPage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold text-content">{course.title}</span>
                       <span className="mt-1 block text-[11px] text-content-secondary">
-                        {[course.category?.name, course.level].filter(Boolean).join(' · ')}
+                        {[course.category, course.level].filter(Boolean).join(' · ')}
                       </span>
                       <span className="mt-2 block text-[11px] text-content-muted">
-                        {hasRatings ? `${(course.avgRating ?? 0).toFixed(1)} ${t('dashboard.ratingLabel')} · ${course.ratingCount} ${t('common.reviews')}` : t('dashboard.noRatingsYet')}
+                        {overview
+                          ? `${overview.enrollments.total} ${t('dashboard.learnersLabel')} · ${
+                              overview.ratings.count
+                                ? `${overview.ratings.average.toFixed(1)} ${t('dashboard.ratingLabel')}`
+                                : t('dashboard.noRatingsYet')
+                            }`
+                          : t('dashboard.metric.updating')}
                       </span>
                     </span>
-                    <StatusPill tone="success">{t('common.published')}</StatusPill>
+                    <StatusPill tone={status.tone}>{t(status.labelKey)}</StatusPill>
                   </Link>
                 )
               })}
             </div>
-          ) : !catalogQuery.isError ? (
+          ) : !coursesQuery.isError ? (
             <div className="rounded-input border border-dashed border-border p-8 text-center">
-              <p className="text-sm font-semibold text-content">{t('dashboard.noPublished')}</p>
-              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.noPublishedHint')}</p>
+              <p className="text-sm font-semibold text-content">{t('dashboard.noCourses')}</p>
+              <p className="mt-1 text-xs text-content-secondary">{t('dashboard.noCoursesHint')}</p>
             </div>
           ) : null}
         </Card>
@@ -138,17 +210,17 @@ export default function DashboardPage() {
           </div>
           <div className="mt-5"><AIUnavailable compact /></div>
 
-          {firstAuthoringCourse ? (
-            <Link href={`/studio/${firstAuthoringCourse.id}/ai-studio`} className="mt-auto pt-5">
-              <Button fullWidth>{t('common.open')} {firstAuthoringCourse.title}</Button>
+          {firstCourse ? (
+            <Link href={`/studio/${firstCourse.id}/ai-studio`} className="mt-auto pt-5">
+              <Button fullWidth>{t('common.open')} {firstCourse.title}</Button>
             </Link>
           ) : (
             <div className="mt-auto pt-5">
               <Button fullWidth disabled>
-                {authoringQuery.isLoading ? t('dashboard.loadingCoursesBtn') : t('dashboard.noCourseAvailable')}
+                {coursesQuery.isPending ? t('dashboard.loadingCoursesBtn') : t('dashboard.noCourseAvailable')}
               </Button>
               <p className="mt-2 text-center text-[11px] leading-4 text-content-muted">
-                {authoringQuery.isError
+                {coursesQuery.isError
                   ? t('dashboard.coursesLoadError')
                   : t('dashboard.createBeforeAi')}
               </p>

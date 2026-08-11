@@ -25,6 +25,9 @@ describe('isTeachingRoute', () => {
       '/studio/abc-123/curriculum',
       '/studio/new/setup',
       '/courses',
+      '/teaching/assignments',
+      '/teaching/assignments/abc-123',
+      '/teaching/grading',
     ]) {
       expect(isTeachingRoute(path), path).toBe(true)
     }
@@ -67,6 +70,13 @@ describe('isTeachingRoute', () => {
   it('does not match a route that merely starts with the same characters', () => {
     expect(isTeachingRoute('/dashboards')).toBe(false)
     expect(isTeachingRoute('/uploads-archive')).toBe(false)
+  })
+
+  it('separates the instructor assignment surfaces from the learner one', () => {
+    // Same feature, two sides: /teaching/* sets and marks the work, /assignments
+    // is where a learner does it.
+    expect(isTeachingRoute('/teaching/assignments')).toBe(true)
+    expect(isTeachingRoute('/assignments')).toBe(false)
   })
 })
 
