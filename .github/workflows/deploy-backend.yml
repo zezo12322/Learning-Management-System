@@ -116,6 +116,28 @@ jobs:
       # gets through is applied with `--force`, which is now doing only the job of
       # answering a prompt nobody is present to answer.
       #
+      # `--force` belongs on `migrate` and NOT on `deploy`, and the asymmetry is
+      # deliberate. The two flags do different jobs:
+      #
+      #   migrate  always prompts, so in CI the flag is the only way the command
+      #            can run at all. The grep below is what makes that safe.
+      #   deploy   already succeeds non-interactively whenever the connector
+      #            assessment finds no breaking-level changes. Per the CLI docs it
+      #            only "exit[s] with a log of breaking changes" when there ARE
+      #            some, and `--force` is "equivalent to accepting all
+      #            assessments" — including destructive ones, where the docs warn
+      #            "you may not be able to fully recover any data deleted".
+      #
+      # So `--force` on deploy does not unblock ordinary releases; nothing was
+      # blocking them. It only removes the one report a human would want to read
+      # before a breaking connector change ships. The grep does not cover this:
+      # it scans the SQL plan, while these assessments are about the connector
+      # API surface.
+      #
+      # If a release legitimately needs to ship a breaking connector change, run
+      # that deploy by hand having read the assessment, rather than making every
+      # future release silent.
+      #
       # The scan is a text heuristic over generated DDL, not a proof. It can flag
       # something harmless and it could miss an exotic destructive change — so it
       # errs toward stopping, since a blocked release is recoverable and a dropped
@@ -149,7 +171,7 @@ jobs:
           fi
 
           firebase dataconnect:sql:migrate --force --non-interactive
-          firebase deploy --only dataconnect --force --non-interactive
+          firebase deploy --only dataconnect --non-interactive
 
       # `up --detach` uploads this checkout and returns once the build is queued;
       # the health gate below is what decides whether it worked. Railway will not
