@@ -796,7 +796,6 @@ export class QuizzesService {
   // SESSION MANAGEMENT (KAN-115)
   // ==========================================
 
-
   async heartbeat(attemptId: string, authToken: string, callerUid?: string) {
     const sessionData = await this.dc.executeQuery(
       'GetActiveQuizSession',

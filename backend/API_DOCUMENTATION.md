@@ -1387,7 +1387,7 @@ Creates a payment intention in Paymob and redirects the user's browser directly 
 `POST /api/v1/payments/webhook?hmac=...`
 **Auth:** Public (HMAC Verified)
 
-Called securely by Paymob when a transaction succeeds or fails. Validates the HMAC signature, updates the FDC database payment status, and automatically enrolls the user in the purchased courses/missions.
+Called securely by Paymob when a transaction succeeds or fails. Validates the HMAC signature, accurately matches the signed `order.id` (avoiding unsigned intention IDs), explicitly compares the `amount_cents` payload with the stored payment amount, and updates the FDC database payment status. Uses a strict state machine to enforce idempotency (preventing replays of already `COMPLETED` payments). Once validated, it calls the `EnrollmentService`'s Entitlement Gate to automatically grant course/mission access, explicitly checking `targetType === 'COURSE'` to ensure cheap missions cannot unlock premium courses.
 
 ---
 

@@ -9,7 +9,11 @@ export function extractBearerToken(req: any): string {
   }
 
   // Fallback to query parameter strictly for video streaming GETs (HTML5 video tags cannot send headers)
-  if (req?.method === 'GET' && typeof req?.path === 'string' && req.path.includes('/streaming/')) {
+  if (
+    req?.method === 'GET' &&
+    typeof req?.path === 'string' &&
+    req.path.includes('/streaming/')
+  ) {
     const queryToken = req?.query?.token;
     if (typeof queryToken === 'string' && queryToken.trim().length > 0) {
       return queryToken.trim();

@@ -4,7 +4,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, development]
+    branches: [main, development, MVP-Back-End-Development]
 
 # A new push to the same ref supersedes the previous run.
 concurrency:
@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   # paths-filter reads the PR's changed files from the API, which needs this.
   # Without it the action fails with "Resource not accessible by integration".
   pull-requests: read
@@ -86,9 +86,14 @@ jobs:
           package: backend
           node-version: ${{ env.NODE_VERSION }}
 
-      # `lint:ci` rather than `lint`: the latter passes --fix, which rewrites
-      # files and lets auto-fixable violations pass silently.
-      - run: npm run lint:ci
+      # Run lint with --fix and automatically commit the changes if any are found,
+      # saving the developer from having to run it manually before pushing.
+      - run: npm run lint
+
+      - name: Commit lint fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-fix linting issues"
 
       - run: npm run build
 

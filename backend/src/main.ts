@@ -29,7 +29,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
+
   // Trust the Railway proxy so req.ip reflects the actual client
   app.set('trust proxy', 1);
 

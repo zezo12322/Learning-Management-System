@@ -120,3 +120,5 @@ functions/lib/
 
 # Local ad-hoc debug scripts (never commit — may contain DB credentials)
 backend/test.js
+skills-lock.json
+backend/API_DOCUMENTATION.pdf

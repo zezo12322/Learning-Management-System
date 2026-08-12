@@ -190,20 +190,30 @@ export class PaymentsController {
 
           const payment = paymentDetails?.payments?.[0];
           if (!payment) {
-            console.error('Webhook received for unknown payment reference:', referenceId);
+            console.error(
+              'Webhook received for unknown payment reference:',
+              referenceId,
+            );
             return { success: true };
           }
 
           // 3. Check idempotency/state machine
           if (payment.status === 'COMPLETED' || payment.status === 'REFUNDED') {
-            console.log(`Webhook ignored: payment ${referenceId} is already ${payment.status}`);
+            console.log(
+              `Webhook ignored: payment ${referenceId} is already ${payment.status}`,
+            );
             return { success: true };
           }
 
           // 4. Verify amount_cents matches the stored payment
           const receivedAmount = body.obj.amount_cents;
-          if (receivedAmount !== undefined && payment.amount !== receivedAmount) {
-            console.error(`Amount mismatch for ${referenceId}: expected ${payment.amount}, got ${receivedAmount}`);
+          if (
+            receivedAmount !== undefined &&
+            payment.amount !== receivedAmount
+          ) {
+            console.error(
+              `Amount mismatch for ${referenceId}: expected ${payment.amount}, got ${receivedAmount}`,
+            );
             void this.auditLoggingService.createLog({
               action: 'PAYMENT_FAILED',
               adminUid: 'SYSTEM',
@@ -219,7 +229,10 @@ export class PaymentsController {
             'UpdatePaymentStatusByReference',
             { referenceId, status },
           );
-          console.log(`Payment status updated to ${status} for reference:`, referenceId);
+          console.log(
+            `Payment status updated to ${status} for reference:`,
+            referenceId,
+          );
 
           // 6. If successful, enroll the user
           if (status === 'COMPLETED' && payment.paymentItems_on_payment) {
@@ -240,7 +253,9 @@ export class PaymentsController {
                   'EnrollInCourse',
                   { courseId: item.courseId, userId },
                 );
-                console.log(`Enrolled user ${userId} in course ${item.courseId}`);
+                console.log(
+                  `Enrolled user ${userId} in course ${item.courseId}`,
+                );
 
                 void this.auditLoggingService.createLog({
                   action: 'ENROLLMENT_CREATED',
@@ -254,7 +269,9 @@ export class PaymentsController {
                   'EnrollInMission',
                   { missionId: item.missionId, userId },
                 );
-                console.log(`Enrolled user ${userId} in mission ${item.missionId}`);
+                console.log(
+                  `Enrolled user ${userId} in mission ${item.missionId}`,
+                );
 
                 void this.auditLoggingService.createLog({
                   action: 'ENROLLMENT_CREATED',

@@ -21,9 +21,9 @@ on:
       ref:
         description: Branch or tag to deploy
         required: false
-        default: development
+        default: main
   push:
-    branches: [development]
+    branches: [main]
     # dataconnect/ is here because the build generates the Data Connect SDKs the
     # bundle imports; a schema change alone can change what ships.
     paths:

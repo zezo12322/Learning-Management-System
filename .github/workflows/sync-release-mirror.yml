@@ -1,10 +1,10 @@
 name: Sync release mirror
 
 # Keeps zezo12322/Learning-Management-System-release's `main` in step with this
-# repository's `development`.
+# repository's `main`.
 #
 # WHY THIS FILE LIVES HERE, in the source repo, when it only ever runs in the
-# mirror: the mirror's `main` is a copy of `development`, so anything committed
+# mirror: the mirror's `main` is a copy of `main`, so anything committed
 # to the mirror alone is overwritten by the next sync. Shipping the workflow as
 # part of the synced content is the only way it survives — and GitHub only runs
 # scheduled workflows from a repository's default branch, which for the mirror
@@ -28,20 +28,20 @@ permissions:
 
 jobs:
   sync:
-    name: development → main
+    name: main → main
     # Only the mirror acts on this. In the source repo the job is skipped.
     if: github.repository == 'zezo12322/Learning-Management-System-release'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Mirror the source development branch onto main
+      - name: Mirror the source main branch onto main
         env:
           # Fine-grained PAT with Contents: Read on the source repository and
           # Contents: Write on this one. Both repos are private, so the default
           # GITHUB_TOKEN cannot read the source.
           SOURCE_TOKEN: ${{ secrets.SOURCE_REPO_TOKEN }}
           SOURCE_REPO: zezo12322/Learning-Management-System
-          SOURCE_BRANCH: development
+          SOURCE_BRANCH: main
         run: |
           set -euo pipefail
 

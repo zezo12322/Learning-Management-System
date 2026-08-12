@@ -1,6 +1,11 @@
 # OptimaTech LMS - Firebase Backend Functions
 
-This directory contains the modernized **Firebase Cloud Functions (v2)** backend for the OptimaTech Learning Management System. The architecture has been written in strict **TypeScript (Node 22)** and deeply integrates with Firebase Auth and Firebase Data Connect (PostgreSQL).
+This directory contains the **Firebase Cloud Functions (v2)** for the OptimaTech Learning Management System. 
+
+> **Architectural Note:** This is **NOT** the primary backend API for the platform. The core business logic (video streaming, AI chat proxy, instructor authoring, heavy compute, payments) lives in the `backend/` folder (a NestJS server). These Firebase Functions are exclusively used as **microservices** for isolated triggers and Firebase-native tasks, specifically:
+> 1. Authentication lifecycle triggers (cleaning up DB rows when a Firebase Auth user is deleted).
+> 2. Admin-only custom claim manipulation (changing a user's role).
+> 3. Secure student registration (passing through Firebase Auth).
 
 ## 🚀 Technology Stack
 - **Firebase Functions v2**: Next-generation Cloud Functions utilizing Google Cloud Run, offering improved concurrency, better performance, and seamless Secret Manager integration.
