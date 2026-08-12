@@ -67,6 +67,7 @@ export class EnrollmentService {
       const hasPaidForCourse = (paymentsData?.payments ?? []).some((p: any) =>
         (p?.paymentItems_on_payment ?? []).some(
           (item: any) =>
+            item?.targetType === 'COURSE' &&
             typeof item?.courseId === 'string' &&
             item.courseId.toLowerCase() === courseId.toLowerCase(),
         ),

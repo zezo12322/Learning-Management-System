@@ -44,4 +44,8 @@ export class FailClosedThrottlerGuard extends ThrottlerGuard {
       );
     }
   }
+
+  protected async getTracker(req: Record<string, any>): Promise<string> {
+    return req.user?.uid || req.ip || 'unknown-ip';
+  }
 }

@@ -225,6 +225,7 @@ type RubricCriterion @table(name: "rubric_criteria") {
   description: String
   maxPoints: Float!
   order: Int! @index
+  deletedAt: Timestamp @index
 }
 
 type MissionSubmission @table(name: "mission_submissions") {

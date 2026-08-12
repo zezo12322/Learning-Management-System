@@ -11,6 +11,7 @@ import { CompletionService } from '../completion/completion.service';
 import { OrderingService } from '../common/services/ordering.service';
 import { AccessService } from '../common/services/access.service';
 import { assertReorderMembership } from '../common/utils/ordering';
+import { RedisLockService } from '../common/redis/redis-lock.service';
 import {
   CreateQuizDto,
   UpdateQuizDto,
@@ -29,6 +30,7 @@ export class QuizzesService {
     private readonly completionService: CompletionService,
     private readonly ordering: OrderingService,
     private readonly access: AccessService,
+    private readonly locks: RedisLockService,
   ) {}
 
   /**
@@ -148,9 +150,10 @@ export class QuizzesService {
       { courseId },
       authToken,
     );
-    if (enrollmentData?.enrollments?.[0]?.status !== 'ACTIVE') {
+    const status = enrollmentData?.enrollments?.[0]?.status;
+    if (status !== 'ACTIVE' && status !== 'COMPLETED') {
       throw new ForbiddenException(
-        'You must have an active enrollment in this course to access this quiz',
+        'You must have an active or completed enrollment in this course to access this quiz',
       );
     }
   }
@@ -473,64 +476,86 @@ export class QuizzesService {
   // ==========================================
 
   async startAttempt(quizId: string, authToken: string, callerUid: string) {
-    // Fetch quiz settings (maxAttempts) and the owning course
-    const settingsData = await this.dc.executeQuery(
-      'GetQuizSettings',
-      { quizId },
-      authToken,
-    );
-    const quiz = settingsData?.courseQuiz;
-    if (!quiz) {
-      throw new NotFoundException(`Quiz ${quizId} not found`);
-    }
+    const lockKey = `quiz:start:${quizId}:${callerUid}`;
+    let attemptResult: any;
 
-    // Verify the student has an active enrollment in the course
-    const courseId = quiz.lecture?.section?.course?.id;
-    if (courseId) {
-      const enrollmentData = await this.dc.executeQuery(
-        'GetUserEnrollmentForCourse',
-        { courseId },
-        authToken,
-      );
-      const enrollment = enrollmentData?.enrollments?.[0];
-      if (!enrollment || enrollment.status !== 'ACTIVE') {
-        throw new ForbiddenException(
-          'You must have an active enrollment in this course to take the quiz',
+    const acquired = await this.locks.runExclusively(
+      lockKey,
+      15000,
+      async () => {
+        // Fetch quiz settings (maxAttempts) and the owning course
+        const settingsData = await this.dc.executeQuery(
+          'GetQuizSettings',
+          { quizId },
+          authToken,
         );
-      }
-    }
+        const quiz = settingsData?.courseQuiz;
+        if (!quiz) {
+          throw new NotFoundException(`Quiz ${quizId} not found`);
+        }
 
-    // Fetch existing attempts
-    const attemptsData = await this.dc.executeQuery(
-      'GetUserQuizAttempts',
-      { quizId },
-      authToken,
+        // Verify the student has an active enrollment in the course
+        const courseId = quiz.lecture?.section?.course?.id;
+        if (courseId) {
+          const enrollmentData = await this.dc.executeQuery(
+            'GetUserEnrollmentForCourse',
+            { courseId },
+            authToken,
+          );
+          const enrollment = enrollmentData?.enrollments?.[0];
+          // We allow COMPLETED enrollment too for access to quizzes
+          if (
+            !enrollment ||
+            (enrollment.status !== 'ACTIVE' &&
+              enrollment.status !== 'COMPLETED')
+          ) {
+            throw new ForbiddenException(
+              'You must have an active or completed enrollment in this course to take the quiz',
+            );
+          }
+        }
+
+        // Fetch existing attempts
+        const attemptsData = await this.dc.executeQuery(
+          'GetUserQuizAttempts',
+          { quizId },
+          authToken,
+        );
+        const attempts = attemptsData?.quizAttempts ?? [];
+
+        // Check for an in-progress attempt
+        const inProgress = attempts.find((a: any) => !a.completedAt);
+        if (inProgress) {
+          throw new BadRequestException(
+            'You already have an in-progress attempt. Finish or abandon it first.',
+          );
+        }
+
+        // Enforce max attempts
+        if (attempts.length >= quiz.maxAttempts) {
+          throw new ForbiddenException(
+            `Maximum attempts (${quiz.maxAttempts}) exceeded`,
+          );
+        }
+
+        // Runs via the service account (NO_ACCESS in the connector); the attempt owner
+        // is passed explicitly rather than derived from auth.uid. Enrollment + max-attempt
+        // limits were enforced above and are now the sole gate on starting an attempt.
+        attemptResult = await this.dc.executeMutation(
+          'StartQuizAttempt',
+          { quizId, userId: callerUid },
+          authToken,
+        );
+      },
     );
-    const attempts = attemptsData?.quizAttempts ?? [];
 
-    // Check for an in-progress attempt
-    const inProgress = attempts.find((a: any) => !a.completedAt);
-    if (inProgress) {
+    if (!acquired) {
       throw new BadRequestException(
-        'You already have an in-progress attempt. Finish or abandon it first.',
+        'Request already in progress. Please try again.',
       );
     }
 
-    // Enforce max attempts
-    if (attempts.length >= quiz.maxAttempts) {
-      throw new ForbiddenException(
-        `Maximum attempts (${quiz.maxAttempts}) exceeded`,
-      );
-    }
-
-    // Runs via the service account (NO_ACCESS in the connector); the attempt owner
-    // is passed explicitly rather than derived from auth.uid. Enrollment + max-attempt
-    // limits were enforced above and are now the sole gate on starting an attempt.
-    return this.dc.executeMutation(
-      'StartQuizAttempt',
-      { quizId, userId: callerUid },
-      authToken,
-    );
+    return attemptResult;
   }
 
   async submitAnswer(
@@ -770,6 +795,7 @@ export class QuizzesService {
   // ==========================================
   // SESSION MANAGEMENT (KAN-115)
   // ==========================================
+
 
   async heartbeat(attemptId: string, authToken: string, callerUid?: string) {
     const sessionData = await this.dc.executeQuery(

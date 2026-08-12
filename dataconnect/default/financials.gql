@@ -64,6 +64,8 @@ query GetPaymentDetailsByReference($referenceId: String!) @auth(level: NO_ACCESS
   payments(where: { referenceId: { eq: $referenceId } }) {
     id
     userId
+    amount
+    status
     paymentItems_on_payment {
       targetType
       courseId

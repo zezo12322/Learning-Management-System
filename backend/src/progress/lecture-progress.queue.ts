@@ -53,7 +53,11 @@ export function isLectureComplete(
   durationSeconds: number,
   lastWatchedSecond: number,
   watchedSeconds?: number,
+  lectureType?: string,
 ): boolean {
+  if (lectureType === 'READING' || lectureType === 'INTERACTIVE') {
+    return true; // Reading and interactive content is complete upon access
+  }
   if (durationSeconds <= 0) return false;
   const bar = durationSeconds * COMPLETION_THRESHOLD;
   if (lastWatchedSecond < bar) return false;

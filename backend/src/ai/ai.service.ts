@@ -115,7 +115,7 @@ export class AiService {
         },
         body: JSON.stringify({
           request_id: uuidv4(),
-          tenant_id: 'default',
+          tenant_id: '550e8400-e29b-41d4-a716-446655440000',
           user_id: userId,
           course_id: courseId,
           video_id: lectureId,
@@ -178,7 +178,7 @@ export class AiService {
         },
         body: JSON.stringify({
           job_id: aiJobId,
-          tenant_id: 'default',
+          tenant_id: '550e8400-e29b-41d4-a716-446655440000',
           course_id: courseId,
           video_id: lectureId,
           video_title: lecture.title,

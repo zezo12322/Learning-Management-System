@@ -45,10 +45,15 @@ export class ProgressProcessor extends WorkerHost {
     const lectureData = await this.dc.executeQueryAsAdmin<{
       courseLecture: {
         duration: number | null;
+        type?: string;
         isFreePreview?: boolean;
         section?: { course?: { id?: string } };
       } | null;
-      lectureProgresses?: { watchedSeconds: number | null }[];
+      lectureProgresses?: {
+        watchedSeconds: number | null;
+        lastWatchedSecond: number;
+        completedAt?: string | null;
+      }[];
     }>('GetLectureDuration', { lectureId, userId });
 
     const lecture = lectureData?.courseLecture;
@@ -87,21 +92,37 @@ export class ProgressProcessor extends WorkerHost {
     // session, seeded from what it read back at load; taking the max means a
     // device that starts from zero — the mobile player always does — cannot
     // erase time banked elsewhere.
-    const stored = lectureData?.lectureProgresses?.[0]?.watchedSeconds ?? null;
+    const existingProgress = lectureData?.lectureProgresses?.[0];
+    const stored = existingProgress?.watchedSeconds ?? null;
     const bankedSeconds =
       watchedSeconds == null ? stored : Math.max(watchedSeconds, stored ?? 0);
 
-    const reachedThreshold = isLectureComplete(
-      duration,
-      lastWatchedSecond,
-      bankedSeconds ?? undefined,
-    );
-    const completedAt = reachedThreshold ? new Date().toISOString() : null;
+    // Hold the high-water mark for the playhead position so an out-of-order
+    // smaller position doesn't erase progress.
+    const storedLastWatched = existingProgress?.lastWatchedSecond ?? 0;
+    const bankedLastWatched = Math.max(lastWatchedSecond, storedLastWatched);
+
+    const alreadyCompleted = !!existingProgress?.completedAt;
+    const reachedThreshold =
+      alreadyCompleted ||
+      isLectureComplete(
+        duration,
+        bankedLastWatched,
+        bankedSeconds ?? undefined,
+        lecture.type,
+      );
+
+    // Never clear completion if it's already completed.
+    const completedAt = reachedThreshold
+      ? alreadyCompleted
+        ? existingProgress.completedAt
+        : new Date().toISOString()
+      : null;
 
     // 4. Upsert on the composite key (user, lecture). Clamp the stored position
     //    to the lecture length so a bad client can't persist nonsense > duration.
     const storedSecond =
-      duration > 0 ? Math.min(lastWatchedSecond, duration) : lastWatchedSecond;
+      duration > 0 ? Math.min(bankedLastWatched, duration) : bankedLastWatched;
 
     await this.dc.executeMutationAsAdmin('AdminUpsertLectureProgress', {
       userId,

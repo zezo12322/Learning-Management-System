@@ -8,10 +8,12 @@ export function extractBearerToken(req: any): string {
     if (match) return match[1].trim();
   }
 
-  // Fallback to query parameter for video streaming (Flutter Web / HTML5 video tags cannot send headers)
-  const queryToken = req?.query?.token;
-  if (typeof queryToken === 'string' && queryToken.trim().length > 0) {
-    return queryToken.trim();
+  // Fallback to query parameter strictly for video streaming GETs (HTML5 video tags cannot send headers)
+  if (req?.method === 'GET' && typeof req?.path === 'string' && req.path.includes('/streaming/')) {
+    const queryToken = req?.query?.token;
+    if (typeof queryToken === 'string' && queryToken.trim().length > 0) {
+      return queryToken.trim();
+    }
   }
 
   return '';

@@ -70,21 +70,30 @@ export class ProgressService {
         ? storedWatched
         : Math.max(dto.watchedSeconds, storedWatched ?? 0);
 
-    // Only a positive duration can complete; lectures with unknown/zero duration
-    // never auto-complete here.
-    const completed = isLectureComplete(
-      duration,
-      dto.lastWatchedSecond,
-      bankedSeconds ?? undefined,
-    );
-    const completedAt = completed ? new Date().toISOString() : null;
+    const storedLastWatched = (existing as any)?.lastWatchedSecond ?? 0;
+    const bankedLastWatched = Math.max(dto.lastWatchedSecond, storedLastWatched);
+
+    const alreadyCompleted = !!(existing as any)?.completedAt;
+    const completed =
+      alreadyCompleted ||
+      isLectureComplete(
+        duration,
+        bankedLastWatched,
+        bankedSeconds ?? undefined,
+        lecture?.type,
+      );
+    const completedAt = completed
+      ? alreadyCompleted
+        ? (existing as any).completedAt
+        : new Date().toISOString()
+      : null;
 
     // Clamp the stored position to the lecture length so a bad client can't
     // persist a position past the end.
     const storedSecond =
       duration > 0
-        ? Math.min(dto.lastWatchedSecond, duration)
-        : dto.lastWatchedSecond;
+        ? Math.min(bankedLastWatched, duration)
+        : bankedLastWatched;
 
     // UpdateLectureProgress is NO_ACCESS (backend-only) and runs via the service
     // account, so the progress owner is passed explicitly rather than derived

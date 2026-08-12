@@ -48,7 +48,7 @@ export class RubricService {
   async delete(missionId: string, criterionId: string, authToken: string) {
     await this.dc.executeMutation(
       'AdminDeleteRubricCriterion',
-      { criterionId },
+      { criterionId, deletedAt: new Date().toISOString() },
       authToken,
     );
 

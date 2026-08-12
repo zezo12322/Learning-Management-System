@@ -38,6 +38,7 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
       courseLecture(id: $lectureId) {
         id
         duration
+        type
         section {
           course {
             id
@@ -48,6 +49,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
         where: { userId: { eq: $userId }, lectureId: { eq: $lectureId } }
       ) {
         watchedSeconds
+        lastWatchedSecond
+        completedAt
       }
     }
   `,
@@ -205,6 +208,8 @@ export const ADMIN_OPERATIONS: Record<string, string> = {
         id
         paymentItems_on_payment {
           courseId
+          targetType
+          priceAtPurchase
         }
       }
     }

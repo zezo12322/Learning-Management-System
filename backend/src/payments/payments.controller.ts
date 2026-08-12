@@ -74,24 +74,11 @@ export class PaymentsController {
         // For simplicity, charge $0 for missions or look up the parent course.
         // Returning 0 price for missions since they're bundled with courses.
         priceCents = 0;
-      } else if (
-        item.targetType === 'SUBSCRIPTION' &&
-        item.subscriptionTierId
-      ) {
-        // Fetch subscription tier price
-        const subscriptionResult: any =
-          await this.dataConnectService.executeQueryAsAdmin(
-            'AdminGetSubscriptionTier',
-            { subscriptionTierId: item.subscriptionTierId },
-          );
-        const subscription = subscriptionResult?.subscriptionTier;
-        if (!subscription) {
-          throw new HttpException(
-            `Subscription tier ${item.subscriptionTierId} not found`,
-            HttpStatus.NOT_FOUND,
-          );
-        }
-        priceCents = subscription.price || 0;
+      } else if (item.targetType === 'SUBSCRIPTION') {
+        throw new HttpException(
+          'Subscriptions are not yet enabled for purchase.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Add to total
@@ -189,100 +176,101 @@ export class PaymentsController {
       // PaymentStatus enum only has PENDING/COMPLETED/FAILED/REFUNDED — a
       // 'SUCCESS' literal is rejected by Data Connect enum validation.
       const status = body.obj.success ? 'COMPLETED' : 'FAILED';
-      // In NextGen API, the webhook might provide intention_id or order.id
-      const referenceId =
-        body.obj.intention_id?.toString() ||
-        body.obj.order?.id?.toString() ||
-        body.obj.id?.toString();
+      // ONLY use order.id (which is signed) instead of intention_id (which is unsigned)
+      const referenceId = body.obj.order?.id?.toString();
 
       if (referenceId) {
         try {
-          // 2. Update payment status
+          // 2. Fetch payment FIRST to verify amount and idempotency
+          const paymentDetails: any =
+            await this.dataConnectService.executeQueryAsAdmin(
+              'GetPaymentDetailsByReference',
+              { referenceId },
+            );
+
+          const payment = paymentDetails?.payments?.[0];
+          if (!payment) {
+            console.error('Webhook received for unknown payment reference:', referenceId);
+            return { success: true };
+          }
+
+          // 3. Check idempotency/state machine
+          if (payment.status === 'COMPLETED' || payment.status === 'REFUNDED') {
+            console.log(`Webhook ignored: payment ${referenceId} is already ${payment.status}`);
+            return { success: true };
+          }
+
+          // 4. Verify amount_cents matches the stored payment
+          const receivedAmount = body.obj.amount_cents;
+          if (receivedAmount !== undefined && payment.amount !== receivedAmount) {
+            console.error(`Amount mismatch for ${referenceId}: expected ${payment.amount}, got ${receivedAmount}`);
+            void this.auditLoggingService.createLog({
+              action: 'PAYMENT_FAILED',
+              adminUid: 'SYSTEM',
+              targetUid: payment.userId,
+              ipAddress: undefined,
+              details: { referenceId, reason: 'AMOUNT_MISMATCH' },
+            });
+            return { success: true };
+          }
+
+          // 5. Update payment status
           await this.dataConnectService.executeMutationAsAdmin(
             'UpdatePaymentStatusByReference',
-            {
-              referenceId: referenceId,
-              status: status,
-            },
+            { referenceId, status },
           );
-          console.log(
-            `Payment status updated to ${status} for reference:`,
-            referenceId,
-          );
+          console.log(`Payment status updated to ${status} for reference:`, referenceId);
 
-          // 3. If successful, enroll the user
-          if (status === 'COMPLETED') {
-            const paymentDetails: any =
-              await this.dataConnectService.executeQueryAsAdmin(
-                'GetPaymentDetailsByReference',
-                {
-                  referenceId: referenceId,
-                },
-              );
+          // 6. If successful, enroll the user
+          if (status === 'COMPLETED' && payment.paymentItems_on_payment) {
+            const userId = payment.userId;
 
-            const payment = paymentDetails?.payments?.[0];
-            if (payment && payment.paymentItems_on_payment) {
-              const userId = payment.userId;
+            // Audit Log: Payment Successful
+            void this.auditLoggingService.createLog({
+              action: 'PAYMENT_SUCCESS',
+              adminUid: 'SYSTEM',
+              targetUid: userId,
+              ipAddress: undefined,
+              details: { referenceId, paymentId: payment.id },
+            });
 
-              // Audit Log: Payment Successful
-              void this.auditLoggingService.createLog({
-                action: 'PAYMENT_SUCCESS',
-                adminUid: 'SYSTEM',
-                targetUid: userId,
-                ipAddress: undefined,
-                details: { referenceId, paymentId: payment.id },
-              });
+            for (const item of payment.paymentItems_on_payment) {
+              if (item.targetType === 'COURSE' && item.courseId) {
+                await this.dataConnectService.executeMutationAsAdmin(
+                  'EnrollInCourse',
+                  { courseId: item.courseId, userId },
+                );
+                console.log(`Enrolled user ${userId} in course ${item.courseId}`);
 
-              for (const item of payment.paymentItems_on_payment) {
-                if (item.targetType === 'COURSE' && item.courseId) {
-                  await this.dataConnectService.executeMutationAsAdmin(
-                    'EnrollInCourse',
-                    {
-                      courseId: item.courseId,
-                      userId: userId,
-                    },
-                  );
-                  console.log(
-                    `Enrolled user ${userId} in course ${item.courseId}`,
-                  );
+                void this.auditLoggingService.createLog({
+                  action: 'ENROLLMENT_CREATED',
+                  adminUid: 'SYSTEM',
+                  targetUid: userId,
+                  ipAddress: undefined,
+                  details: { courseId: item.courseId, type: 'COURSE' },
+                });
+              } else if (item.targetType === 'MISSION' && item.missionId) {
+                await this.dataConnectService.executeMutationAsAdmin(
+                  'EnrollInMission',
+                  { missionId: item.missionId, userId },
+                );
+                console.log(`Enrolled user ${userId} in mission ${item.missionId}`);
 
-                  // Audit Log: Enrollment
-                  void this.auditLoggingService.createLog({
-                    action: 'ENROLLMENT_CREATED',
-                    adminUid: 'SYSTEM',
-                    targetUid: userId,
-                    ipAddress: undefined,
-                    details: { courseId: item.courseId, type: 'COURSE' },
-                  });
-                } else if (item.targetType === 'MISSION' && item.missionId) {
-                  await this.dataConnectService.executeMutationAsAdmin(
-                    'EnrollInMission',
-                    {
-                      missionId: item.missionId,
-                      userId: userId,
-                    },
-                  );
-                  console.log(
-                    `Enrolled user ${userId} in mission ${item.missionId}`,
-                  );
-
-                  // Audit Log: Enrollment
-                  void this.auditLoggingService.createLog({
-                    action: 'ENROLLMENT_CREATED',
-                    adminUid: 'SYSTEM',
-                    targetUid: userId,
-                    ipAddress: undefined,
-                    details: { missionId: item.missionId, type: 'MISSION' },
-                  });
-                }
+                void this.auditLoggingService.createLog({
+                  action: 'ENROLLMENT_CREATED',
+                  adminUid: 'SYSTEM',
+                  targetUid: userId,
+                  ipAddress: undefined,
+                  details: { missionId: item.missionId, type: 'MISSION' },
+                });
               }
             }
-          } else {
+          } else if (status === 'FAILED') {
             // Audit Log: Payment Failed
             void this.auditLoggingService.createLog({
               action: 'PAYMENT_FAILED',
               adminUid: 'SYSTEM',
-              targetUid: null,
+              targetUid: payment.userId,
               ipAddress: undefined,
               details: { referenceId },
             });

@@ -63,7 +63,7 @@ export class ProgressController {
         // No ':' — BullMQ rejects it in custom job ids (Redis key separator).
         jobId: `progress-${uid}-${lectureId}`,
         removeOnComplete: true,
-        removeOnFail: 100,
+        removeOnFail: true,
         attempts: 3,
         backoff: { type: 'exponential', delay: 1000 },
       },

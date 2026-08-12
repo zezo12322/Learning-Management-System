@@ -71,7 +71,7 @@ export class FirebaseAuthGuard implements CanActivate {
     try {
       const decodedToken = (await this.firebaseService
         .getAuth()
-        .verifyIdToken(idToken)) as FirebaseClaims;
+        .verifyIdToken(idToken, true)) as FirebaseClaims;
       const roles = normalizeRoles(decodedToken);
 
       // Spread the raw token first, then OVERRIDE role/admin from the normalized

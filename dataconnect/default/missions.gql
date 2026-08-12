@@ -68,7 +68,7 @@ query MyAssignments @auth(level: USER) {
     # the two definitions are byte-identical. Every other repeated relation here
     # is named for its use for the same reason (publishedSections, videoSections,
     # userCompletionLectures).
-    assignmentCriteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order }
+    assignmentCriteria: rubricCriteria_on_mission(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) { id criterionName description maxPoints order }
     mySubmissions: missionSubmissions_on_mission(
       where: { studentId: { eq_expr: "auth.uid" } },
       orderBy: [{ submittedAt: DESC }]
@@ -134,7 +134,7 @@ mutation AdminSoftDeleteMission($missionId: UUID!) @auth(level: NO_ACCESS) {
 # NO_ACCESS: exposes any mission's full authoring detail — backend-only, read
 # via the service account after CourseAccessGuard / ResourceOwnershipGuard.
 query AdminGetMission($missionId: UUID!) @auth(level: NO_ACCESS) {
-  mission(id: $missionId) { id title scenarioDescription durationMinutes difficulty skillsTested deletedAt createdAt updatedAt category { id name } course { id title } author { id name email avatar } createdBy { id name } microLessons: missionMicroLessons_on_mission(orderBy: [{ order: ASC }]) { id title type assetUrl content durationSeconds order } templates: missionTemplates_on_mission { id title fileUrl fileType } criteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order } }
+  mission(id: $missionId) { id title scenarioDescription durationMinutes difficulty skillsTested deletedAt createdAt updatedAt category { id name } course { id title } author { id name email avatar } createdBy { id name } microLessons: missionMicroLessons_on_mission(orderBy: [{ order: ASC }]) { id title type assetUrl content durationSeconds order } templates: missionTemplates_on_mission { id title fileUrl fileType } criteria: rubricCriteria_on_mission(where: { deletedAt: { eq: null } }, orderBy: [{ order: ASC }]) { id criterionName description maxPoints order } }
 }
 
 query AdminListMyMissions @auth(expr: "auth.token.roles != null && ('admin' in auth.token.roles || 'instructor' in auth.token.roles)") {
@@ -195,8 +195,8 @@ mutation AdminUpdateRubricCriterion($criterionId: UUID!, $criterionName: String,
   rubricCriterion_update(id: $criterionId, data: { criterionName: $criterionName, description: $description, maxPoints: $maxPoints })
 }
 
-mutation AdminDeleteRubricCriterion($criterionId: UUID!) @auth(level: NO_ACCESS) {
-  rubricCriterion_delete(id: $criterionId)
+mutation AdminDeleteRubricCriterion($criterionId: UUID!, $deletedAt: Timestamp!) @auth(level: NO_ACCESS) {
+  rubricCriterion_update(id: $criterionId, data: { deletedAt: $deletedAt })
 }
 
 mutation AdminUpdateRubricCriterionOrder($criterionId: UUID!, $order: Int!) @auth(level: NO_ACCESS) {

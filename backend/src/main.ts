@@ -25,8 +25,13 @@ const DRAIN_DELAY_MS = Number(process.env.SHUTDOWN_DRAIN_DELAY_MS ?? 5000);
  */
 const SHUTDOWN_TIMEOUT_MS = Number(process.env.SHUTDOWN_TIMEOUT_MS ?? 20000);
 
+import { NestExpressApplication } from '@nestjs/platform-express';
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // Trust the Railway proxy so req.ip reflects the actual client
+  app.set('trust proxy', 1);
 
   // The global error filter + access log (KAN-60) are registered as APP_FILTER /
   // APP_INTERCEPTOR providers in AppModule, so they resolve through the DI

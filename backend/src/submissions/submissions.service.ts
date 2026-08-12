@@ -38,9 +38,10 @@ export class SubmissionsService {
       { missionId },
       authToken,
     );
-    if (enrollmentData?.enrollments?.[0]?.status !== 'ACTIVE') {
+    const status = enrollmentData?.enrollments?.[0]?.status;
+    if (status !== 'ACTIVE' && status !== 'COMPLETED') {
       throw new ForbiddenException(
-        'You must have an active enrollment in this mission to submit',
+        'You must have an active or completed enrollment in this mission to submit',
       );
     }
 

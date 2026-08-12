@@ -155,7 +155,7 @@ export class TranscodingProcessor extends WorkerHost {
           },
           body: JSON.stringify({
             job_id: aiJobId,
-            tenant_id: 'default',
+            tenant_id: '550e8400-e29b-41d4-a716-446655440000',
             course_id: courseId,
             video_id: lectureId,
             video_title: videoTitle,
@@ -166,8 +166,9 @@ export class TranscodingProcessor extends WorkerHost {
         });
 
         if (!ingestRes.ok && ingestRes.status !== 409) {
+          const errText = await ingestRes.text().catch(() => '');
           throw new Error(
-            `AI Ingest failed: ${ingestRes.status} ${ingestRes.statusText}`,
+            `AI Ingest failed: ${ingestRes.status} ${ingestRes.statusText} - ${errText}`,
           );
         }
 
@@ -191,6 +192,7 @@ export class TranscodingProcessor extends WorkerHost {
         this.logger.error(
           `AI ingestion integration failed for ${lectureId}: ${err?.message}`,
         );
+        throw err; // Re-throw so BullMQ marks the job as failed
       }
     } finally {
       // Always clean up the scratch dir, even on failure.
