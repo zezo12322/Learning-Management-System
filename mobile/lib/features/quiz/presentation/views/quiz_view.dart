@@ -10,9 +10,12 @@ import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_cubit.dar
 import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_state.dart';
 
 /// Arguments for [QuizView]. The screen needs both the course and the quiz id.
-/// NOTE: there is no student-facing endpoint to discover a lecture's quizId yet
-/// (documented backend blocker in mobile/MISSING_SCREENS_SPEC.md). The entry
-/// point that opens this screen must obtain the quizId once that endpoint lands.
+///
+/// The quiz id is resolved from the lecture by
+/// `GET /courses/:courseId/lectures/:lectureId/quiz`
+/// (`QuizRepository.getQuizIdForLecture`), which the lesson screen calls when a
+/// QUIZ lecture is open. An earlier note here said no such endpoint existed and
+/// that is why nothing ever pushed this route; the endpoint has since shipped.
 class QuizViewArgs {
   final String courseId;
   final String quizId;

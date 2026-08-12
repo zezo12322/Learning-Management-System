@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils'
 export type StatTone = 'primary' | 'secondary' | 'success' | 'warning'
 
 const toneClasses: Record<StatTone, { tile: string; note: string; card: string }> = {
-  primary: { tile: 'bg-brand-soft text-primary', note: 'text-primary', card: 'bg-primary/[0.04]' },
+  primary: { tile: 'bg-brand-soft text-on-brand-soft', note: 'text-primary', card: 'bg-primary/[0.04]' },
   secondary: { tile: 'bg-secondary/10 text-secondary', note: 'text-secondary', card: 'bg-secondary/[0.05]' },
-  success: { tile: 'bg-success/10 text-success', note: 'text-success', card: 'bg-success/[0.05]' },
-  warning: { tile: 'bg-warning/10 text-warning', note: 'text-warning', card: 'bg-warning/[0.06]' },
+  success: { tile: 'bg-success-soft text-success', note: 'text-success', card: 'bg-success/[0.05]' },
+  warning: { tile: 'bg-warning-soft text-warning', note: 'text-warning', card: 'bg-warning/[0.06]' },
 }
 
 /**

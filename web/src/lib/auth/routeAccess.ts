@@ -16,6 +16,10 @@ const TEACHING_ROUTES: { path: string; exact?: boolean }[] = [
   { path: '/insights' },
   { path: '/uploads' },
   { path: '/studio' },
+  // Assignment authoring and the grading queue. `/teaching` is a prefix on
+  // purpose: anything added under it is guarded without touching this list, and
+  // the learner-facing `/assignments` stays open.
+  { path: '/teaching' },
 ]
 
 /**

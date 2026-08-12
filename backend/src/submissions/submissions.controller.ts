@@ -37,6 +37,11 @@ export class SubmissionsController {
     return this.submissionsService.mySubmissions(token);
   }
 
+  @Get('me/assignments')
+  myAssignments(@AuthToken() token: string) {
+    return this.submissionsService.myAssignments(token);
+  }
+
   // ----- Instructor / Admin -----
 
   @Get('submissions/pending')

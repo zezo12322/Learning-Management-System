@@ -69,8 +69,12 @@ class OptimaTechLMS extends StatelessWidget {
               localizationsDelegates: context.localizationDelegates,
               // Theme
               themeMode: themeMode,
-              theme: AppTheme.light,
-              darkTheme: AppTheme.dark,
+              // Locale-aware: the bundled Poppins family has no Arabic glyphs,
+              // so Arabic gets the platform's own Arabic face instead of
+              // per-glyph substitution. `context.locale` above already rebuilds
+              // this on a language switch.
+              theme: AppTheme.light(context.locale),
+              darkTheme: AppTheme.dark(context.locale),
               // Routing
               onGenerateRoute: generateRoute,
               initialRoute: SplashView.routeName,

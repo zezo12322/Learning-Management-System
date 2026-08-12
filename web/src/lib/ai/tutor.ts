@@ -51,11 +51,16 @@ export class TutorError extends Error {
 
 export type StudioKind = 'SUMMARY' | 'OUTCOMES' | 'QUIZ' | 'LESSON_PLAN'
 
-export const STUDIO_ACTIONS: { kind: StudioKind; label: string }[] = [
-  { kind: 'SUMMARY', label: 'Lesson summary' },
-  { kind: 'OUTCOMES', label: 'Learning outcomes' },
-  { kind: 'QUIZ', label: 'Quiz questions' },
-  { kind: 'LESSON_PLAN', label: 'Lesson plan' },
+/**
+ * The Studio buttons, as dictionary keys rather than English literals — these
+ * four labels were the only user-visible strings in the app that lived in a lib
+ * module, so they stayed English in Arabic.
+ */
+export const STUDIO_ACTIONS: { kind: StudioKind; labelKey: string }[] = [
+  { kind: 'SUMMARY', labelKey: 'ai.studio.action.summary' },
+  { kind: 'OUTCOMES', labelKey: 'ai.studio.action.outcomes' },
+  { kind: 'QUIZ', labelKey: 'ai.studio.action.quiz' },
+  { kind: 'LESSON_PLAN', labelKey: 'ai.studio.action.lessonPlan' },
 ]
 
 const KIND_PROMPTS: Record<StudioKind, string> = {

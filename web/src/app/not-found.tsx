@@ -12,7 +12,7 @@ export default function NotFound() {
   const t = useT()
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-soft text-2xl font-bold text-primary">
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-soft text-2xl font-bold text-on-brand-soft">
         404
       </span>
       <h1 className="text-xl font-bold text-content">{t('notFound.title')}</h1>

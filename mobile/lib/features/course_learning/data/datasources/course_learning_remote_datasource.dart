@@ -1,15 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:optimatech_lms/core/config/app_config.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/core/error/exceptions.dart';
 import 'package:optimatech_lms/core/helper_function/lecture_type.dart';
 import 'package:optimatech_lms/core/network/api_service.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/curriculum_model.dart';
 import 'package:optimatech_lms/features/course_learning/data/models/lecture_content_model.dart';
+import 'package:optimatech_lms/core/error/user_facing_message.dart';
 
 abstract class CourseLearningRemoteDataSource {
   Future<CourseCurriculumModel> getCourseCurriculum(String courseId);
   Future<LectureContentModel> getLectureContent(String lectureId);
+
+  /// Synchronous write, for the events where the caller needs the server's
+  /// decision now: the explicit "mark complete" button and the playhead
+  /// reaching the end.
   Future<void> updateLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds});
+
+  /// Queued write, for the heartbeat that fires while the video plays.
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond,
       {int? watchedSeconds});
 }
 
@@ -36,7 +45,7 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       final response = await apiService.get('/catalog/courses/$courseId/curriculum');
       return CourseCurriculumModel.fromJson(response.data);
     } catch (e){
-      throw CustomExceptions(message: 'Failed to fetch Course Curriculum: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -56,12 +65,18 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       // URL, so video lectures are pointed at that instead.
       if (model.type == LectureContentType.video && model.videoUrl != null) {
         return model.copyWith(
-          videoUrl: '${AppConfig.apiBaseUrl}/lectures/$lectureId/stream/manifest',
+          // `AppConstants.baseUrl`, not `AppConfig.apiBaseUrl`: those are two
+          // independent sources of truth that only agree by coincidence. The
+          // rest of the app (ApiService) uses AppConstants, so with
+          // `useLocalBackend = true` the manifest would point at production
+          // while every other call went to localhost — and the player scopes
+          // the auth header to the host AppConstants names.
+          videoUrl: '${AppConstants.baseUrl}/lectures/$lectureId/stream/manifest',
         );
       }
       return model;
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to fetch Lecture Content: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 
@@ -70,19 +85,45 @@ class CourseLearningRemoteDataSourceImpl extends CourseLearningRemoteDataSource{
       {int? watchedSeconds}) async {
     try {
       await _setAuthToken();
-      // NestJS route: PUT /api/v1/lectures/:lectureId/progress
+      // PUT is the synchronous path — it writes through Data Connect and
+      // returns the derived completion, which is what the explicit actions need.
+      //
       // `completed` is gone: the server ignored it and derives completion from
       // the position plus the credited watch time below.
       //
       // The key is omitted rather than sent as null when there is no watch time
-      // to report — the server reads an absent field as "not reported" and an
-      // explicit value as a measurement, and null is the former.
+      // to report — `isLectureComplete` reads an absent field as "not reported"
+      // and an explicit value as a measurement, and null is the former.
       await apiService.put('/lectures/$lectureId/progress', data: {
         'lastWatchedSecond': lastWatchedSecond,
         if (watchedSeconds != null) 'watchedSeconds': watchedSeconds,
       });
     } catch (e) {
-      throw CustomExceptions(message: 'Failed to update lecture progress: $e');
+      throw CustomExceptions(message: userFacingMessage(e));
+    }
+  }
+
+  /// `POST /lectures/:lectureId/progress` — validates, enqueues, and answers
+  /// 202 without touching the database. The queue collapses a burst of
+  /// heartbeats for the same (user, lecture) into one pending job, so a player
+  /// reporting every 10 seconds costs one write per lecture rather than one per
+  /// tick. The controller says as much: heartbeats belong here, and the
+  /// synchronous PUT is kept for explicit actions.
+  @override
+  Future<void> recordLectureProgress(String lectureId, int lastWatchedSecond,
+      {int? watchedSeconds}) async {
+    try {
+      await _setAuthToken();
+      await apiService.post('/lectures/$lectureId/progress', data: {
+        'lastWatchedSecond': lastWatchedSecond,
+        // Carried here as well: `RecordProgressJob` has the field and the worker
+        // runs the same `isLectureComplete`, so the queued route enforces the
+        // watch-time rule exactly like the synchronous one. Dropping it would
+        // have made the heartbeat the soft way to complete a lecture.
+        if (watchedSeconds != null) 'watchedSeconds': watchedSeconds,
+      });
+    } catch (e) {
+      throw CustomExceptions(message: userFacingMessage(e));
     }
   }
 }

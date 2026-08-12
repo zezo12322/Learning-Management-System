@@ -1,3 +1,4 @@
+import 'package:optimatech_lms/core/utils/money.dart';
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
 import 'package:optimatech_lms/features/home/domain/entities/home_course_entity.dart';
 
@@ -26,7 +27,7 @@ class PopularCourseModel extends HomeCourseEntity {
           avatar: course.author.avatar,
         ),
       ],
-      price: course.price.toDouble(),
+      price: egpFromPiastres(course.price),
       level: course.level.stringValue,
       categoryName: course.category.name,
       tags: course.tags,

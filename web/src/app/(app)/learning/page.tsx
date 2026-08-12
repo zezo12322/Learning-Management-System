@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   BookOpen,
@@ -18,18 +17,15 @@ import { useT } from '@/lib/i18n'
 import type { ContinueLearningItem } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CourseThumbnail } from '@/components/course/CourseThumbnail'
-import { SaveButton } from '@/components/course/SaveButton'
-import { RatingStars } from '@/components/common/RatingStars'
 import { PageHeader } from '@/components/workspace/PageHeader'
 import { FilterChips, type FilterChip } from '@/components/student/FilterChips'
+import { EnrolledCourseRow } from '@/components/student/EnrolledCourseRow'
 import { EmptyState } from '@/components/student/EmptyState'
 import { cn } from '@/lib/utils'
 
 type Filter = 'ALL' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED'
-type Sort = 'RECENT' | 'PROGRESS' | 'TITLE'
+type Sort = 'ENROLLED' | 'PROGRESS' | 'TITLE'
 
 const PAGE_SIZE = 10
 
@@ -47,6 +43,26 @@ function matchesFilter(item: ContinueLearningItem, filter: Filter): boolean {
 }
 
 /**
+ * First page, last page and the current page ±1; `null` marks each elided run.
+ * Printing every page number was fine for three pages and unusable for forty.
+ */
+function pageWindow(current: number, total: number): (number | null)[] {
+  const wanted = [1, total, current - 1, current, current + 1]
+  const pages = Array.from(new Set(wanted))
+    .filter((page) => page >= 1 && page <= total)
+    .sort((a, b) => a - b)
+
+  const out: (number | null)[] = []
+  let previous = 0
+  for (const page of pages) {
+    if (previous && page - previous > 1) out.push(null)
+    out.push(page)
+    previous = page
+  }
+  return out
+}
+
+/**
  * "My Courses" (Figma "6. Courses") — the student's enrolled courses with
  * search, state filters, a category strip, sorting, the result count and
  * pagination. Backed by GET /courses/continue-learning, which is the only feed
@@ -57,7 +73,7 @@ export default function MyLearningPage() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('ALL')
   const [category, setCategory] = useState<string>('ALL')
-  const [sort, setSort] = useState<Sort>('RECENT')
+  const [sort, setSort] = useState<Sort>('ENROLLED')
   const [page, setPage] = useState(1)
 
   const enrollments = useQuery({ queryKey: ['continue-learning'], queryFn: coursesApi.continueLearning })
@@ -104,6 +120,8 @@ export default function MyLearningPage() {
     const sorted = [...rows]
     if (sort === 'PROGRESS') sorted.sort((a, b) => b.percentage - a.percentage)
     else if (sort === 'TITLE') sorted.sort((a, b) => a.course.title.localeCompare(b.course.title))
+    // Enrolment date, not last activity: no endpoint reports when the learner
+    // last opened a course, so the option says what it actually does.
     else sorted.sort((a, b) => (b.enrolledAt ?? '').localeCompare(a.enrolledAt ?? ''))
     return sorted
   }, [items, filter, category, search, sort])
@@ -157,7 +175,7 @@ export default function MyLearningPage() {
                   className={cn(
                     'flex h-20 w-24 shrink-0 flex-col items-center justify-center gap-1.5 rounded-card border text-[11px] font-semibold transition-colors',
                     active
-                      ? 'border-primary bg-brand-soft text-primary'
+                      ? 'border-primary bg-brand-soft text-on-brand-soft'
                       : 'border-border bg-surface text-content-secondary hover:text-content',
                   )}
                 >
@@ -180,7 +198,7 @@ export default function MyLearningPage() {
             onChange={(event) => setSort(event.target.value as Sort)}
             className="h-10 rounded-input border border-border bg-surface px-3 text-xs font-semibold text-content outline-none focus:border-primary"
           >
-            <option value="RECENT">{t('learning.sort.recent')}</option>
+            <option value="ENROLLED">{t('learning.sort.enrolled')}</option>
             <option value="PROGRESS">{t('learning.sort.progress')}</option>
             <option value="TITLE">{t('learning.sort.title')}</option>
           </select>
@@ -197,62 +215,12 @@ export default function MyLearningPage() {
           ))}
         </div>
       ) : enrollments.isError ? (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">{t('learning.loadError')}</Card>
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">{t('learning.loadError')}</Card>
       ) : pageItems.length ? (
         <div className="space-y-3">
-          {pageItems.map((item) => {
-            const percentage = Math.round(item.percentage)
-            const done = item.status === 'COMPLETED'
-            const started = item.completedLessons > 0
-            return (
-              <div key={item.enrollmentId} className="relative">
-                <SaveButton courseId={item.course.id} className="absolute end-3 top-3 z-10" />
-                <Link href={`/courses/${item.course.id}`} className="block">
-                  <Card hover className="flex gap-3 p-3">
-                    <CourseThumbnail
-                      src={item.course.thumbnail}
-                      seed={item.course.id}
-                      label={item.course.title}
-                      className="h-24 w-24 shrink-0 rounded-xl sm:h-28 sm:w-32"
-                    />
-                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 pe-10">
-                      <div className="space-y-1">
-                        <h3 className="line-clamp-2 text-sm font-bold text-content">{item.course.title}</h3>
-                        {item.course.author?.name && (
-                          <p className="truncate text-xs text-content-secondary">{item.course.author.name}</p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-content-secondary">
-                          {item.course.avgRating != null && (
-                            <RatingStars value={item.course.avgRating} size={12} count={item.course.ratingCount} />
-                          )}
-                          <span>{t(`level.${item.course.level}`, item.course.level)}</span>
-                          <span>
-                            {t('learning.lessons').replace('{n}', String(item.totalLessons))}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-border/70">
-                          <div
-                            className={cn('h-full rounded-full', done ? 'bg-success' : 'bg-primary')}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                        <Badge tone={done ? 'success' : started ? 'primary' : 'muted'}>
-                          {done
-                            ? t('student.completed')
-                            : started
-                              ? t('student.inProgress')
-                              : t('learning.filter.notStarted')}
-                        </Badge>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              </div>
-            )
-          })}
+          {pageItems.map((item) => (
+            <EnrolledCourseRow key={item.enrollmentId} item={item} />
+          ))}
         </div>
       ) : items.length ? (
         <Card>
@@ -292,22 +260,34 @@ export default function MyLearningPage() {
             >
               <ChevronLeft size={16} className="rtl:rotate-180" />
             </button>
-            {Array.from({ length: pageCount }).map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-current={page === index + 1 ? 'page' : undefined}
-                onClick={() => setPage(index + 1)}
-                className={cn(
-                  'h-9 w-9 rounded-full text-xs font-bold transition-colors',
-                  page === index + 1
-                    ? 'bg-primary text-white'
-                    : 'border border-border text-content-secondary hover:text-content',
-                )}
-              >
-                {index + 1}
-              </button>
-            ))}
+            {pageWindow(page, pageCount).map((entry, index) =>
+              entry === null ? (
+                <span
+                  key={`gap-${index}`}
+                  className="flex h-9 w-6 items-center justify-center text-xs font-bold text-content-muted"
+                >
+                  <span aria-hidden="true">…</span>
+                  {/* The ellipsis is decorative; the skipped pages still need saying. */}
+                  <span className="sr-only">{t('pagination.morePages')}</span>
+                </span>
+              ) : (
+                <button
+                  key={entry}
+                  type="button"
+                  aria-label={t('pagination.goToPage').replace('{n}', String(entry))}
+                  aria-current={page === entry ? 'page' : undefined}
+                  onClick={() => setPage(entry)}
+                  className={cn(
+                    'h-9 w-9 rounded-full text-xs font-bold transition-colors',
+                    page === entry
+                      ? 'bg-primary text-white'
+                      : 'border border-border text-content-secondary hover:text-content',
+                  )}
+                >
+                  {entry}
+                </button>
+              ),
+            )}
             <button
               type="button"
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}

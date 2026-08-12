@@ -29,7 +29,7 @@ export default function InsightsIndexPage() {
     return (
       <div className="space-y-6">
         <PageHeader title={t('insights.title')} />
-        <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">
+        <Card className="border-error bg-error-soft p-6 text-sm text-error">
           {t('insights.accessDenied')}
         </Card>
       </div>
@@ -41,7 +41,7 @@ export default function InsightsIndexPage() {
       <PageHeader title={t('insights.title')} description={t('insights.listSubtitle')} />
 
       {query.isError && (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {apiErrorStatus(query.error) === 403 ? t('insights.accessDenied') : t('insights.loadError')}
         </Card>
       )}
@@ -58,7 +58,7 @@ export default function InsightsIndexPage() {
               <Link key={course.id} href={`/insights/${course.id}`} className="block h-full">
                 <Card hover className="flex h-full flex-col p-4 sm:p-5">
                   <div className="flex items-center justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-primary">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
                       <BarChart3 size={18} />
                     </span>
                     <StatusPill tone={status.tone}>{t(status.labelKey)}</StatusPill>

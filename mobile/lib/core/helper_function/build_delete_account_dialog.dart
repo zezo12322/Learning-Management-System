@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:optimatech_lms/core/services/session_cleanup_service.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/secondary_button.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
@@ -100,6 +101,9 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
         return;
       }
       await user.delete();
+      // The Cloud Function cascade removes the server-side record; this removes
+      // what the deleted account left on the device.
+      await clearSessionData();
       if (!mounted) return;
       // Clears the dialog and every route, then lands on the login screen.
       Navigator.of(context).pushNamedAndRemoveUntil(

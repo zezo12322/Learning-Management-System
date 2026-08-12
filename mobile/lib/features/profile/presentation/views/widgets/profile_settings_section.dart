@@ -6,12 +6,11 @@ import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/helper_function/build_change_language_dialog.dart';
 import 'package:optimatech_lms/core/helper_function/build_change_theme_dialog.dart';
 import 'package:optimatech_lms/core/helper_function/build_delete_account_dialog.dart';
+import 'package:optimatech_lms/core/services/session_cleanup_service.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/modern_dialog.dart';
 import 'package:optimatech_lms/features/auth/presentation/views/log_in_view.dart';
 import 'package:optimatech_lms/features/profile/presentation/views/widgets/setting/profile_setting_tile.dart';
-
-import '../../../../../core/services/get_it_service.dart';
 import '../../../../../core/services/secure_storage_service.dart';
 
 class ProfileSettingsSection extends StatelessWidget {
@@ -93,8 +92,10 @@ class ProfileSettingsSection extends StatelessWidget {
                     message: 'profile.settings.log_out_confirmation'.tr(),
                     onCancel: () => Navigator.pop(context),
                     onConfirm: () async{
-                      //await StorageService.clearAll();
-                      await getIt<SecureStorageService>().deleteAuthToken();
+                      // Clears secure storage, the cached AI transcripts, the
+                      // remember-me flag and the bearer token on the shared Dio
+                      // client — see `clearSessionData`.
+                      await clearSessionData();
                       await FirebaseAuth.instance.signOut();
                       if(!context.mounted) return;
                       Navigator.pushNamedAndRemoveUntil(context, LogInView.routeName, (route) => false,);

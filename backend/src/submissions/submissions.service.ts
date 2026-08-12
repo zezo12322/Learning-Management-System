@@ -57,6 +57,23 @@ export class SubmissionsService {
     return data?.missionSubmissions ?? [];
   }
 
+  /**
+   * Assignments open to the caller: every mission on a course they are enrolled
+   * in, with its rubric and their own submissions.
+   *
+   * This closes the one gap that made the assignment loop unusable from a
+   * client. `GET /missions` lists missions the caller *authored* and
+   * `GET /missions/:id` is owner-only, so a student had no way to learn that an
+   * assignment existed, let alone its id — and `POST /missions/:id/submissions`
+   * needs that id. The query is self-scoped to auth.uid (see MyAssignments in
+   * dataconnect/default/missions.gql), so it runs on the caller's own token
+   * rather than the service account.
+   */
+  async myAssignments(authToken: string) {
+    const data = await this.dc.executeQuery('MyAssignments', {}, authToken);
+    return data?.missions ?? [];
+  }
+
   // ----- Instructor -----
 
   async pending(authToken: string, isAdmin: boolean) {

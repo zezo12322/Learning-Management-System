@@ -53,6 +53,7 @@ export function LecturePlayer({
   watchedSecondsSoFar = 0,
   onEnded,
   onPosition,
+  className,
 }: {
   lectureId: string
   title: string
@@ -63,6 +64,12 @@ export function LecturePlayer({
   onEnded?: () => void
   /** Live playback position, so the page can stamp notes and complete lessons. */
   onPosition?: (seconds: number) => void
+  /**
+   * Extra classes for the stage. /learn passes a height cap here so the video
+   * letterboxes instead of filling the viewport and pushing the curriculum rail
+   * off screen.
+   */
+  className?: string
 }) {
   const t = useT()
   const { firebaseUser } = useAuth()
@@ -211,7 +218,12 @@ export function LecturePlayer({
   }, [watermark.data?.text])
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-card bg-slate-950">
+    <div
+      className={cn(
+        'relative aspect-video w-full overflow-hidden rounded-card bg-stage',
+        className,
+      )}
+    >
       <video
         ref={videoRef}
         controls={started && state === 'ready'}
@@ -221,7 +233,12 @@ export function LecturePlayer({
         onEnded={onEnded}
         onPause={(event) => onPosition?.(Math.floor(event.currentTarget.currentTime))}
         onSeeked={(event) => onPosition?.(Math.floor(event.currentTarget.currentTime))}
-        className={cn('h-full w-full', started && state === 'ready' ? 'block' : 'hidden')}
+        // object-contain, so a capped stage letterboxes the frame against the
+        // dark surface rather than stretching or cropping it.
+        className={cn(
+          'h-full w-full object-contain',
+          started && state === 'ready' ? 'block' : 'hidden',
+        )}
       />
 
       {!started && (
@@ -229,7 +246,7 @@ export function LecturePlayer({
           type="button"
           onClick={() => setStarted(true)}
           aria-label={t('learn.player.play')}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary-800 to-slate-950 text-white transition-opacity hover:opacity-95"
+          className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary to-stage text-on-stage transition-opacity hover:opacity-95"
           data-seed={posterSeed}
         >
           <PlayCircle size={64} strokeWidth={1.4} className="opacity-90" />
@@ -238,14 +255,14 @@ export function LecturePlayer({
       )}
 
       {started && state === 'loading' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white/80">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-on-stage-muted">
           <Loader2 size={32} className="animate-spin" />
           <span className="text-xs">{t('learn.player.loading')}</span>
         </div>
       )}
 
       {started && state === 'error' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-8 text-center text-white/85">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-8 text-center text-on-stage-muted">
           <AlertTriangle size={32} className="text-warning" />
           <p className="text-sm font-semibold">{t(errorKey)}</p>
           <button
@@ -254,7 +271,7 @@ export function LecturePlayer({
               setState('idle')
               setStarted(false)
             }}
-            className="rounded-btn border border-white/30 px-4 py-2 text-xs font-semibold hover:bg-white/10"
+            className="rounded-btn border border-on-stage/30 px-4 py-2 text-xs font-semibold hover:bg-on-stage/10"
           >
             {t('learn.player.retry')}
           </button>
@@ -266,7 +283,7 @@ export function LecturePlayer({
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute select-none rounded bg-black/25 px-2 py-1 text-[10px] font-medium text-white/60 transition-all duration-700',
+            'pointer-events-none absolute select-none rounded bg-stage/60 px-2 py-1 text-[10px] font-medium text-on-stage-muted transition-all duration-700',
             CORNERS[corner],
           )}
         >

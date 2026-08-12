@@ -42,7 +42,7 @@ export default function CertificatesPage() {
           ))}
         </div>
       ) : enrollments.isError ? (
-        <Card className="border-error/20 bg-error/5 p-4 text-sm text-error">
+        <Card className="border-error bg-error-soft p-4 text-sm text-error">
           {t('certificates.loadError')}
         </Card>
       ) : certificates.length ? (

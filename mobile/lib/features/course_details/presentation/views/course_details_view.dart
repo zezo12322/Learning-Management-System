@@ -25,7 +25,6 @@ import 'package:optimatech_lms/features/course_details/presentation/manager/cour
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/resources_content.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
-import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 
 class CourseDetailsView extends StatelessWidget {
   const CourseDetailsView({super.key, required this.course});
@@ -128,10 +127,9 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceDim,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 90.h),
-        child: GlobalChatbotFab(courseId: widget.course.id),
-      ),
+      // The AI tutor is lecture-scoped and this screen has no lecture open, so
+      // it lives on the lesson screen only — mounting it here sent
+      // `/ai/lectures/null/chat`.
       body: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
         builder: (context, state) {
           List<CourseLessonEntity> allLessons = [];
@@ -238,7 +236,10 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                                   Gap(32.h),
                                   BlocProvider<HomeCoursesCubit>(
                                     create: (context) =>
-                                        getIt<HomeCoursesCubit>()..fetchHomeCourses(),
+                                        // Only the popular list is rendered
+                                        // here, so only that query runs.
+                                        getIt<HomeCoursesCubit>()
+                                          ..fetchPopularCourses(),
                                     child: BlocBuilder<HomeCoursesCubit, HomeCourseState>(
                                       builder: (context, state) {
                                         return state.maybeWhen(

@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/courses/domain/repositories/categories_repository.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class CategoriesCubit extends Cubit<CategoriesState> {
+class CategoriesCubit extends Cubit<CategoriesState> with SafeEmit<CategoriesState> {
   CategoriesCubit({required this.repository}) : super(const CategoriesState());
 
   final CategoriesRepository repository;

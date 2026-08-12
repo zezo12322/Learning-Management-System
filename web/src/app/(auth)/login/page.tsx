@@ -110,17 +110,17 @@ export default function LoginPage() {
         <p className="mb-7 mt-2 text-sm text-content-secondary">{t('auth.signInSubtitle')}</p>
 
         {configurationError && (
-          <div className="mb-5 flex items-start gap-2 rounded-input bg-error/10 px-3 py-2.5 text-xs text-error">
+          <div className="mb-5 flex items-start gap-2 rounded-input bg-error-soft px-3 py-2.5 text-xs text-error">
             <ShieldCheck size={16} className="mt-0.5 shrink-0" />
             {t('auth.configError')}
           </div>
         )}
 
-        {error && <div className="mb-4 rounded-input bg-error/10 px-3 py-2 text-sm text-error">{error}</div>}
-        {notice && <div className="mb-4 rounded-input bg-success/10 px-3 py-2 text-sm text-success">{notice}</div>}
+        {error && <div className="mb-4 rounded-input bg-error-soft px-3 py-2 text-sm text-error">{error}</div>}
+        {notice && <div className="mb-4 rounded-input bg-success-soft px-3 py-2 text-sm text-success">{notice}</div>}
 
         <Button variant="outline" fullWidth size="lg" onClick={googleLogin} disabled={configurationError}>
-          <span className="mr-1 text-base font-bold">G</span> {t('auth.continueGoogle')}
+          <span aria-hidden className="me-1 text-base font-bold">G</span> {t('auth.continueGoogle')}
         </Button>
 
         <div className="my-6 flex items-center gap-3 text-[10px] font-medium text-content-muted">
@@ -172,7 +172,7 @@ export default function LoginPage() {
           </label>
 
           <Button type="submit" fullWidth size="lg" loading={isSubmitting} disabled={configurationError}>
-            {t('auth.signIn')} <ArrowRight size={17} />
+            {t('auth.signIn')} <ArrowRight size={17} className="rtl:rotate-180" aria-hidden />
           </Button>
         </form>
 

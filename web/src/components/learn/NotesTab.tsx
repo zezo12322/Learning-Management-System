@@ -18,29 +18,57 @@ function stamp(seconds: number): string {
 }
 
 /**
+ * A half-written note. Held by the /learn page rather than by this component:
+ * switching tabs unmounts the tab panel, and when the editor owned this state a
+ * tab switch silently destroyed whatever the learner had typed.
+ */
+export interface NoteDraft {
+  composing: boolean
+  /** The existing note being edited, or null when composing a new one. */
+  editing: LectureNote | null
+  title: string
+  body: string
+}
+
+export const EMPTY_NOTE_DRAFT: NoteDraft = {
+  composing: false,
+  editing: null,
+  title: '',
+  body: '',
+}
+
+/** Whether the draft holds text worth telling the learner about. */
+export function hasNoteDraftText(draft: NoteDraft): boolean {
+  return draft.title.trim().length > 0 || draft.body.trim().length > 0
+}
+
+/**
  * Notes tab (Figma "9. Course notes"): counters, search, an editor, and the
  * note list with star / edit / delete. Notes are per-account and local — see
  * lib/notes.ts for why.
+ *
+ * The editor's state is a prop, not local state: see NoteDraft above.
  */
 export function NotesTab({
   lectureId,
   lectureTitle,
   lectureIds,
   currentSecond,
+  draft,
+  onDraftChange,
 }: {
   lectureId: string | null
   lectureTitle: string
   lectureIds: string[]
   /** Playback position stamped onto a new note. */
   currentSecond: number
+  draft: NoteDraft
+  onDraftChange: (draft: NoteDraft) => void
 }) {
   const { t, locale } = useI18n()
   const notes = useCourseNotes(lectureIds)
   const [search, setSearch] = useState('')
-  const [editing, setEditing] = useState<LectureNote | null>(null)
-  const [composing, setComposing] = useState(false)
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
+  const { composing, editing, title, body } = draft
 
   const visible = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -55,17 +83,15 @@ export function NotesTab({
   const starred = notes.filter((note) => note.starred).length
 
   const openCompose = () => {
-    setEditing(null)
-    setTitle('')
-    setBody('')
-    setComposing(true)
+    onDraftChange({ composing: true, editing: null, title: '', body: '' })
   }
 
   const openEdit = (note: LectureNote) => {
-    setEditing(note)
-    setTitle(note.title)
-    setBody(note.body)
-    setComposing(true)
+    onDraftChange({ composing: true, editing: note, title: note.title, body: note.body })
+  }
+
+  const closeCompose = () => {
+    onDraftChange(EMPTY_NOTE_DRAFT)
   }
 
   const save = () => {
@@ -83,24 +109,21 @@ export function NotesTab({
         atSecond: currentSecond,
       })
     }
-    setComposing(false)
-    setEditing(null)
-    setTitle('')
-    setBody('')
+    closeCompose()
   }
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         {[
-          { icon: FileText, value: String(notes.length), label: t('learn.notes.total'), tone: 'bg-brand-soft text-primary' },
+          { icon: FileText, value: String(notes.length), label: t('learn.notes.total'), tone: 'bg-brand-soft text-on-brand-soft' },
           {
             icon: Clock,
             value: lastEdited ? relativeTime(lastEdited, locale) : '—',
             label: t('learn.notes.lastEdited'),
             tone: 'bg-secondary/10 text-secondary',
           },
-          { icon: Star, value: String(starred), label: t('learn.notes.starred'), tone: 'bg-success/10 text-success' },
+          { icon: Star, value: String(starred), label: t('learn.notes.starred'), tone: 'bg-success-soft text-success' },
         ].map((stat) => (
           <Card key={stat.label} className="flex items-center gap-2.5 p-3">
             <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', stat.tone)}>
@@ -130,7 +153,7 @@ export function NotesTab({
             </h3>
             <button
               type="button"
-              onClick={() => setComposing(false)}
+              onClick={closeCompose}
               aria-label={t('common.cancel')}
               className="text-content-muted hover:text-content"
             >
@@ -139,14 +162,14 @@ export function NotesTab({
           </div>
           <Input
             value={title}
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(event) => onDraftChange({ ...draft, title: event.target.value })}
             placeholder={t('learn.notes.titlePlaceholder')}
             aria-label={t('learn.notes.titlePlaceholder')}
             maxLength={120}
           />
           <textarea
             value={body}
-            onChange={(event) => setBody(event.target.value)}
+            onChange={(event) => onDraftChange({ ...draft, body: event.target.value })}
             placeholder={t('learn.notes.bodyPlaceholder')}
             aria-label={t('learn.notes.bodyPlaceholder')}
             rows={4}
@@ -154,7 +177,7 @@ export function NotesTab({
             className="w-full resize-y rounded-input border border-border bg-surface px-4 py-3 text-sm text-content outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
           <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setComposing(false)}>
+            <Button variant="outline" size="sm" onClick={closeCompose}>
               {t('common.cancel')}
             </Button>
             <Button size="sm" onClick={save} disabled={!lectureId && !editing}>
@@ -173,7 +196,7 @@ export function NotesTab({
           {visible.map((note) => (
             <Card key={note.id} className="p-4">
               <div className="flex items-start gap-3">
-                <span className="shrink-0 rounded-lg bg-brand-soft px-2 py-1 font-mono text-[11px] font-semibold text-primary">
+                <span className="shrink-0 rounded-lg bg-brand-soft px-2 py-1 font-mono text-[11px] font-semibold text-on-brand-soft">
                   {stamp(note.atSecond)}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -183,14 +206,14 @@ export function NotesTab({
                       {note.body}
                     </p>
                   )}
-                  <p className="mt-2 truncate text-[11px] text-content-muted">{note.lectureTitle}</p>
+                  <p dir="auto" className="mt-2 truncate text-[11px] text-content-secondary">{note.lectureTitle}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => updateNote(note.lectureId, note.id, { starred: !note.starred })}
                   aria-pressed={note.starred}
                   aria-label={t('learn.notes.star')}
-                  className={note.starred ? 'text-warning' : 'text-content-muted hover:text-warning'}
+                  className={note.starred ? 'text-warning' : 'text-content-secondary hover:text-warning'}
                 >
                   <Star size={16} fill={note.starred ? 'currentColor' : 'none'} />
                 </button>

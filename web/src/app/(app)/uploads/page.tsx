@@ -40,7 +40,7 @@ export default function UploadsPage() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-input bg-brand-soft px-3 py-3 text-xs font-semibold text-primary"><Database size={15} /> {authoringQuery.isLoading ? t('uploads.loadingCourses') : `${courses.length} ${t('uploads.courses')}`}</span>
+            <span className="inline-flex items-center gap-2 rounded-input bg-brand-soft px-3 py-3 text-xs font-semibold text-on-brand-soft"><Database size={15} /> {authoringQuery.isLoading ? t('uploads.loadingCourses') : `${courses.length} ${t('uploads.courses')}`}</span>
             {courseId && (
               <Link href={`/studio/${courseId}/setup`}>
                 <Button variant="outline"><ExternalLink size={15} /> {t('uploads.viewCourse')}</Button>
@@ -48,7 +48,7 @@ export default function UploadsPage() {
             )}
           </div>
         </div>
-        {authoringQuery.isError && <div className="mt-4 rounded-input bg-error/10 p-3 text-xs text-error">{t('uploads.loadError')}</div>}
+        {authoringQuery.isError && <div className="mt-4 rounded-input bg-error-soft p-3 text-xs text-error">{t('uploads.loadError')}</div>}
       </Card>
       {courseId ? <CourseUploadWorkspace courseId={courseId} /> : !authoringQuery.isLoading && !authoringQuery.isError ? (
         <Card className="py-16 text-center"><UploadCloud className="mx-auto text-content-muted" /><p className="mt-3 text-sm font-semibold text-content">{t('uploads.noCourseSelected')}</p><p className="mt-1 text-xs text-content-secondary">{t('uploads.createBeforeUpload')}</p></Card>

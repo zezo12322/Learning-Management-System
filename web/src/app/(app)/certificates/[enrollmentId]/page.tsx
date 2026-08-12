@@ -77,7 +77,7 @@ export default function CertificateDetailPage() {
 
   if (enrollments.isError) {
     return (
-      <Card className="border-error/20 bg-error/5 p-6 text-sm text-error">
+      <Card className="border-error bg-error-soft p-6 text-sm text-error">
         {t('certificates.loadError')}
       </Card>
     )

@@ -39,7 +39,7 @@ export default function SavedPage() {
       {catalog.isError ? (
         // Distinct from "your saved courses are gone": the catalog request
         // failed, so we simply do not know what is still available.
-        <div className="rounded-card border border-error/20 bg-error/5 p-6 text-center text-sm text-error">
+        <div className="rounded-card border border-error bg-error-soft p-6 text-center text-sm text-error">
           {t('catalog.reachError')}
         </div>
       ) : savedIds.length === 0 ? (

@@ -17,15 +17,15 @@ class CourseStatsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    var totalMinutes = 0;
+    var totalSeconds = 0;
     for (final lesson in lessons) {
-      totalMinutes += lesson.durationMinutes;
+      totalSeconds += lesson.durationSeconds;
     }
 
     final stats = [
       _StatItem(
         icon: Icons.access_time_rounded,
-        value: formatMinutes(totalMinutes),
+        value: formatSeconds(totalSeconds),
         label: 'course_details.total_duration'.tr(),
       ),
       _StatItem(

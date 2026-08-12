@@ -12,6 +12,7 @@ import {
   BarChart3,
   Bell,
   ClipboardList,
+  GraduationCap,
   Home,
   UploadCloud,
   UserRound,
@@ -52,6 +53,8 @@ const LEARNER_NAV: NavItem[] = [
 const TEACHING_NAV: NavItem[] = [
   { href: '/dashboard', label: 'nav.overview', icon: LayoutDashboard },
   { href: '/courses', label: 'nav.courses', icon: LibraryBig },
+  { href: '/teaching/assignments', label: 'nav.setAssignments', icon: ClipboardList },
+  { href: '/teaching/grading', label: 'nav.grading', icon: GraduationCap },
   { href: '/students', label: 'nav.students', icon: UserPlus },
   { href: '/insights', label: 'nav.insights', icon: BarChart3 },
   { href: '/uploads', label: 'nav.uploads', icon: UploadCloud },
@@ -69,7 +72,7 @@ function NavLink({ item, active, t }: { item: NavItem; active: boolean; t: (key:
       className={cn(
         'group flex h-11 items-center gap-3 rounded-input px-3 text-sm font-medium transition-colors',
         active
-          ? 'bg-brand-soft text-primary'
+          ? 'bg-brand-soft text-on-brand-soft'
           : 'text-content-secondary hover:bg-subtle hover:text-content',
       )}
     >
@@ -166,7 +169,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {canTeach && (
             <Link
               href="/studio/new/setup"
-              className="flex h-11 items-center justify-center gap-2 rounded-input bg-primary text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-600"
+              className="flex h-11 items-center justify-center gap-2 rounded-input bg-primary text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
             >
               <Plus size={17} /> {t('common.createCourse')}
             </Link>
@@ -203,7 +206,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
                 isActive(pathname, '/notifications')
-                  ? 'bg-brand-soft text-primary'
+                  ? 'bg-brand-soft text-on-brand-soft'
                   : 'text-content-secondary hover:bg-subtle hover:text-content',
               )}
             >

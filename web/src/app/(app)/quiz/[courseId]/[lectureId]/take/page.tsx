@@ -19,9 +19,10 @@ import {
   X,
   XCircle,
 } from 'lucide-react'
-import { quizApi } from '@/lib/api/services'
+import { quizApi, quizResultFromError } from '@/lib/api/services'
 import { apiErrorMessage, apiErrorStatus } from '@/lib/api/client'
 import { useT } from '@/lib/i18n'
+import { clearQuizAttempt, readQuizAttempt, writeQuizAttempt } from '@/lib/quizAttempt'
 import type { QuizResult, TakeQuestion } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -33,6 +34,13 @@ type Phase = 'intro' | 'taking' | 'review' | 'result'
 type ReviewFilter = 'ALL' | 'ANSWERED' | 'UNANSWERED'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
+
+/**
+ * How often the attempt asks the server for the authoritative remaining time.
+ * The server also auto-grades an expired attempt on this call, so this doubles
+ * as the "did my time run out while this tab was asleep?" check.
+ */
+const HEARTBEAT_MS = 30_000
 
 function clock(totalSeconds: number): string {
   const safe = Math.max(0, Math.floor(totalSeconds))
@@ -67,7 +75,6 @@ export default function TakeQuizPage() {
   })
 
   const [phase, setPhase] = useState<Phase>('intro')
-  const [attemptId, setAttemptId] = useState<string | null>(null)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [index, setIndex] = useState(0)
   const [result, setResult] = useState<QuizResult | null>(null)
@@ -76,72 +83,241 @@ export default function TakeQuizPage() {
   const [error, setError] = useState<string | null>(null)
   const [remaining, setRemaining] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
+  const [resumed, setResumed] = useState(false)
+  /** Answers the server has not acknowledged yet — retried on submit. */
+  const [unsyncedCount, setUnsyncedCount] = useState(0)
 
   const questions = useMemo<TakeQuestion[]>(() => quizQuery.data?.questions ?? [], [quizQuery.data])
   const answeredCount = Object.keys(answers).length
   const timeLimit = quizQuery.data?.timeLimitMinutes ?? quizRef.data?.timeLimitMinutes
   const passingScore = quizRef.data?.passingScore ?? 70
 
+  /**
+   * The attempt lives in refs, not state, because every async callback below
+   * needs the *current* value: a stale closure here would post an answer to a
+   * finished attempt or lose one the learner just changed. State mirrors only
+   * what the UI draws.
+   */
+  const attemptRef = useRef<{ attemptId: string; startedAtMs: number } | null>(null)
+  const answersRef = useRef<Record<string, string>>({})
+  const syncedRef = useRef<Set<string>>(new Set())
+  /** Wall-clock deadline from the server's heartbeat; null = no time limit. */
+  const deadlineRef = useRef<number | null>(null)
   // Submission must happen exactly once per attempt: the countdown fires it,
   // and the Review button can fire it too.
   const submittedRef = useRef(false)
 
+  const countUnsynced = () =>
+    Object.keys(answersRef.current).filter((id) => !syncedRef.current.has(id)).length
+
+  /** Snapshot the attempt so a reload can walk straight back into it. */
+  const persist = useCallback(() => {
+    const attempt = attemptRef.current
+    if (!quizId || !attempt) return
+    writeQuizAttempt(quizId, {
+      attemptId: attempt.attemptId,
+      startedAtMs: attempt.startedAtMs,
+      answers: answersRef.current,
+      synced: [...syncedRef.current],
+    })
+  }, [quizId])
+
+  /** The attempt is over: show the score and stop tracking it locally. */
+  const finalize = useCallback(
+    (graded: QuizResult) => {
+      submittedRef.current = true
+      deadlineRef.current = null
+      if (quizId) clearQuizAttempt(quizId)
+      setResult(graded)
+      setPhase('result')
+    },
+    [quizId],
+  )
+
+  /**
+   * Send one answer the moment it is picked. `SubmitQuizAnswer` is an upsert, so
+   * re-sending or changing an answer is safe, and the server holds the work even
+   * if this browser never comes back. Before this, answers were batched to the
+   * very end — one refresh mid-quiz lost every one of them while the attempt
+   * itself had already been counted against `maxAttempts`.
+   */
+  const pushAnswer = useCallback(
+    async (questionId: string, optionId: string) => {
+      const attempt = attemptRef.current
+      if (!quizId || !attempt) return
+      try {
+        await quizApi.submitAnswer(courseId, quizId, attempt.attemptId, {
+          questionId,
+          selectedOptionId: optionId,
+        })
+        // Only mark it synced if this is still the chosen option — the learner
+        // may have changed their mind while the request was in flight.
+        if (answersRef.current[questionId] === optionId) {
+          syncedRef.current.add(questionId)
+          persist()
+        }
+      } catch (pushError) {
+        // The limit ran out and the server graded the attempt for us.
+        const graded = quizResultFromError(pushError)
+        if (graded) {
+          finalize(graded)
+          return
+        }
+        /* stays unsynced — retried when the learner submits */
+      } finally {
+        setUnsyncedCount(countUnsynced())
+      }
+    },
+    [courseId, quizId, persist, finalize],
+  )
+
+  const select = (questionId: string, optionId: string) => {
+    if (submittedRef.current) return
+    answersRef.current = { ...answersRef.current, [questionId]: optionId }
+    // A changed answer needs re-sending, so it stops counting as acknowledged.
+    syncedRef.current.delete(questionId)
+    setAnswers(answersRef.current)
+    setUnsyncedCount(countUnsynced())
+    persist()
+    void pushAnswer(questionId, optionId)
+  }
+
   const submit = useCallback(async () => {
-    if (!quizId || !attemptId || submittedRef.current) return
+    const attempt = attemptRef.current
+    if (!quizId || !attempt || submittedRef.current) return
     submittedRef.current = true
     setBusy(true)
     setError(null)
     try {
-      for (const question of questions) {
-        const selected = answers[question.id]
-        if (selected) {
-          await quizApi.submitAnswer(courseId, quizId, attemptId, {
-            questionId: question.id,
-            selectedOptionId: selected,
-          })
-        }
+      // Only the answers the server never acknowledged; the rest went out as
+      // they were picked.
+      for (const [questionId, optionId] of Object.entries(answersRef.current)) {
+        if (syncedRef.current.has(questionId)) continue
+        await quizApi.submitAnswer(courseId, quizId, attempt.attemptId, {
+          questionId,
+          selectedOptionId: optionId,
+        })
+        syncedRef.current.add(questionId)
       }
-      setResult(await quizApi.finishAttempt(courseId, quizId, attemptId))
-      setPhase('result')
+      persist()
+      setUnsyncedCount(0)
+      finalize(await quizApi.finishAttempt(courseId, quizId, attempt.attemptId))
     } catch (submitError) {
-      // Let the learner try again — the attempt was not recorded.
+      const graded = quizResultFromError(submitError)
+      if (graded) {
+        finalize(graded)
+        return
+      }
+      if (apiErrorStatus(submitError) === 400) {
+        // Already finished server-side — a timeout graded it and this response
+        // carries no score. Retrying can never succeed, so say so and point the
+        // learner at the course rather than looping on the button.
+        clearQuizAttempt(quizId)
+        setError(t('quizTake.alreadyFinished'))
+        return
+      }
+      // Recoverable: let the learner try again. Nothing was lost — every answer
+      // is already on the server or still queued for retry.
       submittedRef.current = false
+      setUnsyncedCount(countUnsynced())
       setError(apiErrorMessage(submitError, t('quizTake.submitError')))
     } finally {
       setBusy(false)
     }
-  }, [quizId, attemptId, questions, answers, courseId, t])
+  }, [quizId, courseId, persist, finalize, t])
 
-  // One ticker drives both the countdown and the elapsed time shown on the
-  // result card. Auto-submit fires exactly once, when the limit runs out.
   const submitRef = useRef(submit)
   submitRef.current = submit
+
+  // Walk back into an attempt this browser already started. Runs once the
+  // questions are loaded so the restored answers have something to attach to.
+  const resumeCheckedRef = useRef(false)
   useEffect(() => {
-    // Stops once the attempt is submitted: the clock must not keep running
-    // behind the result screen, and it must never re-submit a finished attempt.
+    if (resumeCheckedRef.current || !quizId || !quizQuery.data) return
+    resumeCheckedRef.current = true
+    const stored = readQuizAttempt(quizId)
+    if (!stored) return
+    attemptRef.current = { attemptId: stored.attemptId, startedAtMs: stored.startedAtMs }
+    answersRef.current = stored.answers
+    syncedRef.current = new Set(stored.synced)
+    setAnswers(stored.answers)
+    setUnsyncedCount(countUnsynced())
+    // A guess until the first heartbeat replaces it with the server's own count.
+    deadlineRef.current = timeLimit ? stored.startedAtMs + timeLimit * 60_000 : null
+    setResumed(true)
+    setPhase('taking')
+  }, [quizId, quizQuery.data, timeLimit])
+
+  /**
+   * The clock. `remaining` comes from the server's heartbeat and is interpolated
+   * locally between beats; `elapsed` is measured from the attempt's own start.
+   * Neither is a tick counter any more — one reset itself to the full limit on
+   * reload, and both ran slow in a background tab, quietly handing out extra
+   * time.
+   */
+  useEffect(() => {
     if ((phase !== 'taking' && phase !== 'review') || result) return
-    const timer = window.setInterval(() => {
-      setElapsed((value) => value + 1)
-      setRemaining((value) => {
-        if (value === null) return null
-        if (value > 1) return value - 1
-        // Hitting zero submits once; submit() itself is idempotent per attempt.
-        void submitRef.current()
-        return 0
-      })
+    const attempt = attemptRef.current
+    if (!attempt || !quizId) return
+    let cancelled = false
+
+    const beat = async () => {
+      try {
+        const status = await quizApi.attemptHeartbeat(courseId, quizId, attempt.attemptId)
+        if (cancelled) return
+        if (!status.active) {
+          if (status.result) finalize(status.result)
+          else {
+            clearQuizAttempt(quizId)
+            setError(t('quizTake.alreadyFinished'))
+          }
+          return
+        }
+        if (status.remainingSeconds !== null) {
+          deadlineRef.current = Date.now() + status.remainingSeconds * 1000
+          setRemaining(status.remainingSeconds)
+        }
+      } catch {
+        /* keep the local clock — the server still enforces the real limit */
+      }
+    }
+
+    void beat()
+    const beatTimer = window.setInterval(() => void beat(), HEARTBEAT_MS)
+    const tick = window.setInterval(() => {
+      setElapsed(Math.max(0, Math.floor((Date.now() - attempt.startedAtMs) / 1000)))
+      if (deadlineRef.current === null) return
+      const left = Math.max(0, Math.round((deadlineRef.current - Date.now()) / 1000))
+      setRemaining(left)
+      if (left === 0) void submitRef.current()
     }, 1000)
-    return () => window.clearInterval(timer)
-  }, [phase, result])
+
+    return () => {
+      cancelled = true
+      window.clearInterval(beatTimer)
+      window.clearInterval(tick)
+    }
+  }, [phase, result, quizId, courseId, finalize, t])
 
   const start = async () => {
     if (!quizId) return
     setBusy(true)
     setError(null)
     try {
-      setAttemptId(await quizApi.startAttempt(courseId, quizId))
+      const newAttemptId = await quizApi.startAttempt(courseId, quizId)
+      const startedAtMs = Date.now()
+      attemptRef.current = { attemptId: newAttemptId, startedAtMs }
+      answersRef.current = {}
+      syncedRef.current = new Set()
+      submittedRef.current = false
+      deadlineRef.current = timeLimit ? startedAtMs + timeLimit * 60_000 : null
+      persist()
+      setAnswers({})
+      setUnsyncedCount(0)
       setRemaining(timeLimit ? timeLimit * 60 : null)
       setElapsed(0)
       setIndex(0)
+      setResumed(false)
       setPhase('taking')
     } catch (startError) {
       setError(apiErrorMessage(startError, t('quizTake.startError')))
@@ -151,13 +327,19 @@ export default function TakeQuizPage() {
   }
 
   const retake = () => {
+    if (quizId) clearQuizAttempt(quizId)
+    attemptRef.current = null
+    answersRef.current = {}
+    syncedRef.current = new Set()
+    deadlineRef.current = null
     submittedRef.current = false
     setAnswers({})
-    setAttemptId(null)
+    setUnsyncedCount(0)
     setResult(null)
     setIndex(0)
     setRemaining(null)
     setElapsed(0)
+    setResumed(false)
     setError(null)
     setPhase('intro')
   }
@@ -229,7 +411,7 @@ export default function TakeQuizPage() {
         <Card
           className={cn(
             'flex items-start gap-3 p-4',
-            result.passed ? 'bg-success/5' : 'bg-warning/5',
+            result.passed ? 'bg-success-soft' : 'bg-warning-soft',
           )}
         >
           <Trophy size={20} className={cn('mt-0.5 shrink-0', result.passed ? 'text-success' : 'text-warning')} />
@@ -304,12 +486,12 @@ export default function TakeQuizPage() {
             return (
               <Card
                 key={question.id}
-                className={cn('flex items-start gap-3 p-4', !selected && 'bg-warning/5')}
+                className={cn('flex items-start gap-3 p-4', !selected && 'bg-warning-soft')}
               >
                 <span
                   className={cn(
                     'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
-                    selected ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning',
+                    selected ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning',
                   )}
                 >
                   {selected ? <CheckCircle2 size={15} /> : <XCircle size={15} />}
@@ -349,9 +531,16 @@ export default function TakeQuizPage() {
         {error && <p className="text-center text-sm text-error">{error}</p>}
 
         {!submitted && (
-          <Button fullWidth size="lg" loading={busy} onClick={submit}>
-            {t('quizTake.seeResults')}
-          </Button>
+          <>
+            {unsyncedCount > 0 && (
+              <p className="text-center text-xs text-content-secondary">
+                {t('quizTake.pendingSync').replace('{n}', String(unsyncedCount))}
+              </p>
+            )}
+            <Button fullWidth size="lg" loading={busy} onClick={submit}>
+              {t('quizTake.seeResults')}
+            </Button>
+          </>
         )}
       </div>
     )
@@ -369,7 +558,7 @@ export default function TakeQuizPage() {
         </Link>
 
         <Card className="p-6 text-center">
-          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-primary">
+          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-on-brand-soft">
             <ClipboardList size={30} strokeWidth={1.7} />
           </span>
           <h1 className="mt-4 text-xl font-bold text-content">{t('quizTake.title')}</h1>
@@ -448,6 +637,13 @@ export default function TakeQuizPage() {
         />
       </div>
 
+      {resumed && (
+        <Card className="flex items-start gap-2.5 bg-brand-soft/60 p-3.5">
+          <RefreshCw size={16} className="mt-0.5 shrink-0 text-primary" />
+          <p className="text-xs leading-5 text-content-secondary">{t('quizTake.resumed')}</p>
+        </Card>
+      )}
+
       <h1 className="text-lg font-bold leading-7 text-content">{question.questionText}</h1>
 
       <div
@@ -463,7 +659,7 @@ export default function TakeQuizPage() {
               type="button"
               role="radio"
               aria-checked={selected}
-              onClick={() => setAnswers((prev) => ({ ...prev, [question.id]: option.id }))}
+              onClick={() => select(question.id, option.id)}
               className={cn(
                 'flex w-full items-center gap-3 rounded-card border p-4 text-start text-sm transition-colors',
                 selected
@@ -519,6 +715,13 @@ export default function TakeQuizPage() {
       <p className="text-center text-xs text-content-secondary">
         {answeredCount}/{questions.length} {t('quizTake.answered')}
       </p>
+      {/* Saving is silent when it works; only a backlog is worth a word, so the
+          learner knows an offline moment did not throw their answers away. */}
+      {unsyncedCount > 0 && (
+        <p className="text-center text-xs text-warning">
+          {t('quizTake.pendingSync').replace('{n}', String(unsyncedCount))}
+        </p>
+      )}
     </div>
   )
 }
@@ -534,7 +737,7 @@ function IntroRow({
 }) {
   return (
     <div className="flex items-center gap-3 p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-primary">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
         <Icon size={18} strokeWidth={1.9} />
       </span>
       <span>
@@ -556,7 +759,7 @@ function StatTile({
 }) {
   return (
     <Card className="flex items-center gap-3 p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-primary">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-on-brand-soft">
         <Icon size={18} strokeWidth={1.9} />
       </span>
       <span className="min-w-0">

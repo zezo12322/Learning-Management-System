@@ -1,11 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/course_learning/domain/entities/course_curriculum_entity.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_course_curriculum_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/get_lecture_content_usecase.dart';
 import 'package:optimatech_lms/features/course_learning/domain/usecases/update_lecture_progress_usecase.dart';
 import 'course_learning_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class CourseLearningCubit extends Cubit<CourseLearningState> {
+class CourseLearningCubit extends Cubit<CourseLearningState> with SafeEmit<CourseLearningState> {
   final GetCourseCurriculumUseCase getCourseCurriculumUseCase;
   final GetLectureContentUseCase getLectureContentUseCase;
   final UpdateLectureProgressUseCase updateLectureProgressUseCase;
@@ -19,6 +21,12 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
   String? _courseId;
   String? _lastRequestedLectureId;
   String? _initialLectureId;
+
+  /// Furthest position reported by the player for the lecture now open, in
+  /// seconds. Kept because the server derives completion from the position it
+  /// is sent and clamps what it stores — so sending a position *behind* the
+  /// real one silently rewinds progress and clears `completedAt`.
+  int _lastKnownSecond = 0;
 
   List<CurriculumLectureEntity> get _flatLectures {
     final curriculum = state.curriculum;
@@ -40,6 +48,11 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     return index >= 0 && index < _flatLectures.length - 1;
   }
 
+  /// The course being studied. Exposed so widgets that need to call a
+  /// course-scoped endpoint (the quiz lookup, for one) do not have to thread the
+  /// id down from the route.
+  String? get courseId => _courseId;
+
   String get currentLessonProgressLabel {
     final curriculum = state.curriculum;
     if (curriculum == null || state.currentLecture == null) return '';
@@ -47,7 +60,8 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     final index = currentLectureIndex;
     if (index < 0) return '';
 
-    return 'Lesson ${index + 1} of ${_flatLectures.length}';
+    return 'lesson_learning.header.lesson_x_of_y'
+        .tr(args: ['${index + 1}', '${_flatLectures.length}']);
   }
 
   /// [initialLectureId] opens a specific lecture instead of the first one —
@@ -87,6 +101,9 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
 
   Future<void> fetchLectureContent(String lectureId) async {
     _lastRequestedLectureId = lectureId;
+    // A new lecture starts from an unknown position; carrying the previous
+    // lecture's watched seconds over would mark this one complete on open.
+    if (state.currentLecture?.id != lectureId) _lastKnownSecond = 0;
 
     emit(state.copyWith(lectureState: Status.loading, lectureErrorMessage: null));
     final result = await getLectureContentUseCase.call(lectureId);
@@ -163,9 +180,14 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
+    // Never report a position behind the furthest point reached: the server
+    // clamps and re-derives completion from what it is sent, so a late, smaller
+    // position silently rewinds progress.
+    if (lastWatchedSecond > _lastKnownSecond) _lastKnownSecond = lastWatchedSecond;
+
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: lastWatchedSecond,
+      lastWatchedSecond: _lastKnownSecond,
       watchedSeconds: watchedSeconds,
     );
   }
@@ -177,10 +199,18 @@ class CourseLearningCubit extends Cubit<CourseLearningState> {
     final currentLectureId = state.currentLecture?.id;
     if (currentLectureId == null) return;
 
+    // Seeking backwards must not report a position behind the furthest point
+    // reached, or the next heartbeat undoes a completion the learner earned.
+    if (currentSecond > _lastKnownSecond) _lastKnownSecond = currentSecond;
+
+    // Queued transport: the server enqueues and answers 202, and collapses a
+    // burst of positions for this lecture into one write. The synchronous PUT
+    // this used to call went through Data Connect on every tick.
     await updateLectureProgressUseCase(
       lectureId: currentLectureId,
-      lastWatchedSecond: currentSecond,
+      lastWatchedSecond: _lastKnownSecond,
       watchedSeconds: watchedSeconds,
+      heartbeat: true,
     );
   }
 }

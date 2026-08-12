@@ -23,10 +23,10 @@ export interface AppNotification {
 
 /** Icon + tint per category, mirroring the Figma "Categories" legend. */
 export const CATEGORY_STYLE: Record<NotificationCategory, { icon: LucideIcon; tile: string }> = {
-  ANNOUNCEMENT: { icon: Megaphone, tile: 'bg-warning/10 text-warning' },
-  ASSIGNMENT: { icon: ClipboardList, tile: 'bg-success/10 text-success' },
+  ANNOUNCEMENT: { icon: Megaphone, tile: 'bg-warning-soft text-warning' },
+  ASSIGNMENT: { icon: ClipboardList, tile: 'bg-success-soft text-success' },
   COURSE: { icon: BookOpen, tile: 'bg-secondary/10 text-secondary' },
-  DISCUSSION: { icon: MessageCircle, tile: 'bg-brand-soft text-primary' },
+  DISCUSSION: { icon: MessageCircle, tile: 'bg-brand-soft text-on-brand-soft' },
   SYSTEM: { icon: Settings, tile: 'bg-subtle text-content-secondary' },
 }
 

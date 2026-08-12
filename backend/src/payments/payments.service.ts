@@ -149,16 +149,30 @@ export class PaymentsService {
     return `https://accept.paymob.com/unifiedcheckout/?publicKey=${publicKey}&clientSecret=${clientSecret}`;
   }
 
+  /**
+   * Verifies Paymob's HMAC over a transaction callback.
+   *
+   * Fails **closed**. This used to return `true` when `PAYMOB_HMAC_SECRET` was
+   * unset — so a deploy that simply forgot the variable accepted any webhook
+   * body from anyone, and the only trace was a warning in the log. A missing
+   * secret is a misconfiguration, not a reason to trust an unsigned payment
+   * notification.
+   *
+   * Operational note: if the secret is absent in an environment, paid
+   * enrollment stops rather than silently running unauthenticated. That is the
+   * intended failure direction, and the error below says exactly what to set.
+   */
   verifyHmac(queryHmac: string, bodyObj: any): boolean {
     const hmacSecret = this.configService.get<string>('PAYMOB_HMAC_SECRET');
     if (!hmacSecret) {
-      this.logger.warn(
-        'PAYMOB_HMAC_SECRET is missing, skipping HMAC validation',
+      this.logger.error(
+        'PAYMOB_HMAC_SECRET is not set — rejecting the webhook. Paid ' +
+          'enrollment cannot complete until this variable is configured.',
       );
-      return true; // We accept if secret is not configured, but warn
+      return false;
     }
 
-    if (!bodyObj) return false;
+    if (!bodyObj || !queryHmac) return false;
 
     // Standard Paymob Transaction HMAC fields
     const {
@@ -211,6 +225,13 @@ export class PaymentsService {
       .createHmac('sha512', hmacSecret)
       .update(dataString)
       .digest('hex');
-    return hashed === queryHmac;
+
+    // Constant-time compare. `===` on a hex digest leaks how many leading
+    // characters matched through timing, which is enough to forge a signature
+    // one character at a time given an endpoint that can be called repeatedly.
+    const expected = Buffer.from(hashed, 'utf8');
+    const received = Buffer.from(queryHmac, 'utf8');
+    if (expected.length !== received.length) return false;
+    return crypto.timingSafeEqual(expected, received);
   }
 }
