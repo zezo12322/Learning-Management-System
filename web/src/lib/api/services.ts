@@ -36,6 +36,7 @@ import {
   mapLecture,
   mapMe,
   mapSection,
+  mapTosStatus,
   mutationEntity,
   numberValue,
   objectValue,
@@ -52,6 +53,15 @@ export const meApi = {
     phone?: string
     preferences?: Record<string, unknown>
   }) => apiClient.patch('/me/profile', payload).then((response) => response.data),
+}
+
+/**
+ * Terms of service. `status` is read after provisioning (POST /me/sync) because
+ * acceptance is recorded on the users row that sync creates.
+ */
+export const tosApi = {
+  status: () => apiClient.get('/me/tos/status').then((response) => mapTosStatus(response.data)),
+  accept: () => apiClient.post('/me/tos/accept').then((response) => response.data),
 }
 
 // Instructor course-overview analytics (KAN-51). Consumes the backend

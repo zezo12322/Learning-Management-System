@@ -415,3 +415,24 @@ export interface Certificate {
   totalLessons: number
   credentialId: string
 }
+
+// ── Terms of service ─────────────────────────────────────────────────
+/** The published terms a user is asked to accept. */
+export interface TermsOfService {
+  id: string
+  version: string
+  title: string
+  contentHtml: string
+}
+
+/**
+ * Whether the signed-in user still owes acceptance of the current terms.
+ *
+ * `current` is null when nothing is published, in which case `needsAcceptance`
+ * is always false — there is nothing to agree to.
+ */
+export interface TosStatus {
+  needsAcceptance: boolean
+  acceptedAt: string | null
+  current: TermsOfService | null
+}

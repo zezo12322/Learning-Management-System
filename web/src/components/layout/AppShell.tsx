@@ -25,6 +25,7 @@ import {
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { canTeach as canTeachRoles } from '@/lib/auth/routeAccess'
 import { useRouteGuard } from '@/lib/auth/useRouteGuard'
+import { TosAcceptanceGate } from '@/components/tos/TosAcceptanceGate'
 import { authoringApi } from '@/lib/api/services'
 import { PageSpinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
@@ -140,6 +141,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/*
+        Rendered inside the shell rather than around it so the app is visible
+        behind the gate — the reader can see what they are agreeing to use. It
+        returns null unless acceptance is actually outstanding.
+      */}
+      <TosAcceptanceGate />
       <aside className="fixed inset-y-0 start-0 z-40 hidden w-[260px] flex-col border-e border-border bg-surface px-5 py-6 lg:flex">
         <Link href="/home" className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary text-lg font-bold text-white">
