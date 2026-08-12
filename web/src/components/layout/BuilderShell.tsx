@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useAuth } from '@/lib/auth/AuthProvider'
 import { useRouteGuard } from '@/lib/auth/useRouteGuard'
+import { TosAcceptanceGate } from '@/components/tos/TosAcceptanceGate'
 import { authoringApi } from '@/lib/api/services'
 import { useCourseReadiness } from '@/lib/builder/readiness'
 import { useT } from '@/lib/i18n'
@@ -209,6 +210,10 @@ export function BuilderShell({ courseId, children }: { courseId: string; childre
     <BuilderAnnouncerProvider>
       <DirtyContext.Provider value={setDirty}>
         <div className="min-h-screen bg-background">
+          {/* The builder is a separate shell, so it needs the acceptance gate of
+              its own — otherwise an instructor could author a course on a direct
+              /studio link without ever being asked. */}
+          <TosAcceptanceGate />
           {/* Everything behind the unsaved-changes dialog. `aria-modal` alone
               told assistive tech the rest of the page was unavailable while Tab
               could still walk into it, so the shell is hidden from the a11y tree

@@ -667,6 +667,17 @@ const en: Dict = {
   'learning.nextPage': 'Next page',
 
   // Assignments
+  // Terms of service acceptance gate.
+  'tos.title': 'Terms of Service',
+  'tos.subtitle': 'Please review and accept to continue.',
+  'tos.version': 'Version',
+  'tos.documentLabel': 'Terms of service document',
+  'tos.accept': 'I agree',
+  'tos.accepting': 'Saving…',
+  'tos.acceptFailed': 'We could not record your agreement. Please try again.',
+  'tos.contentUnavailable': 'The full terms could not be displayed. Contact support before agreeing if you need a copy.',
+  'tos.signOut': 'Sign out',
+
   'assignments.title': 'Assignments',
   'assignments.subtitle': 'Track, submit and review your course assignments.',
   'assignments.searchPlaceholder': 'Search assignments…',
@@ -1936,6 +1947,17 @@ const ar: Dict = {
   'learning.nextPage': 'الصفحة التالية',
 
   // التكليفات
+  // Terms of service acceptance gate.
+  'tos.title': 'شروط الاستخدام',
+  'tos.subtitle': 'راجع الشروط ووافق عليها للمتابعة.',
+  'tos.version': 'الإصدار',
+  'tos.documentLabel': 'مستند شروط الاستخدام',
+  'tos.accept': 'أوافق',
+  'tos.accepting': 'جاري الحفظ…',
+  'tos.acceptFailed': 'لم نتمكن من تسجيل موافقتك. حاول مرة أخرى.',
+  'tos.contentUnavailable': 'لم نتمكن من عرض الشروط كاملة. تواصل مع الدعم قبل الموافقة إذا كنت تحتاج نسخة منها.',
+  'tos.signOut': 'تسجيل الخروج',
+
   'assignments.title': 'التكليفات',
   'assignments.subtitle': 'تابع تكليفات دوراتك وسلّمها واطّلع على تقييمها.',
   'assignments.searchPlaceholder': 'ابحث في التكليفات…',
