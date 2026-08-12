@@ -64,7 +64,9 @@ export class UsersService {
       const decodedToken = await auth.verifyIdToken(token);
       return decodedToken.uid;
     } catch (error) {
-      throw new Error('Could not extract UID from token: ' + error.message);
+      throw new Error('Could not extract UID from token: ' + error.message, {
+        cause: error,
+      });
     }
   }
 

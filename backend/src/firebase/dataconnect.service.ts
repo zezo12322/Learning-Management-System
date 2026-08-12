@@ -51,7 +51,8 @@ export class DataConnectService {
     // Use the single FIREBASE_EMULATOR_LOCAL toggle. When true, point all
     // Data Connect requests at the local emulator; otherwise use the cloud.
     this.isEmulator =
-      this.configService.get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
+      this.configService
+        .get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
         ?.toLowerCase() === 'true';
 
     if (this.isEmulator) {
@@ -62,7 +63,7 @@ export class DataConnectService {
       const base = emulatorHost.replace(/\/+$/, '');
       this.serviceBaseUrl = `${base}/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
       this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;
-      this.logger.log( `Data Connect emulator detected — using ${this.baseUrl}`, );
+      this.logger.log(`Data Connect emulator detected — using ${this.baseUrl}`);
     } else {
       this.serviceBaseUrl = `https://firebasedataconnect.googleapis.com/v1beta/projects/${projectId}/locations/${location}/services/${serviceId}`;
       this.baseUrl = `${this.serviceBaseUrl}/connectors/${connectorId}`;

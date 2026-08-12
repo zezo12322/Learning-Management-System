@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Patch, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';

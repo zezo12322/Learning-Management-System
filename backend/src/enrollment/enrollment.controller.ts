@@ -31,7 +31,7 @@ export class EnrollmentController {
     );
 
     // Audit Log: Enrollment in Course
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'ENROLLMENT_CREATED',
       adminUid: uid,
       targetUid: uid,
@@ -64,7 +64,7 @@ export class EnrollmentController {
     );
 
     // Audit Log: Enrollment in Mission
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'ENROLLMENT_CREATED',
       adminUid: uid,
       targetUid: uid,

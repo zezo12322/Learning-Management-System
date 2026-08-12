@@ -24,7 +24,8 @@ export class AuditLoggingService {
     // Otherwise use the production named database ("optimatech-lms").
     // FIRESTORE_DATABASE_ID can override either if needed.
     const useEmulator =
-      this.configService.get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
+      this.configService
+        .get<string>('FIREBASE_EMULATOR_LOCAL', 'false')
         ?.toLowerCase() === 'true';
     this.databaseId =
       this.configService.get<string>('FIRESTORE_DATABASE_ID', '') ||
@@ -65,7 +66,7 @@ export class AuditLoggingService {
       if (typeof details === 'object' && details !== null) {
         serializableDetails = JSON.parse(JSON.stringify(details));
       } else {
-        serializableDetails = {} as Record<string, unknown>;
+        serializableDetails = {};
       }
 
       await docRef.set({
