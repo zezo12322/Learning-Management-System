@@ -17,7 +17,9 @@ import { PaymentsController } from './payments.controller';
 describe('PaymentsController — webhook', () => {
   const buildController = (verifyHmac: jest.Mock) => {
     const executeMutationAsAdmin = jest.fn().mockResolvedValue({});
-    const executeQueryAsAdmin = jest.fn().mockResolvedValue({ payments: [] });
+    const executeQueryAsAdmin = jest.fn().mockResolvedValue({
+      payments: [{ status: 'PENDING', amount: 1000 }],
+    });
 
     const controller = new PaymentsController(
       { verifyHmac } as never,
@@ -69,13 +71,17 @@ describe('PaymentsController — webhook', () => {
     const { controller, executeMutationAsAdmin } = buildController(verifyHmac);
 
     await controller.handleWebhook(
-      { type: 'TRANSACTION', obj: { success: true, id: 'ref-123' } },
+      {
+        type: 'TRANSACTION',
+        obj: { success: true, order: { id: 'ref-123' }, amount_cents: 1000 },
+      },
       'signature',
     );
 
     expect(verifyHmac).toHaveBeenCalledWith('signature', {
       success: true,
-      id: 'ref-123',
+      order: { id: 'ref-123' },
+      amount_cents: 1000,
     });
     expect(executeMutationAsAdmin).toHaveBeenCalledWith(
       'UpdatePaymentStatusByReference',

@@ -26,11 +26,18 @@ describe('QuizzesService', () => {
   let completion: { onQuizPassed: jest.Mock };
   let ordering: any;
   let access: { assertCourseAccess: jest.Mock };
+  let locks: { runExclusively: jest.Mock };
 
   beforeEach(() => {
     completion = { onQuizPassed: jest.fn().mockResolvedValue(undefined) };
     ordering = { nextOrder: jest.fn(), applyOrder: jest.fn() };
     access = { assertCourseAccess: jest.fn() };
+    locks = {
+      runExclusively: jest.fn().mockImplementation(async (key, ttl, cb) => {
+        await cb();
+        return true;
+      }),
+    };
   });
 
   describe('autoGrade', () => {
@@ -71,6 +78,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
 
       const res = await svc.autoGrade('a1', { token: 'tok', uid: 'u1' });
@@ -122,6 +130,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
 
       const res = await svc.autoGrade('a1', { token: 'tok' });
@@ -145,6 +154,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
 
       const res = await svc.autoGrade('a1', { token: 'tok' });
@@ -173,6 +183,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.startAttempt('quiz1', 'tok', 'u1'),
@@ -192,6 +203,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.startAttempt('quiz1', 'tok', 'u1'),
@@ -214,6 +226,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.startAttempt('quiz1', 'tok', 'u1'),
@@ -236,6 +249,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       const res = await svc.startAttempt('quiz1', 'tok', 'u1');
       expect(res).toEqual({ quizAttempt_insert: { id: 'new' } });
@@ -260,6 +274,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       const res = await svc.getQuizForTaking('quiz1', 'tok', 'u1', false);
       expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
@@ -276,6 +291,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       const res = await svc.getQuizForTaking('quiz1', 'tok', 'u1', false);
       expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
@@ -292,6 +308,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.getQuizForTaking('quiz1', 'tok', 'u1', false),
@@ -305,6 +322,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.getQuizForTaking('nope', 'tok', 'u1', false),
@@ -328,6 +346,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       const res = await svc.getQuizForLecture('L1', 'tok', 'u1', false);
       expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
@@ -344,6 +363,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       const res = await svc.getQuizForLecture('L1', 'tok', 'u1', false);
       expect(res).toEqual({ id: 'quiz1', takeQuestions: [] });
@@ -360,6 +380,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.getQuizForLecture('L1', 'tok', 'u1', false),
@@ -373,6 +394,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.getQuizForLecture('nope', 'tok', 'u1', false),
@@ -387,6 +409,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.getQuizForLecture('L1', 'tok', 'u1', false),
@@ -404,6 +427,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.createQuestion(
@@ -436,6 +460,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
 
       await expect(
@@ -468,6 +493,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
       await expect(
         svc.updateQuestion(
@@ -497,6 +523,7 @@ describe('QuizzesService', () => {
         completion as any,
         ordering,
         access as any,
+        locks as any,
       );
 
       const res = await svc.updateQuestion(

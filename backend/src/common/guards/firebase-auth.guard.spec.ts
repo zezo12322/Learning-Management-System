@@ -38,7 +38,7 @@ describe('FirebaseAuthGuard', () => {
     };
 
     await expect(guard.canActivate(createContext(request))).resolves.toBe(true);
-    expect(verifyIdToken).toHaveBeenCalledWith('test-token');
+    expect(verifyIdToken).toHaveBeenCalledWith('test-token', true);
     expect(request.user).toMatchObject({
       uid: 'uid-123',
       email: 'user@example.com',
