@@ -39,7 +39,7 @@ export class AdminController {
     await this.firebase.setUserRole(uid, role);
 
     // fire-and-forget — logging failures must never affect the API response
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPDATE_ROLE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: uid,

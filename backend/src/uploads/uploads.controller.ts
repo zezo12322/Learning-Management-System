@@ -28,7 +28,7 @@ export class UploadsController {
     );
 
     // Audit Log: Upload Signed URL Request
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPLOAD_SIGNED_URL',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: null,
@@ -54,7 +54,7 @@ export class UploadsController {
     );
 
     // Audit Log: Upload Confirmed
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPLOAD_CONFIRMED',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: null,

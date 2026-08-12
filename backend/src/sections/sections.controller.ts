@@ -40,7 +40,7 @@ export class SectionsController {
   ) {
     const result = await this.sectionsService.create(courseId, dto, token);
     // fire-and-forget — a Firestore failure must never affect the API response
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'CREATE_SECTION',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: result?.section_insert?.id ?? null,
@@ -60,7 +60,7 @@ export class SectionsController {
     @Req() req: any,
   ) {
     const result = await this.sectionsService.update(sectionId, dto, token);
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPDATE_SECTION',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: sectionId,
@@ -84,7 +84,7 @@ export class SectionsController {
       sectionId,
       token,
     );
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'DELETE_SECTION',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: sectionId,

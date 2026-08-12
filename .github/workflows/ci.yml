@@ -4,7 +4,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, development]
 
 # A new push to the same ref supersedes the previous run.
 concurrency:

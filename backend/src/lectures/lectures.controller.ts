@@ -53,7 +53,7 @@ export class LecturesController {
       dto,
       token,
     );
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'CREATE_LECTURE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: result?.lecture_insert?.id ?? null,
@@ -74,7 +74,7 @@ export class LecturesController {
     @Req() req: any,
   ) {
     const result = await this.lecturesService.update(lectureId, dto, token);
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPDATE_LECTURE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: lectureId,
@@ -102,7 +102,7 @@ export class LecturesController {
       token,
     );
 
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'DELETE_LECTURE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: lectureId,

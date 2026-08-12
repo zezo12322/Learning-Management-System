@@ -107,7 +107,7 @@ export class CoursesController {
     console.log('Extracted uid:', uid);
     const result = await this.coursesService.create(dto, token, uid);
     // fire-and-forget — a Firestore failure must never affect the API response
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'CREATE_COURSE',
       adminUid: uid,
       targetUid: result?.course_insert?.id ?? null,
@@ -150,7 +150,7 @@ export class CoursesController {
     @Req() req: any,
   ) {
     const result = await this.coursesService.update(courseId, dto, token);
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPDATE_COURSE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: courseId,
@@ -170,7 +170,7 @@ export class CoursesController {
     @Req() req: any,
   ) {
     const result = await this.coursesService.updateStatus(courseId, dto, token);
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'UPDATE_COURSE_STATUS',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: courseId,
@@ -189,7 +189,7 @@ export class CoursesController {
     @Req() req: any,
   ) {
     const result = await this.coursesService.softDelete(courseId, token);
-    this.auditLoggingService.createLog({
+    void this.auditLoggingService.createLog({
       action: 'DELETE_COURSE',
       adminUid: req.user?.uid ?? 'unknown',
       targetUid: courseId,

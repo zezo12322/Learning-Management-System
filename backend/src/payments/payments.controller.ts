@@ -132,7 +132,7 @@ export class PaymentsController {
       );
 
       // Audit Log: Payment Initiated
-      this.auditLoggingService.createLog({
+      void this.auditLoggingService.createLog({
         action: 'PAYMENT_INITIATED',
         adminUid: req.user?.uid ?? 'unknown',
         targetUid: null,
@@ -225,7 +225,7 @@ export class PaymentsController {
               const userId = payment.userId;
 
               // Audit Log: Payment Successful
-              this.auditLoggingService.createLog({
+              void this.auditLoggingService.createLog({
                 action: 'PAYMENT_SUCCESS',
                 adminUid: 'SYSTEM',
                 targetUid: userId,
@@ -247,7 +247,7 @@ export class PaymentsController {
                   );
 
                   // Audit Log: Enrollment
-                  this.auditLoggingService.createLog({
+                  void this.auditLoggingService.createLog({
                     action: 'ENROLLMENT_CREATED',
                     adminUid: 'SYSTEM',
                     targetUid: userId,
@@ -267,7 +267,7 @@ export class PaymentsController {
                   );
 
                   // Audit Log: Enrollment
-                  this.auditLoggingService.createLog({
+                  void this.auditLoggingService.createLog({
                     action: 'ENROLLMENT_CREATED',
                     adminUid: 'SYSTEM',
                     targetUid: userId,
@@ -279,7 +279,7 @@ export class PaymentsController {
             }
           } else {
             // Audit Log: Payment Failed
-            this.auditLoggingService.createLog({
+            void this.auditLoggingService.createLog({
               action: 'PAYMENT_FAILED',
               adminUid: 'SYSTEM',
               targetUid: null,
