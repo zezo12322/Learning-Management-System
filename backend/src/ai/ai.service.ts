@@ -5,6 +5,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   ForbiddenException,
+  HttpException,
 } from '@nestjs/common';
 import { DataConnectService } from '../firebase/dataconnect.service';
 import { FirebaseService } from '../firebase/firebase.service';
@@ -15,7 +16,7 @@ import {
   AiCleanupJob,
 } from '../transcoding/transcoding.queue';
 import { AccessService } from '../common/services/access.service';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 @Injectable()
 export class AiService {
@@ -23,6 +24,9 @@ export class AiService {
   private readonly aiUrl =
     process.env.AI_SERVICE_URL || 'http://localhost:8000';
   private readonly apiKey = process.env.INTERNAL_API_KEY || 'default-secret';
+  private readonly aiTenantId =
+    process.env.AI_TENANT_ID || '00000000-0000-5000-8000-000000000001';
+  private readonly uuidNamespace = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
 
   constructor(
     private readonly dc: DataConnectService,
@@ -115,8 +119,8 @@ export class AiService {
         },
         body: JSON.stringify({
           request_id: uuidv4(),
-          tenant_id: '550e8400-e29b-41d4-a716-446655440000',
-          user_id: userId,
+          tenant_id: this.aiTenantId,
+          user_id: uuidv5(userId, this.uuidNamespace),
           course_id: courseId,
           video_id: lectureId,
           session_id: payload.sessionId,
@@ -139,6 +143,55 @@ export class AiService {
     }
   }
 
+  async generate(lectureId: string, userId: string, payload: any) {
+    const data = await this.dc.executeQueryAsAdmin('GetLectureContent', {
+      lectureId,
+    });
+    const lecture = data?.courseLecture;
+    if (!lecture) throw new NotFoundException('Lecture not found');
+
+    const courseId = lecture.section?.course?.id;
+    if (!courseId)
+      throw new BadRequestException('Course ID not found for lecture');
+
+    try {
+      const res = await fetch(`${this.aiUrl}/v1/rag/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Internal-Api-Key': this.apiKey,
+        },
+        body: JSON.stringify({
+          ...payload,
+          request_id: uuidv4(),
+          tenant_id: this.aiTenantId,
+          user_id: uuidv5(userId, this.uuidNamespace),
+          course_id: courseId,
+          video_id: lectureId,
+        }),
+      });
+
+      if (!res.ok) {
+        let errorBody;
+        try {
+          errorBody = await res.json();
+        } catch {
+          errorBody = await res.text();
+        }
+        throw new HttpException(errorBody, res.status);
+      }
+      return await res.json();
+    } catch (err: any) {
+      if (err instanceof HttpException) throw err;
+      this.logger.error(
+        `Failed to call generate for lecture ${lectureId}: ${err.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Failed to communicate with AI Service',
+      );
+    }
+  }
+
   async retryIngest(lectureId: string) {
     const data = await this.dc.executeQueryAsAdmin('GetLectureContent', {
       lectureId,
@@ -154,6 +207,7 @@ export class AiService {
     }
 
     const courseId = lecture.section?.course?.id;
+    const authorId = lecture.section?.course?.author?.id || 'default-author-id';
     const duration = lecture.duration;
     const aiJobId = uuidv4();
 
@@ -178,7 +232,8 @@ export class AiService {
         },
         body: JSON.stringify({
           job_id: aiJobId,
-          tenant_id: '550e8400-e29b-41d4-a716-446655440000',
+          tenant_id: this.aiTenantId,
+          user_id: uuidv5(authorId, this.uuidNamespace),
           course_id: courseId,
           video_id: lectureId,
           video_title: lecture.title,
@@ -189,7 +244,13 @@ export class AiService {
       });
 
       if (!ingestRes.ok && ingestRes.status !== 409) {
-        throw new Error(`AI Ingest failed: ${ingestRes.status}`);
+        let errorBody;
+        try {
+          errorBody = await ingestRes.json();
+        } catch {
+          errorBody = await ingestRes.text();
+        }
+        throw new HttpException(errorBody, ingestRes.status);
       }
 
       // Add to cleanup queue
@@ -207,6 +268,7 @@ export class AiService {
 
       return { success: true, aiJobId };
     } catch (err: any) {
+      if (err instanceof HttpException) throw err;
       this.logger.error(
         `AI retry ingestion failed for ${lectureId}: ${err?.message}`,
       );

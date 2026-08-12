@@ -45,4 +45,16 @@ export class AiController {
   retryIngest(@Param('lectureId') lectureId: string) {
     return this.aiService.retryIngest(lectureId);
   }
+
+  @Post('lectures/:lectureId/generate')
+  @UseGuards(RolesGuard, ResourceOwnershipGuard)
+  @Roles('admin', 'instructor')
+  @OwnsResource('lecture')
+  generate(
+    @Param('lectureId') lectureId: string,
+    @CurrentUser('uid') uid: string,
+    @Body() payload: any,
+  ) {
+    return this.aiService.generate(lectureId, uid, payload);
+  }
 }

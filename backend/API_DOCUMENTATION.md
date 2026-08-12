@@ -1234,6 +1234,10 @@ Proxy a student's message to the AI Service for RAG chat. **User.**
 Retry AI ingestion for a failed video processing job. **Instructor/Admin, owner.**
 **Response `201`:** `{ "success": true, "aiJobId": "..." }`
 
+### `POST /ai/lectures/:lectureId/generate`
+Proxy an authoring prompt to the AI Service for lecture generation. **Instructor/Admin, owner.**
+**Response `201`:** (Determined by AI service response schema)
+
 ---
 
 ## 22. Common flows
@@ -1504,6 +1508,7 @@ Every route in the backend, prefixed with `/api/v1`. Use it as a build checklist
 | 94 | GET | `/ai/lectures/:lectureId/status` | U | 21 | [ai.controller.ts:24](./src/ai/ai.controller.ts#L24) |
 | 95 | POST | `/ai/lectures/:lectureId/chat` | U | 21 | [ai.controller.ts:29](./src/ai/ai.controller.ts#L29) |
 | 96 | POST | `/ai/lectures/:lectureId/retry` | I/A Own | 21 | [ai.controller.ts:40](./src/ai/ai.controller.ts#L40) |
+| 97 | POST | `/ai/lectures/:lectureId/generate` | I/A Own | 21 | [ai.controller.ts:49](./src/ai/ai.controller.ts#L49) |
 | 97 | POST | `/payments/checkout` | U | 24 | [payments.controller.ts:28](./src/payments/payments.controller.ts#L28) |
 | 98 | POST | `/payments/webhook` | P | 24 | [payments.controller.ts:78](./src/payments/payments.controller.ts#L78) |
 | 99 | GET | `/payments/callback` | P | 24 | [payments.controller.ts:166](./src/payments/payments.controller.ts#L166) |

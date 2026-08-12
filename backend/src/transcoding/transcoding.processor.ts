@@ -18,7 +18,7 @@ import {
   AiCleanupJob,
   AI_CLEANUP_JOB,
 } from './transcoding.queue';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 const HLS_SEGMENT_SECONDS = 6;
 
@@ -140,6 +140,9 @@ export class TranscodingProcessor extends WorkerHost {
           { lectureId },
         );
         const videoTitle = lectureData?.courseLecture?.title || 'Lecture Video';
+        const authorId =
+          lectureData?.courseLecture?.section?.course?.author?.id ||
+          'default-author-id';
 
         // AI service needs a directly downloadable URL
         const signedVideoUrl = await this.firebase.generateSignedReadUrl(
@@ -155,7 +158,10 @@ export class TranscodingProcessor extends WorkerHost {
           },
           body: JSON.stringify({
             job_id: aiJobId,
-            tenant_id: '550e8400-e29b-41d4-a716-446655440000',
+            tenant_id:
+              process.env.AI_TENANT_ID ||
+              '00000000-0000-5000-8000-000000000001',
+            user_id: uuidv5(authorId, '6ba7b811-9dad-11d1-80b4-00c04fd430c8'),
             course_id: courseId,
             video_id: lectureId,
             video_title: videoTitle,
