@@ -963,6 +963,29 @@ Same fields, optional. → **`200`** `{ "rubricCriterion_update": { "id": "…" 
 **Response `201`:** `{ "missionSubmission_insert": { "id": "…" } }`
 **Errors:** `403` if not actively or completely enrolled in the mission.
 
+### `GET /me/assignments`
+**User.** Assignments open to the caller: every non-deleted mission attached to a
+course they hold an `ACTIVE` or `COMPLETED` enrollment in, with the mission's
+rubric and the caller's own submissions and mission enrollment.
+
+This is how a student discovers an assignment at all — `GET /missions` lists
+missions the caller *authored* and `GET /missions/:missionId` is owner-only, so
+without this there is no way to obtain the `missionId` that
+`POST /missions/:missionId/submissions` requires. Missions with no parent course
+are not listed: no enrollment could entitle a learner to them.
+
+**Response `200`:**
+```json
+[
+  { "id": "…", "title": "Incident Response Drill", "scenarioDescription": "…",
+    "durationMinutes": 90, "difficulty": "ADVANCED", "skillsTested": ["debugging"],
+    "createdAt": "…", "course": { "id": "…", "title": "…" },
+    "assignmentCriteria": [ { "id": "…", "criterionName": "Clarity", "description": "…", "maxPoints": 10, "order": 1 } ],
+    "mySubmissions": [ { "id": "…", "status": "PENDING", "submittedAt": "…", "attemptNumber": 1, "feedback": null } ],
+    "myMissionEnrollments": [ { "id": "…", "status": "ACTIVE" } ] }
+]
+```
+
 ### `GET /me/submissions`
 **User.** My submissions + scores + feedback.
 **Response `200`:**
@@ -1467,24 +1490,25 @@ Every route in the backend, prefixed with `/api/v1`. Use it as a build checklist
 | 80 | PUT | `/missions/:missionId/rubric/reorder` | I/A Own | 15 | [rubric.controller.ts:60](./src/rubric/rubric.controller.ts#L60) |
 | 81 | POST | `/missions/:missionId/submissions` | U enrolled | 16 | [submissions.controller.ts:25](./src/submissions/submissions.controller.ts#L25) |
 | 82 | GET | `/me/submissions` | U | 16 | [submissions.controller.ts:35](./src/submissions/submissions.controller.ts#L35) |
-| 83 | GET | `/submissions/pending` | I/A | 16 | [submissions.controller.ts:42](./src/submissions/submissions.controller.ts#L42) |
-| 84 | POST | `/submissions/:submissionId/grade` | I/A | 16 | [submissions.controller.ts:49](./src/submissions/submissions.controller.ts#L49) |
-| 85 | POST | `/uploads/signed-url` | I/A Own | 17 | [uploads.controller.ts:18](./src/uploads/uploads.controller.ts#L18) |
-| 86 | POST | `/uploads/confirm` | I/A Own | 17 | [uploads.controller.ts:23](./src/uploads/uploads.controller.ts#L23) |
-| 87 | GET | `/lectures/:lectureId/stream/manifest` | U enrolled | 19.2 | [streaming.controller.ts:32](./src/streaming/streaming.controller.ts#L32) |
-| 88 | GET | `/lectures/:lectureId/stream/watermark` | U enrolled | 19.3 | [streaming.controller.ts:57](./src/streaming/streaming.controller.ts#L57) |
-| 89 | GET | `/lectures/:lectureId/stream/key` | U enrolled | 19.4 | [streaming.controller.ts:81](./src/streaming/streaming.controller.ts#L81) |
-| 90 | POST | `/courses/:courseId/lectures/:lectureId/stream/register` | I/A Own | 19.6 | [streaming.controller.ts:113](./src/streaming/streaming.controller.ts#L113) |
-| 91 | POST | `/courses/:courseId/lectures/:lectureId/video/transcode` | I/A Own | 20 | [transcoding.controller.ts:29](./src/transcoding/transcoding.controller.ts#L29) |
-| 92 | GET | `/courses/:courseId/lectures/:lectureId/video/transcode/status` | I/A Own | 20 | [transcoding.controller.ts:43](./src/transcoding/transcoding.controller.ts#L43) |
-| 93 | GET | `/ai/lectures/:lectureId/status` | U | 21 | [ai.controller.ts:24](./src/ai/ai.controller.ts#L24) |
-| 94 | POST | `/ai/lectures/:lectureId/chat` | U | 21 | [ai.controller.ts:29](./src/ai/ai.controller.ts#L29) |
-| 95 | POST | `/ai/lectures/:lectureId/retry` | I/A Own | 21 | [ai.controller.ts:40](./src/ai/ai.controller.ts#L40) |
-| 96 | POST | `/payments/checkout` | U | 24 | [payments.controller.ts:28](./src/payments/payments.controller.ts#L28) |
-| 97 | POST | `/payments/webhook` | P | 24 | [payments.controller.ts:78](./src/payments/payments.controller.ts#L78) |
-| 98 | GET | `/payments/callback` | P | 24 | [payments.controller.ts:166](./src/payments/payments.controller.ts#L166) |
+| 83 | GET | `/me/assignments` | U | 16 | [submissions.controller.ts:40](./src/submissions/submissions.controller.ts#L40) |
+| 84 | GET | `/submissions/pending` | I/A | 16 | [submissions.controller.ts:42](./src/submissions/submissions.controller.ts#L42) |
+| 85 | POST | `/submissions/:submissionId/grade` | I/A | 16 | [submissions.controller.ts:49](./src/submissions/submissions.controller.ts#L49) |
+| 86 | POST | `/uploads/signed-url` | I/A Own | 17 | [uploads.controller.ts:18](./src/uploads/uploads.controller.ts#L18) |
+| 87 | POST | `/uploads/confirm` | I/A Own | 17 | [uploads.controller.ts:23](./src/uploads/uploads.controller.ts#L23) |
+| 88 | GET | `/lectures/:lectureId/stream/manifest` | U enrolled | 19.2 | [streaming.controller.ts:32](./src/streaming/streaming.controller.ts#L32) |
+| 89 | GET | `/lectures/:lectureId/stream/watermark` | U enrolled | 19.3 | [streaming.controller.ts:57](./src/streaming/streaming.controller.ts#L57) |
+| 90 | GET | `/lectures/:lectureId/stream/key` | U enrolled | 19.4 | [streaming.controller.ts:81](./src/streaming/streaming.controller.ts#L81) |
+| 91 | POST | `/courses/:courseId/lectures/:lectureId/stream/register` | I/A Own | 19.6 | [streaming.controller.ts:113](./src/streaming/streaming.controller.ts#L113) |
+| 92 | POST | `/courses/:courseId/lectures/:lectureId/video/transcode` | I/A Own | 20 | [transcoding.controller.ts:29](./src/transcoding/transcoding.controller.ts#L29) |
+| 93 | GET | `/courses/:courseId/lectures/:lectureId/video/transcode/status` | I/A Own | 20 | [transcoding.controller.ts:43](./src/transcoding/transcoding.controller.ts#L43) |
+| 94 | GET | `/ai/lectures/:lectureId/status` | U | 21 | [ai.controller.ts:24](./src/ai/ai.controller.ts#L24) |
+| 95 | POST | `/ai/lectures/:lectureId/chat` | U | 21 | [ai.controller.ts:29](./src/ai/ai.controller.ts#L29) |
+| 96 | POST | `/ai/lectures/:lectureId/retry` | I/A Own | 21 | [ai.controller.ts:40](./src/ai/ai.controller.ts#L40) |
+| 97 | POST | `/payments/checkout` | U | 24 | [payments.controller.ts:28](./src/payments/payments.controller.ts#L28) |
+| 98 | POST | `/payments/webhook` | P | 24 | [payments.controller.ts:78](./src/payments/payments.controller.ts#L78) |
+| 99 | GET | `/payments/callback` | P | 24 | [payments.controller.ts:166](./src/payments/payments.controller.ts#L166) |
 
-> **Route total: 98** distinct handlers across 21 controller files. This index was generated by scanning every `@Get/@Post/@Put/@Patch/@Delete` decorator in `src/**/*.controller.ts` — it is the full set. The **Source** column links each route to its handler in the codebase (`file:line`; line numbers for the health routes are as of the 2026-07-28 scan, the rest as of 2026-07-05, and may drift). Breakdown: health 2, me 3, admin 1, catalog 2, courses 16, sections 4, lectures 6, enrollment 4, progress 4, ratings 5, quizzes 17, missions 5, micro-lessons 4, templates 3, rubric 4, submissions 4, uploads 2, streaming 4, transcoding 2, ai 3, payments 3.
+> **Route total: 99** distinct handlers across 21 controller files. This index was generated by scanning every `@Get/@Post/@Put/@Patch/@Delete` decorator in `src/**/*.controller.ts` — it is the full set. The **Source** column links each route to its handler in the codebase (`file:line`; line numbers for the health routes are as of the 2026-07-28 scan, the rest as of 2026-07-05, and may drift). Breakdown: health 2, me 3, admin 1, catalog 2, courses 16, sections 4, lectures 6, enrollment 4, progress 4, ratings 5, quizzes 17, missions 5, micro-lessons 4, templates 3, rubric 4, submissions 5, uploads 2, streaming 4, transcoding 2, ai 3, payments 3.
 
 ## Appendix B — Controller & service source map
 
@@ -1507,12 +1531,12 @@ Where each route group lives in the backend, and the service it delegates to. Pa
 | [micro-lessons.controller.ts](./src/micro-lessons/micro-lessons.controller.ts) | `/missions/:missionId/micro-lessons` | 4 | `MicroLessonsService` |
 | [templates.controller.ts](./src/templates/templates.controller.ts) | `/missions/:missionId/templates` | 3 | `TemplatesService` |
 | [rubric.controller.ts](./src/rubric/rubric.controller.ts) | `/missions/:missionId/rubric` | 4 | `RubricService` |
-| [submissions.controller.ts](./src/submissions/submissions.controller.ts) | `/` (multiple) | 4 | `SubmissionsService` |
+| [submissions.controller.ts](./src/submissions/submissions.controller.ts) | `/` (multiple) | 5 | `SubmissionsService` |
 | [uploads.controller.ts](./src/uploads/uploads.controller.ts) | `/uploads` | 2 | `UploadsService`, `DataConnectService` |
 | [streaming.controller.ts](./src/streaming/streaming.controller.ts) | `/` (multiple) | 4 | `StreamingService` |
 | [transcoding.controller.ts](./src/transcoding/transcoding.controller.ts) | `/` (multiple) | 2 | `TranscodingService` |
 | [ai.controller.ts](./src/ai/ai.controller.ts) | `/ai` | 3 | `AiService` |
 | [payments.controller.ts](./src/payments/payments.controller.ts) | `/payments` | 3 | `PaymentsService` |
 
-**Totals:** 98 routes across 21 controllers. Guards live in [`src/common/guards/`](./src/common/guards/) (`FirebaseAuthGuard` → `RolesGuard` → `CourseAccessGuard`/`ResourceOwnershipGuard`); shared decorators in [`src/common/decorators/`](./src/common/decorators/).
+**Totals:** 99 routes across 21 controllers. Guards live in [`src/common/guards/`](./src/common/guards/) (`FirebaseAuthGuard` → `RolesGuard` → `CourseAccessGuard`/`ResourceOwnershipGuard`); shared decorators in [`src/common/decorators/`](./src/common/decorators/).
 

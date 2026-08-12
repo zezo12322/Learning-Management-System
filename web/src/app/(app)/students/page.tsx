@@ -141,7 +141,7 @@ export default function StudentsPage() {
         <Card className="max-w-xl p-6">
           <h2 className="text-lg font-semibold text-content">{t('students.formTitle')}</h2>
           <p className="mb-5 mt-1 text-sm text-content-secondary">{t('students.formSubtitle')}</p>
-          {error && <div className="mb-4 rounded-input bg-error/10 px-3 py-2 text-xs text-error">{error}</div>}
+          {error && <div className="mb-4 rounded-input bg-error-soft px-3 py-2 text-xs text-error">{error}</div>}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label htmlFor="name">{t('reg.fullName')}</Label>

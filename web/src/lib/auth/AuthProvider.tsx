@@ -3,24 +3,30 @@
 import {
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  getRedirectResult,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signInWithRedirect,
   signOut as fbSignOut,
   type User as FirebaseUser,
 } from 'firebase/auth'
 import { getFirebaseAuth, googleProvider } from '@/lib/firebase'
 import { meApi } from '@/lib/api/services'
+import { setStoreUid } from '@/lib/localStore'
 import { callCloudFunction } from '@/lib/auth/cloudFunctions'
 import type { Me, Role } from '@/lib/types'
 
@@ -28,6 +34,12 @@ interface AuthContextValue {
   firebaseUser: FirebaseUser | null
   me: Me | null
   roles: Role[]
+  /**
+   * False until the roles for the signed-in user have actually been determined.
+   * Guards must wait for this: treating "not loaded yet" as "no roles" bounces
+   * an instructor out of their own workspace on a slow or failed profile fetch.
+   */
+  rolesResolved: boolean
   loading: boolean
   configurationError: boolean
   isAuthenticated: boolean
@@ -54,24 +66,58 @@ const firebaseConfigured = Boolean(
 
 const knownRoles: Role[] = ['admin', 'instructor', 'student']
 
-function readClaimRoles(value: unknown): Role[] {
-  if (!Array.isArray(value)) return []
+/**
+ * Roles from the ID token. `null` means the token carries no `roles` claim at
+ * all, which is different from an empty array: absent means "this token says
+ * nothing", empty means "this account has no roles". Only the second is
+ * authoritative.
+ */
+function readClaimRoles(value: unknown): Role[] | null {
+  if (!Array.isArray(value)) return null
   return value.filter((role): role is Role => knownRoles.includes(role as Role))
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient()
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [me, setMe] = useState<Me | null>(null)
-  const [claimRoles, setClaimRoles] = useState<Role[]>([])
+  const [claimRoles, setClaimRoles] = useState<Role[] | null>(null)
+  const [rolesResolved, setRolesResolved] = useState(false)
   const [loading, setLoading] = useState(true)
+  const lastUid = useRef<string | null>(null)
 
   useEffect(() => {
     if (!firebaseConfigured) {
       setLoading(false)
+      setRolesResolved(true)
       return
     }
 
+    // Completes a sign-in that came back through the redirect fallback. Nothing
+    // called this before, so a redirect that failed on the return leg — an
+    // unauthorized domain, state dropped in transit — resolved to no user and
+    // no error, and the app simply rendered the login page again with nothing
+    // to show for the round trip. onAuthStateChanged still delivers the user on
+    // success; this is what makes the failures visible.
+    getRedirectResult(getFirebaseAuth()).catch((err: unknown) => {
+      // eslint-disable-next-line no-console
+      console.error('[auth] Google redirect sign-in failed', (err as { code?: string } | null)?.code ?? err)
+    })
+
     const unsub = onAuthStateChanged(getFirebaseAuth(), async (user) => {
+      const uid = user?.uid ?? null
+      // Whenever the account changes — including sign-out — drop everything
+      // cached for the previous one. React Query holds the profile,
+      // enrollments, submissions and grades of whoever was signed in, and
+      // sign-out is a client-side navigation with no reload, so without this
+      // the next account on a shared device is served the previous user's data.
+      if (uid !== lastUid.current) {
+        lastUid.current = uid
+        queryClient.clear()
+        setStoreUid(uid)
+        setRolesResolved(false)
+      }
+
       setFirebaseUser(user)
       if (user) {
         try {
@@ -86,12 +132,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         setMe(null)
-        setClaimRoles([])
+        setClaimRoles(null)
       }
+      setRolesResolved(true)
       setLoading(false)
     })
     return () => unsub()
-  }, [])
+  }, [queryClient])
 
   const login = async (email: string, password: string, remember = true) => {
     if (!firebaseConfigured) {
@@ -102,11 +149,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password)
   }
 
+  /**
+   * Popup first, redirect only as a fallback.
+   *
+   * The redirect flow sends the browser to `<authDomain>/__/auth/handler` and
+   * back, which makes `<project>.firebaseapp.com` an intermediate site in the
+   * navigation chain. Chrome's bounce-tracking mitigation clears state for
+   * exactly that shape, so the user completes Google sign-in and returns with
+   * nothing — landing back on the login page as if they had never signed in.
+   * (Chrome reports this in DevTools → Issues: "may soon delete state for
+   * intermediate websites in a recent navigation chain".) It cannot be fixed
+   * from the app side while the auth domain differs from the site's own.
+   *
+   * The popup keeps the exchange in one window and hands the credential back
+   * through `window.opener`, which the `Cross-Origin-Opener-Policy:
+   * same-origin-allow-popups` header in next.config.mjs deliberately preserves.
+   *
+   * Redirect stays as the fallback for browsers that block or cannot open the
+   * popup — worse odds there than none at all.
+   */
   const loginWithGoogle = async () => {
     if (!firebaseConfigured) {
       throw new Error('Firebase Web authentication is not configured.')
     }
-    await signInWithRedirect(getFirebaseAuth(), googleProvider)
+    const auth = getFirebaseAuth()
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code
+      const popupUnavailable =
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      if (!popupUnavailable) throw err
+      await signInWithRedirect(auth, googleProvider)
+    }
   }
 
   const resetPassword = async (email: string) => {
@@ -131,12 +207,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(getFirebaseAuth(), data.email, data.password)
   }
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     if (!firebaseConfigured) return
     await fbSignOut(getFirebaseAuth())
     setMe(null)
-    setClaimRoles([])
-  }
+    setClaimRoles(null)
+    // onAuthStateChanged clears the caches too; doing it here as well means the
+    // data is gone the moment the user asks, not one tick later.
+    queryClient.clear()
+    setStoreUid(null)
+  }, [queryClient])
 
   const refreshMe = async () => {
     if (!firebaseConfigured) return
@@ -148,9 +228,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const roles = useMemo(
-    () => Array.from(new Set([...(me?.roles ?? []), ...claimRoles])),
-    [me?.roles, claimRoles]
+  /**
+   * The ID token is what the API authorizes against, so when it carries a
+   * `roles` claim that claim is the truth — including when it is empty, which
+   * is how a revoked instructor looks. The database row is only consulted when
+   * the token says nothing about roles at all, so an account whose claims have
+   * not been minted yet still gets its UI.
+   */
+  const roles = useMemo<Role[]>(
+    () => (claimRoles !== null ? claimRoles : (me?.roles ?? [])),
+    [me?.roles, claimRoles],
   )
 
   const value = useMemo<AuthContextValue>(
@@ -158,6 +245,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       firebaseUser,
       me,
       roles,
+      rolesResolved,
       loading,
       configurationError: !firebaseConfigured,
       isAuthenticated: Boolean(firebaseUser),
@@ -168,7 +256,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       refreshMe,
     }),
-    [firebaseUser, me, roles, loading]
+    [firebaseUser, me, roles, rolesResolved, loading, logout]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

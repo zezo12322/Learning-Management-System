@@ -6,6 +6,18 @@ export class UpdateProgressDto {
   lastWatchedSecond: number;
 
   /**
+   * Seconds the client actually spent playing, capped at
+   * MAX_CREDITED_PLAYBACK_RATE seconds of credit per real second. Optional so
+   * clients that predate it keep working on the old position-only rule; when
+   * sent, completion needs it to clear the threshold as well. See
+   * `isLectureComplete`.
+   */
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  watchedSeconds?: number;
+
+  /**
    * @deprecated Accepted but IGNORED. Completion is derived server-side from
    * `lastWatchedSecond` vs the lecture duration (see ProgressService), so a
    * client can no longer assert completion. Retained only so existing clients
@@ -33,9 +45,10 @@ export class EnqueueProgressDto {
   lastWatchedSecond: number;
 
   /**
-   * Total seconds actually watched in this session (optional analytics signal,
-   * distinct from `lastWatchedSecond` which is a position). Carried through to
-   * the worker for future watch-time aggregation.
+   * Seconds actually spent playing, distinct from `lastWatchedSecond` which is
+   * only a position. Carried through to the worker, where completion requires
+   * it to clear the same threshold — this is what stops a scrubber drag or an
+   * 8x pass from finishing a lecture. See `isLectureComplete`.
    */
   @IsOptional()
   @IsInt()

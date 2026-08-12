@@ -72,10 +72,11 @@ describe('StreamingService', () => {
         uid: 'u1',
         token: 't',
         isAdmin: false,
+        origin: 'https://api.example.com',
       });
 
       expect(out).toContain(
-        'URI="http://localhost:3000/lectures/L1/stream/key?kt=KT"',
+        'URI="https://api.example.com/lectures/L1/stream/key?kt=KT"',
       );
       expect(out).toContain(`signed(${HLS_DIR}/seg_000.ts)`);
       expect(out).toContain(`signed(${HLS_DIR}/seg_001.ts)`);
@@ -107,10 +108,72 @@ describe('StreamingService', () => {
         uid: 'u1',
         token: 't',
         isAdmin: false,
+        origin: 'https://api.example.com',
       });
 
       expect(out).toContain(
-        'http://localhost:3000/lectures/L1/stream/manifest?v=720p%2Findex.m3u8',
+        'https://api.example.com/lectures/L1/stream/manifest?v=720p%2Findex.m3u8',
+      );
+    });
+
+    it('keeps the API prefix in the key URL so the player can fetch it', async () => {
+      dc.executeQuery.mockResolvedValue(lecture());
+      firebase.downloadFile.mockResolvedValue(
+        Buffer.from(
+          ['#EXTM3U', '#EXT-X-KEY:METHOD=AES-128,URI="enc.key",IV=0x00'].join(
+            '\n',
+          ),
+        ),
+      );
+
+      const out = await svc.getManifest({
+        lectureId: 'L1',
+        uid: 'u1',
+        token: 't',
+        isAdmin: false,
+        // what the controller derives: scheme + host + global prefix
+        origin: 'https://api.example.com/api/v1',
+      });
+
+      // Dropping the prefix here 404s the key request and playback dies on the
+      // first segment.
+      expect(out).toContain(
+        'URI="https://api.example.com/api/v1/lectures/L1/stream/key?kt=KT"',
+      );
+    });
+
+    it('prefers a configured API_PUBLIC_URL over the request origin', async () => {
+      const pinned = new StreamingService(
+        dc as any,
+        firebase as any,
+        access as any,
+        keyTokens as any,
+        watermark as any,
+        {
+          get: (k: string, d?: any) =>
+            k === 'API_PUBLIC_URL' ? 'https://cdn.example.com/' : d,
+        } as any,
+      );
+      dc.executeQuery.mockResolvedValue(lecture());
+      firebase.downloadFile.mockResolvedValue(
+        Buffer.from(
+          ['#EXTM3U', '#EXT-X-KEY:METHOD=AES-128,URI="enc.key",IV=0x00'].join(
+            '\n',
+          ),
+        ),
+      );
+
+      const out = await pinned.getManifest({
+        lectureId: 'L1',
+        uid: 'u1',
+        token: 't',
+        isAdmin: false,
+        origin: 'https://ignored.example.com',
+      });
+
+      // trailing slash trimmed, origin ignored
+      expect(out).toContain(
+        'URI="https://cdn.example.com/lectures/L1/stream/key?kt=KT"',
       );
     });
 

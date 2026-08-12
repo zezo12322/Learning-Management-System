@@ -3,8 +3,9 @@ import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.d
 import '../../../domain/repositories/courses_repository.dart';
 import '../../views/widgets/courses_filter_chips_row.dart';
 import 'courses_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class CoursesCubit extends Cubit<CoursesState> {
+class CoursesCubit extends Cubit<CoursesState> with SafeEmit<CoursesState> {
   CoursesCubit({required CoursesRepository repository}) : _repository = repository, super(const CoursesState());
 
   final CoursesRepository _repository;

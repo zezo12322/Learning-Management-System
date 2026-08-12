@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/features/quiz/domain/repositories/quiz_repository.dart';
 import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class QuizCubit extends Cubit<QuizState> {
+class QuizCubit extends Cubit<QuizState> with SafeEmit<QuizState> {
   final QuizRepository repository;
 
   QuizCubit(this.repository) : super(QuizInitial());

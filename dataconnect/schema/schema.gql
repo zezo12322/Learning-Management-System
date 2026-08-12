@@ -264,6 +264,13 @@ type LectureProgress @table(name: "lecture_progress", key: ["user", "lecture"]) 
   user: User! @index
   lecture: CourseLecture! @index
   lastWatchedSecond: Int!
+  # Seconds actually spent playing, as distinct from lastWatchedSecond, which is
+  # only where the playhead ended up. Completion needs both: a position alone is
+  # reached just as easily by dragging the scrubber or playing at 8x, which is
+  # how lectures were being completed unwatched. Nullable because rows written
+  # before this column existed have no measurement — absent means "not known",
+  # not "watched zero", and the server reads it that way.
+  watchedSeconds: Int
   completedAt: Timestamp @index
 }
 

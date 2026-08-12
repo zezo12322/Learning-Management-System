@@ -69,7 +69,8 @@ class ProfileHeaderInfo extends StatelessWidget {
               child: Text(
                 'profile.header.joined'.tr(args: [
                   currentUser?.metadata.creationTime != null 
-                    ? DateFormat('MMMM yyyy').format(currentUser!.metadata.creationTime!) 
+                    ? DateFormat('MMMM yyyy', context.locale.toLanguageTag())
+                        .format(currentUser!.metadata.creationTime!) 
                     : 'Unknown'
                 ]),
                 style: context.textTheme.bodyMedium?.copyWith(

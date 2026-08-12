@@ -7,7 +7,6 @@ import 'package:optimatech_lms/features/chatbot/data/models/chat_context_model.d
 import 'package:optimatech_lms/features/chatbot/data/models/chat_message_model.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../domain/entities/chat_message_entity.dart';
 import 'chat_remote_data_source.dart';
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -21,7 +20,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (user != null) {
       final token = await user.getIdToken();
       if (token != null) {
-         print(token);
+        // Never log the token. `print` is not stripped from release builds, so
+        // the previous `print(token)` here wrote a live bearer credential into
+        // the device log on every message — undoing the deliberate hygiene in
+        // ApiService, where the network logger is kDebugMode-gated and request
+        // headers are omitted for exactly this reason.
         apiService.setAuthToken(token);
       }
     }
@@ -37,33 +40,27 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       throw CustomExceptions(message: 'chatbot.offline_error'.tr());
     }
 
-    try {
-      await _setAuthToken();
-      final requestId = uuid.v4();
-      final payload = context.toJson(text, requestId);
+    await _setAuthToken();
+    final requestId = uuid.v4();
+    final payload = context.toJson(text, requestId);
 
-      final response = await apiService.post(
-        '/ai/lectures/${context.videoId}/chat',
-        data: payload,
-      );
+    // Failures propagate. There used to be a catch-all here that swallowed
+    // every exception and returned a fabricated bot message — "I am a simulated
+    // AI response!" — with `grounded: true`, which the cubit then appended and
+    // persisted like any real answer. `ChatRepositoryImpl` already maps
+    // exceptions to a `ServerFailure` and the UI already has a failure path;
+    // it simply never saw one. Showing an invented answer as if the model had
+    // produced it is worse than showing an error.
+    final response = await apiService.post(
+      '/ai/lectures/${context.videoId}/chat',
+      data: payload,
+    );
 
-      if (response.statusCode == 200) {
-        return ChatMessageModel.fromJson(response.data);
-      } else {
-        throw Exception('Failed to send message: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("=>>>>>>>>>>>>>>>>> $e");
-      // MOCK FALLBACK: For UI testing while backend is offline
-      await Future.delayed(const Duration(seconds: 2));
-      return ChatMessageModel(
-        id: uuid.v4(),
-        text:
-        'I am a simulated AI response! The real backend  is currently unreachable, but your frontend UI is working perfectly.',
-        sender: ChatSender.bot,
-        timestamp: DateTime.now(),
-        grounded: true,
-      );
+    final status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) {
+      throw CustomExceptions(message: 'errors.server'.tr());
     }
+
+    return ChatMessageModel.fromJson(response.data);
   }
 }

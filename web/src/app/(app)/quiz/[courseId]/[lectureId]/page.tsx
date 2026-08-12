@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -8,7 +8,6 @@ import { ArrowLeft, Check, Plus, Trash2, X } from 'lucide-react'
 import { quizApi, type QuestionInput } from '@/lib/api/services'
 import { apiErrorMessage } from '@/lib/api/client'
 import { useT } from '@/lib/i18n'
-import { getCachedQuizId, setCachedQuizId } from '@/lib/quizCache'
 import type { Quiz, QuizQuestion, QuizSettings } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,28 +23,26 @@ export default function QuizEditorPage() {
   const lectureId = params.lectureId
   const qc = useQueryClient()
 
-  const [ready, setReady] = useState(false)
-  const [quizId, setQuizId] = useState<string | null>(null)
-
-  useEffect(() => {
-    setQuizId(getCachedQuizId(lectureId))
-    setReady(true)
-  }, [lectureId])
+  // Resolved from the server, not a device-local map: the id used to come from
+  // localStorage, so opening the same quiz on another browser looked like "no
+  // quiz yet" and offered to create a duplicate.
+  const quizRef = useQuery({
+    queryKey: ['lecture-quiz', courseId, lectureId],
+    queryFn: () => quizApi.forLecture(courseId, lectureId),
+    retry: false,
+  })
+  const ready = !quizRef.isLoading
+  const quizId = quizRef.data?.id ?? null
 
   const quizQuery = useQuery({
     queryKey: ['quiz', quizId],
     queryFn: () => quizApi.get(courseId, quizId as string),
-    enabled: ready && !!quizId,
+    enabled: !!quizId,
   })
 
   const createQuiz = useMutation({
     mutationFn: (settings: QuizSettings) => quizApi.create(courseId, lectureId, settings),
-    onSuccess: (newId) => {
-      if (newId) {
-        setCachedQuizId(lectureId, newId)
-        setQuizId(newId)
-      }
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['lecture-quiz', courseId, lectureId] }),
   })
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['quiz', quizId] })
@@ -94,8 +91,8 @@ export default function QuizEditorPage() {
           <Button
             variant="outline"
             onClick={() => {
-              setQuizId(null)
               createQuiz.reset()
+              void quizRef.refetch()
             }}
           >
             {t('quizEditor.startOver')}
@@ -338,7 +335,7 @@ function QuestionCard({
             <span
               className={
                 option.isCorrect
-                  ? 'inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-white'
+                  ? 'inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-on-status'
                   : 'inline-flex h-4 w-4 items-center justify-center rounded-full border border-border'
               }
             >

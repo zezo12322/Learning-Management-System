@@ -32,14 +32,34 @@ Design = mobile layout; web adapts to RTL + responsive (sidebar desktop / bottom
 - [x] Domain types → `lib/types.ts`
 - [x] Typed API services → `lib/api/services/*`
 - [x] Auth context + hooks → `lib/auth/*`
-- [ ] Middleware / route protection
+- [x] Route protection → `lib/auth/routeAccess.ts`, enforced in `AppShell`: a learner
+      who opens an instructor route (`/dashboard`, `/courses`, `/students`,
+      `/insights`, `/uploads`, `/studio/*`) is redirected to `/home` without the
+      workspace ever painting. This is a UI guard — the NestJS API remains the
+      authorization boundary and answers 403 on authoring endpoints regardless.
 - [x] Auth pages → `(auth)/login`, `(auth)/register`
 - [x] Home dashboard → `(app)/home`
 - [x] Courses catalog → `(app)/courses`
 - [x] Course details → `(app)/courses/[id]`
-- [ ] Course learning (lecture player) → `(app)/learn/[courseId]`
-- [ ] Profile → `(app)/profile`
-- [ ] Quiz flow, submissions, certificates
+- [x] Course learning → `(app)/learn/[courseId]` (Figma 8–11): secure AES-128 HLS player
+      (`components/learn/LecturePlayer`, API §19), Curriculum / Notes / Resources /
+      Discussion tabs, resume position and progress heartbeat
+- [x] Student home → `(app)/home` (Figma 5)
+- [x] My courses (enrolled + progress) → `(app)/learning` (Figma 6)
+- [x] Assignments → `(app)/assignments` (Figma 13, backed by `GET /me/submissions`)
+- [x] Certificates list + detail → `(app)/certificates` (Figma 14, derived from COMPLETED enrollments)
+- [x] Notifications → `(app)/notifications` (Figma 15, empty shell — no backend endpoint)
+- [x] Profile → `(app)/profile` (Figma 16)
+- [x] Role-aware navigation: learner nav for everyone, "Teaching" group for instructors/admins
+- [x] Quiz experience refit to the 4-step Figma flow (Figma 12), and the quiz id now
+      comes from `GET /courses/:courseId/lectures/:lectureId/quiz` — it used to be read
+      from a localStorage map written by the authoring screen, so no learner could open
+      a quiz at all
+- [x] Paid enrollment via `POST /payments/checkout` (the `/payment-*` landing pages
+      finally have something linking to them)
+- [x] Security pass: CSP + HSTS, sanitised untrusted URLs (`lib/safeUrl`), per-account
+      browser storage (`lib/localStore`), React Query cache cleared on account change,
+      and `/api/ai/chat` authenticated + enrollment-gated
 
 ## How to run
 ```bash

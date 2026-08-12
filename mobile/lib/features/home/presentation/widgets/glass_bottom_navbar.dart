@@ -30,7 +30,15 @@ class BottomNavItemData {
 }
 
 class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
-  double _pillLeft = 0;
+  /// Offset of the selection pill from the **start** edge — the leading edge
+  /// in the current text direction, so left in English and right in Arabic.
+  ///
+  /// The arithmetic below is already start-relative (index 0 is the smallest
+  /// offset), but it used to be applied with a physical `left:`, which never
+  /// flips with `Directionality`. The Row of `Expanded` items does flip, so in
+  /// Arabic the pill sat under the mirrored slot: select Home and the pill
+  /// highlighted Profile.
+  double _pillStart = 0;
   @override
   void didUpdateWidget(covariant GlassBottomNavBar oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -43,9 +51,9 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
     final width = box.size.width;
     final itemWidth = width / widget.items.length;
     const double pillWidth = 40.0;
-    final targetLeft =
+    final targetStart =
         itemWidth * widget.currentIndex + (itemWidth - pillWidth) / 2;
-    setState(() => _pillLeft = targetLeft.clamp(4.0, width - pillWidth - 4.0));
+    setState(() => _pillStart = targetStart.clamp(4.0, width - pillWidth - 4.0));
   }
 
   @override
@@ -64,9 +72,9 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
             final totalWidth = constraints.maxWidth;
             final itemWidth = totalWidth / widget.items.length;
             const double pillWidth = 40.0;
-            final initialLeft =
+            final initialStart =
                 itemWidth * widget.currentIndex + (itemWidth - pillWidth) / 2;
-            if (_pillLeft == 0) _pillLeft = initialLeft;
+            if (_pillStart == 0) _pillStart = initialStart;
 
             return ClipRRect(
               borderRadius: BorderRadius.circular(100),
@@ -94,10 +102,10 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      AnimatedPositioned(
+                      AnimatedPositionedDirectional(
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeInOut,
-                        left: _pillLeft,
+                        start: _pillStart,
                         top: -4,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
@@ -140,10 +148,10 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                             child: InkWell(
                               onTap: () {
                                 widget.onTap(index);
-                                final targetLeft = itemWidth * index +
+                                final targetStart = itemWidth * index +
                                     (itemWidth - pillWidth) / 2;
                                 setState(
-                                  () => _pillLeft = targetLeft.clamp(
+                                  () => _pillStart = targetStart.clamp(
                                     4.0,
                                     totalWidth - pillWidth - 4.0,
                                   ),

@@ -2,8 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:optimatech_lms/core/utils/app_validators.dart';
 import 'package:optimatech_lms/features/auth/domain/repositories/auth_repository.dart';
 import 'log_in_state.dart';
+import 'package:optimatech_lms/core/bloc/safe_emit.dart';
 
-class LogInCubit extends Cubit<LogInState> {
+class LogInCubit extends Cubit<LogInState> with SafeEmit<LogInState> {
   LogInCubit({required AuthRepository authRepository}) : _authRepository = authRepository, super(const LogInState());
   final AuthRepository _authRepository;
 

@@ -151,17 +151,39 @@ export class PaymentsController {
     }
   }
 
-  // Paymob Server-to-Server webhook callback
+  /**
+   * Paymob server-to-server webhook.
+   *
+   * This route is deliberately unauthenticated — Paymob calls it, not a user —
+   * so **the HMAC is the only thing standing between a stranger and the
+   * enrollment mutations below**, all of which run as the service account.
+   *
+   * It previously admitted `type: 'INTENTION'` alongside `'TRANSACTION'` while
+   * nesting the signature check inside the `'TRANSACTION'` branch. An
+   * `INTENTION` body therefore reached the privileged path with no verification
+   * at all, and both the status (`obj.success`) and the payment it applies to
+   * (`obj.intention_id`) come straight from that body. Anyone who knew a
+   * `referenceId` — which `MyPaymentHistory` hands a user for their own pending
+   * payment — could flip it to COMPLETED and be enrolled without paying, or
+   * flip someone else's to FAILED.
+   *
+   * `TRANSACTION` is the event that represents money actually moving and is the
+   * only one this handler ever acted on meaningfully, so it is now the only one
+   * accepted, and its signature is verified before anything else happens.
+   * Other event types are acknowledged so Paymob stops retrying, and ignored.
+   *
+   * If INTENTION callbacks are ever needed, they need their own verifier —
+   * Paymob does not sign them with the transaction field set used here.
+   */
   @Post('webhook')
   @Throttle({ default: { ttl: 60000, limit: 60 } })
   async handleWebhook(@Body() body: any, @Query('hmac') hmac: string) {
-    if (body.type === 'TRANSACTION' || body.type === 'INTENTION') {
-      // 1. Verify HMAC for security
-      if (body.type === 'TRANSACTION') {
-        const isValid = this.paymentsService.verifyHmac(hmac, body.obj);
-        if (!isValid) {
-          throw new UnauthorizedException('Invalid HMAC signature');
-        }
+    if (body?.type === 'TRANSACTION') {
+      // 1. Verify HMAC for security — unconditionally, before reading anything
+      //    else out of the body.
+      const isValid = this.paymentsService.verifyHmac(hmac, body.obj);
+      if (!isValid) {
+        throw new UnauthorizedException('Invalid HMAC signature');
       }
 
       // PaymentStatus enum only has PENDING/COMPLETED/FAILED/REFUNDED — a
@@ -270,19 +292,35 @@ export class PaymentsController {
         }
       }
     } else {
-      console.log('Other event type received:', body.type);
+      // Acknowledged and ignored. Anything that is not a signed TRANSACTION —
+      // including INTENTION — lands here and touches nothing.
+      console.log('Unhandled webhook event type received:', body?.type);
     }
 
     // Always return 200 to acknowledge receipt to Paymob
     return { success: true };
   }
 
-  // Success/Fail redirect URL for the user browser to return to
+  /**
+   * Browser redirect target after payment.
+   *
+   * `returnUrl` used to be taken from the query string and redirected to
+   * verbatim, which made this an open redirect on an unauthenticated route —
+   * and one attached to a payment flow, where a link that genuinely starts on
+   * the real domain and ends on an attacker's "payment failed, re-enter your
+   * card" page is about as convincing as phishing gets.
+   *
+   * It is now honoured only when it points at an origin the app already trusts
+   * for CORS, and falls back to the configured frontend otherwise.
+   */
   @Get('callback')
   async handleBrowserCallback(@Query() query: any, @Res() res: Response) {
     const defaultFrontendUrl =
       process.env.FRONTEND_URL || 'http://localhost:3000';
-    const frontendUrl = query.returnUrl || defaultFrontendUrl;
+    const frontendUrl = this.resolveReturnUrl(
+      query.returnUrl,
+      defaultFrontendUrl,
+    );
 
     // Paymob redirects back here after payment
     if (query.success === 'true' || query.success === true) {
@@ -290,5 +328,47 @@ export class PaymentsController {
     } else {
       return res.redirect(`${frontendUrl}/payment-failed`);
     }
+  }
+
+  /**
+   * Allows a caller-supplied return URL only when its origin is one the app
+   * already trusts — the configured frontend, anything listed in
+   * `CORS_ORIGINS`, or localhost for development (the same set `main.ts`
+   * accepts as a CORS origin).
+   */
+  private resolveReturnUrl(candidate: unknown, fallback: string): string {
+    if (typeof candidate !== 'string' || !candidate) return fallback;
+
+    let origin: string;
+    try {
+      origin = new URL(candidate).origin;
+    } catch {
+      // Not an absolute URL — including protocol-relative `//evil.example`,
+      // which `URL` rejects without a base and which a bare string concat
+      // would have happily redirected to.
+      return fallback;
+    }
+
+    const allowed = new Set(
+      (process.env.CORS_ORIGINS ?? '')
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+        .concat(fallback)
+        .map((entry) => {
+          try {
+            return new URL(entry).origin;
+          } catch {
+            return '';
+          }
+        })
+        .filter(Boolean),
+    );
+
+    const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(
+      origin,
+    );
+
+    return allowed.has(origin) || isLocalhost ? candidate : fallback;
   }
 }

@@ -2,8 +2,13 @@
 # STUDENT — MISSION SUBMISSIONS
 # ==========================================
 
+# `course { id }` is selected because EnrollmentService.enrollInMission gates
+# mission enrollment on the parent course: a course-linked mission may only be
+# joined by someone already enrolled in that course. The gate read
+# `mission.courseId`, which this query never returned, so the check silently
+# passed for every mission.
 query GetMissionForEnrollment($missionId: UUID!) @auth(level: USER) {
-  mission(id: $missionId) { id deletedAt }
+  mission(id: $missionId) { id deletedAt course { id } }
 }
 
 # RBAC hardening: NO_ACCESS. A USER-level version let a student submit to any
@@ -14,9 +19,63 @@ mutation SubmitMission($missionId: UUID!, $fileUrl: String!, $studentId: String!
   missionSubmission_insert(data: { missionId: $missionId, studentId: $studentId, fileUrl: $fileUrl, status: PENDING })
 }
 
+# `mission { id }` and `attemptNumber` are selected so the web can group a
+# student's submissions by assignment and show which attempt each one was —
+# without an id, a submission could not be tied back to the assignment it
+# answers.
 query MySubmissions @auth(level: USER) {
   missionSubmissions(where: { studentId: { eq_expr: "auth.uid" } }, orderBy: [{ updatedAt: DESC }]) {
-    id fileUrl status feedback submittedAt missionSubmissionScores_on_submission { score criterion { criterionName maxPoints } } mission { title difficulty }
+    id fileUrl status feedback submittedAt attemptNumber missionSubmissionScores_on_submission { score criterion { criterionName maxPoints } } mission { id title difficulty }
+  }
+}
+
+# The student's own assignment feed.
+#
+# Nothing listed assignments *to* a learner before this: GET /missions returns
+# missions the caller authored, and AdminGetMission is owner-only, so a student
+# could not discover an assignment at all — the Assignments screen could only
+# ever show work they had already submitted, which they had no way to submit.
+#
+# USER level is safe because the filter is self-scoped the same way MySubmissions
+# and AdminListMyMissions are: a mission appears only when the caller holds an
+# ACTIVE or COMPLETED enrollment in its parent course, and the submissions and
+# enrollments selected below are narrowed to auth.uid. Missions with no course
+# are excluded — there is no enrollment that could entitle anyone to them.
+#
+# The rubric comes along because the learner should see what they are marked on
+# before they submit, not after.
+query MyAssignments @auth(level: USER) {
+  missions(
+    where: {
+      deletedAt: { eq: null },
+      course: {
+        enrollments_on_course: {
+          exist: {
+            userId: { eq_expr: "auth.uid" },
+            targetType: { eq: COURSE },
+            status: { in: [ACTIVE, COMPLETED] }
+          }
+        }
+      }
+    },
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id title scenarioDescription durationMinutes difficulty skillsTested createdAt
+    course { id title }
+    # `assignmentCriteria`, not `criteria`: the SDK generator requires an alias
+    # that carries arguments to be defined exactly once across the connector, so
+    # reusing AdminGetMission's `criteria` fails schema validation even though
+    # the two definitions are byte-identical. Every other repeated relation here
+    # is named for its use for the same reason (publishedSections, videoSections,
+    # userCompletionLectures).
+    assignmentCriteria: rubricCriteria_on_mission(orderBy: [{ order: ASC }]) { id criterionName description maxPoints order }
+    mySubmissions: missionSubmissions_on_mission(
+      where: { studentId: { eq_expr: "auth.uid" } },
+      orderBy: [{ submittedAt: DESC }]
+    ) { id status submittedAt attemptNumber feedback }
+    myMissionEnrollments: enrollments_on_mission(
+      where: { userId: { eq_expr: "auth.uid" }, targetType: { eq: MISSION } }
+    ) { id status }
   }
 }
 

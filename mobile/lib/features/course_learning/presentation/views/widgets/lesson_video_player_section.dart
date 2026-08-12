@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:easy_localization/easy_localization.dart' as esay;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:optimatech_lms/core/services/language_service.dart';
+import 'package:optimatech_lms/core/utils/constants.dart';
 import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 import 'package:optimatech_lms/features/course_learning/presentation/manager/course_learning_cubit.dart';
@@ -33,6 +35,19 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
   // Latch so "mark complete" fires once per video, not on every value tick
   // after the playhead reaches the end (which spammed PUT /lectures/:id/progress).
   bool _completedSent = false;
+
+  /// Seconds of playback the server may credit, mirroring
+  /// MAX_CREDITED_PLAYBACK_RATE in the backend's lecture-progress queue and the
+  /// web player. Each tick credits how far the timeline moved, capped at what
+  /// real elapsed time allows: 2x still completes a lecture, 8x credits only a
+  /// quarter of what it covers, and a scrubber drag credits nothing because no
+  /// real time passed. Starts at zero, which needs no resume seeding here
+  /// because this player always opens a lecture from the beginning — position
+  /// and credit therefore advance together.
+  static const double _maxCreditedPlaybackRate = 2;
+  double _creditedSeconds = 0;
+  Duration _prevPosition = Duration.zero;
+  DateTime _prevTick = DateTime.now();
 
   @override
   void initState() {
@@ -77,8 +92,36 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
         });
       }
 
+      // The manifest and the AES key are both served by our API behind
+      // FirebaseAuthGuard, so the player has to carry the ID token — without it
+      // the key request comes back 401 and playback dies on the first segment.
+      //
+      // The header is attached only when the URL is our API. That is not the
+      // whole story, and the previous comment here ("segment URLs are pre-signed
+      // GCS links; they ignore this header") was wrong: `video_player` installs
+      // this map on the platform data source, which replays it on *every*
+      // request, including the pre-signed `storage.googleapis.com` segment URLs
+      // the manifest points at. API_DOCUMENTATION.md §19.5 says segment requests
+      // must stay header-free.
+      //
+      // Scoping at creation stops the token going out when a non-API URL is
+      // ever passed here, but it cannot stop the replay — that needs a player
+      // with per-request header control (`better_player`, per §19.5) or a
+      // loopback proxy that injects the header only for the API host. Tracked
+      // separately; not changed blind, because getting it wrong breaks playback
+      // outright.
+      final uri = Uri.parse(url);
+      final isApiUrl =
+          uri.origin == Uri.parse(AppConstants.baseUrl).origin;
+      final idToken = isApiUrl
+          ? await FirebaseAuth.instance.currentUser?.getIdToken()
+          : null;
+
       final controller = VideoPlayerController.networkUrl(
-        Uri.parse(url),
+        uri,
+        httpHeaders: {
+          if (idToken != null) 'Authorization': 'Bearer $idToken',
+        },
       );
       await controller.initialize();
 
@@ -97,17 +140,42 @@ class _LessonVideoPlayerSectionState extends State<LessonVideoPlayerSection> {
             value.position >= value.duration &&
             value.duration > Duration.zero) {
           _completedSent = true;
-          context.read<CourseLearningCubit>().markCurrentLectureAsCompleted();
+          // Reaching the end reports the position and the credited watch time
+          // and lets the server decide. It used to post duration * 60 to force
+          // completion, which meant dragging to the end finished a lecture
+          // nobody had watched.
+          context.read<CourseLearningCubit>().reportLectureFinished(
+                lastWatchedSecond: value.position.inSeconds,
+                watchedSeconds: _creditedSeconds.floor(),
+              );
         }
       });
+
+      _prevPosition = controller.value.position;
+      _prevTick = DateTime.now();
 
       // Start the heartbeat timer (e.g. every 10 seconds)
       _heartbeatTimer?.cancel();
       _heartbeatTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
         if (!mounted) return;
-        if (controller.value.isPlaying) {
-          final currentSecond = controller.value.position.inSeconds;
-          context.read<CourseLearningCubit>().syncLectureHeartbeat(currentSecond);
+        final value = controller.value;
+        final now = DateTime.now();
+        final timelineDelta =
+            (value.position - _prevPosition).inMilliseconds / 1000;
+        final realDelta = now.difference(_prevTick).inMilliseconds / 1000;
+        _prevPosition = value.position;
+        _prevTick = now;
+
+        if (value.isPlaying && timelineDelta > 0) {
+          final allowed = realDelta * _maxCreditedPlaybackRate;
+          _creditedSeconds += timelineDelta < allowed ? timelineDelta : allowed;
+        }
+
+        if (value.isPlaying) {
+          context.read<CourseLearningCubit>().syncLectureHeartbeat(
+                value.position.inSeconds,
+                watchedSeconds: _creditedSeconds.floor(),
+              );
         }
       });
 

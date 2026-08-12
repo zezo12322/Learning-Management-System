@@ -7,6 +7,8 @@ class HomeCourseEntity extends Equatable {
   final double rating;
   final String image;
 
+  /// Pounds, not piastres. The API transports piastres; conversion happens once
+  /// in the data layer via `core/utils/money.dart`.
   final double price;
   final String level;
   final String categoryName;

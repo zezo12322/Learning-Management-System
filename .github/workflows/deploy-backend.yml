@@ -70,15 +70,86 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_SERVICE: ${{ vars.RAILWAY_SERVICE }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           missing=""
           [ -z "$RAILWAY_TOKEN" ] && missing="$missing RAILWAY_TOKEN(secret)"
           [ -z "$RAILWAY_SERVICE" ] && missing="$missing RAILWAY_SERVICE(variable)"
+          # Either credential works for the schema deploy below. A service
+          # account is the supported path; FIREBASE_TOKEN is the older CI token
+          # and is accepted so an existing setup keeps working.
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ] && [ -z "$FIREBASE_TOKEN" ]; then
+            missing="$missing FIREBASE_SERVICE_ACCOUNT-or-FIREBASE_TOKEN(secret)"
+          fi
           if [ -n "$missing" ]; then
             echo "::error::Missing:$missing — see docs/OPERATIONS.md §1."
             exit 1
           fi
-          echo "Railway credentials present."
+          echo "Railway and Firebase credentials present."
+
+      # THE SCHEMA GOES FIRST. The backend's queries are written against the
+      # schema in dataconnect/, so a release that adds a column has to migrate
+      # the database before the code that selects it starts serving traffic.
+      #
+      # Nothing used to deploy the schema at all: every workflow ran only
+      # `dataconnect:sdk:generate`, which is client codegen and never touches the
+      # database. A release adding a field therefore shipped a backend querying a
+      # column that did not exist, and every request through it would fail.
+      #
+      # TWO commands, in this order. `deploy` does NOT run SQL migrations — it
+      # publishes the schema and connectors, and aborts if the database does not
+      # already match, telling you to run the migrate command. Deploying alone
+      # therefore never applies a column, which is how the first attempt at this
+      # step failed: "Your database schema is incompatible with your SQL Connect
+      # schema. Run `firebase dataconnect:sql:migrate`".
+      #
+      # `--force` cannot simply be dropped to make this safe. Per the CLI, it means
+      # "execute any required database changes without prompting" — so without it
+      # the migrate prompts, and a prompt in a non-interactive runner fails. That
+      # would halt EVERY schema release, additive ones included, not just the
+      # dangerous ones.
+      #
+      # So the gate is built here instead of borrowed from a flag. `sql:diff`
+      # prints the pending SQL without executing it; the plan is scanned for
+      # statements that destroy data, and the release stops if any appear. What
+      # gets through is applied with `--force`, which is now doing only the job of
+      # answering a prompt nobody is present to answer.
+      #
+      # The scan is a text heuristic over generated DDL, not a proof. It can flag
+      # something harmless and it could miss an exotic destructive change — so it
+      # errs toward stopping, since a blocked release is recoverable and a dropped
+      # column is not. The plan is printed either way; read it.
+      #
+      # One global install rather than two `npx` invocations: npx re-downloads
+      # firebase-tools per call, which cost ~25s twice.
+      - name: Migrate and deploy Data Connect schema
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
+            export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+          fi
+          npm install -g firebase-tools@15
+
+          # diff exits non-zero when the database differs, which is the normal
+          # case on a schema release — the plan's contents decide, not the code.
+          firebase dataconnect:sql:diff --non-interactive > "$RUNNER_TEMP/plan.sql" 2>&1 || true
+          echo "--- pending migration ---"
+          cat "$RUNNER_TEMP/plan.sql"
+          echo "-------------------------"
+
+          DESTRUCTIVE='DROP[[:space:]]+(TABLE|COLUMN|CONSTRAINT|SCHEMA)|TRUNCATE|ALTER[[:space:]]+COLUMN[[:space:]]+[^[:space:]]+[[:space:]]+TYPE'
+          if grep -Eiq "$DESTRUCTIVE" "$RUNNER_TEMP/plan.sql"; then
+            echo "::error::This release would run a destructive migration. Nothing has been applied. Review the statements below, then run 'firebase dataconnect:sql:migrate' by hand if they are intended."
+            grep -Ein "$DESTRUCTIVE" "$RUNNER_TEMP/plan.sql"
+            exit 1
+          fi
+
+          firebase dataconnect:sql:migrate --force --non-interactive
+          firebase deploy --only dataconnect --non-interactive
 
       # `up --detach` uploads this checkout and returns once the build is queued;
       # the health gate below is what decides whether it worked. Railway will not

@@ -25,7 +25,6 @@ import 'package:optimatech_lms/features/course_details/presentation/manager/cour
 import 'package:optimatech_lms/features/course_details/presentation/manager/course_details_state.dart';
 import 'package:optimatech_lms/features/course_details/presentation/widgets/resources_content.dart';
 import 'package:optimatech_lms/core/widgets/app_error_widget.dart';
-import 'package:optimatech_lms/features/chatbot/presentation/widgets/global_chatbot_fab.dart';
 
 class CourseDetailsView extends StatelessWidget {
   const CourseDetailsView({super.key, required this.course});
@@ -108,12 +107,15 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
   }
 
 
-  // open videoPlayer Stage screen from current screen
+  // open the tapped lesson, not just the course
   void _onLessonTap(CourseLessonEntity lesson) {
     Navigator.pushNamed(
       context,
       CourseLearningView.routeName,
-      arguments: widget.course.id,
+      arguments: CourseLearningArgs(
+        courseId: widget.course.id,
+        lectureId: lesson.id,
+      ),
     );
   }
 
@@ -125,17 +127,20 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceDim,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 90.h),
-        child: GlobalChatbotFab(courseId: widget.course.id),
-      ),
+      // The AI tutor is lecture-scoped and this screen has no lecture open, so
+      // it lives on the lesson screen only — mounting it here sent
+      // `/ai/lectures/null/chat`.
       body: BlocBuilder<CourseDetailsCubit, CourseDetailsState>(
         builder: (context, state) {
           List<CourseLessonEntity> allLessons = [];
           bool isEnrolling = false;
+          String? courseDescription;
+          String? courseLanguage;
 
           if (state is CourseDetailsLoaded) {
-            allLessons = state.curriculum.sections.expand((s) => s.lessons).toList();
+            allLessons = state.curriculum.allLessons;
+            courseDescription = state.curriculum.description;
+            courseLanguage = state.curriculum.language;
             isEnrolling = state.isEnrolling ||
                 state.isPurchasing ||
                 state.isConfirmingPayment;
@@ -151,7 +156,9 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                   _openCheckout(checkoutUrl);
                 } else if (state.enrollmentSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Successfully enrolled!')),
+                    SnackBar(
+                      content: Text('course_details.enrolled_success'.tr()),
+                    ),
                   );
                   Navigator.pushNamed(
                     context,
@@ -160,7 +167,12 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                   );
                 } else if (state.enrollmentError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Enrollment failed: ${state.enrollmentError}')),
+                    SnackBar(
+                      content: Text(
+                        'course_details.enroll_failed'
+                            .tr(args: ['${state.enrollmentError}']),
+                      ),
+                    ),
                   );
                 } else if (state.purchaseError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -183,6 +195,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                         // instructor profile card, course stats card, and course content tabs
                         CourseHeroSection(
                           course: widget.course,
+                          description: courseDescription,
                           onPlayTap: _openVideoPlayer,
                         ),
                         Transform.translate(
@@ -214,11 +227,19 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
                                     },
                                   ),
                                   Gap(20.h),
-                                  _buildTabContent(state, allLessons),
+                                  _buildTabContent(
+                                    state,
+                                    allLessons,
+                                    description: courseDescription,
+                                    language: courseLanguage,
+                                  ),
                                   Gap(32.h),
                                   BlocProvider<HomeCoursesCubit>(
                                     create: (context) =>
-                                        getIt<HomeCoursesCubit>()..fetchHomeCourses(),
+                                        // Only the popular list is rendered
+                                        // here, so only that query runs.
+                                        getIt<HomeCoursesCubit>()
+                                          ..fetchPopularCourses(),
                                     child: BlocBuilder<HomeCoursesCubit, HomeCourseState>(
                                       builder: (context, state) {
                                         return state.maybeWhen(
@@ -266,10 +287,19 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
     );
   }
 
-  Widget _buildTabContent(CourseDetailsState state, List<CourseLessonEntity> allLessons) {
+  Widget _buildTabContent(
+    CourseDetailsState state,
+    List<CourseLessonEntity> allLessons, {
+    String? description,
+    String? language,
+  }) {
     switch (_selectedTabIndex) {
       case 0:
-        return OverviewTab(course: widget.course);
+        return OverviewTab(
+          course: widget.course,
+          description: description,
+          language: language,
+        );
       case 1:
         if (state is CourseDetailsLoading || state is CourseDetailsInitial) {
           return const Center(child: CircularProgressIndicator());
@@ -285,7 +315,7 @@ class _CourseDetailsContentState extends State<_CourseDetailsContent>
           onLessonTap: _onLessonTap,
         );
       case 2:
-        return const CourseReviewCard();
+        return CourseReviewCard(course: widget.course);
       case 3:
         return const ResourcesContent();
       default:

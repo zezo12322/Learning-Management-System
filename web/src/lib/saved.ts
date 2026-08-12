@@ -1,88 +1,61 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { readStore, useStore, writeStore } from './localStore'
 
 /**
- * Saved / bookmarked courses — a small client-side store persisted to
- * localStorage. Self-contained (no backend endpoint exists for bookmarks yet):
- * IDs are kept locally and resolved to course objects from the public catalog.
+ * Saved / bookmarked courses — kept in this browser because the backend has no
+ * bookmarks endpoint. IDs are stored locally and resolved to course objects
+ * from the public catalog.
  *
- * Uses useSyncExternalStore so every SaveButton and the Saved page stay in sync
- * (and across browser tabs via the `storage` event) without a global state lib.
+ * Storage goes through `localStore`, so the key is namespaced by Firebase uid:
+ * bookmarks used to live under one flat `optima.savedCourses` key, which meant
+ * they survived sign-out and showed up under whoever signed in next on a shared
+ * device.
  */
-const KEY = 'optima.savedCourses'
+const STORE = 'savedCourses'
+/** Pre-namespacing key, removed once so old bookmarks do not linger forever. */
+const LEGACY_KEY = 'optima.savedCourses'
 
-let cache: string[] | null = null
-const listeners = new Set<() => void>()
-
-function read(): string[] {
-  if (typeof window === 'undefined') return []
-  if (cache) return cache
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    const parsed = raw ? JSON.parse(raw) : []
-    cache = Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : []
-  } catch {
-    cache = []
-  }
-  return cache
-}
-
-function write(next: string[]): void {
-  cache = next
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(next))
-  } catch {
-    /* storage may be unavailable (private mode / quota) — keep the in-memory copy */
-  }
-  listeners.forEach((l) => l())
+function clean(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : []
 }
 
 export function getSavedCourseIds(): string[] {
-  return read()
+  return clean(readStore<string[]>(STORE, []))
 }
 
 export function isCourseSaved(id: string): boolean {
-  return read().includes(id)
+  return getSavedCourseIds().includes(id)
 }
 
 /** Add or remove a course id; returns the new saved state. */
 export function toggleSavedCourse(id: string): boolean {
-  const current = read()
+  const current = getSavedCourseIds()
   const exists = current.includes(id)
-  write(exists ? current.filter((x) => x !== id) : [id, ...current])
+  writeStore(STORE, exists ? current.filter((entry) => entry !== id) : [id, ...current])
   return !exists
 }
 
 export function clearSavedCourses(): void {
-  write([])
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener)
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === KEY) {
-      cache = null // force re-read from the other tab's write
-      listener()
-    }
-  }
-  if (typeof window !== 'undefined') window.addEventListener('storage', onStorage)
-  return () => {
-    listeners.delete(listener)
-    if (typeof window !== 'undefined') window.removeEventListener('storage', onStorage)
-  }
+  writeStore(STORE, [])
 }
 
 /** Reactive list of saved course ids. */
 export function useSavedCourseIds(): string[] {
-  return useSyncExternalStore(subscribe, getSavedCourseIds, () => [])
+  return clean(useStore<string[]>(STORE, []))
 }
 
 /** Reactive saved-state for a single course. */
 export function useIsCourseSaved(id: string): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => isCourseSaved(id),
-    () => false,
-  )
+  return useSavedCourseIds().includes(id)
+}
+
+/** Drop the pre-namespacing key. Safe to call repeatedly. */
+export function dropLegacySavedCourses(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(LEGACY_KEY)
+  } catch {
+    /* storage unavailable — nothing to clean up */
+  }
 }

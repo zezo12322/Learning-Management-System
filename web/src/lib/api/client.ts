@@ -21,6 +21,34 @@ function resolveApiBaseUrl(): string {
 }
 
 const API_BASE_URL = resolveApiBaseUrl()
+
+/**
+ * The resolved API base, for callers that build a URL instead of going through
+ * `apiClient` — the HLS player hands the manifest URL to hls.js, which does its
+ * own XHR.
+ */
+export function apiBaseUrl(): string {
+  return API_BASE_URL
+}
+
+/**
+ * True when `url` points at our own API, i.e. a request that must carry the
+ * Firebase token. Used by the player to keep the token off the pre-signed GCS
+ * segment URLs — sending it there would leak the caller's credentials to a
+ * third-party host.
+ *
+ * A relative base means same-origin, so anything relative is ours.
+ */
+export function isApiUrl(url: string): boolean {
+  try {
+    if (API_BASE_URL.startsWith('/')) {
+      return new URL(url, window.location.origin).origin === window.location.origin
+    }
+    return new URL(url).origin === new URL(API_BASE_URL).origin
+  } catch {
+    return false
+  }
+}
 const FIREBASE_AUTH_CONFIGURED = Boolean(
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
     process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&

@@ -28,11 +28,13 @@ export function courseStatusOf(status: string) {
 
 const tones: Record<StatusTone, string> = {
   neutral: 'bg-subtle text-content-secondary',
-  brand: 'bg-brand-soft text-primary',
-  info: 'bg-secondary/10 text-secondary',
-  success: 'bg-success/10 text-success',
-  warning: 'bg-warning/10 text-warning',
-  danger: 'bg-error/10 text-error',
+  brand: 'bg-brand-soft text-on-brand-soft',
+  // Was `bg-secondary/10 text-secondary`, which painted identically to the new
+  // `info` token while looking like a separate system.
+  info: 'bg-info-soft text-info',
+  success: 'bg-success-soft text-success',
+  warning: 'bg-warning-soft text-warning',
+  danger: 'bg-error-soft text-error',
 }
 
 export function StatusPill({

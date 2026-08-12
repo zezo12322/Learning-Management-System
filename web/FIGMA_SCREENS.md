@@ -34,5 +34,37 @@
 | 16 | 201:2 | Student Profile | profile card (avatar+online, name, role badge, joined), 4 stats (enrolled/hours/assessments/certificates), User Information (name/email/phone/location/DOB, Edit), Learning Statistics, Certificates, Completed Courses, Settings (account/notifications/privacy/help/logout) |
 
 ## Web build status vs design
-- Built: Login, Register, Home, Courses, Course Details, Course Learning (basic), Profile (basic).
-- To refine to match design: Course Learning tabs+prev/next+about, Profile (stats+info+settings), Splash/Onboarding, Quiz, Assignments, Certificates, Notifications, Notes/Resources/Discussion tabs.
+
+### Student area — built to the design
+| Figma | Web route | Notes |
+|---|---|---|
+| 5 · Home (`201:7`) | `/home` | Greeting, search → catalog, 4 stat tiles, Continue Learning, Popular, Recommended, Top Instructors |
+| 6 · Courses (`201:9`) | `/learning` | Search, state chips, category strip, sort, count, progress rows, pagination |
+| 7 · Course details (`201:10`) | `/courses/[id]` | Hero, instructor, stats, curriculum, reviews, sticky enroll/checkout bar |
+| 8 · Course Learning (`201:11`) | `/learn/[courseId]` | Secure HLS player, lesson header, Curriculum / Notes / Resources / Discussion tabs, About this lesson, Previous / Mark complete / Next |
+| 9 · Course notes (`201:12`) | `/learn/[courseId]` → Notes | Counters, search, add/edit/delete, star; per-account and browser-local |
+| 10 · Resources (`201:13`) | `/learn/[courseId]` → Resources | Lecture transcripts with type-coloured tiles and sanitised download links |
+| 11 · Discussion (`201:14`) | `/learn/[courseId]` → Discussion | Honest unavailable state — no discussions module exists in the backend |
+| 12 · Quiz experience (`201:15`) | `/quiz/[courseId]/[lectureId]/take` | Intro → Question → Review → Result, countdown with auto-submit, score gauge |
+| 13 · Assignments (`201:16`) | `/assignments` | All / Submitted / Graded tabs, state badges, scored points, empty state |
+| 14 · Certificates (`201:17`) | `/certificates`, `/certificates/[enrollmentId]` | List, certificate sheet, credential info, download (print) + share, empty state |
+| 15 · Notifications (`201:18`) | `/notifications` | Search, category tabs, mark-all-read, unread dots, empty state |
+| 16 · Student profile (`201:2`) | `/profile` | Header + 4 stats, User Information (inline edit), Learning Statistics, Certificates, Completed Courses, Settings |
+
+Shared pieces live in `src/components/student/` (`StatCard`, `SectionHeader`, `FilterChips`/`TabBar`,
+`EmptyState`, `ContinueLearningCard`, `AssignmentCard`, `CertificateArtwork`, `NotificationRow`,
+`InfoRow`/`SettingsRow`). Navigation is role-aware: every account gets the learner nav, and
+instructors/admins additionally get a "Teaching" group. Learning-screen pieces live in
+`src/components/learn/` (`LecturePlayer`, `NotesTab`, `ResourcesTab`, `DiscussionTab`).
+Both shells gate on the shared `lib/auth/useRouteGuard`.
+
+### Still to refine
+- Splash / Onboarding (screens 1–2) — intentionally skipped on web.
+- The Figma "Helpful links" block on Resources has no data source (no attachments endpoint) and is left out.
+
+### Design elements the backend cannot supply yet
+- **Home** "Hours learned" and "Day streak" tiles → no watch-time or streak aggregate; the web shows *Lessons completed* and *In progress* instead.
+- **Home** "Recent Lessons" → no per-lecture recency feed.
+- **Assignments** "Available" state → `GET /missions` returns missions the caller *authored*, so a student cannot list assignments open to them; only their own submissions (`GET /me/submissions`) are listable.
+- **Certificates** → no certificates endpoint; certificates are projected from COMPLETED enrollments and the enrollment id is the credential reference.
+- **Notifications** → no notifications endpoint (the Flutter app ships the same empty shell); the screen renders its designed empty state and `lib/notifications.ts` is the single seam to wire `GET /notifications`.

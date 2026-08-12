@@ -25,7 +25,7 @@ export default function SavedPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-title-md font-bold text-content">{t('saved.title')}</h1>
-        {savedIds.length > 0 && (
+        {savedIds.length > 0 && !catalog.isError && (
           <button
             type="button"
             onClick={clearSavedCourses}
@@ -36,7 +36,13 @@ export default function SavedPage() {
         )}
       </div>
 
-      {savedIds.length === 0 ? (
+      {catalog.isError ? (
+        // Distinct from "your saved courses are gone": the catalog request
+        // failed, so we simply do not know what is still available.
+        <div className="rounded-card border border-error bg-error-soft p-6 text-center text-sm text-error">
+          {t('catalog.reachError')}
+        </div>
+      ) : savedIds.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center text-content-secondary">
           <Bookmark size={40} />
           <p>{t('saved.empty')}</p>

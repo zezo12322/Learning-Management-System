@@ -16,10 +16,18 @@ abstract class CourseLearningRepository {
   //   required String lectureId,
   // });
 
+  /// Records a lecture position.
+  ///
+  /// [heartbeat] picks the transport: `true` uses the queued POST, which
+  /// answers 202 and collapses a burst of positions for the same lecture into a
+  /// single write; `false` uses the synchronous PUT, which the caller needs
+  /// when it wants the derived completion back. A player reporting every ten
+  /// seconds should always be a heartbeat.
   Future<Either<Failure, void>> updateLectureProgress({
     required String lectureId,
     required int lastWatchedSecond,
-    bool completed = false,
+    int? watchedSeconds,
+    bool heartbeat = false,
   });
   // Future<Either<Failure, bool>> getCourseAccess({
   //   required String courseId,

@@ -1,0 +1,78 @@
+name: Sync release mirror
+
+# Keeps zezo12322/Learning-Management-System-release's `main` in step with this
+# repository's `development`.
+#
+# WHY THIS FILE LIVES HERE, in the source repo, when it only ever runs in the
+# mirror: the mirror's `main` is a copy of `development`, so anything committed
+# to the mirror alone is overwritten by the next sync. Shipping the workflow as
+# part of the synced content is the only way it survives — and GitHub only runs
+# scheduled workflows from a repository's default branch, which for the mirror
+# is that same `main`. The `if` below is what stops it from acting when the file
+# is sitting in the source repo.
+
+on:
+  schedule:
+    # Hourly. The mirror is a release copy, not a live branch, so a lag of up to
+    # an hour is fine; run the workflow by hand when you need it sooner.
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  # Never two mirror pushes at once.
+  group: sync-release-mirror
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: development → main
+    # Only the mirror acts on this. In the source repo the job is skipped.
+    if: github.repository == 'zezo12322/Learning-Management-System-release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Mirror the source development branch onto main
+        env:
+          # Fine-grained PAT with Contents: Read on the source repository and
+          # Contents: Write on this one. Both repos are private, so the default
+          # GITHUB_TOKEN cannot read the source.
+          SOURCE_TOKEN: ${{ secrets.SOURCE_REPO_TOKEN }}
+          SOURCE_REPO: zezo12322/Learning-Management-System
+          SOURCE_BRANCH: development
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SOURCE_TOKEN}" ]; then
+            echo "::error::SOURCE_REPO_TOKEN is not set. Add a fine-grained PAT with Contents:Read on ${SOURCE_REPO} and Contents:Write on ${GITHUB_REPOSITORY} under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          # A bare clone carries the full history of the branch, which is what
+          # makes the mirror a real copy rather than a snapshot.
+          git clone --bare --single-branch --branch "${SOURCE_BRANCH}" \
+            "https://x-access-token:${SOURCE_TOKEN}@github.com/${SOURCE_REPO}.git" source.git
+          cd source.git
+
+          source_sha=$(git rev-parse "refs/heads/${SOURCE_BRANCH}")
+          echo "Source ${SOURCE_REPO}@${SOURCE_BRANCH} is at ${source_sha}"
+
+          # Pushed with the PAT rather than GITHUB_TOKEN so the mirror's own CI
+          # runs on the synced commit — a GITHUB_TOKEN push deliberately does not
+          # trigger workflows. This cannot loop: the sync job runs only on a
+          # schedule or by hand, never on push.
+          git push --force \
+            "https://x-access-token:${SOURCE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "refs/heads/${SOURCE_BRANCH}:refs/heads/main"
+
+          {
+            echo "### Release mirror synced"
+            echo
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Source | \`${SOURCE_REPO}@${SOURCE_BRANCH}\` |"
+            echo "| Commit | \`${source_sha}\` |"
+            echo "| Target | \`${GITHUB_REPOSITORY}@main\` |"
+          } >> "$GITHUB_STEP_SUMMARY"

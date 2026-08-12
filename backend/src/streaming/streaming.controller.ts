@@ -19,6 +19,29 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { API_GLOBAL_PREFIX } from '../common/constants/api-prefix';
+
+/**
+ * Absolute base this request actually arrived on — scheme, host *and* the global
+ * route prefix. The prefix matters: without it the key URL embedded in the
+ * manifest points at /lectures/... instead of /api/v1/lectures/..., the player
+ * gets a 404 fetching the AES key, and playback stops on the first segment.
+ *
+ * Proxy headers are honoured (Railway and any load balancer set them). This is
+ * only ever used to build URLs back to this same API, so a spoofed Host cannot
+ * redirect a caller anywhere it could not already reach itself.
+ */
+function originOf(req: any): string | undefined {
+  const host = req?.headers?.['x-forwarded-host'] ?? req?.headers?.host;
+  if (!host) return undefined;
+  const proto =
+    (req?.headers?.['x-forwarded-proto'] as string | undefined)
+      ?.split(',')[0]
+      ?.trim() ??
+    req?.protocol ??
+    'https';
+  return `${proto}://${host}/${API_GLOBAL_PREFIX}`;
+}
 
 @Controller()
 @UseGuards(FirebaseAuthGuard)
@@ -50,6 +73,7 @@ export class StreamingController {
       variant,
       ip,
       userAgent: req?.headers?.['user-agent'],
+      origin: originOf(req),
     });
   }
 

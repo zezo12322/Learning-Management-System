@@ -24,12 +24,29 @@ export function formatDuration(minutes: number | null | undefined): string {
   return `${m}m`
 }
 
-/** Format a price with optional currency. */
-export function formatPrice(value: number | null | undefined, currency = 'USD'): string {
+/** Format an ISO date as a locale-aware long date ("May 30, 2025"). */
+export function formatDate(value: string | null | undefined, locale = 'en'): string {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
+}
+
+/**
+ * Format a price. Defaults to EGP because that is the currency the payment
+ * service actually charges in (payments.service.ts builds every Paymob
+ * intention with `currency: 'EGP'`) — showing a dollar sign over an EGP charge
+ * misstates the price by roughly fiftyfold.
+ */
+export function formatPrice(
+  value: number | null | undefined,
+  currency = 'EGP',
+  locale = 'en-US',
+): string {
   if (value == null) return ''
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value)
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value)
   } catch {
-    return `$${value}`
+    return `${value} ${currency}`
   }
 }

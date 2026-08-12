@@ -7,7 +7,7 @@ import { DataConnectService } from '../firebase/dataconnect.service';
 import { UpdateProgressDto } from './dto/progress.dto';
 import { CompletionService } from '../completion/completion.service';
 import { EnrollmentService } from '../enrollment/enrollment.service';
-import { COMPLETION_THRESHOLD } from './lecture-progress.queue';
+import { isLectureComplete } from './lecture-progress.queue';
 
 @Injectable()
 export class ProgressService {
@@ -60,10 +60,23 @@ export class ProgressService {
 
     const duration = lecture?.duration ?? 0;
 
+    // Same monotonic banking as the async worker: never let a client that
+    // starts counting from zero erase watch time recorded on another device.
+    const existing = await this.getLectureProgress(lectureId, authToken);
+    const storedWatched =
+      (existing as { watchedSeconds?: number | null })?.watchedSeconds ?? null;
+    const bankedSeconds =
+      dto.watchedSeconds == null
+        ? storedWatched
+        : Math.max(dto.watchedSeconds, storedWatched ?? 0);
+
     // Only a positive duration can complete; lectures with unknown/zero duration
     // never auto-complete here.
-    const completed =
-      duration > 0 && dto.lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
+    const completed = isLectureComplete(
+      duration,
+      dto.lastWatchedSecond,
+      bankedSeconds ?? undefined,
+    );
     const completedAt = completed ? new Date().toISOString() : null;
 
     // Clamp the stored position to the lecture length so a bad client can't
@@ -81,6 +94,7 @@ export class ProgressService {
       {
         lectureId,
         lastWatchedSecond: storedSecond,
+        watchedSeconds: bankedSeconds,
         completedAt,
         userId: uid,
       },
@@ -104,9 +118,13 @@ export class ProgressService {
       { lectureId },
       authToken,
     );
+    // watchedSeconds is part of the response so the player can seed its
+    // accumulator from time already banked instead of from the position, which
+    // is what let a scrubbed-to-the-end lecture complete itself on reload.
     return (
       data?.lectureProgresses?.[0] ?? {
         lastWatchedSecond: 0,
+        watchedSeconds: null,
         completedAt: null,
       }
     );
@@ -138,6 +156,14 @@ export class ProgressService {
         sectionTitle: section.title,
         totalLectures: sectionTotal,
         completedLectures: sectionCompleted,
+        // Per-lecture completion, so a curriculum list can mark finished
+        // lessons. The query already selects this per lecture; the counts above
+        // used to be all that survived, which meant the only way to know whether
+        // one lesson was done was to open it.
+        lectures: lectures.map((l: any) => ({
+          lectureId: l.id,
+          completedAt: l.userProgress?.[0]?.completedAt ?? null,
+        })),
         percentage:
           sectionTotal > 0
             ? Math.round((sectionCompleted / sectionTotal) * 100)

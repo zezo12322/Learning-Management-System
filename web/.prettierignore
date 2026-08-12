@@ -1,0 +1,7 @@
+# Build output and vendored code — never ours to format.
+.next
+.open-next
+node_modules
+src/dataconnect-generated
+public
+package-lock.json

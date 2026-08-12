@@ -7,7 +7,7 @@ import { EnrollmentService } from '../enrollment/enrollment.service';
 import {
   LECTURE_PROGRESS_QUEUE,
   RecordProgressJob,
-  COMPLETION_THRESHOLD,
+  isLectureComplete,
 } from './lecture-progress.queue';
 
 /**
@@ -36,16 +36,20 @@ export class ProgressProcessor extends WorkerHost {
   }
 
   async process(job: Job<RecordProgressJob>): Promise<void> {
-    const { userId, lectureId, lastWatchedSecond } = job.data;
+    const { userId, lectureId, lastWatchedSecond, watchedSeconds } = job.data;
 
     // 1. Load the authoritative duration (+ owning course) as admin.
+    // The same round trip also returns what this user has already banked, so
+    // watch time can accumulate across sittings without a second query on what
+    // is the hottest path in the app.
     const lectureData = await this.dc.executeQueryAsAdmin<{
       courseLecture: {
         duration: number | null;
         isFreePreview?: boolean;
         section?: { course?: { id?: string } };
       } | null;
-    }>('GetLectureDuration', { lectureId });
+      lectureProgresses?: { watchedSeconds: number | null }[];
+    }>('GetLectureDuration', { lectureId, userId });
 
     const lecture = lectureData?.courseLecture;
     if (!lecture) {
@@ -75,10 +79,23 @@ export class ProgressProcessor extends WorkerHost {
     }
 
     // 3. Derive completion server-side. Only a positive duration can complete;
-    //    lectures with unknown/zero duration never auto-complete here.
+    //    lectures with unknown/zero duration never auto-complete here. Position
+    //    alone is not enough — see isLectureComplete for why watch time matters.
     const duration = lecture.duration ?? 0;
-    const reachedThreshold =
-      duration > 0 && lastWatchedSecond >= duration * COMPLETION_THRESHOLD;
+
+    // Watch time only ever goes up. The client reports its running total for the
+    // session, seeded from what it read back at load; taking the max means a
+    // device that starts from zero — the mobile player always does — cannot
+    // erase time banked elsewhere.
+    const stored = lectureData?.lectureProgresses?.[0]?.watchedSeconds ?? null;
+    const bankedSeconds =
+      watchedSeconds == null ? stored : Math.max(watchedSeconds, stored ?? 0);
+
+    const reachedThreshold = isLectureComplete(
+      duration,
+      lastWatchedSecond,
+      bankedSeconds ?? undefined,
+    );
     const completedAt = reachedThreshold ? new Date().toISOString() : null;
 
     // 4. Upsert on the composite key (user, lecture). Clamp the stored position
@@ -90,6 +107,7 @@ export class ProgressProcessor extends WorkerHost {
       userId,
       lectureId,
       lastWatchedSecond: storedSecond,
+      watchedSeconds: bankedSeconds,
       completedAt,
     });
 

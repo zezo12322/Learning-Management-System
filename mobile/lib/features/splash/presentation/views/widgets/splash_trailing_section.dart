@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -88,7 +89,7 @@ class _SplashTrailingSectionState extends State<SplashTrailingSection>
           ),
           Gap(12.h),
           Text(
-            'Loading...',
+            'common.loading'.tr(),
             style: TextStyles.labelSmall.copyWith(
               color: context.theme.colorScheme.primary,
             ),
