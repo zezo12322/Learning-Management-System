@@ -25,10 +25,10 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth'
 import { getFirebaseAuth, googleProvider } from '@/lib/firebase'
-import { meApi } from '@/lib/api/services'
+import { meApi, tosApi } from '@/lib/api/services'
 import { setStoreUid } from '@/lib/localStore'
 import { callCloudFunction } from '@/lib/auth/cloudFunctions'
-import type { Me, Role } from '@/lib/types'
+import type { Me, Role, TosStatus } from '@/lib/types'
 
 interface AuthContextValue {
   firebaseUser: FirebaseUser | null
@@ -54,6 +54,13 @@ interface AuthContextValue {
   }) => Promise<void>
   logout: () => Promise<void>
   refreshMe: () => Promise<void>
+  /**
+   * Acceptance state for the current terms, or null when it could not be read.
+   * Null means "do not gate" — see the fail-open note where it is fetched.
+   */
+  tosStatus: TosStatus | null
+  /** Record acceptance of the current terms, then re-read the status. */
+  acceptTos: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -84,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [claimRoles, setClaimRoles] = useState<Role[] | null>(null)
   const [rolesResolved, setRolesResolved] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [tosStatus, setTosStatus] = useState<TosStatus | null>(null)
   const lastUid = useRef<string | null>(null)
 
   useEffect(() => {
@@ -130,9 +138,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
           setMe(null)
         }
+        // Read acceptance separately from the profile: a terms lookup that fails
+        // must not null out `me` and blank the whole app, and an unreadable
+        // status must not raise a gate the user cannot get past. Either way this
+        // fails open — the server is what enforces acceptance.
+        try {
+          setTosStatus(await tosApi.status())
+        } catch {
+          setTosStatus(null)
+        }
       } else {
         setMe(null)
         setClaimRoles(null)
+        setTosStatus(null)
       }
       setRolesResolved(true)
       setLoading(false)
@@ -229,6 +247,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   /**
+   * Errors propagate on purpose here, unlike the background read above: the user
+   * pressed a button, so a failure has to surface in the gate instead of
+   * silently leaving them on it.
+   */
+  const acceptTos = useCallback(async () => {
+    await tosApi.accept()
+    setTosStatus(await tosApi.status())
+  }, [])
+
+  /**
    * The ID token is what the API authorizes against, so when it carries a
    * `roles` claim that claim is the truth — including when it is empty, which
    * is how a revoked instructor looks. The database row is only consulted when
@@ -255,8 +283,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       refreshMe,
+      tosStatus,
+      acceptTos,
     }),
-    [firebaseUser, me, roles, rolesResolved, loading, logout]
+    [firebaseUser, me, roles, rolesResolved, loading, logout, tosStatus, acceptTos]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

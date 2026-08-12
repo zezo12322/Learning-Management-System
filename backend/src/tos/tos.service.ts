@@ -76,12 +76,29 @@ export class ToSService {
       throw new NotFoundException('No Terms of Service available');
     }
 
+    // `AcceptCurrentToS` is a `user_update`, so with no row to update it affects
+    // nothing and still reports success — the caller would be told they had
+    // accepted while `acceptedTosId` stayed null, and would be asked again on
+    // every load. Fail loudly instead: the row is created by POST /me/sync.
+    const userData = await this.dc.executeQuery('GetUserToSStatus', { uid });
+    if (!userData?.user) {
+      throw new NotFoundException(
+        'No user record to record acceptance on. Call POST /me/sync first.',
+      );
+    }
+
     // Update user with current ToS ID and timestamp
-    return this.dc.executeMutation(
+    await this.dc.executeMutation(
       'AcceptCurrentToS',
       { tosId: currentTos.id },
       token,
     );
+
+    return {
+      accepted: true,
+      tosId: currentTos.id,
+      version: currentTos.version,
+    };
   }
 
   /**
@@ -95,8 +112,18 @@ export class ToSService {
 
     // Get current ToS
     const currentTos = await this.getCurrent();
+
+    // No published terms is a normal state, not an error — it is exactly the
+    // state right after the migration adds the table, since `isCurrent`
+    // defaults to false and nothing seeds a row. Throwing here made every
+    // ToS-gated request fail for everyone until an admin published something.
+    // Nobody can be required to accept terms that do not exist.
     if (!currentTos) {
-      throw new NotFoundException('No Terms of Service available');
+      return {
+        needsAcceptance: false,
+        acceptedAt: user?.tosAcceptedAt,
+        current: null,
+      };
     }
 
     // Compare - if user's acceptedToSId doesn't match current ToS ID, they need to accept

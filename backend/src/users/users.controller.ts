@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Patch, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { SyncUserDto, UpdateProfileDto } from './dto/user.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
-import { TosGuard } from '../tos/tos.guard';
 
 /**
  * Self-service identity endpoints for the authenticated user. No role required
@@ -17,8 +16,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // Strict rate limit: 5 sync requests per 60 seconds (brute-force protection).
+  //
+  // Not ToS-gated: this endpoint provisions the `users` row that acceptance is
+  // recorded on, so requiring acceptance first is unsatisfiable for a new
+  // account. See the comment on UsersService.sync.
   @Post('sync')
-  @UseGuards(TosGuard)
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   async sync(@Body() dto: SyncUserDto, @AuthToken() token: string) {
     return this.usersService.sync(dto, token);

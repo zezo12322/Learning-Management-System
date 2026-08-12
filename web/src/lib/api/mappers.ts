@@ -12,6 +12,7 @@ import type {
   LectureType,
   Me,
   Role,
+  TosStatus,
 } from '@/lib/types'
 
 type JsonObject = Record<string, unknown>
@@ -247,5 +248,33 @@ export function mapCourseOverview(value: unknown): CourseOverview {
         5: numberValue(distribution['5']),
       },
     },
+  }
+}
+
+/**
+ * ToS acceptance status from GET /me/tos/status.
+ *
+ * Fails safe: anything unparseable becomes "nothing to accept" rather than a
+ * gate the user cannot get past. A broken status response must not be able to
+ * lock people out of the app — the server-side record is what governs
+ * enforcement, and the worst case here is that acceptance is asked for later.
+ */
+export function mapTosStatus(value: unknown): TosStatus {
+  const raw = objectValue(value)
+  const current = objectValue(raw.current)
+  const id = stringValue(current.id)
+  const contentHtml = stringValue(current.contentHtml)
+  const parsed = id
+    ? {
+        id,
+        version: stringValue(current.version),
+        title: stringValue(current.title),
+        contentHtml,
+      }
+    : null
+  return {
+    needsAcceptance: raw.needsAcceptance === true && parsed !== null,
+    acceptedAt: typeof raw.acceptedAt === 'string' ? raw.acceptedAt : null,
+    current: parsed,
   }
 }

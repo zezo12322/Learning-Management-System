@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, NotFoundException,} from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ToSService } from './tos.service';
 
 /**
@@ -13,6 +19,19 @@ import { ToSService } from './tos.service';
  *   // Only accessible if user has accepted current ToS
  * }
  * ```
+ *
+ * Two rules before applying this to an endpoint:
+ *
+ * 1. Never to a provisioning endpoint. Acceptance is stored on the `users` row,
+ *    so anything that creates that row must run first — see UsersService.sync.
+ * 2. Only to endpoints whose clients can actually present the terms. The web has
+ *    an acceptance gate; the Flutter app does not call the acceptance endpoint at
+ *    all, so gating a shared endpoint (enrollment, submissions, progress) would
+ *    lock every mobile user out of it the moment an admin publishes a version,
+ *    with no in-app way to recover.
+ *
+ * That is why nothing gates on this guard today: the web gate is the enforcement
+ * point until the mobile acceptance flow exists.
  */
 @Injectable()
 export class TosGuard implements CanActivate {
@@ -29,7 +48,9 @@ export class TosGuard implements CanActivate {
       throw new NotFoundException('User not authenticated');
     }
 
-    // Admins and superadmins are exempt from ToS acceptance checks
+    // Admins are exempt from ToS acceptance checks. Note this also means an
+    // admin cannot see a ToS lockout that affects everyone else, so verify
+    // acceptance changes with a non-admin account.
     const roles = request.user?.roles || [];
     if (roles.includes('admin')) {
       return true;
