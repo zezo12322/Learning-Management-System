@@ -1235,8 +1235,48 @@ Retry AI ingestion for a failed video processing job. **Instructor/Admin, owner.
 **Response `201`:** `{ "success": true, "aiJobId": "..." }`
 
 ### `POST /ai/lectures/:lectureId/generate`
-Proxy an authoring prompt to the AI Service for lecture generation. **Instructor/Admin, owner.**
-**Response `201`:** (Determined by AI service response schema)
+Generate structured teaching material from the lecture transcript. **Instructor/Admin, owner.** Rate limited to **10 requests/minute** — each call runs a full-transcript LLM pass.
+
+**Body:**
+| Field | Type | Description | Default |
+|---|---|---|---|
+| `kind` | `SUMMARY \| OUTCOMES \| QUIZ \| LESSON_PLAN` | What to generate. | **required** |
+| `count` | `int` 1–20 | Number of items (quiz questions, outcomes, plan steps). Ignored for `SUMMARY`. | `3` |
+| `language` | `string` | Output language — `"auto"` follows the video's detected spoken language. Accepts tags (`en`, `pt-BR`) or names (`English`); letters and hyphens only. | `"auto"` |
+
+The tenant/user/course/video ids and the `request_id` are resolved server-side from the lecture and the caller — they are not accepted from the client.
+
+**Response `201`:** exactly one content field is populated, chosen by `kind`; the rest are `null`. Field names are the AI service's (snake_case), like the chat payload.
+```json
+{
+  "kind": "QUIZ",
+  "summary": null,
+  "items": null,
+  "questions": [
+    {
+      "question": "What is the first law of thermodynamics?",
+      "options": [
+        { "text": "Energy cannot be created or destroyed", "is_correct": true },
+        { "text": "Entropy always increases", "is_correct": false }
+      ],
+      "explanation": "The first law is the conservation of energy.",
+      "source": { "chunk_id": "8a391696-…", "start_ms": 12000, "end_ms": 45000 }
+    }
+  ]
+}
+```
+`summary` is a string (`SUMMARY`); `items` is a string array (`OUTCOMES`, `LESSON_PLAN`). Every quiz question carries a `source` pointing at the transcript chunk it came from — the AI service resolves the model's `chunk_id` to real timestamps, so `start_ms`/`end_ms` are never hallucinated.
+
+**Errors** — all use `{ "error": { "code", "message", "request_id" } }`:
+| Status | `code` | Meaning |
+|---|---|---|
+| `400` | — | Validation failure (bad `kind`, `count` out of 1–20, malformed `language`). Standard Nest validation body. |
+| `422` | `VIDEO_NOT_READY` | The video has not finished AI indexing. Poll `…/status`, or `…/retry` if it failed. |
+| `422` | `EMPTY_TRANSCRIPT` | Indexed, but no transcript chunks exist to generate from. |
+| `4xx` | `AI_REJECTED` | The AI service rejected the request but sent no recognizable error code. The status is preserved; `message` carries its explanation when it gave one. |
+| `502` | `AI_UNAVAILABLE` | AI service unreachable or failing. Upstream detail is logged, never returned. |
+| `502` | `AI_EMPTY_RESULT` | AI service answered `200` with no content for the requested `kind`. |
+| `504` | `AI_TIMEOUT` | Generation exceeded `AI_GENERATE_TIMEOUT_MS` (default 180s). Safe to retry. |
 
 ---
 
@@ -1505,10 +1545,10 @@ Every route in the backend, prefixed with `/api/v1`. Use it as a build checklist
 | 91 | POST | `/courses/:courseId/lectures/:lectureId/stream/register` | I/A Own | 19.6 | [streaming.controller.ts:113](./src/streaming/streaming.controller.ts#L113) |
 | 92 | POST | `/courses/:courseId/lectures/:lectureId/video/transcode` | I/A Own | 20 | [transcoding.controller.ts:29](./src/transcoding/transcoding.controller.ts#L29) |
 | 93 | GET | `/courses/:courseId/lectures/:lectureId/video/transcode/status` | I/A Own | 20 | [transcoding.controller.ts:43](./src/transcoding/transcoding.controller.ts#L43) |
-| 94 | GET | `/ai/lectures/:lectureId/status` | U | 21 | [ai.controller.ts:24](./src/ai/ai.controller.ts#L24) |
-| 95 | POST | `/ai/lectures/:lectureId/chat` | U | 21 | [ai.controller.ts:29](./src/ai/ai.controller.ts#L29) |
-| 96 | POST | `/ai/lectures/:lectureId/retry` | I/A Own | 21 | [ai.controller.ts:40](./src/ai/ai.controller.ts#L40) |
-| 97 | POST | `/ai/lectures/:lectureId/generate` | I/A Own | 21 | [ai.controller.ts:49](./src/ai/ai.controller.ts#L49) |
+| 94 | GET | `/ai/lectures/:lectureId/status` | U | 21 | [ai.controller.ts:27](./src/ai/ai.controller.ts#L27) |
+| 95 | POST | `/ai/lectures/:lectureId/chat` | U | 21 | [ai.controller.ts:32](./src/ai/ai.controller.ts#L32) |
+| 96 | POST | `/ai/lectures/:lectureId/retry` | I/A Own | 21 | [ai.controller.ts:44](./src/ai/ai.controller.ts#L44) |
+| 97 | POST | `/ai/lectures/:lectureId/generate` | I/A Own | 21 | [ai.controller.ts:60](./src/ai/ai.controller.ts#L60) |
 | 97 | POST | `/payments/checkout` | U | 24 | [payments.controller.ts:28](./src/payments/payments.controller.ts#L28) |
 | 98 | POST | `/payments/webhook` | P | 24 | [payments.controller.ts:78](./src/payments/payments.controller.ts#L78) |
 | 99 | GET | `/payments/callback` | P | 24 | [payments.controller.ts:166](./src/payments/payments.controller.ts#L166) |

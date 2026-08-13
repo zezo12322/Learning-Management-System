@@ -15,6 +15,9 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { ResourceOwnershipGuard } from '../common/guards/resource-ownership.guard';
 import { OwnsResource } from '../common/decorators/owns-resource.decorator';
 import { AuthToken } from '../common/decorators/auth-token.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { GenerateContentDto } from './dto/generate.dto';
+import type { GenerateResponse } from './dto/generate.dto';
 
 @Controller('ai')
 @UseGuards(FirebaseAuthGuard)
@@ -46,15 +49,24 @@ export class AiController {
     return this.aiService.retryIngest(lectureId);
   }
 
+  /**
+   * Structured generation from the lecture transcript — summary, learning
+   * outcomes, quiz questions, or a lesson plan (KAN-181).
+   *
+   * Rate-limited well below the app-wide 100/min: one call runs a full-transcript
+   * LLM pass, so this is the most expensive route in the API and the limit is
+   * about upstream cost, not abuse alone.
+   */
   @Post('lectures/:lectureId/generate')
   @UseGuards(RolesGuard, ResourceOwnershipGuard)
   @Roles('admin', 'instructor')
   @OwnsResource('lecture')
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   generate(
     @Param('lectureId') lectureId: string,
     @CurrentUser('uid') uid: string,
-    @Body() payload: any,
-  ) {
-    return this.aiService.generate(lectureId, uid, payload);
+    @Body() dto: GenerateContentDto,
+  ): Promise<GenerateResponse> {
+    return this.aiService.generate(lectureId, uid, dto);
   }
 }
