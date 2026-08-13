@@ -47,4 +47,16 @@ class CoursesRepositoryImpl implements CoursesRepository {
       return left(ServerFailure('auth.error.genericError'.tr()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<CourseEntity>>> searchCourses(String query) async {
+    try {
+      final courses = await _remoteDatasource.searchCourses(query);
+      return right(courses.map((c) => c.toEntity()).toList());
+    } on CustomExceptions catch (e) {
+      return left(ServerFailure(e.message));
+    } catch (e) {
+      return left(ServerFailure('auth.error.genericError'.tr()));
+    }
+  }
 }

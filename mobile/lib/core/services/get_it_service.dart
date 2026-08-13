@@ -59,6 +59,8 @@ import 'package:optimatech_lms/features/quiz/domain/repositories/quiz_repository
 import 'package:optimatech_lms/features/quiz/presentation/manager/quiz_cubit.dart';
 import 'package:optimatech_lms/features/notifications/presentation/manager/notifications_cubit.dart';
 
+import '../../features/courses/presentation/manager/search_cubit/search_cubit.dart';
+
 final getIt = GetIt.instance;
 Future<void> setupDependencies() async {
   // ========================= Auth Feature =========================
@@ -129,7 +131,7 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<CoursesRemoteDatasource>(
-    () => CoursesRemoteDatasourceImpl(DefaultConnector.instance),
+    () => CoursesRemoteDatasourceImpl(DefaultConnector.instance, apiService: getIt<ApiService>(),),
   );
   getIt.registerLazySingleton<CoursesRepository>(
     () => CoursesRepositoryImpl(getIt<CoursesRemoteDatasource>()),
@@ -138,6 +140,9 @@ Future<void> setupDependencies() async {
     () => CoursesCubit(repository: getIt<CoursesRepository>()),
   );
 
+  getIt.registerFactory<SearchCubit>(
+    () => SearchCubit(repository: getIt<CoursesRepository>()),
+  );
   getIt.registerLazySingleton<CategoriesRemoteDatasource>(
     () => CategoriesRemoteDatasourceImpl(DefaultConnector.instance),
   );

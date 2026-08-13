@@ -408,5 +408,9 @@
     "thinking": "Thinking...",
     "offline_error": "No internet connection. AI requires an active connection.",
     "welcome_user": "Welcome {}! 👋 How can I help you today?"
+  },
+  "search": {
+    "prompt": "Search for courses, lessons, quizzes...",
+    "no_results": "No courses matched your search"
   }
 }

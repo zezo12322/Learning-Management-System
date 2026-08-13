@@ -12,4 +12,6 @@ abstract class CoursesRepository {
   
   /// Returns recommended courses based on user's interests.
   Future<Either<Failure, List<CourseEntity>>> getRecommended({int limit = 10});
+
+  Future<Either<Failure, List<CourseEntity>>> searchCourses(String query);
 }

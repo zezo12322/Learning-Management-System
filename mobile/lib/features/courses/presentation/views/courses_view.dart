@@ -8,13 +8,13 @@ import 'package:optimatech_lms/core/utils/extension.dart';
 import 'package:optimatech_lms/core/widgets/app_search_filed.dart';
 import 'package:optimatech_lms/core/widgets/custom_app_bar.dart';
 import 'package:optimatech_lms/core/widgets/notification_button.dart';
+import 'package:optimatech_lms/features/courses/presentation/views/search_view.dart';
 import 'package:optimatech_lms/features/notifications/presentation/views/notifications_view.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/categories_cubit/categories_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_cubit.dart';
 import 'package:optimatech_lms/features/courses/presentation/manager/courses_cubit/courses_state.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/courses_category_Section.dart';
 import 'package:optimatech_lms/features/courses/presentation/views/widgets/courses_list.dart';
-import 'package:optimatech_lms/features/courses/presentation/views/widgets/show_courses_filter_bottom_sheet.dart';
 
 class CoursesView extends StatelessWidget {
   const CoursesView({super.key});
@@ -65,15 +65,15 @@ class CourseBody extends StatelessWidget {
             padding: EdgeInsets.symmetric(
               horizontal: 16.w,
             ),
-            child: AppSearchField(
-              searchController: null,
-              onSearch: () {},
-              onFilter: () async {
-                final result = await showCoursesFilterBottomSheet(context);
-                if (result != null && context.mounted) {
-                  //context.read<CoursesCubit>().applyFilter(result);
-                }
-              },
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(context, SearchView.routeName),
+              child: AbsorbPointer(
+                child: AppSearchField(
+                  searchController: null,
+                  onSearch: () {},
+                  onFilter: () {},
+                ),
+              ),
             ),
           ),
           Gap(16.h),

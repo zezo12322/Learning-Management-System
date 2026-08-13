@@ -5,4 +5,5 @@ abstract class CoursesRemoteDatasource {
   Future<List<CourseModel>> getPublishedCourses();
   Future<List<EnrolledCourseModel>> getContinueLearning();
   Future<List<CourseModel>> getRecommended({int limit = 10});
+  Future<List<CourseModel>> searchCourses(String query);
 }
