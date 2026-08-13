@@ -53,6 +53,30 @@ class CourseModel {
     );
   }
 
+  /// Parses the raw `GET /courses/search` REST response. Unlike [fromJson]
+  /// (which round-trips [toJson]'s already-converted pounds), `price` here is
+  /// still in piastres. `avgRating`/`ratingCount` aren't returned by this
+  /// endpoint, so they default to 0; `enrollmentCount` falls back to the
+  /// length of `activeEnrollments` when present.
+  factory CourseModel.fromApiJson(Map<String, dynamic> json) {
+    final activeEnrollments = json['activeEnrollments'] as List?;
+    return CourseModel(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      price: egpFromPiastres(json['price'] as num? ?? 0),
+      level: json['level'] as String,
+      thumbnail: json['thumbnail'] as String?,
+      tags: List<String>.from(json['tags'] ?? const []),
+      category: Category.fromJson(json['category'] as Map<String, dynamic>),
+      author: Author.fromJson(json['author'] as Map<String, dynamic>),
+      avgRating: (json['avgRating'] as num?)?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
+      enrollmentCount: json['enrollmentCount'] as int? ??
+          activeEnrollments?.length ??
+          0,
+    );
+  }
+
   /// Round-trips [toJson], which writes the already-converted pound value — so
   /// `price` is read verbatim here. Converting again would divide twice.
   factory CourseModel.fromJson(Map<String, dynamic> json) {

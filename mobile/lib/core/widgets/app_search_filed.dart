@@ -10,12 +10,17 @@ class AppSearchField extends StatelessWidget {
     required this.searchController,
     required this.onSearch,
     required this.onFilter,
-
+    this.onChanged,
+    this.focusNode,
+    this.autofocus = false,
   });
 
   final TextEditingController? searchController;
   final VoidCallback onSearch;
   final VoidCallback onFilter;
+  final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +34,9 @@ class AppSearchField extends StatelessWidget {
           color: context.theme.colorScheme.onSurface,
         ),
         controller: searchController,
+        focusNode: focusNode,
+        autofocus: autofocus,
+        onChanged: onChanged,
         decoration: InputDecoration(
           hintText: 'courses.searchHint'.tr(),
           hintStyle: context.textTheme.bodyMedium?.copyWith(

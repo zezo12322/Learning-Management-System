@@ -14,6 +14,8 @@ import 'package:optimatech_lms/features/profile/presentation/views/profile_view.
 import 'package:optimatech_lms/features/splash/presentation/views/splash_view.dart';
 import 'package:optimatech_lms/features/courses/domain/entities/courses_entity.dart';
 
+import '../../features/courses/presentation/views/search_view.dart';
+
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case SplashView.routeName:
@@ -36,6 +38,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const HomeView());
     case CoursesView.routeName:
       return MaterialPageRoute(builder: (_) => const CoursesView());
+    case SearchView.routeName:
+      return MaterialPageRoute(builder: (_) => const SearchView());
     case CourseLearningView.routeName:
       final args = settings.arguments;
       if (args is CourseLearningArgs) {

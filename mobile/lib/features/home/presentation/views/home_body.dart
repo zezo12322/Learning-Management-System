@@ -16,7 +16,7 @@ import 'package:optimatech_lms/features/home/presentation/widgets/build_continue
 import 'package:optimatech_lms/features/home/presentation/widgets/build_popular_courses_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/build_recommended_courses_section.dart';
 import 'package:optimatech_lms/features/home/presentation/widgets/home_shimmer_skeleton.dart';
-import '../../../courses/presentation/views/widgets/show_courses_filter_bottom_sheet.dart';
+import '../../../courses/presentation/views/search_view.dart';
 
 // ============================================================================
 // HomeBody — Main content area for the Home tab.
@@ -100,15 +100,15 @@ class _HomeSuccessViewState extends State<_HomeSuccessView> {
               Gap(20.h),
 
               // ------------- Home Search Bar -------------
-              AppSearchField(
-                searchController: _searchController,
-                onSearch: () {},
-                onFilter: () async {
-                  final result = await showCoursesFilterBottomSheet(context);
-                  if (result != null && context.mounted) {
-                    //context.read<CoursesCubit>().applyFilter(result);
-                  }
-                },
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, SearchView.routeName),
+                child: AbsorbPointer(
+                  child: AppSearchField(
+                    searchController: _searchController,
+                    onSearch: () {},
+                    onFilter: () {},
+                  ),
+                ),
               ),
               Gap(24.h),
 

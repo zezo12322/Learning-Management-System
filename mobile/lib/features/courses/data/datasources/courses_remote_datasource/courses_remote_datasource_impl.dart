@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_data_connect/firebase_data_connect.dart';
 import 'package:optimatech_lms/core/utils/money.dart';
 import 'package:optimatech_lms/dataconnect_generated/generated.dart';
@@ -8,9 +9,13 @@ import 'package:optimatech_lms/features/courses/data/models/enrolled_course_mode
 import '../../../../../core/error/exceptions.dart';
 import 'package:optimatech_lms/core/error/user_facing_message.dart';
 
+import '../../../../../core/network/api_service.dart';
+
 class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
   final DefaultConnector _connector;
-  CoursesRemoteDatasourceImpl(this._connector);
+  final ApiService _apiService;
+  CoursesRemoteDatasourceImpl(this._connector,{required ApiService apiService})
+      : _apiService = apiService;
 
   @override
   Future<List<CourseModel>> getPublishedCourses() async{
@@ -132,6 +137,33 @@ class CoursesRemoteDatasourceImpl extends CoursesRemoteDatasource{
       return recommendedCourses;
     } on DataConnectError catch (e) {
       throw CustomExceptions(message: userFacingMessage(e));
+    } catch (e) {
+      throw CustomExceptions(message: userFacingMessage(e));
+    }
+  }
+
+  Future<void> _setAuthToken() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final token = await user.getIdToken();
+      if (token != null) {
+        _apiService.setAuthToken(token);
+      }
+    }
+  }
+
+  @override
+  Future<List<CourseModel>> searchCourses(String query) async {
+    try {
+      await _setAuthToken();
+      // NestJS route: GET /api/v1/courses/search?q=<text>
+      final response = await _apiService.get(
+        '/courses/search?q=${Uri.encodeQueryComponent(query)}',
+      );
+      final data = response.data as List;
+      return data
+          .map((json) => CourseModel.fromApiJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw CustomExceptions(message: userFacingMessage(e));
     }
