@@ -2777,6 +2777,41 @@
             "description": "Re-run AI ingestion for a lecture whose processing failed. **Instructor/Admin, owner** of the lecture.\n\nResponse `201`: `{ \"success\": true, \"aiJobId\": \"...\" }`"
           },
           "response": []
+        },
+        {
+          "name": "Generate from transcript (summary / outcomes / quiz / lesson plan)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"QUIZ\",\n  \"count\": 3,\n  \"language\": \"auto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/lectures/{{lectureId}}/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ai",
+                "lectures",
+                "{{lectureId}}",
+                "generate"
+              ]
+            },
+            "description": "Generate structured teaching material from the lecture transcript. **Instructor/Admin, owner** of the lecture. Rate limited to 10/min — each call is a full-transcript LLM pass.\n\n`kind` is one of `SUMMARY`, `OUTCOMES`, `QUIZ`, `LESSON_PLAN`. `count` (1–20, default 3) sets how many questions/outcomes/steps to produce and is ignored for `SUMMARY`. `language` defaults to `\"auto\"`, which follows the video's detected spoken language.\n\nResponse `201`: exactly one content field is populated by `kind` — `summary` (string), `items` (string array), or `questions`; the rest are `null`. Quiz questions carry `source: { chunk_id, start_ms, end_ms }` pointing at the transcript chunk they came from.\n\nErrors use `{ \"error\": { \"code\", \"message\", \"request_id\" } }`: `422 VIDEO_NOT_READY` (still indexing — poll `/status`), `422 EMPTY_TRANSCRIPT`, `502 AI_UNAVAILABLE`, `502 AI_EMPTY_RESULT`, `504 AI_TIMEOUT`."
+          },
+          "response": []
         }
       ]
     }
