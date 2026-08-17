@@ -37,7 +37,7 @@ jobs:
       functions: ${{ steps.filter.outputs.functions || steps.all.outputs.all || 'true' }}
       mobile: ${{ steps.filter.outputs.mobile || steps.all.outputs.all || 'true' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - id: all
         if: github.event_name != 'pull_request'
@@ -79,7 +79,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-node-package
         with:
@@ -148,7 +148,7 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-node-package
         with:
@@ -193,7 +193,7 @@ jobs:
       run:
         working-directory: functions
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-node-package
         with:
@@ -219,7 +219,7 @@ jobs:
       run:
         working-directory: mobile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
