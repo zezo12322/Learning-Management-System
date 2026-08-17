@@ -45,7 +45,7 @@ jobs:
     # the one-time setup step in docs/OPERATIONS.md §1.
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 

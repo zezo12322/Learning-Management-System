@@ -58,7 +58,7 @@ jobs:
       # succession would otherwise both build the newer one.
       DEPLOY_REF: ${{ inputs.ref || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
 
