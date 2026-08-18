@@ -1,5 +1,3 @@
-
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'signup_state.freezed.dart';
@@ -17,7 +15,7 @@ class SignupState with _$SignupState {
     @Default(SignupStatus.initial) SignupStatus status,
     String? fullNameError,
     String? emailError,
-    String? phoneError,
+    String? nationalIdError,
     String? passwordError,
     String? confirmPasswordError,
     String? errorMessage,

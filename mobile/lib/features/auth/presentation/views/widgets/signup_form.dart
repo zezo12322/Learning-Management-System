@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -27,7 +28,7 @@ class _SignupFormState extends State<SignupForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _fullNameController;
   late final TextEditingController _emailController;
-  late final TextEditingController _phoneController;
+  late final TextEditingController _nationalIdController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
@@ -39,7 +40,7 @@ class _SignupFormState extends State<SignupForm> {
   void initState() {
     _fullNameController = TextEditingController();
     _emailController = TextEditingController();
-    _phoneController = TextEditingController();
+    _nationalIdController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     super.initState();
@@ -48,7 +49,7 @@ class _SignupFormState extends State<SignupForm> {
   void clearFields(){
     _fullNameController.clear();
     _emailController.clear();
-    _phoneController.clear();
+    _nationalIdController.clear();
     _passwordController.clear();
     _confirmPasswordController.clear();
   }
@@ -57,7 +58,7 @@ class _SignupFormState extends State<SignupForm> {
   void dispose() {
     _fullNameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
+    _nationalIdController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -68,7 +69,7 @@ class _SignupFormState extends State<SignupForm> {
       context.read<SignupCubit>().signup(
         fullName: _fullNameController.text.trim(),
         email: _emailController.text.trim(),
-        phone: _phoneController.text.trim(),
+        nationalId: _nationalIdController.text.trim(),
         password: _passwordController.text,
       );
     } else {
@@ -148,20 +149,25 @@ class _SignupFormState extends State<SignupForm> {
                 ),
                 Gap(16.h),
 
-                SectionLabel(label: 'auth.signup_screen.phone_number'.tr()),
+                SectionLabel(label: 'auth.signup_screen.national_id'.tr()),
                 Gap(8.h),
                 BlocSelector<SignupCubit, SignupState, String?>(
-                  selector: (state) => state.phoneError,
+                  selector: (state) => state.nationalIdError,
                   builder: (context, error) {
                     return CustomTextField(
-                      controller: _phoneController,
-                      hintText: 'auth.signup_screen.enter_phone_number'.tr(),
-                      validator: AppValidators.validatePhoneNumber,
-                      maxLength: 11,
+                      controller: _nationalIdController,
+                      hintText: 'auth.signup_screen.enter_national_id'.tr(),
+                      validator: AppValidators.validateNationalId,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(14),
+                      ],
+                      maxLength: 14,
                       errorText: error,
-                      prefixIcon: Icons.phone_outlined,
+                      prefixIcon: Icons.badge_outlined,
                       onChanged: (value) {
-                        context.read<SignupCubit>().phoneChanged();
+                        context.read<SignupCubit>().nationalIdChanged();
                       },
                     );
                   },
@@ -177,6 +183,7 @@ class _SignupFormState extends State<SignupForm> {
                       controller: _passwordController,
                       hintText: 'auth.signup_screen.create_password'.tr(),
                       isObscure: _obscurePassword,
+                      validator: AppValidators.validateSignupPassword,
                       errorText: error,
                       onToggled: () {
                         setState(() => _obscurePassword = !_obscurePassword);

@@ -38,6 +38,7 @@ import 'package:optimatech_lms/features/profile/data/datasources/theme_local_dat
 import 'package:optimatech_lms/features/profile/presentation/manager/theme/theme_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../dataconnect_generated/generated.dart';
+import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/courses/data/datasources/categories_remote_datasource/categories_remote_datasource_impl.dart';
 import '../../features/courses/data/datasources/courses_remote_datasource/courses_remote_datasource.dart';
 import '../../features/courses/domain/repositories/categories_repository.dart';
@@ -88,12 +89,17 @@ Future<void> setupDependencies() async {
     ),
   );
 
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(apiService: getIt<ApiService>()),
+  );
+
   getIt.registerLazySingleton<AuthRepository>(() =>
       AuthRepositoryImpl(
         firebaseAuthService: getIt<FirebaseAuthService>(),
         fireStoreService: getIt<FireStoreService>(),
-        authLocalDataSources: getIt<AuthLocalDataSources>()),
-      );
+        authLocalDataSources: getIt<AuthLocalDataSources>(),
+        authRemoteDataSource: getIt<AuthRemoteDataSource>(),
+      ),);
 
   getIt.registerFactory<LogInCubit>(
     () => LogInCubit(authRepository: getIt<AuthRepository>()),

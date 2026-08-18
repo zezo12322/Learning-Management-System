@@ -22,9 +22,9 @@ class SignupCubit extends Cubit<SignupState> with SafeEmit<SignupState> {
       emit(state.copyWith(emailError: null));
     }
   }
-  void phoneChanged(){
-    if(state.phoneError != null){
-      emit(state.copyWith(phoneError: null));
+  void nationalIdChanged(){
+    if(state.nationalIdError != null){
+      emit(state.copyWith(nationalIdError: null));
     }
   }
   void passwordChanged(){
@@ -41,7 +41,7 @@ class SignupCubit extends Cubit<SignupState> with SafeEmit<SignupState> {
   Future<void> signup({
     required String fullName,
     required String email,
-    required String phone,
+    required String nationalId,
     required String password,
   }) async{
 
@@ -57,7 +57,12 @@ class SignupCubit extends Cubit<SignupState> with SafeEmit<SignupState> {
 
     emit(state.copyWith(status: SignupStatus.loading, errorMessage: null));
 
-    final response = await _authRepository.signupWithEmail(email: email, password: password, fullName: fullName, phone: phone);
+    final response = await _authRepository.signupWithEmail(
+      email: email,
+      password: password,
+      fullName: fullName,
+      nationalId: nationalId,
+    );
 
     response.fold(
       (failure) => emit(

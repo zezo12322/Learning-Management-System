@@ -7,7 +7,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String fullName,
-    required String phone
+    required String nationalId
   });
   Future<Either<Failure, UserEntity>> loginWithEmailPassword({required String email, required String password});
   Future<Either<Failure, UserEntity>> loginWithGoogle();

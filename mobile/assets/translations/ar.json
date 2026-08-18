@@ -58,7 +58,13 @@
       "phone_required": "رقم الهاتف مطلوب",
       "phone_not_match": "يرجى إدخال رقم هاتف صحيح",
       "confirm_password_required": "يرجى تأكيد كلمة المرور",
-      "passwords_not_match": "كلمتا المرور غير متطابقتين"
+      "passwords_not_match": "كلمتا المرور غير متطابقتين",
+      "national_id_required": "الرقم القومي مطلوب",
+      "national_id_not_match": "الرقم القومي يجب أن يتكون من 14 رقمًا بالضبط",
+      "password_length_strong": "كلمة المرور يجب أن تكون بين 8 و64 حرفًا",
+      "password_uppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+      "password_number": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+      "password_special_char": "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل"
     },
     "password_hint": "أدخل كلمة المرور",
     "show_password": "اظهر كلمه المرور",
@@ -94,8 +100,8 @@
       "enter_full_name": "أدخل اسمك الكامل",
       "email": "البريد الإلكتروني",
       "enter_email": "أدخل بريدك الإلكتروني",
-      "phone_number": "رقم الهاتف",
-      "enter_phone_number": "أدخل رقم هاتفك",
+      "national_id": "الرقم القومي",
+      "enter_national_id": "ادخل الرقم القومي (14 رقم)",
       "password": "كلمة المرور",
       "create_password": "أنشئ كلمة مرور",
       "confirm_password": "تأكيد كلمة المرور",
@@ -116,7 +122,10 @@
       "genericError": "هناك خطأ ما، حاول مرة أخري.",
       "invalidEmailOrPassword": "البريد الإلكتروني او كلمة مرور غير صحيح.",
       "invalidCredential": "البريد الإلكتروني او كلمة مرور غير صحيحه. حاول مرة اخرى.",
-      "accept_terms_required": "accept terms is required"
+      "accept_terms_required": "accept terms is required",
+      "invalidRegistrationData": "بيانات التسجيل غير صحيحة",
+      "rateLimited": "محاولات كتيرة، حاول تاني بعد شوية",
+      "permissionDenied": "غير مسموح بهذا الإجراء"
     }
   },
   "home": {

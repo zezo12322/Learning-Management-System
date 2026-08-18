@@ -58,7 +58,12 @@
       "phone_required": "Phone number is required",
       "phone_not_match": "Please enter a valid phone number",
       "confirm_password_required": "Please confirm your password",
-      "passwords_not_match": "Passwords do not match"
+      "passwords_not_match": "Passwords do not match",
+      "national_id_required": "National ID is required",
+      "national_id_not_match": "National ID must be exactly 14 digits",
+      "password_uppercase": "Password must contain at least one uppercase letter",
+      "password_number": "Password must contain at least one number",
+      "password_special_char": "Password must contain at least one special character"
     },
     "password_hint": "Enter The Password",
     "show_password": "show password",
@@ -94,8 +99,8 @@
       "enter_full_name": "Enter your full name",
       "email": "Email",
       "enter_email": "Enter your email",
-      "phone_number": "Phone Number",
-      "enter_phone_number": "Enter your phone number",
+      "national_id": "National ID",
+      "enter_national_id": "Enter your 14-digit national ID",
       "password": "Password",
       "create_password": "Create a password",
       "confirm_password": "Confirm Password",
@@ -116,7 +121,10 @@
       "genericError": "Something went wrong, please try again.",
       "invalidEmailOrPassword": "Invalid email or password.",
       "invalidCredential": "Incorrect email or password. Please try again.",
-      "accept_terms_required": "accept terms is required"
+      "accept_terms_required": "accept terms is required",
+      "invalidRegistrationData": "Invalid registration data",
+      "rateLimited": "Too many attempts. Please try again later",
+      "permissionDenied": "This action is not allowed"
     }
   },
   "home": {

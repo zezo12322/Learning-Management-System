@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:optimatech_lms/core/error/exceptions.dart';
@@ -5,6 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthService {
   User? get currentUser => FirebaseAuth.instance.currentUser;
+
+  static const String _functionsRegion = 'europe-west3';
 
   Future<User> signInWithEmailPassword({required String email, required String password}) async{
     try{
@@ -83,6 +86,48 @@ class FirebaseAuthService {
         throw CustomExceptions(message: 'auth.error.networkError'.tr());
       }else{
         throw CustomExceptions(message: 'auth.error.genericError'.tr());
+      }
+    } catch (e){
+      throw CustomExceptions(message: 'auth.error.genericError'.tr());
+    }
+  }
+
+  Future<String> registerStudent({
+    required String name,
+    required String email,
+    required String password,
+    required String nationalId,
+  }) async {
+    try{
+      final functions = FirebaseFunctions.instanceFor(region: _functionsRegion);
+      final result = await functions.httpsCallable('registerStudent').call(
+        {
+          'name': name,
+          'email': email,
+          'password': password,
+          'nationalId': nationalId,
+        },
+      );
+
+      final data = result.data;
+      if (data is Map && data['uid'] != null){
+        return data['uid'].toString();
+      }
+      throw CustomExceptions(message: 'auth.error.genericError'.tr());
+    } on FirebaseFunctionsException catch (e) {
+      switch (e.code) {
+        case 'invalid-argument':
+          throw CustomExceptions(message: e.message ?? 'auth.error.invalidRegistrationData'.tr(),);
+        case 'already-exists':
+          throw CustomExceptions(message: 'auth.error.emailAlreadyInUse'.tr());
+        case 'resource-exhausted':
+          throw CustomExceptions(message: 'auth.error.rateLimited'.tr());
+        case 'unauthenticated':
+        case 'permission-denied':
+        case 'not-found':
+        case 'internal':
+        default:
+          throw CustomExceptions(message: 'auth.error.genericError'.tr());
       }
     } catch (e){
       throw CustomExceptions(message: 'auth.error.genericError'.tr());

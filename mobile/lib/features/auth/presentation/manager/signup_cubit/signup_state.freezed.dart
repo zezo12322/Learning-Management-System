@@ -19,7 +19,7 @@ mixin _$SignupState {
   SignupStatus get status => throw _privateConstructorUsedError;
   String? get fullNameError => throw _privateConstructorUsedError;
   String? get emailError => throw _privateConstructorUsedError;
-  String? get phoneError => throw _privateConstructorUsedError;
+  String? get nationalIdError => throw _privateConstructorUsedError;
   String? get passwordError => throw _privateConstructorUsedError;
   String? get confirmPasswordError => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
@@ -40,7 +40,7 @@ abstract class $SignupStateCopyWith<$Res> {
       {SignupStatus status,
       String? fullNameError,
       String? emailError,
-      String? phoneError,
+      String? nationalIdError,
       String? passwordError,
       String? confirmPasswordError,
       String? errorMessage,
@@ -63,7 +63,7 @@ class _$SignupStateCopyWithImpl<$Res, $Val extends SignupState>
     Object? status = null,
     Object? fullNameError = freezed,
     Object? emailError = freezed,
-    Object? phoneError = freezed,
+    Object? nationalIdError = freezed,
     Object? passwordError = freezed,
     Object? confirmPasswordError = freezed,
     Object? errorMessage = freezed,
@@ -82,9 +82,9 @@ class _$SignupStateCopyWithImpl<$Res, $Val extends SignupState>
           ? _value.emailError
           : emailError // ignore: cast_nullable_to_non_nullable
               as String?,
-      phoneError: freezed == phoneError
-          ? _value.phoneError
-          : phoneError // ignore: cast_nullable_to_non_nullable
+      nationalIdError: freezed == nationalIdError
+          ? _value.nationalIdError
+          : nationalIdError // ignore: cast_nullable_to_non_nullable
               as String?,
       passwordError: freezed == passwordError
           ? _value.passwordError
@@ -118,7 +118,7 @@ abstract class _$$SignupStateImplCopyWith<$Res>
       {SignupStatus status,
       String? fullNameError,
       String? emailError,
-      String? phoneError,
+      String? nationalIdError,
       String? passwordError,
       String? confirmPasswordError,
       String? errorMessage,
@@ -139,7 +139,7 @@ class __$$SignupStateImplCopyWithImpl<$Res>
     Object? status = null,
     Object? fullNameError = freezed,
     Object? emailError = freezed,
-    Object? phoneError = freezed,
+    Object? nationalIdError = freezed,
     Object? passwordError = freezed,
     Object? confirmPasswordError = freezed,
     Object? errorMessage = freezed,
@@ -158,9 +158,9 @@ class __$$SignupStateImplCopyWithImpl<$Res>
           ? _value.emailError
           : emailError // ignore: cast_nullable_to_non_nullable
               as String?,
-      phoneError: freezed == phoneError
-          ? _value.phoneError
-          : phoneError // ignore: cast_nullable_to_non_nullable
+      nationalIdError: freezed == nationalIdError
+          ? _value.nationalIdError
+          : nationalIdError // ignore: cast_nullable_to_non_nullable
               as String?,
       passwordError: freezed == passwordError
           ? _value.passwordError
@@ -189,7 +189,7 @@ class _$SignupStateImpl implements _SignupState {
       {this.status = SignupStatus.initial,
       this.fullNameError,
       this.emailError,
-      this.phoneError,
+      this.nationalIdError,
       this.passwordError,
       this.confirmPasswordError,
       this.errorMessage,
@@ -203,7 +203,7 @@ class _$SignupStateImpl implements _SignupState {
   @override
   final String? emailError;
   @override
-  final String? phoneError;
+  final String? nationalIdError;
   @override
   final String? passwordError;
   @override
@@ -216,7 +216,7 @@ class _$SignupStateImpl implements _SignupState {
 
   @override
   String toString() {
-    return 'SignupState(status: $status, fullNameError: $fullNameError, emailError: $emailError, phoneError: $phoneError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, errorMessage: $errorMessage, isAgree: $isAgree)';
+    return 'SignupState(status: $status, fullNameError: $fullNameError, emailError: $emailError, nationalIdError: $nationalIdError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError, errorMessage: $errorMessage, isAgree: $isAgree)';
   }
 
   @override
@@ -229,8 +229,8 @@ class _$SignupStateImpl implements _SignupState {
                 other.fullNameError == fullNameError) &&
             (identical(other.emailError, emailError) ||
                 other.emailError == emailError) &&
-            (identical(other.phoneError, phoneError) ||
-                other.phoneError == phoneError) &&
+            (identical(other.nationalIdError, nationalIdError) ||
+                other.nationalIdError == nationalIdError) &&
             (identical(other.passwordError, passwordError) ||
                 other.passwordError == passwordError) &&
             (identical(other.confirmPasswordError, confirmPasswordError) ||
@@ -246,7 +246,7 @@ class _$SignupStateImpl implements _SignupState {
       status,
       fullNameError,
       emailError,
-      phoneError,
+      nationalIdError,
       passwordError,
       confirmPasswordError,
       errorMessage,
@@ -264,7 +264,7 @@ abstract class _SignupState implements SignupState {
       {final SignupStatus status,
       final String? fullNameError,
       final String? emailError,
-      final String? phoneError,
+      final String? nationalIdError,
       final String? passwordError,
       final String? confirmPasswordError,
       final String? errorMessage,
@@ -277,7 +277,7 @@ abstract class _SignupState implements SignupState {
   @override
   String? get emailError;
   @override
-  String? get phoneError;
+  String? get nationalIdError;
   @override
   String? get passwordError;
   @override

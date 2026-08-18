@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:optimatech_lms/core/utils/app_colors.dart';
 import '../utils/extension.dart';
 
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final bool enabled;
   final bool showClear;
   final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
     super.key,
@@ -28,6 +30,7 @@ class CustomTextField extends StatelessWidget {
     this.onClear,
     this.showClear = false,
     this.maxLength,
+    this.inputFormatters,
   });
 
   @override
@@ -48,6 +51,7 @@ class CustomTextField extends StatelessWidget {
       autofillHints: [AutofillHints.email],
       textInputAction: TextInputAction.done,
       maxLength: maxLength,
+      inputFormatters: inputFormatters,
       validator: validator,
       onChanged: onChanged,
 
